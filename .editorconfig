@@ -1,0 +1,33 @@
+# References:
+#     http://editorconfig.org/ (Official Site)
+#     http://editorconfig.org/#download (Plugins)
+#     http://davidensinger.com/2013/07/why-i-use-editorconfig/ (Reference)
+#     https://github.com/eslint/eslint/blob/master/.editorconfig (Sample file)
+
+# No .editorconfig files above the root directory
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[.nvmrc]
+insert_final_newline = false
+
+[Makefile]
+indent_style = tab
+
+[{package.json,bower.json,nodemon.json,.babelrc,.travis.yml}]
+indent_size = 2
+
+[node_modules/**]
+charset = disabled
+end_of_line = disabled
+indent_size = disabled
+indent_style = disabled
+insert_final_newline = disabled
+trim_trailing_whitespace = disabled

@@ -1,0 +1,26 @@
+{
+    "Extension_Description": {
+        "message": "Live preview of CSS/LESS changes with an in-page editor. Write code in CSS/LESS, convert code from Less to CSS & CSS to Less, beautify, minify, syntax highlighting, etc."
+    },
+    "Extension_Name": {
+        "message": "MagiCSS - live editor for CSS and LESS"
+    },
+    "Include_CanRunOnOtherPages": {
+        "message": "You can run it on other web pages and websites."
+    },
+    "Include_GrantPermisssions": {
+        "message": "You need to grant permissions by going to:"
+    },
+    "Include_MagicssDoesNotOperateOnSomeTabs": {
+        "message": "MagiCSS does not operate on Chrome extension pages and some other native tabs."
+    },
+    "Include_RequiresYourPermission": {
+        "message": "It requires your permission to execute on:"
+    },
+    "Include_ToExecuteMagicssEditor": {
+        "message": "To execute MagiCSS - live editor for CSS and LESS on:"
+    },
+    "Include_UnableToStart": {
+        "message": "Unable to start"
+    }
+}

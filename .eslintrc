@@ -1,0 +1,25 @@
+{
+    // http://eslint.org/docs/user-guide/configuring.html
+    // http://bl.ocks.org/cletusw/e01a85e399ab563b1236
+    "rules": {
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "linebreak-style": ["error", "unix"],
+        "semi": ["error", "always"],
+        // http://eslint.org/docs/rules/quotes
+        "quotes": "off",
+        "no-console": "off",
+        "no-debugger": "off",
+        "no-shadow": "off"
+    },
+    "env": {
+        "es6": true,
+        "node": false,
+        "browser": true
+    },
+    "extends": "eslint:recommended",
+    "ecmaFeatures": {
+        "jsx": true,
+        "experimentalObjectRestSpread": true
+    },
+    "plugins": []
+}

@@ -1,0 +1,23 @@
+#MagiCSS .CodeMirror-hscrollbar {
+    right: 17px !important;
+}
+#MagiCSS .CodeMirror-vscrollbar {
+	bottom: 0px !important;
+	margin-bottom: 17px;
+    padding-right: 17px;
+}
+
+#MagiCSS .codemirror-hscrollbar {
+  	overflow-x: auto;
+}
+#MagiCSS .codemirror-vscrollbar {
+  	overflow-y: auto;
+}
+
+#MagiCSS.container {
+	width: auto;	/* better solution would be to change the generic class name ".container" */
+}
+
+html .CodeMirror-hints {
+    z-index: 2147483647;
+}

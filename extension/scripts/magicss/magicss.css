@@ -1,0 +1,246 @@
+#MagiCSS-bookmarklet {
+    text-align: left;
+}
+
+#MagiCSS-bookmarklet * {
+    font-size: 12px !important;
+    -webkit-box-sizing: content-box !important;
+    box-sizing: content-box !important;
+}
+
+#MagiCSS-bookmarklet .editor-icon {
+    width: 16px;
+    height: 16px;
+}
+
+#MagiCSS-bookmarklet .editor-icon.editor-icon-close,
+#MagiCSS-bookmarklet .editor-icon.editor-icon-close img {
+    width: 20px;
+    height: 20px;
+}
+
+#MagiCSS-bookmarklet textarea {
+    padding: 0 !important;
+    padding: 4px !important;
+    outline-width: 0;
+    line-height: 1em;
+}
+
+#MagiCSS-bookmarklet textarea {
+    -webkit-tab-size:4;
+    tab-size:4;
+}
+
+#MagiCSS-bookmarklet .CodeMirror-placeholder {
+    color: #aaa;
+}
+
+.indicate-disabled#MagiCSS-bookmarklet .CodeMirror {
+    background-color: #bbb;
+}
+
+/* Begin: More icons */
+body .tooltipster-default {
+    z-index: 2147483647;
+    background-color: #7A89C6;
+}
+
+body .tooltipster-default,
+body .tooltipster-arrow-border {
+    border-color: #475A9B !important;
+}
+
+body .tooltipster-default .tooltipster-content {
+    padding: 0;
+    margin: 0;
+}
+.tooltipster-content ul {
+    padding: 0;
+    margin: 0;
+}
+
+.tooltipster-content ul li {
+    padding: 0;
+}
+
+.tooltipster-content ul li:hover {
+    background-color: #5A69A6 !important;
+}
+
+.tooltipster-base ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 11px;
+    font-family: Arial;
+    display: block;
+    padding: 2px 10px 2px 25px;
+}
+
+.more-icons {
+    background-position: 7px 5px !important;
+    background-repeat: no-repeat !important;
+    padding-left: 30px !important;
+    height: 20px !important;
+    font-weight: bold;
+    text-align: left;
+    background-size: 16px !important;
+}
+
+.more-icons.magicss-less-to-css {
+    /* Source: https://upload.wikimedia.org/wikipedia/commons/8/81/LESS_Logo.svg */
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxklEQVQ4y53TMWpCQRCA4Q8JasAiRcQjWBixsUiRQPAwOYW9dmIpBMUTSCBtTpDOOoGQQBoru1RPmxUeq+CuA8OyMP8/sDPLcfQxQtMFcYcv7PCCm1zBPMBFOGdo5Ai6+AjwIZe4zpH0sI4kC9RyJH38RJIpqjmSe2wjyRBXOZKHSLDDc7mgckbwj03pXqCd2n2Av1LnAuNU+LG0UIecoJ4Cd/AZwfPUCbTwHcGrnFd/j+C33L/QwW+AXxOmdDKewv7fphTvATvpPMc4jdhXAAAAAElFTkSuQmCC");
+    background-position: 7px 3px !important;
+}
+
+.tooltipster-base ul li a.magicss-less-to-css,
+.tooltipster-base ul li a.magicss-css-to-less {
+    opacity: 0.35;
+}
+
+.tooltipster-selected-mode-less.tooltipster-base ul li a.magicss-less-to-css,
+.tooltipster-selected-mode-css.tooltipster-base ul li a.magicss-css-to-less {
+    opacity: 1;
+}
+
+.more-icons.magicss-minify {
+    /* Source: http://www.iconfinder.com/icondetails/35891/32/compress_icon (http://www.iconfinder.com/icons/35891/download/png/16) */
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACNElEQVR4Xn3QXUhTYRwG8Oedp80ZyNI5w6msi3DSxS6kyIi66iJM6aaLLupi3VQXgRAI0Y2iUpBI3oyRDqTQmynhRx9uWGokFClJpHTRFHY2t1m4Dzb2cc6/847NDnTsBy8czvP+n/PnsPU+CxZPLcB+0ko4RGDrG4MKEaFMkCFA0lVNfFldwmHa2i8SVHZ+fJ8F0AUF422MsWMAjNDQ5/aK0JBKphgUbPNJ6wyATmibbb2/eRsK9/SKmM0kEQiGMdxzy9ozNB6CQuDD9htO4Eg9UF6Ud+cj2Hru6XS//dmll/Ypm44fDD8a9RaHywWQMwkUxA2oCTU2cGdXWuDoz1tdU8uirfE4uh+PibIkMwL9LZCySewFFqFWd/QauNXzm/DMx0W+wXZwt7iB59UaiGSASgVUSMNs74Aaf8dJUgHOjjary/tObG6oK25Assx4ARHA1gZbFox63SVoyORkX/jKB80svLPNAAIDUDO/EfuFQ/hfz/wTNDc1vdHrDZfBrfXWQ9EwMDo3p6xHWofn7qmlg2f+USICPwIDYfjl11D3VcdNAJXQ8HTCH9JVVIAbmfSHEok4Bp9NA2AQUDL0wvc7GgmBMQZTdTVvH7NaTM5gdN8Vje3ePWE7AS62F4GxsupBo8U0oGTjbL3XgvcOHygVRUQpMBgMfBipdJrOnT6Dj58/QUs5E6CSy+dRkCRwslRYVYbbpXxueeThnetQudfvmlSyC/wO/sNc+mG1GlltKTP/AfVKEvDzwM83AAAAAElFTkSuQmCC");
+}
+
+.more-icons.magicss-tweet {
+    /* Source: https://dev.twitter.com/sites/default/files/images_documentation/bird_black_16_0.png */
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAALCAYAAABPhbxiAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYxIDY0LjE0MDk0OSwgMjAxMC8xMi8wNy0xMDo1NzowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNS4xIE1hY2ludG9zaCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo5NDVFMTUwREE0MzgxMUUxOEQxMTgzNjBDNjQ4QTVBMiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo5NDVFMTUwRUE0MzgxMUUxOEQxMTgzNjBDNjQ4QTVBMiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjk0NUUxNTBCQTQzODExRTE4RDExODM2MEM2NDhBNUEyIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjk0NUUxNTBDQTQzODExRTE4RDExODM2MEM2NDhBNUEyIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+pNEn9gAAAKhJREFUeNpi/P//PwMjI6MAkP7AgAZA4kAqAYhB9AOgmgVQMQYGkEYgWA9SAGIjYyA4D1KChPcD8X2wYVAF+6ES80GmQ8UM0DTB8HuwHFRRApoEyIB+HBoDwHrQbCSI4d5ActZ7IjSeR9EI1dxAhOYEbBodsIQiVttQNCI5eT02TbDQRlILjtz5eJw5H10TONHAdANTBMi2AKSE8wCIDwDlHzBgAQABBgDSj8Y9pTSceAAAAABJRU5ErkJggg==");
+    background-position: 7px 6px !important;
+}
+
+.more-icons.magicss-email {
+    /* Source: http://git-scm.com/downloads/logos (http://git-scm.com/images/logos/downloads/Git-Icon-1788C.png) */
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAjhJREFUOMt1kj1oFFEUhb/7ZmdnkxAdUVIIKgTSBCsnYApNYxNQYUAsLAzYaCEGRFCLgERQ0U7RUlEEUQw4ouAP8QeFkAjTKCKJCUK6IMQpzGZ3dmeuxc7EMYmverx7zrnnnXvhP+fXYK9Evncl8r2lyPf2AkS+twZnVj/Unz1AVUH1IXAeaAfGI9874AbhGhHJL5Hv4QYhP7uRTe9mbybzcyeqV89aWFYLKALQ7wbh1LoCBYv3qLQNdYxcT7QRE79+oo2JcSNgaIn4bhA+zRtKgSjAXeCoqgpxnQ333zbM5i47fjVWr94YdaTs5L363SCcinxvJQMBbgFDLbcCxpBMf0kBtXp3GXEqKaAZfjLPRCLfE+ARcDgrKiCqirWtu9lx7lranJ9LMZZWR0+2UbLBKiEiMbDPAJczshZzERFImkLJpnpx2DFbuuzO2y9rlWOnY7EsBcrABwMMrxfoP0dTaUy8wdq6veLsP2JhOytOS8AgMJ4pakFI/87KEL94bEo7++rNz5+EuGYy3Ixxg/AjcKjgokVUFSptKh2dQslOdLlqlkaOO/WxO2VNUwGmgQGTzfM50F8U0bhO+6kLiXRutNvPXEqI64hTQewyIrII9LlBuGDy9cw2zF8RMYbkx3cBTZLZb2Cs/ENfgR43CH9Hvrc2uMj3dgOTqoqUSopdhnoNTVPJOve4QbiYb6JZvcqZk4MiEpMkQm0ZVEVEpoEdRfK6o8uLke/tAd4DFjADDLhBuFAkA/wB6FzuVi+tgTsAAAAASUVORK5CYII=");
+    background-position: 7px 3px !important;
+}
+
+.more-icons.magicss-rate-on-webstore {
+    /* Source: https://ssl.gstatic.com/chrome/webstore/images/icon_48px.png */
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAN2AAADdgF91YLMAAAAB3RJTUUH3wUPDxwNLKX9oQAAAd9JREFUOMulk71rU2EUh5/z3pubEKiJOqgRqpSI4FCh4uQkiEtXoZt/gDgLDtJFpw5SiB0EN10EFx0EoVCFiBTj4iIO0gSS6wemH8ntTe6973scmvpV28G+cJb3nN/D+Z3DgX0+CcNQVXXPor3y/i7JFefcAqAjgBhjrgEndwD+pTbGNCuVytzvf2EYTjvndgCk0+no/7YPYPYj3tUCIlvBzymAjuJvgGwXjoQ2bDOsvyRtLGM/twHFHKkQTJ0nuHARr3L8D5B0u11FFXIBw8XnbD5+iK6vg/erA3UKNkUOlCjOXCV/eRqSBEQwIoIEAVnjDdHCXYj6iG8QEURBth35PkR9otoc2fJrJAgQEXxBaA5WefekxqUgT4KCc3jFIoWJCbxSDhu10CwCBLSIW5xHzp5GvTK+EeHZpzoPzh1kKuwxNrBIqUx0/TaPWseQgseVya9Uo1nEro0Wp8S9FwzKM5jYJrxfbREbZX7yEBLH5G/cYbZR5dVKgaUPOW4+Hef74VuQ9cAl4FL84UdEh5jEZnSTPgBLlQLNM+O85RTf1uyWd+DLhqXerkLh6GivirE90BQTp8N7ngrqHBs54f6JHGMmRdXhnEPVYdRRzKWQbWKdYq2SOYPNBrX9XjM/AFVF4OTTNk73AAAAAElFTkSuQmCC");
+    background-position: 7px 4px !important;
+}
+
+.more-icons.magicss-github-repo {
+    /* Source: https://github.com/logos */
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAe1BMVEUAAAAXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRYXFRZfQn0AAAAAKHRSTlMAEPIFFvxjMd2uqvbr0jXh23NfH9bCnplaPMa4jUPQpH55Z2UoDQxog76o6AAAAUdJREFUOMuNUluCgyAMDGJpRbQ+q9bad7vc/4QLibqCfuz8EJLJBJLAH0JxSwKtg+QmQlhjL3d6xk7uvTBrtIeGOekHvcJhITIEegPBMOdTfM0YNZjVr6LAiUWVrULvOFlPC1wo88W6Nl9VgkNrvScbTzHFqrE3IN7M1kV3aqxotDxQXgQQUn8Kn1BQx0J4onFkPoEdMfAEiaeAFQQGJFSoxNYEhrUriLECbABrxIBC2RaB5kOEYItArR2PjQ0Jx9Sr2wa/EVeahE64H+eJpmm0GnHxCRfyt/CJyZKh8wBJ3vgD0Jj0rraL+ko5inc/0bTAjbmXRiLnZ5odItIT4tLe73bape1bR4RuJtzxbrN7YOIx8LkDhPPkOJgiyzFNiz+/u8y0rvPiwR1CVi5yenSxJaFn7nool6Be4OGbZ2oswVWWf+G/+AUSBz+2FOLP3QAAAABJRU5ErkJggg==");
+    background-position: 7px 4px !important;
+}
+/* End: More icons */
+
+.magicss-gray-out {
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+}
+.magicss-gray-out:hover {
+    -webkit-filter: none;
+    filter: none;
+}
+
+.magicss-disable-css {
+    /* Source: http://findicons.com/icon/download/116499/150/16/png */
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJFSURBVHjapJO/T1pRFMe/Dx7ypEXri4lUGUhsHF40hODSpQ61cTH+2HSoZaF1dHSxpU7+Ca04NE7dyuBiapcuLFokTdD4A01awNdBSkAf8ut5zhUoxq3e5OS+nPv5nnvuyfdJpmniPksSBd68aM1pFDMU4xS+ei5GsUHxmSLRJD9+hcx7rVqFZWwMtc3NIGy2Zam31yX19ABdXTdgNuszdd1nptNBlMtviQ0TC0ujg1LgGWNByelctQ4M4G8qhfN4HLmDA6HvpJzq9eJRXx+qlDPz+deUDrd9+i6KoFouazVg2erx4M/uLn5FItGLk5NX/qUliYO+I2o2C4vLBWaYZQ1rRYFyqTQDVXXl02mcb29HbXb7S+/CwjqKRSAaDXlHRqYwOoqdxUUww6zQNApUSqVxuaMDF8kk2hTlgxYIHMMwaHSxEB2/a4g7u7sjzDDLmn8dXF35ZJsNVWrzycTEOtxuYH//lpjWezqbZoZZ1rQ+AXyj3eEQO7a27oj9s7OhVkZoWjqIFXUdD1QVub29L3fEk5MhXF7y2RwzzLKmdQYb+UwGiqLwO6duiVdWxM2GrvfTfOaZYZY1TScmvE7NKsvf3B6PyzE8jB9ra6DJR2TTnBYXSNIcbfN021Mjl8Pv09OzaqXyXIvnE6LAT00RRlLa21cfk1kesgNpULBab5xITiUHokADzJDJioYhjDSUKNafUKlgaHAwXCCHJQ8Pz1JHRyhQm2RhEfzNOT5jhlnWNJ+w0y/918/kPzbrf+M91rUAAwCuQDz94e2kLwAAAABJRU5ErkJggg==');
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+}
+.indicate-disabled#MagiCSS-bookmarklet .magicss-disable-css {
+    -webkit-filter: none;
+    filter: none;
+}
+
+.magicss-beautify {
+    /* Source: http://www.iconfinder.com/icondetails/10227/16/smile_smiley_icon (http://www.iconfinder.com/icons/10227/download/png/16) */
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gsNEzMIhYrOGAAAAmtJREFUOMutk71PU2EUh5/33tIKV9vyoQhC0YYIKvEjQtTEQSOb3XRwMjK46eDGP6CMbi7GUCfR4GQdTIyufsZoUKIRFEQLFAv9uL297b3vcYBUMWx6lpOcnDznl985B/4x1N8Feb9vO6grgnFGCMRFfMQrTyPufdHe9eDhufkNAZK+ZpC9dw78m3g/G/DmQeu1LgNfRfGxSlrk4kq5d6zt+GO9HvCh/wK6OIr7BbS7gTYQAlSkEV8Hhqwj6WQNIJNHd6Dtj7ifLALuancVkD901q3likmpGrW1mD1bji1+NwDwC8P4S1au4JF82MP4kzhl9/fksmsy/iROMtVLvqipUyXLkPIwQABAVDCh/Hkmv23l9uMelFQ4crCRztAbEE0mV8+NB32IVOntjnC0+y2OLQng8ioA1aW00NFis7t9iWhzJ5HtB8B+B2giVoWB3WlW3J10xPvA/IzW5a6aB97EAW06bxUK2NQKkQSUvkLhKbC2iWAYIqehakP+Ecs5Q5pOOsaqAr8ygzJ2gqZaXMDN3mJzPWDU7Ce37FCXv0NDaM1bFZypeYB2Ur6KXjKNLBNTLTx8EePE/kViW3MAzGYsUs9jDPYXGOyfolzwMfBSNYBPaERhDZmSsyKWg11p5urdGG3RDADprMWhvWG6e8NAEbc6Z3seI+sOyXkVu6DEGQ0ZS2QLEV7PDvAjvwuA9m11HN6jaApOkF98QbVSGmo5RXIdIPMsYVjq5TkR72bQKDWYpsI3msEMYxpQKa/g2Esl8d2L03OM9Z9Hb/hM9rPGVtH+Fa31WV8TF61RyptWosfBux49wQL/M34BW2Yaj1Q8PX0AAAAASUVORK5CYII=');
+}
+
+.magicss-title {
+    float: left;
+    background-color: #4458ae;
+    border-radius: 5px 5px 0 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: 1px;
+    font-family: Helvetica, "Trebuchet MS", sans-serif;
+    overflow: auto;
+    font-size: 15px;
+    line-height: 20px;
+    cursor: default;
+}
+
+.magicss-mode-switch {
+    width: 30px;
+    height: 10px;
+    background-color: #ccc;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+
+.magicss-mode-switch-selected {
+    width: 15px;
+    height: 10px;
+    float: right;
+    background-color: rgb(34, 186, 17);
+    border-radius: 10px;
+}
+.magicss-selected-mode-less .magicss-mode-switch-selected {
+    float: left;
+}
+
+.magicss-mode-button {
+    float: left;
+    cursor: pointer;
+}
+
+.magicss-mode-css {
+    padding-left: 5px;
+}
+
+.magicss-mode-less {
+    padding-right: 5px;
+}
+
+.magicss-mode-css,
+.magicss-mode-less {
+    font-weight: bold;
+    color: #ffff00;
+    opacity: 0.5;
+}
+
+.magicss-mode-css:hover,
+.magicss-mode-less:hover,
+.magicss-selected-mode-less .magicss-mode-less,
+.magicss-selected-mode-css .magicss-mode-css {
+    opacity: 1;
+}
+
+/*
+    Begin: Site-specific fixes
+    (where sites over-ride some default styles in an unexpected manner)
+    (these styles would be non-essential for most of the sites)
+*/
+
+/* http://cssbeautify.com/ - Without this style, a scrollbar might appear when the size (height) of CodeMirror is increased */
+#MagiCSS-bookmarklet .CodeMirror-scroll {
+    height: 100%;
+}
+
+/* http://www.phpied.com/cssmin-js/ */
+#MagiCSS-bookmarklet .more-icons {
+    background-repeat: no-repeat !important;
+}
+
+#MagiCSS-bookmarklet .CodeMirror {
+    line-height: 14px !important;
+}
+
+.CodeMirror-hints * {
+    font-size: 12px !important;
+}
+
+/* End: Site-specific fixes */
