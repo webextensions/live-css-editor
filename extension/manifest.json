@@ -26,19 +26,6 @@
     "background": {
         "page": "background-magicss.html"
     },
-
-    /*
-        Sources:
-            http://developer.chrome.com/dev/extensions/samples.html#85a6acff229804797d14411e7a8acd3d
-            http://developer.chrome.com/dev/extensions/commands.html#event-onCommand
-            http://developer.chrome.com/dev/extensions/examples/api/commands/manifest.json
-
-        Also note:
-            http://stackoverflow.com/questions/20721938/chrome-extension-commands-keyboard-shortcuts-not-working/20724071#20724071
-                Another thing to have in mind is that suggested keys are only considered when an extension is first installed.
-                Disabling and enabling, updating, or reloading won't have any effect. So if you just changed the suggested key
-                in your manifest and want to test it, you have to uninstall the extension and install it again.
-    */
     "commands": {
         "_execute_browser_action": {
             "suggested_key": {
