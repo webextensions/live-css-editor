@@ -19,24 +19,96 @@
     height: 20px;
 }
 
-#MagiCSS-bookmarklet textarea {
-    padding: 0 !important;
-    padding: 4px !important;
-    outline-width: 0;
-    line-height: 1em;
+.magicss-title {
+    float: left;
+    background-color: #4458ae;
+    border-radius: 5px 5px 0 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: 1px;
+    font-family: Helvetica, "Trebuchet MS", sans-serif;
+    overflow: auto;
+    font-size: 15px;
+    line-height: 20px;
+    cursor: default;
 }
 
-#MagiCSS-bookmarklet textarea {
-    -webkit-tab-size:4;
-    tab-size:4;
+.magicss-mode-switch {
+    width: 30px;
+    height: 10px;
+    background-color: #ccc;
+    border-radius: 10px;
+    margin-top: 5px;
 }
 
-#MagiCSS-bookmarklet .CodeMirror-placeholder {
-    color: #aaa;
+.magicss-mode-switch-selected {
+    width: 15px;
+    height: 10px;
+    float: right;
+    background-color: rgb(34, 186, 17);
+    border-radius: 10px;
+}
+.magicss-selected-mode-less .magicss-mode-switch-selected {
+    float: left;
 }
 
-.indicate-disabled#MagiCSS-bookmarklet .CodeMirror {
-    background-color: #bbb;
+.magicss-mode-button {
+    float: left;
+    cursor: pointer;
+}
+
+.magicss-mode-css {
+    padding-left: 5px;
+}
+
+.magicss-mode-less {
+    padding-right: 5px;
+}
+
+.magicss-mode-css,
+.magicss-mode-less {
+    font-weight: bold;
+    color: #ffff00;
+    opacity: 0.5;
+}
+
+.magicss-mode-css:hover,
+.magicss-mode-less:hover,
+.magicss-selected-mode-less .magicss-mode-less,
+.magicss-selected-mode-css .magicss-mode-css {
+    opacity: 1;
+}
+
+.magicss-gray-out {
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+}
+.magicss-gray-out:hover {
+    -webkit-filter: none;
+    filter: none;
+}
+
+.magicss-disable-css {
+    /* Source: http://findicons.com/icon/download/116499/150/16/png */
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJFSURBVHjapJO/T1pRFMe/Dx7ypEXri4lUGUhsHF40hODSpQ61cTH+2HSoZaF1dHSxpU7+Ca04NE7dyuBiapcuLFokTdD4A01awNdBSkAf8ut5zhUoxq3e5OS+nPv5nnvuyfdJpmniPksSBd68aM1pFDMU4xS+ei5GsUHxmSLRJD9+hcx7rVqFZWwMtc3NIGy2Zam31yX19ABdXTdgNuszdd1nptNBlMtviQ0TC0ujg1LgGWNByelctQ4M4G8qhfN4HLmDA6HvpJzq9eJRXx+qlDPz+deUDrd9+i6KoFouazVg2erx4M/uLn5FItGLk5NX/qUliYO+I2o2C4vLBWaYZQ1rRYFyqTQDVXXl02mcb29HbXb7S+/CwjqKRSAaDXlHRqYwOoqdxUUww6zQNApUSqVxuaMDF8kk2hTlgxYIHMMwaHSxEB2/a4g7u7sjzDDLmn8dXF35ZJsNVWrzycTEOtxuYH//lpjWezqbZoZZ1rQ+AXyj3eEQO7a27oj9s7OhVkZoWjqIFXUdD1QVub29L3fEk5MhXF7y2RwzzLKmdQYb+UwGiqLwO6duiVdWxM2GrvfTfOaZYZY1TScmvE7NKsvf3B6PyzE8jB9ra6DJR2TTnBYXSNIcbfN021Mjl8Pv09OzaqXyXIvnE6LAT00RRlLa21cfk1kesgNpULBab5xITiUHokADzJDJioYhjDSUKNafUKlgaHAwXCCHJQ8Pz1JHRyhQm2RhEfzNOT5jhlnWNJ+w0y/918/kPzbrf+M91rUAAwCuQDz94e2kLwAAAABJRU5ErkJggg==');
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+}
+.indicate-disabled#MagiCSS-bookmarklet .magicss-disable-css {
+    -webkit-filter: none;
+    filter: none;
+}
+
+.magicss-beautify {
+    /* Source: http://www.iconfinder.com/icondetails/10227/16/smile_smiley_icon (http://www.iconfinder.com/icons/10227/download/png/16) */
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gsNEzMIhYrOGAAAAmtJREFUOMutk71PU2EUh5/33tIKV9vyoQhC0YYIKvEjQtTEQSOb3XRwMjK46eDGP6CMbi7GUCfR4GQdTIyufsZoUKIRFEQLFAv9uL297b3vcYBUMWx6lpOcnDznl985B/4x1N8Feb9vO6grgnFGCMRFfMQrTyPufdHe9eDhufkNAZK+ZpC9dw78m3g/G/DmQeu1LgNfRfGxSlrk4kq5d6zt+GO9HvCh/wK6OIr7BbS7gTYQAlSkEV8Hhqwj6WQNIJNHd6Dtj7ifLALuancVkD901q3likmpGrW1mD1bji1+NwDwC8P4S1au4JF82MP4kzhl9/fksmsy/iROMtVLvqipUyXLkPIwQABAVDCh/Hkmv23l9uMelFQ4crCRztAbEE0mV8+NB32IVOntjnC0+y2OLQng8ioA1aW00NFis7t9iWhzJ5HtB8B+B2giVoWB3WlW3J10xPvA/IzW5a6aB97EAW06bxUK2NQKkQSUvkLhKbC2iWAYIqehakP+Ecs5Q5pOOsaqAr8ygzJ2gqZaXMDN3mJzPWDU7Ce37FCXv0NDaM1bFZypeYB2Ur6KXjKNLBNTLTx8EePE/kViW3MAzGYsUs9jDPYXGOyfolzwMfBSNYBPaERhDZmSsyKWg11p5urdGG3RDADprMWhvWG6e8NAEbc6Z3seI+sOyXkVu6DEGQ0ZS2QLEV7PDvAjvwuA9m11HN6jaApOkF98QbVSGmo5RXIdIPMsYVjq5TkR72bQKDWYpsI3msEMYxpQKa/g2Esl8d2L03OM9Z9Hb/hM9rPGVtH+Fa31WV8TF61RyptWosfBux49wQL/M34BW2Yaj1Q8PX0AAAAASUVORK5CYII=');
+}
+
+.magicss-rate-on-webstore {
+    /* Source: https://ssl.gstatic.com/chrome/webstore/images/icon_48px.png */
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAN2AAADdgF91YLMAAAAB3RJTUUH3wUPDxwNLKX9oQAAAd9JREFUOMulk71rU2EUh5/z3pubEKiJOqgRqpSI4FCh4uQkiEtXoZt/gDgLDtJFpw5SiB0EN10EFx0EoVCFiBTj4iIO0gSS6wemH8ntTe6973scmvpV28G+cJb3nN/D+Z3DgX0+CcNQVXXPor3y/i7JFefcAqAjgBhjrgEndwD+pTbGNCuVytzvf2EYTjvndgCk0+no/7YPYPYj3tUCIlvBzymAjuJvgGwXjoQ2bDOsvyRtLGM/twHFHKkQTJ0nuHARr3L8D5B0u11FFXIBw8XnbD5+iK6vg/erA3UKNkUOlCjOXCV/eRqSBEQwIoIEAVnjDdHCXYj6iG8QEURBth35PkR9otoc2fJrJAgQEXxBaA5WefekxqUgT4KCc3jFIoWJCbxSDhu10CwCBLSIW5xHzp5GvTK+EeHZpzoPzh1kKuwxNrBIqUx0/TaPWseQgseVya9Uo1nEro0Wp8S9FwzKM5jYJrxfbREbZX7yEBLH5G/cYbZR5dVKgaUPOW4+Hef74VuQ9cAl4FL84UdEh5jEZnSTPgBLlQLNM+O85RTf1uyWd+DLhqXerkLh6GivirE90BQTp8N7ngrqHBs54f6JHGMmRdXhnEPVYdRRzKWQbWKdYq2SOYPNBrX9XjM/AFVF4OTTNk73AAAAAElFTkSuQmCC");
 }
 
 /* Begin: More icons */
@@ -120,8 +192,6 @@ body .tooltipster-default .tooltipster-content {
 }
 
 .more-icons.magicss-rate-on-webstore {
-    /* Source: https://ssl.gstatic.com/chrome/webstore/images/icon_48px.png */
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAN2AAADdgF91YLMAAAAB3RJTUUH3wUPDxwNLKX9oQAAAd9JREFUOMulk71rU2EUh5/z3pubEKiJOqgRqpSI4FCh4uQkiEtXoZt/gDgLDtJFpw5SiB0EN10EFx0EoVCFiBTj4iIO0gSS6wemH8ntTe6973scmvpV28G+cJb3nN/D+Z3DgX0+CcNQVXXPor3y/i7JFefcAqAjgBhjrgEndwD+pTbGNCuVytzvf2EYTjvndgCk0+no/7YPYPYj3tUCIlvBzymAjuJvgGwXjoQ2bDOsvyRtLGM/twHFHKkQTJ0nuHARr3L8D5B0u11FFXIBw8XnbD5+iK6vg/erA3UKNkUOlCjOXCV/eRqSBEQwIoIEAVnjDdHCXYj6iG8QEURBth35PkR9otoc2fJrJAgQEXxBaA5WefekxqUgT4KCc3jFIoWJCbxSDhu10CwCBLSIW5xHzp5GvTK+EeHZpzoPzh1kKuwxNrBIqUx0/TaPWseQgseVya9Uo1nEro0Wp8S9FwzKM5jYJrxfbREbZX7yEBLH5G/cYbZR5dVKgaUPOW4+Hef74VuQ9cAl4FL84UdEh5jEZnSTPgBLlQLNM+O85RTf1uyWd+DLhqXerkLh6GivirE90BQTp8N7ngrqHBs54f6JHGMmRdXhnEPVYdRRzKWQbWKdYq2SOYPNBrX9XjM/AFVF4OTTNk73AAAAAElFTkSuQmCC");
     background-position: 7px 4px !important;
 }
 
@@ -132,91 +202,24 @@ body .tooltipster-default .tooltipster-content {
 }
 /* End: More icons */
 
-.magicss-gray-out {
-    -webkit-filter: grayscale(1);
-    filter: grayscale(1);
-}
-.magicss-gray-out:hover {
-    -webkit-filter: none;
-    filter: none;
+#MagiCSS-bookmarklet textarea {
+    padding: 0 !important;
+    padding: 4px !important;
+    outline-width: 0;
+    line-height: 1em;
 }
 
-.magicss-disable-css {
-    /* Source: http://findicons.com/icon/download/116499/150/16/png */
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJFSURBVHjapJO/T1pRFMe/Dx7ypEXri4lUGUhsHF40hODSpQ61cTH+2HSoZaF1dHSxpU7+Ca04NE7dyuBiapcuLFokTdD4A01awNdBSkAf8ut5zhUoxq3e5OS+nPv5nnvuyfdJpmniPksSBd68aM1pFDMU4xS+ei5GsUHxmSLRJD9+hcx7rVqFZWwMtc3NIGy2Zam31yX19ABdXTdgNuszdd1nptNBlMtviQ0TC0ujg1LgGWNByelctQ4M4G8qhfN4HLmDA6HvpJzq9eJRXx+qlDPz+deUDrd9+i6KoFouazVg2erx4M/uLn5FItGLk5NX/qUliYO+I2o2C4vLBWaYZQ1rRYFyqTQDVXXl02mcb29HbXb7S+/CwjqKRSAaDXlHRqYwOoqdxUUww6zQNApUSqVxuaMDF8kk2hTlgxYIHMMwaHSxEB2/a4g7u7sjzDDLmn8dXF35ZJsNVWrzycTEOtxuYH//lpjWezqbZoZZ1rQ+AXyj3eEQO7a27oj9s7OhVkZoWjqIFXUdD1QVub29L3fEk5MhXF7y2RwzzLKmdQYb+UwGiqLwO6duiVdWxM2GrvfTfOaZYZY1TScmvE7NKsvf3B6PyzE8jB9ra6DJR2TTnBYXSNIcbfN021Mjl8Pv09OzaqXyXIvnE6LAT00RRlLa21cfk1kesgNpULBab5xITiUHokADzJDJioYhjDSUKNafUKlgaHAwXCCHJQ8Pz1JHRyhQm2RhEfzNOT5jhlnWNJ+w0y/918/kPzbrf+M91rUAAwCuQDz94e2kLwAAAABJRU5ErkJggg==');
-    -webkit-filter: grayscale(1);
-    filter: grayscale(1);
-}
-.indicate-disabled#MagiCSS-bookmarklet .magicss-disable-css {
-    -webkit-filter: none;
-    filter: none;
+#MagiCSS-bookmarklet textarea {
+    -webkit-tab-size:4;
+    tab-size:4;
 }
 
-.magicss-beautify {
-    /* Source: http://www.iconfinder.com/icondetails/10227/16/smile_smiley_icon (http://www.iconfinder.com/icons/10227/download/png/16) */
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gsNEzMIhYrOGAAAAmtJREFUOMutk71PU2EUh5/33tIKV9vyoQhC0YYIKvEjQtTEQSOb3XRwMjK46eDGP6CMbi7GUCfR4GQdTIyufsZoUKIRFEQLFAv9uL297b3vcYBUMWx6lpOcnDznl985B/4x1N8Feb9vO6grgnFGCMRFfMQrTyPufdHe9eDhufkNAZK+ZpC9dw78m3g/G/DmQeu1LgNfRfGxSlrk4kq5d6zt+GO9HvCh/wK6OIr7BbS7gTYQAlSkEV8Hhqwj6WQNIJNHd6Dtj7ifLALuancVkD901q3likmpGrW1mD1bji1+NwDwC8P4S1au4JF82MP4kzhl9/fksmsy/iROMtVLvqipUyXLkPIwQABAVDCh/Hkmv23l9uMelFQ4crCRztAbEE0mV8+NB32IVOntjnC0+y2OLQng8ioA1aW00NFis7t9iWhzJ5HtB8B+B2giVoWB3WlW3J10xPvA/IzW5a6aB97EAW06bxUK2NQKkQSUvkLhKbC2iWAYIqehakP+Ecs5Q5pOOsaqAr8ygzJ2gqZaXMDN3mJzPWDU7Ce37FCXv0NDaM1bFZypeYB2Ur6KXjKNLBNTLTx8EePE/kViW3MAzGYsUs9jDPYXGOyfolzwMfBSNYBPaERhDZmSsyKWg11p5urdGG3RDADprMWhvWG6e8NAEbc6Z3seI+sOyXkVu6DEGQ0ZS2QLEV7PDvAjvwuA9m11HN6jaApOkF98QbVSGmo5RXIdIPMsYVjq5TkR72bQKDWYpsI3msEMYxpQKa/g2Esl8d2L03OM9Z9Hb/hM9rPGVtH+Fa31WV8TF61RyptWosfBux49wQL/M34BW2Yaj1Q8PX0AAAAASUVORK5CYII=');
+#MagiCSS-bookmarklet .CodeMirror-placeholder {
+    color: #aaa;
 }
 
-.magicss-title {
-    float: left;
-    background-color: #4458ae;
-    border-radius: 5px 5px 0 0;
-    padding-left: 5px;
-    padding-right: 5px;
-    font-weight: bold;
-    color: #fff;
-    letter-spacing: 1px;
-    font-family: Helvetica, "Trebuchet MS", sans-serif;
-    overflow: auto;
-    font-size: 15px;
-    line-height: 20px;
-    cursor: default;
-}
-
-.magicss-mode-switch {
-    width: 30px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 10px;
-    margin-top: 5px;
-}
-
-.magicss-mode-switch-selected {
-    width: 15px;
-    height: 10px;
-    float: right;
-    background-color: rgb(34, 186, 17);
-    border-radius: 10px;
-}
-.magicss-selected-mode-less .magicss-mode-switch-selected {
-    float: left;
-}
-
-.magicss-mode-button {
-    float: left;
-    cursor: pointer;
-}
-
-.magicss-mode-css {
-    padding-left: 5px;
-}
-
-.magicss-mode-less {
-    padding-right: 5px;
-}
-
-.magicss-mode-css,
-.magicss-mode-less {
-    font-weight: bold;
-    color: #ffff00;
-    opacity: 0.5;
-}
-
-.magicss-mode-css:hover,
-.magicss-mode-less:hover,
-.magicss-selected-mode-less .magicss-mode-less,
-.magicss-selected-mode-css .magicss-mode-css {
-    opacity: 1;
+.indicate-disabled#MagiCSS-bookmarklet .CodeMirror {
+    background-color: #bbb;
 }
 
 /*
