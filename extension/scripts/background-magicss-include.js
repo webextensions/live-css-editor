@@ -28,6 +28,7 @@ var main = function () {
         pathCodeMirror + 'mode/css.js',
         pathCodeMirror + 'addons/display/placeholder.js',
         pathCodeMirror + 'addons/selection/active-line.js',
+        pathCodeMirror + 'addons/edit/closebrackets.js',
 
         path3rdparty + 'csslint/csslint.js',
         path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
