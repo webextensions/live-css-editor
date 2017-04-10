@@ -68,6 +68,31 @@
         };
     }());
 
+    var setCodeMirrorCSSLinting = function (cm, enableOrDisable) {
+        var lint,
+            gutters = [].concat(cm.getOption('gutters') || []);
+        if (enableOrDisable === 'enable') {
+            lint = true;
+            gutters.push('CodeMirror-lint-markers');
+        } else {
+            lint = false;
+            var index = gutters.indexOf('CodeMirror-lint-markers');
+            if (index > -1) {
+                gutters.splice(index, 1);
+            }
+        }
+        cm.setOption('gutters', gutters);
+        cm.setOption('lint', lint);
+    };
+    var toggleCodeMirrorCSSLinting = function (cm) {
+        var lint = cm.getOption('lint');
+        if (lint) {
+            setCodeMirrorCSSLinting(cm, 'disable');
+        } else {
+            setCodeMirrorCSSLinting(cm, 'enable');
+        }
+    };
+
     var isMac = false;
     try {
         isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -143,6 +168,7 @@
                     if (languageMode === 'less') {
                         $('#' + id).removeClass('magicss-selected-mode-css').addClass('magicss-selected-mode-less');
                         editor.userPreference('language-mode', 'less');
+                        setCodeMirrorCSSLinting(editor.cm, 'disable');
                         utils.alertNote('Now editing code in LESS mode', 5000);
                     } else {
                         $('#' + id).removeClass('magicss-selected-mode-less').addClass('magicss-selected-mode-css');
@@ -249,33 +275,40 @@
                             title: 'Convert this code from LESS to CSS',
                             uniqCls: 'magicss-less-to-css',
                             onclick: function (evt, editor) {
-                                var lessCode = editor.getTextValue();
-                                utils.lessToCSS(lessCode, function (err, cssCode) {
-                                    if (err) {
-                                        utils.alertNote(
-                                            'Invalid LESS syntax.' +
-                                            '<br />Error in line: ' + err.line + ' column: ' + err.column +
-                                            '<br />Error message: ' + err.message,
-                                            10000
-                                        );
-                                        editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
-                                    } else {
-                                        var beautifiedLessCode = utils.beautifyCSS(utils.minifyCSS(lessCode));
-                                        cssCode = utils.beautifyCSS(utils.minifyCSS(cssCode));
-
-                                        if (cssCode === beautifiedLessCode) {
-                                            utils.alertNote('Your code is already in CSS', 5000);
+                                if (getLanguageMode() === 'less') {
+                                    var lessCode = editor.getTextValue();
+                                    utils.lessToCSS(lessCode, function (err, cssCode) {
+                                        if (err) {
+                                            utils.alertNote(
+                                                'Invalid LESS syntax.' +
+                                                '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                                '<br />Error message: ' + err.message,
+                                                10000
+                                            );
+                                            editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                         } else {
-                                            editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                            utils.alertNote('Your code has been converted from LESS to CSS :-)' + noteForUndo, 5000);
+                                            var beautifiedLessCode = utils.beautifyCSS(utils.minifyCSS(lessCode));
+                                            cssCode = utils.beautifyCSS(utils.minifyCSS(cssCode));
+
+                                            if (cssCode === beautifiedLessCode) {
+                                                utils.alertNote('Your code is already in CSS', 5000);
+                                            } else {
+                                                editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                utils.alertNote('Your code has been converted from LESS to CSS :-)' + noteForUndo, 5000);
+                                            }
                                         }
-                                    }
+                                        editor.focus();
+                                    });
+                                } else {
+                                    utils.alertNote('Please switch to editing code in LESS mode to enable this feature', 5000);
                                     editor.focus();
-                                });
+                                }
                             },
                             beforeShow: function (origin, tooltip) {
                                 if (getLanguageMode() === 'less') {
                                     tooltip.addClass('tooltipster-selected-mode-less');
+                                } else {
+                                    tooltip.addClass('tooltipster-selected-mode-css');
                                 }
                             }
                         },
@@ -297,6 +330,28 @@
                             }
                         },
                         /* */
+                        {
+                            name: 'showHideLineNumbers',
+                            title: 'Show / hide line numbers',
+                            uniqCls: 'magicss-show-hide-line-numbers',
+                            onclick: function (evt, editor) {
+                                editor.cm.setOption('lineNumbers', !editor.cm.getOption('lineNumbers'));
+                                editor.focus();
+                            }
+                        },
+                        {
+                            name: 'enableDisableCSSLinting',
+                            title: 'Enable / disable CSS linting',
+                            uniqCls: 'enable-disable-css-linting',
+                            onclick: function (evt, editor) {
+                                if (getLanguageMode() === 'css') {
+                                    toggleCodeMirrorCSSLinting(editor.cm);
+                                } else {
+                                    utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                                }
+                                editor.focus();
+                            }
+                        },
                         {
                             name: 'minify',
                             title: 'Minify',

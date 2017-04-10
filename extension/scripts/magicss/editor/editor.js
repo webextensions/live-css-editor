@@ -281,6 +281,10 @@
                 mode: thisOb.options.syntaxHighlightingLanguage,
                 placeholder: thisOb.getOption('placeholder'),
 
+                lineNumbers: false,
+                gutters: [],
+                lint: false,
+
                 indentUnit: 4,
                 indentWithTabs: false,
                 undoDepth: 1000,

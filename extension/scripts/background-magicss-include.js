@@ -22,11 +22,19 @@ var main = function () {
         },
         path3rdparty + 'fiber.js',
 
+
         pathCodeMirror + 'codemirror.css',
         pathCodeMirror + 'magicss-codemirror.css',
         pathCodeMirror + 'codemirror.js',
         pathCodeMirror + 'mode/css.js',
         pathCodeMirror + 'addons/display/placeholder.js',
+
+        path3rdparty + 'csslint/csslint.js',
+        path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
+        pathCodeMirror + 'addons/lint/lint.css',
+        path3rdpartyCustomFixes + 'codemirror-addon-lint/tooltip.css',
+        pathCodeMirror + 'addons/lint/lint.js',
+        pathCodeMirror + 'addons/lint/css-lint.js',
 
         pathCodeMirror + 'addons/hint/show-hint.css',
         pathCodeMirror + 'addons/hint/show-hint.js',
