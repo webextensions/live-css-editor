@@ -26,7 +26,6 @@
                 title: 'Text Editor',
                 tooltip: 'A simple text editor',
                 placeholder: 'Write your text here...',
-                syntaxHighlightingLanguage: 'text/x-less',
                 disableCloseIcon: false,
                 disableResize: false,
                 draggable: true,
@@ -267,23 +266,28 @@
         }
 
         _createSyntaxHighlighting() {
-            var thisOb = this;
+            var thisOb = this,
+                options = thisOb.options;
 
             var newDiv = $('<div></div>').addClass('raw-codemirror-container');
             $(thisOb.textarea).parent().after(newDiv);
 
             var closeOnEscapeKey = true;
-            if (thisOb.options.closeOnEscapeKey === false || thisOb.options.closeOnEscapeKey === null) {
+            if (options.closeOnEscapeKey === false || options.closeOnEscapeKey === null) {
                 closeOnEscapeKey = false;
             }
-            var cm = thisOb.cm = CodeMirror(newDiv.get(0), {
+
+            var codemirrorOptions = {
                 value: thisOb.textarea.value,
-                mode: thisOb.options.syntaxHighlightingLanguage,
                 placeholder: thisOb.getOption('placeholder'),
 
                 lineNumbers: false,
                 gutters: [],
                 lint: false,
+
+                styleActiveLine: {
+                    nonEmpty: true
+                },
 
                 indentUnit: 4,
                 indentWithTabs: false,
@@ -306,7 +310,10 @@
                         }
                     }
                 }
-            });
+            };
+            codemirrorOptions = $.extend({}, codemirrorOptions, options.codemirrorOptions);
+
+            var cm = thisOb.cm = CodeMirror(newDiv.get(0), codemirrorOptions);
 
             var dimWH = thisOb.getDimensions();
             cm.setSize(dimWH.width, dimWH.height);

@@ -1,21 +1,25 @@
-#MagiCSS .CodeMirror-hscrollbar {
+#MagiCSS-bookmarklet .CodeMirror-hscrollbar {
     right: 17px !important;
 }
-#MagiCSS .CodeMirror-vscrollbar {
+#MagiCSS-bookmarklet .CodeMirror-vscrollbar {
 	bottom: 0px !important;
 	margin-bottom: 17px;
     padding-right: 17px;
 }
 
-#MagiCSS .codemirror-hscrollbar {
+#MagiCSS-bookmarklet .codemirror-hscrollbar {
   	overflow-x: auto;
 }
-#MagiCSS .codemirror-vscrollbar {
+#MagiCSS-bookmarklet .codemirror-vscrollbar {
   	overflow-y: auto;
 }
 
-#MagiCSS.container {
+#MagiCSS-bookmarklet.container {
 	width: auto;	/* better solution would be to change the generic class name ".container" */
+}
+
+#MagiCSS-bookmarklet .CodeMirror-activeline-background {
+    background: rgba(232, 242, 255, 0.5);
 }
 
 html .CodeMirror-hints {

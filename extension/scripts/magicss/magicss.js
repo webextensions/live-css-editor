@@ -211,7 +211,20 @@
                         return $outer;
                     },
                     placeholder: 'Shortcut: Alt + Shift + C' + '\n\nWrite your LESS/CSS code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}',
-                    syntaxHighlightingLanguage: 'text/x-less',
+                    codemirrorOptions: {
+                        mode: 'text/x-less',
+                        extraKeys: {
+                            'Ctrl-S': function () {
+                                var editor = window.MagiCSSEditor;
+                                createGistAndEmail(editor.getTextValue());
+                                editor.focus();
+                            },
+                            'Ctrl-D': function () {
+                                // TODO: Implement select-next-occurrence-of-current-selection
+                                //       This link might be of some help: https://codereview.chromium.org/219583002/
+                            }
+                        }
+                    },
                     bgColor: '68,88,174,0.7',
                     headerIcons: [
                         {

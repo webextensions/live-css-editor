@@ -22,12 +22,12 @@ var main = function () {
         },
         path3rdparty + 'fiber.js',
 
-
         pathCodeMirror + 'codemirror.css',
         pathCodeMirror + 'magicss-codemirror.css',
         pathCodeMirror + 'codemirror.js',
         pathCodeMirror + 'mode/css.js',
         pathCodeMirror + 'addons/display/placeholder.js',
+        pathCodeMirror + 'addons/selection/active-line.js',
 
         path3rdparty + 'csslint/csslint.js',
         path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
