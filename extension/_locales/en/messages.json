@@ -1,6 +1,6 @@
 {
     "Extension_Description": {
-        "message": "Live preview of CSS/LESS code with an in-page editor. Convert code from Less to CSS & CSS to Less, beautify, minify, etc."
+        "message": "Live preview of CSS/LESS code with an in-page editor. Convert code from Less to CSS, beautify, minify, etc."
     },
     "Extension_Name": {
         "message": "MagiCSS - live editor for CSS and LESS"
