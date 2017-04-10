@@ -152,7 +152,7 @@ body .tooltipster-default .tooltipster-content {
     background-position: 7px 5px !important;
     background-repeat: no-repeat !important;
     padding-left: 30px !important;
-    height: 20px !important;
+    min-height: 20px;
     font-weight: bold;
     text-align: left;
     background-size: 16px !important;
