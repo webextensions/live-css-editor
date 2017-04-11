@@ -58,7 +58,7 @@
                     lastMailedValue = text;
                     lastSuccessNote = 'The GitHub Gist was successfully created: ' +
                         anchor +
-                        '<br/>Share code: <a href="' + 'mailto:?subject=Use this CSS - ' + gistUrl + '&body=' +
+                        '<br/>Share code: <a href="' + 'mailto:?subject=Use this code for styling - ' + gistUrl + '&body=' +
                         encodeURIComponent(text.replace(/\t/g,'  ').substr(0,140) + '\r\n...\r\n...\r\n\r\n' + gistUrl + '\r\n\r\n-- Created via MagiCSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol') +
                         '">Send e-mail</a>';
                     utils.alertNote(lastSuccessNote, 10000);
