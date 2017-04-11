@@ -1,6 +1,6 @@
 {
   "name": "magicss",
-  "version": "4.0.0",
+  "version": "4.0.5",
   "scripts": {
     "lint": "./node_modules/.bin/eslint ."
   },

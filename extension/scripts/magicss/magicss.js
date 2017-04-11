@@ -23,7 +23,7 @@
                 "public": true,
                 "files": {
                     "styles.css": {
-                        "content": text + '\r\n\r\n/* Created via MagiCSS for Chrome - https://chrome.google.com/webstore/detail/magicss-live-css-editor/ifhikkcafabcgolfjegfcgloomalapol */\r\n'
+                        "content": text + '\r\n\r\n/* Created via MagiCSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol */\r\n'
                     }
                 }
             }),
@@ -59,7 +59,7 @@
                     lastSuccessNote = 'The GitHub Gist was successfully created: ' +
                         anchor +
                         '<br/>Share code: <a href="' + 'mailto:?subject=Use this CSS - ' + gistUrl + '&body=' +
-                        encodeURIComponent(text.replace(/\t/g,'  ').substr(0,140) + '\r\n...\r\n...\r\n\r\n' + gistUrl + '\r\n\r\n-- Created via MagiCSS for Chrome - https://chrome.google.com/webstore/detail/magicss-live-css-editor/ifhikkcafabcgolfjegfcgloomalapol') +
+                        encodeURIComponent(text.replace(/\t/g,'  ').substr(0,140) + '\r\n...\r\n...\r\n\r\n' + gistUrl + '\r\n\r\n-- Created via MagiCSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol') +
                         '">Send e-mail</a>';
                     utils.alertNote(lastSuccessNote, 10000);
                 });
@@ -278,7 +278,7 @@
                                     title: 'Rate us on Chrome Web Store',
                                     cls: 'magicss-rate-on-webstore',
                                     uniqCls: 'magicss-rate-on-webstore',
-                                    href: 'https://chrome.google.com/webstore/detail/magicss-live-css-editor/ifhikkcafabcgolfjegfcgloomalapol/reviews'
+                                    href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol/reviews'
                                 };
                             }
                         }())
@@ -391,7 +391,7 @@
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/magicss-live-css-editor/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'MagiCSS - live editor for CSS and LESS') + ' ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'MagiCSS - live editor for CSS and LESS') + ' ... web devs check it out!&via=webextensions'
                         },
                         {
                             name: 'gist',
@@ -418,7 +418,7 @@
                                     title: 'Rate us on Chrome Web Store',
                                     cls: 'magicss-rate-on-webstore',
                                     uniqCls: 'magicss-rate-on-webstore',
-                                    href: 'https://chrome.google.com/webstore/detail/magicss-live-css-editor/ifhikkcafabcgolfjegfcgloomalapol/reviews'
+                                    href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol/reviews'
                                 };
                             }
                         }())
