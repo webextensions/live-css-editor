@@ -214,6 +214,9 @@
                     codemirrorOptions: {
                         mode: 'text/x-less',
                         autoCloseBrackets: true,
+                        hintOptions: {
+                            completeSingle: false
+                        },
                         extraKeys: {
                             'Ctrl-S': function () {
                                 var editor = window.MagiCSSEditor;
