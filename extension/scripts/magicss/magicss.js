@@ -91,7 +91,7 @@
         return function (text) {
             text = $.trim(text);
             if (text === '') {
-                utils.alertNote('No CSS code to be shared', 5000);
+                utils.alertNote('Please type some code to be shared', 5000);
             } else if (lastMailedValue === text) {
                 utils.alertNote(lastSuccessNote, 20000);
             } else {
