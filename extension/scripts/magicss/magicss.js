@@ -185,6 +185,18 @@
         editor.userPreference('autocomplete-selectors', 'disabled');
     };
 
+    var highlightErroneousLineTemporarily = function (editor, errorInLine) {
+        var lineHandle = editor.cm.addLineClass(errorInLine, 'background', 'line-has-less-error-transition-effect');
+        editor.cm.addLineClass(errorInLine, 'background', 'line-has-less-error');
+        var duration = 2000;
+        setTimeout(function () {
+            editor.cm.removeLineClass(lineHandle, 'background', 'line-has-less-error');
+            setTimeout(function () {
+                editor.cm.removeLineClass(lineHandle, 'background', 'line-has-less-error-transition-effect');
+            }, 500);   /* 500ms delay matches the transition duration specified for the CSS selector ".line-has-less-error-transition-effect" */
+        }, duration);
+    };
+
     var isMac = false;
     try {
         isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -238,6 +250,7 @@
                                         '<br />Error message: ' + err.message,
                                         10000
                                     );
+                                    highlightErroneousLineTemporarily(editor, err.line - 1);
                                 }, 0);
                             } else {
                                 var strCssCode = output.css;
@@ -413,6 +426,7 @@
                                                 '<br />Error message: ' + err.message,
                                                 10000
                                             );
+                                            highlightErroneousLineTemporarily(editor, err.line - 1);
                                             editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                         } else {
                                             var beautifiedLessCode = utils.beautifyCSS(utils.minifyCSS(lessCode));
