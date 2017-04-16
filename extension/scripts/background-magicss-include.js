@@ -97,7 +97,7 @@ var prerequisitesReady = function (main) {
                 url.indexOf('about:') === 0
             ) {
                 alert(
-                    TR('Include_MagicssDoesNotOperateOnSomeTabs', 'MagiCSS does not operate on Chrome extension pages and some other native tabs.') +
+                    TR('Include_MagicssDoesNotOperateOnSomeTabs', 'Magic CSS does not operate on Chrome extension pages and some other native tabs.') +
                     '\n\n' +
                     TR('Include_CanRunOnOtherPages', 'You can run it on other web pages and websites.')
                 );
@@ -114,7 +114,7 @@ var prerequisitesReady = function (main) {
                     } else {
                         if (url.indexOf('file:///') === 0) {
                             alert(
-                                TR('Include_ToExecuteMagicssEditor', 'To execute MagiCSS - live editor for CSS and LESS on:') +
+                                TR('Include_ToExecuteMagicssEditor', 'To execute Live editor for CSS and LESS (Magic CSS) on:') +
                                 '\n        ' + url + '\n\n' +
                                 TR('Include_GrantPermisssions', 'You need to grant permissions by going to:') +
                                 '\n        chrome://extensions'
@@ -122,7 +122,7 @@ var prerequisitesReady = function (main) {
                         } else {
                             alert(
                                 TR('Include_UnableToStart', 'Unable to start') +
-                                '\n        ' + TR('Extension_Name', 'MagiCSS - live editor for CSS and LESS') + '\n\n' +
+                                '\n        ' + TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + '\n\n' +
                                 TR('Include_RequiresYourPermission', 'It requires your permission to execute on:') +
                                 '\n        ' + url
                             );

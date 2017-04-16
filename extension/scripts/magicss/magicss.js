@@ -2,7 +2,7 @@
 
 (function($){
     if (window.MagiCSSEditor) {
-        window.MagiCSSEditor.reposition();      // 'MagiCSS window is already there. Repositioning it.'
+        window.MagiCSSEditor.reposition();      // 'Magic CSS window is already there. Repositioning it.'
         return;
     }
 
@@ -46,7 +46,7 @@
             }
         } catch (e) {
             console.log(
-                'If you are seeing this message, it means that MagiCSS extension encountered an unexpected error' +
+                'If you are seeing this message, it means that Magic CSS extension encountered an unexpected error' +
                 ' when trying to read the list of existing CSS selectors.' +
                 '\n\nDon\'t worry :-) This would not cause any issue at all in usage of this extension.' +
                 ' But we would be glad if you report about this error message at https://github.com/webextensions/live-css-editor/issues' +
@@ -65,11 +65,11 @@
             timeout: 20000,
             contentType: 'application/json',
             data: JSON.stringify({
-                "description": window.location.origin + ' - MagiCSS',
+                "description": window.location.origin + ' - Magic CSS',
                 "public": true,
                 "files": {
                     "styles.css": {
-                        "content": text + '\r\n\r\n/* Created via MagiCSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol */\r\n'
+                        "content": text + '\r\n\r\n/* Created via Magic CSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol */\r\n'
                     }
                 }
             }),
@@ -105,7 +105,7 @@
                     lastSuccessNote = 'The GitHub Gist was successfully created: ' +
                         anchor +
                         '<br/>Share code: <a href="' + 'mailto:?subject=Use this code for styling - ' + gistUrl + '&body=' +
-                        encodeURIComponent(text.replace(/\t/g,'  ').substr(0,140) + '\r\n...\r\n...\r\n\r\n' + gistUrl + '\r\n\r\n-- Created via MagiCSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol') +
+                        encodeURIComponent(text.replace(/\t/g,'  ').substr(0,140) + '\r\n...\r\n...\r\n\r\n' + gistUrl + '\r\n\r\n-- Created via Magic CSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol') +
                         '">Send e-mail</a>';
                     utils.alertNote(lastSuccessNote, 10000);
                 });
@@ -569,7 +569,7 @@
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'MagiCSS - live editor for CSS and LESS') + ' ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' ... web devs check it out!&via=webextensions'
                         },
                         {
                             name: 'github-repo',
