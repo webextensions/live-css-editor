@@ -83,7 +83,6 @@
             if (defaultPreferences[pref] !== undefined) {
                 return defaultPreferences[pref];
             } else {
-                console.warn('Unknown preference option: ' + pref + '\nExtend the default preferences so that this code never executes.');
                 return '';
             }
         }
@@ -408,7 +407,7 @@
 
                         options.headerOtherIcons.forEach(function (iconOptions) {
                             tooltipContent.push(
-                                '<li>' +
+                                '<li class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '">' +
                                     '<a' +
                                     ' class="more-icons ' + (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + '"' +
                                     ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
@@ -434,7 +433,7 @@
                             functionReady: function (origin, tooltip) {
                                 options.headerOtherIcons.forEach(function (iconOptions) {
                                     if (iconOptions && iconOptions.beforeShow) {
-                                        iconOptions.beforeShow(origin, tooltip);
+                                        iconOptions.beforeShow(origin, tooltip, editor);
                                     }
                                 });
                             }

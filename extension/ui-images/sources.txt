@@ -1,0 +1,23 @@
+ban.svg
+    https://www.iconfinder.com/icons/1608568/ban_icon#size=128
+    https://www.iconfinder.com/icons/1608568/download/svg/128
+
+ban_edited.svg
+    Manual edit of "ban.svg"
+
+hash.svg
+    https://www.iconfinder.com/icons/118664/hash_icon
+    https://www.iconfinder.com/icons/118664/download/svg/512
+
+hash_edited.svg
+    Manual edit of "hash.svg"
+
+unordered-list.svg
+    https://www.iconfinder.com/icons/383201/list_unordered_icon#size=128
+    https://www.iconfinder.com/icons/383201/download/svg/128
+
+unordered-list_edited.svg
+    Manual edit (using http://www.drawsvg.org/) of "unordered-list.svg"
+
+warning.png
+    https://www.iconfinder.com/icons/173946/warning_icon

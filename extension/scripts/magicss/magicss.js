@@ -12,6 +12,52 @@
         return;
     }
 
+    window.existingCSSSelectors = (function () {
+        var selectorsOb = {};
+        try {
+            var styleSheets = document.styleSheets;
+            var getCSSSelectorsRecursively = function (cssRules, includeMediaTitle) {
+                var cssSelectors = [];
+                for (var i = 0; i < cssRules.length; i++) {
+                    var cssRule = cssRules[i] || {};
+                    if (cssRule.selectorText) {
+                        var selectorsFound = cssRule.selectorText.split(', ');
+                        for (var j = 0; j < selectorsFound.length; j++) {
+                            cssSelectors.push(selectorsFound[j]);
+                        }
+                    }
+                    if (includeMediaTitle && cssRule instanceof CSSMediaRule) {
+                        cssSelectors.push(cssRule.cssText.substring(0, cssRule.cssText.indexOf('{')).trim());
+                    }
+                    if (cssRule.cssRules) {
+                        cssSelectors = cssSelectors.concat(getCSSSelectorsRecursively(cssRule.cssRules, includeMediaTitle));
+                    }
+                }
+                return cssSelectors;
+            };
+            for (var i = 0; i < styleSheets.length; i++) {
+                var styleSheet = styleSheets[i];
+                var cssRules = (styleSheet || {}).cssRules || [];
+                var cssSelectors = getCSSSelectorsRecursively(cssRules, true);
+                cssSelectors = cssSelectors.sort();
+                cssSelectors.forEach(function (cssSelector) {
+                    selectorsOb[cssSelector] = true;
+                });
+            }
+        } catch (e) {
+            console.log(
+                'If you are seeing this message, it means that MagiCSS extension encountered an unexpected error' +
+                ' when trying to read the list of existing CSS selectors.' +
+                '\n\nDon\'t worry :-) This would not cause any issue at all in usage of this extension.' +
+                ' But we would be glad if you report about this error message at https://github.com/webextensions/live-css-editor/issues' +
+                ' so that we can investigate this minor bug and provide better experience for you and other web developers.'
+            );
+            return {};
+        }
+
+        return selectorsOb;
+    }());
+
     var createGist = function (text, cb) {
         $.ajax({
             url: 'https://api.github.com/gists',
@@ -68,6 +114,51 @@
         };
     }());
 
+    var showCSSSelectorMatches = function (cssSelector, editor) {
+        if (!cssSelector) {
+            utils.alertNote.hide();
+        }
+
+        if (!editor.styleHighlightingSelector) {
+            editor.styleHighlightingSelector = new utils.StyleTag({
+                id: 'magicss-higlight-by-selector',
+                parentTag: 'body',
+                overwriteExistingStyleTagWithSameId: true
+            });
+        }
+
+        if (cssSelector) {
+            editor.styleHighlightingSelector.cssText = cssSelector + '{outline: 1px dashed red !important;}';
+        } else {
+            editor.styleHighlightingSelector.cssText = '';
+        }
+        editor.styleHighlightingSelector.applyTag();
+
+        if (cssSelector) {
+            var count;
+
+            try {
+                count = $(cssSelector).length;
+            } catch (e) {
+                return '';
+            }
+
+            var trunc = function (str, limit) {
+                if (str.length > limit) {
+                    var separator = ' ... ';
+                    str = str.substr(0, limit / 2) + separator + str.substr(separator.length + str.length - limit / 2);
+                }
+                return str;
+            };
+
+            if (count) {
+                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
+            } else {
+                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+            }
+        }
+    };
+
     var setCodeMirrorCSSLinting = function (cm, enableOrDisable) {
         var lint,
             gutters = [].concat(cm.getOption('gutters') || []);
@@ -84,13 +175,14 @@
         cm.setOption('gutters', gutters);
         cm.setOption('lint', lint);
     };
-    var toggleCodeMirrorCSSLinting = function (cm) {
-        var lint = cm.getOption('lint');
-        if (lint) {
-            setCodeMirrorCSSLinting(cm, 'disable');
-        } else {
-            setCodeMirrorCSSLinting(cm, 'enable');
-        }
+
+    var enableAutocompleteSelectors = function (editor) {
+        $(editor.container).removeClass('magicss-autocomplete-selectors-disabled').addClass('magicss-autocomplete-selectors-enabled');
+        editor.userPreference('autocomplete-selectors', 'enabled');
+    };
+    var disableAutocompleteSelectors = function (editor) {
+        $(editor.container).removeClass('magicss-autocomplete-selectors-enabled').addClass('magicss-autocomplete-selectors-disabled');
+        editor.userPreference('autocomplete-selectors', 'disabled');
     };
 
     var isMac = false;
@@ -166,12 +258,12 @@
 
                 var setLanguageMode = function (languageMode, editor) {
                     if (languageMode === 'less') {
-                        $('#' + id).removeClass('magicss-selected-mode-css').addClass('magicss-selected-mode-less');
+                        $(editor.container).removeClass('magicss-selected-mode-css').addClass('magicss-selected-mode-less');
                         editor.userPreference('language-mode', 'less');
                         setCodeMirrorCSSLinting(editor.cm, 'disable');
                         utils.alertNote('Now editing code in LESS mode', 5000);
                     } else {
-                        $('#' + id).removeClass('magicss-selected-mode-less').addClass('magicss-selected-mode-css');
+                        $(editor.container).removeClass('magicss-selected-mode-less').addClass('magicss-selected-mode-css');
                         editor.userPreference('language-mode', 'css');
                         utils.alertNote('Now editing code in CSS mode', 5000);
                     }
@@ -215,7 +307,27 @@
                         mode: 'text/x-less',
                         autoCloseBrackets: true,
                         hintOptions: {
-                            completeSingle: false
+                            completeSingle: false,
+                            // closeCharacters: /[\s()\[\]{};:>,]/,     // This is the default value defined in show-hint.js
+                            closeCharacters: /[(){};:,]/,               // Custom override
+                            onAddingAutoCompleteOptionsForSelector: function (add) {
+                                var editor = window.MagiCSSEditor;
+                                if (editor.userPreference('autocomplete-selectors') === 'disabled') {
+                                    return;
+                                }
+                                if (window.existingCSSSelectors) {
+                                    add(window.existingCSSSelectors, true);
+                                }
+                            },
+                            onCssHintSelectForSelector: function (selectedText) {
+                                var editor = window.MagiCSSEditor;
+                                showCSSSelectorMatches(selectedText, editor);
+                            },
+                            onCssHintShownForSelector: function () {    // As per current CodeMirror/css-hint architecture,
+                                                                        // "select" is called before "shown".
+                                                                        // The "select" operation would also show the number  e are hiding the alertNote
+                                utils.alertNote.hide();
+                            }
                         },
                         extraKeys: {
                             'Ctrl-S': function () {
@@ -279,7 +391,6 @@
                                 return {
                                     name: 'rate-on-webstore',
                                     title: 'Rate us on Chrome Web Store',
-                                    cls: 'magicss-rate-on-webstore',
                                     uniqCls: 'magicss-rate-on-webstore',
                                     href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol/reviews'
                                 };
@@ -321,12 +432,11 @@
                                     editor.focus();
                                 }
                             },
-                            beforeShow: function (origin, tooltip) {
-                                if (getLanguageMode() === 'less') {
-                                    tooltip.addClass('tooltipster-selected-mode-less');
-                                } else {
-                                    tooltip.addClass('tooltipster-selected-mode-css');
-                                }
+                            beforeShow: function (origin, tooltip, editor) {
+                                tooltip.addClass(getLanguageMode() === 'less' ? 'tooltipster-selected-mode-less' : 'tooltipster-selected-mode-css')
+                                       .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
+                                       .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
+                                       .addClass(editor.userPreference('autocomplete-selectors') === 'disabled' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
                             }
                         },
                         /*
@@ -348,24 +458,66 @@
                         },
                         /* */
                         {
-                            name: 'showHideLineNumbers',
-                            title: 'Show / hide line numbers',
-                            uniqCls: 'magicss-show-hide-line-numbers',
+                            name: 'showLineNumbers',
+                            title: 'Show line numbers',
+                            uniqCls: 'magicss-show-line-numbers',
                             onclick: function (evt, editor) {
-                                editor.cm.setOption('lineNumbers', !editor.cm.getOption('lineNumbers'));
+                                editor.cm.setOption('lineNumbers', true);
                                 editor.focus();
                             }
                         },
                         {
-                            name: 'enableDisableCSSLinting',
-                            title: 'Enable / disable CSS linting',
-                            uniqCls: 'enable-disable-css-linting',
+                            name: 'hideLineNumbers',
+                            title: 'Hide line numbers',
+                            uniqCls: 'magicss-hide-line-numbers',
+                            onclick: function (evt, editor) {
+                                editor.cm.setOption('lineNumbers', false);
+                                editor.focus();
+                            }
+                        },
+                        {
+                            name: 'enableCSSLinting',
+                            title: 'Enable CSS linting',
+                            uniqCls: 'magicss-enable-css-linting',
                             onclick: function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
-                                    toggleCodeMirrorCSSLinting(editor.cm);
+                                    setCodeMirrorCSSLinting(editor.cm, 'enable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
+                                editor.focus();
+                            }
+                        },
+                        {
+                            name: 'disableCSSLinting',
+                            title: 'Disable CSS linting',
+                            uniqCls: 'magicss-disable-css-linting',
+                            onclick: function (evt, editor) {
+                                if (getLanguageMode() === 'css') {
+                                    setCodeMirrorCSSLinting(editor.cm, 'disable');
+                                } else {
+                                    utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                                }
+                                editor.focus();
+                            }
+                        },
+                        {
+                            name: 'disable-autocomplete-selectors',
+                            title: 'Disable autocomplete for CSS selectors',
+                            uniqCls: 'magicss-disable-autocomplete-selectors',
+                            onclick: function (evt, editor) {
+                                disableAutocompleteSelectors(editor);
+                                utils.alertNote('Disabled autocomplete for CSS selectors', 5000);
+                                editor.focus();
+                            }
+                        },
+                        {
+                            name: 'enable-autocomplete-selectors',
+                            title: 'Enable autocomplete for CSS selectors',
+                            uniqCls: 'magicss-enable-autocomplete-selectors',
+                            onclick: function (evt, editor) {
+                                enableAutocompleteSelectors(editor);
+                                utils.alertNote('Enabled autocomplete for CSS selectors', 5000);
                                 editor.focus();
                             }
                         },
@@ -391,14 +543,8 @@
                             }
                         },
                         {
-                            name: 'tweet',
-                            title: 'Tweet',
-                            uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'MagiCSS - live editor for CSS and LESS') + ' ... web devs check it out!&via=webextensions'
-                        },
-                        {
                             name: 'gist',
-                            title: 'Gist and Mail code',
+                            title: 'Mail code (via Gist)',
                             uniqCls: 'magicss-email',
                             onclick: function (evt, editor) {
                                 createGistAndEmail(editor.getTextValue());
@@ -406,9 +552,14 @@
                             }
                         },
                         {
+                            name: 'tweet',
+                            title: 'Tweet',
+                            uniqCls: 'magicss-tweet',
+                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'MagiCSS - live editor for CSS and LESS') + ' ... web devs check it out!&via=webextensions'
+                        },
+                        {
                             name: 'github-repo',
                             title: 'Contribute / Report issue',
-                            cls: 'magicss-github-repo',
                             uniqCls: 'magicss-github-repo',
                             href: 'https://github.com/webextensions/live-css-editor'
                         },
@@ -419,7 +570,6 @@
                                 return {
                                     name: 'rate-on-webstore',
                                     title: 'Rate us on Chrome Web Store',
-                                    cls: 'magicss-rate-on-webstore',
                                     uniqCls: 'magicss-rate-on-webstore',
                                     href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol/reviews'
                                 };
@@ -466,6 +616,13 @@
                                 $(editor.container).addClass('magicss-selected-mode-less');
                             } else {
                                 $(editor.container).addClass('magicss-selected-mode-css');
+                            }
+
+                            var autocompleteSelectors = editor.userPreference('autocomplete-selectors');
+                            if (autocompleteSelectors === 'disabled') {
+                                $(editor.container).addClass('magicss-autocomplete-selectors-disabled');
+                            } else {
+                                $(editor.container).addClass('magicss-autocomplete-selectors-enabled');
                             }
                         },
                         reInitialized: function (editor, cfg) {
