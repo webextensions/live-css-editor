@@ -337,4 +337,9 @@ body .tooltipster-default .tooltipster-content {
     font-size: 12px !important;
 }
 
+/* http://stackoverflow.com/ */
+#MagiCSS-bookmarklet .CodeMirror {
+    position: relative !important;
+}
+
 /* End: Site-specific fixes */
