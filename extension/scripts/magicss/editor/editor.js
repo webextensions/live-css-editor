@@ -310,7 +310,7 @@
                     }
                 }
             };
-            codemirrorOptions = $.extend({}, codemirrorOptions, options.codemirrorOptions);
+            codemirrorOptions = $.extend(true, {}, codemirrorOptions, options.codemirrorOptions);
 
             var cm = thisOb.cm = CodeMirror(newDiv.get(0), codemirrorOptions);
 
