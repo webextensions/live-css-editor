@@ -348,6 +348,9 @@
                     placeholder: 'Shortcut: Alt + Shift + C' + '\n\nWrite your LESS/CSS code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}',
                     codemirrorOptions: {
                         mode: 'text/x-less',
+                        colorpicker: {
+                            mode: 'edit'
+                        },
                         autoCloseBrackets: true,
                         hintOptions: {
                             completeSingle: false,

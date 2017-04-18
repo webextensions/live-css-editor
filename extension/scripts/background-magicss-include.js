@@ -41,6 +41,11 @@ var main = function () {
         pathCodeMirror + 'addons/hint/show-hint.js',
         pathCodeMirror + 'addons/hint/css-hint.js',
 
+        // https://github.com/easylogic/codemirror-colorpicker
+        pathCodeMirror + 'addons/colorpicker/colorpicker.css',
+        pathCodeMirror + 'addons/colorpicker/colorview.js',
+        pathCodeMirror + 'addons/colorpicker/colorpicker.js',
+
         path3rdparty + 'jquery-ui-1.8.21-lightness.custom.full.css',
         {
             src: path3rdparty + 'jquery-1.7.2.js',

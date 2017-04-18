@@ -313,6 +313,15 @@ body .tooltipster-default .tooltipster-content {
     background-color: #f9edbe;    /* If that line is already in focus, this would not get applied and hence less disturbance to the user */
 }
 
+/* CodeMirror colorpicker */
+.codemirror-colorpicker {
+    z-index: 2147483647 !important;
+}
+
+#MagiCSS-bookmarklet .codemirror-colorview {
+    top: 1px;
+}
+
 /*
     Begin: Site-specific fixes
     (where sites over-ride some default styles in an unexpected manner)
