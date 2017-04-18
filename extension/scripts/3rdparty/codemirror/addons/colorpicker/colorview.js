@@ -216,6 +216,7 @@
         this.open_color_picker(colorMarker);
     }
 
+    var timerCloseColorPicker;
     codemirror_colorpicker.prototype.open_color_picker = function (el) {
         var lineNo = el.lineNo;
         var ch = el.ch;
@@ -232,6 +233,21 @@
                 prevColor = newColor;
             });
 
+            var that = this;
+            var hideColorPickerIfRequired = function () {
+                if (that.cm.state.colorpicker.is_edit_mode()) {
+                    that.close_color_picker();
+                }
+            };
+
+            jQuery(that.colorpicker.$root.el).off('mouseenter').on('mouseenter', function () {
+                clearTimeout(timerCloseColorPicker);
+            }).off('mouseleave').on('mouseleave', function () {
+                clearTimeout(timerCloseColorPicker);
+                timerCloseColorPicker = setTimeout(hideColorPickerIfRequired, 2000);
+            });
+            clearTimeout(timerCloseColorPicker);
+            timerCloseColorPicker = setTimeout(hideColorPickerIfRequired, 2000);
         }
 
     }

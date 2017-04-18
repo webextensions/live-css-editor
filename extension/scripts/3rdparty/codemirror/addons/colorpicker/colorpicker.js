@@ -578,8 +578,12 @@
             var w = $color.width();
             var h = $color.height();
 
-            var x = e.clientX - offset.left;
-            var y = e.clientY - offset.top;
+            // This original calculation was resulting in incorrect drag/point selection behavior if the user had scrolled in the page
+            // var x = e.clientX - offset.left;
+            // var y = e.clientY - offset.top;
+            // The following calculations fix the issue
+            var x = e.pageX - offset.left;
+            var y = e.pageY - offset.top;
 
             if (x < 0) x = 0;
             else if (x > w) x = w;
@@ -1244,6 +1248,7 @@
             isShortCut : function () {
                 return isShortCut;
             },
+            $root: $root,
             show: show,
             hide: hide,
             setColor: setColor,
