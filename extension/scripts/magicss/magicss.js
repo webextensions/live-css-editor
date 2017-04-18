@@ -434,7 +434,7 @@
                                 return {
                                     name: 'rate-on-webstore',
                                     title: 'Rate us on Chrome Web Store',
-                                    uniqCls: 'magicss-rate-on-webstore',
+                                    cls: 'magicss-rate-on-webstore',
                                     href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol/reviews'
                                 };
                             }
@@ -614,7 +614,7 @@
                                 return {
                                     name: 'rate-on-webstore',
                                     title: 'Rate us on Chrome Web Store',
-                                    uniqCls: 'magicss-rate-on-webstore',
+                                    cls: 'magicss-rate-on-webstore',
                                     href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol/reviews'
                                 };
                             }
