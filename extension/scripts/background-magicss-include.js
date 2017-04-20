@@ -11,15 +11,16 @@ var main = function () {
         pathEditor = pathMagicss + 'editor/',
         pathCodeMirror = path3rdparty + 'codemirror/';
 
-    var runningInChromeExtension = document.location.protocol === "chrome-extension:" ? true : false;
+    var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:") ? true : false;
     // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
     // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
     extLib.loadJSCSS([
         {
             src: path3rdparty + 'async.js',
-            skip: typeof async === "undefined" || runningInChromeExtension ? false : true
+            skip: typeof async === "undefined" || runningInBrowserExtension ? false : true
         },
+
         path3rdparty + 'fiber.js',
 
         pathCodeMirror + 'codemirror.css',
@@ -47,10 +48,12 @@ var main = function () {
         pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
         path3rdparty + 'jquery-ui-1.8.21-lightness.custom.full.css',
+
         {
             src: path3rdparty + 'jquery-1.7.2.js',
-            skip: typeof jQuery === "undefined" || runningInChromeExtension ? false : true
+            skip: typeof jQuery === "undefined" || runningInBrowserExtension ? false : true
         },
+
         path3rdparty + 'jquery-ui-1.8.20.js',
 
         path3rdparty + 'amplify.js',
@@ -76,7 +79,7 @@ var main = function () {
 
         {
             src: pathScripts + 'chrome-extension-lib/ext-lib.js',
-            skip: typeof extLib === "undefined" || runningInChromeExtension ? false : true
+            skip: typeof extLib === "undefined" || runningInBrowserExtension ? false : true
         },
 
         pathScripts + 'utils.js',
@@ -96,10 +99,12 @@ var prerequisitesReady = function (main) {
             var url = tab.url;
 
             if (
-                url.indexOf('chrome://') === 0 ||
-                url.indexOf('https://chrome.google.com/webstore/') === 0 ||
-                url.indexOf('view-source:') === 0 ||
-                url.indexOf('about:') === 0
+                url && (
+                    url.indexOf('chrome://') === 0 ||
+                    url.indexOf('https://chrome.google.com/webstore/') === 0 ||
+                    url.indexOf('view-source:') === 0 ||
+                    url.indexOf('about:') === 0
+                )
             ) {
                 alert(
                     TR('Include_MagicssDoesNotOperateOnSomeTabs', 'Magic CSS does not operate on Chrome extension pages and some other native tabs.') +
@@ -109,32 +114,41 @@ var prerequisitesReady = function (main) {
                 return;
             }
 
-            chrome.permissions.request(
-                {
-                    origins: [url]
-                },
-                function (granted) {
-                    if (granted) {
-                        main();
-                    } else {
-                        if (url.indexOf('file:///') === 0) {
-                            alert(
-                                TR('Include_ToExecuteMagicssEditor', 'To execute Live editor for CSS and LESS (Magic CSS) on:') +
-                                '\n        ' + url + '\n\n' +
-                                TR('Include_GrantPermisssions', 'You need to grant permissions by going to:') +
-                                '\n        chrome://extensions'
-                            );
+            if (chrome.permissions) {
+                chrome.permissions.request(
+                    {
+                        origins: [url]
+                    },
+                    function (granted) {
+                        if (granted) {
+                            main();
                         } else {
-                            alert(
-                                TR('Include_UnableToStart', 'Unable to start') +
-                                '\n        ' + TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + '\n\n' +
-                                TR('Include_RequiresYourPermission', 'It requires your permission to execute on:') +
-                                '\n        ' + url
-                            );
+                            if (url.indexOf('file:///') === 0) {
+                                alert(
+                                    TR('Include_ToExecuteMagicssEditor', 'To execute Live editor for CSS and LESS (Magic CSS) on:') +
+                                    '\n        ' + url + '\n\n' +
+                                    TR('Include_GrantPermisssions', 'You need to grant permissions by going to:') +
+                                    '\n        chrome://extensions'
+                                );
+                            } else {
+                                alert(
+                                    TR('Include_UnableToStart', 'Unable to start') +
+                                    '\n        ' + TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + '\n\n' +
+                                    TR('Include_RequiresYourPermission', 'It requires your permission to execute on:') +
+                                    '\n        ' + url
+                                );
+                            }
                         }
                     }
+                );
+            } else {
+                try {
+                    main();
+                } catch (e) {
+                    // TODO
+                    console.log('TODO: Caught unexpected error in Magic CSS extension');
                 }
-            );
+            }
         });
     } else {
         // If the script is loaded in normal web page, run it after page load

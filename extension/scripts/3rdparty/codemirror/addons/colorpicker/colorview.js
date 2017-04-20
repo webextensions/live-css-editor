@@ -216,7 +216,6 @@
         this.open_color_picker(colorMarker);
     }
 
-    var timerCloseColorPicker;
     codemirror_colorpicker.prototype.open_color_picker = function (el) {
         var lineNo = el.lineNo;
         var ch = el.ch;
@@ -228,26 +227,16 @@
             var self = this;
             var prevColor = color;
             var pos = this.cm.charCoords({line : lineNo, ch : ch });
-            this.colorpicker.show({ left : pos.left, top : pos.bottom, isShortCut : el.isShortCut || false }, nameColor || color, function (newColor) {
+            this.colorpicker.show({
+                left : pos.left,
+                top : pos.bottom,
+                isShortCut : el.isShortCut || false,
+                hideDelay : self.opt.hideDelay || 2000
+            }, nameColor || color, function (newColor) {
                 self.cm.replaceRange(newColor, { line : lineNo, ch : ch } , { line : lineNo, ch : ch + prevColor.length }, '*colorpicker');
                 prevColor = newColor;
             });
 
-            var that = this;
-            var hideColorPickerIfRequired = function () {
-                if (that.cm.state.colorpicker.is_edit_mode()) {
-                    that.close_color_picker();
-                }
-            };
-
-            jQuery(that.colorpicker.$root.el).off('mouseenter').on('mouseenter', function () {
-                clearTimeout(timerCloseColorPicker);
-            }).off('mouseleave').on('mouseleave', function () {
-                clearTimeout(timerCloseColorPicker);
-                timerCloseColorPicker = setTimeout(hideColorPickerIfRequired, 2000);
-            });
-            clearTimeout(timerCloseColorPicker);
-            timerCloseColorPicker = setTimeout(hideColorPickerIfRequired, 2000);
         }
 
     }
@@ -307,7 +296,7 @@
         }
     }
 
-    codemirror_colorpicker.prototype.color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\d{1,3},\s*){2}\d{1,3}\)|rgba\((?:\d{1,3},\s*){3}\d*\.?\d+\)|hsl\(\d{1,3}(?:,\s*\d{1,3}%){2}\)|hsla\(\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\)|(\w+))/gi;
+    codemirror_colorpicker.prototype.color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|(\w+))/gi;
 
     codemirror_colorpicker.prototype.match_result = function (lineHandle) {
         return lineHandle.text.match(this.color_regexp);

@@ -45,19 +45,32 @@
                 });
             }
         } catch (e) {
-            console.log(
-                'If you are seeing this message, it means that Magic CSS extension encountered an unexpected error' +
-                ' when trying to read the list of existing CSS selectors.' +
-                '\n\nDon\'t worry :-) This would not cause any issue at all in usage of this extension.' +
-                ' But we would be glad if you report about this error message at https://github.com/webextensions/live-css-editor/issues' +
-                ' so that we can investigate this minor bug and provide better experience for you and other web developers.'
-            );
+            if (e.name === 'SecurityError') {   // This may happen due to cross-domain CSS resources
+                // do nothing
+            } else {
+                console.log(
+                    'If you are seeing this message, it means that Magic CSS extension encountered an unexpected error' +
+                    ' when trying to read the list of existing CSS selectors.' +
+                    '\n\nDon\'t worry :-) This would not cause any issue at all in usage of this extension.' +
+                    ' But we would be glad if you report about this error message at https://github.com/webextensions/live-css-editor/issues' +
+                    ' so that we can investigate this minor bug and provide better experience for you and other web developers.'
+                );
+            }
             return {};
         }
 
         return selectorsOb;
     }());
 
+    var isChrome = /Chrome/.test(navigator.userAgent),
+        isFirefox = /Firefox/.test(navigator.userAgent);
+
+    var strCreatedVia = 'Created via Magic CSS extension';
+    if (isChrome) {
+        strCreatedVia += ' for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol';
+    } else if (isFirefox) {
+        strCreatedVia += ' for Firefox';
+    }
     var createGist = function (text, cb) {
         $.ajax({
             url: 'https://api.github.com/gists',
@@ -65,11 +78,17 @@
             timeout: 20000,
             contentType: 'application/json',
             data: JSON.stringify({
-                "description": window.location.origin + ' - Magic CSS',
+                "description": window.location.origin + ' - via Magic CSS' + (function () {
+                    if (isChrome) {
+                        return ' extension for Chrome';
+                    } else if (isFirefox) {
+                        return ' extension for Firefox';
+                    }
+                }()),
                 "public": true,
                 "files": {
                     "styles.css": {
-                        "content": text + '\r\n\r\n/* Created via Magic CSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol */\r\n'
+                        "content": text + '\r\n\r\n/* ' + strCreatedVia + ' */\r\n'
                     }
                 }
             }),
@@ -105,7 +124,7 @@
                     lastSuccessNote = 'The GitHub Gist was successfully created: ' +
                         anchor +
                         '<br/>Share code: <a href="' + 'mailto:?subject=Use this code for styling - ' + gistUrl + '&body=' +
-                        encodeURIComponent(text.replace(/\t/g,'  ').substr(0,140) + '\r\n...\r\n...\r\n\r\n' + gistUrl + '\r\n\r\n-- Created via Magic CSS for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol') +
+                        encodeURIComponent(text.replace(/\t/g,'  ').substr(0,140) + '\r\n...\r\n...\r\n\r\n' + gistUrl + '\r\n\r\n-- ' + strCreatedVia + '') +
                         '">Send e-mail</a>';
                     utils.alertNote(lastSuccessNote, 10000);
                 });
@@ -431,6 +450,9 @@
                             }
                         },
                         (function () {
+                            if (!isChrome) {
+                                return null;
+                            }
                             if (executionCounter < 25 || 50 <= executionCounter) {
                                 return null;
                             } else {
@@ -602,7 +624,7 @@
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' (for Chrome %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
                         {
                             name: 'github-repo',
@@ -611,6 +633,9 @@
                             href: 'https://github.com/webextensions/live-css-editor'
                         },
                         (function () {
+                            if (!isChrome) {
+                                return null;
+                            }
                             if (executionCounter < 50) {
                                 return null;
                             } else {

@@ -307,7 +307,7 @@
             { rgb : '#ff0000', start : 1 }
         ];
 
-        var $root, $hue, $color, $value, $saturation, $drag_pointer, $drag_bar,
+        var $body, $root, $hue, $color, $value, $saturation, $drag_pointer, $drag_bar,
             $control, $controlPattern, $controlColor, $hueContainer, $opacity, $opacityContainer, $opacityColorBar, $formatChangeButton,
             $opacity_drag_bar, $information, $informationChange;
 
@@ -322,21 +322,48 @@
         var cached = {};
         var isColorPickerShow = false;
         var isShortCut = false;
+        var hideDelay = 2000;
 
         function dom(tag, className, attr) {
-            var el  = document.createElement(tag);
 
-            this.uniqId = counter++;
+            if (typeof tag != 'string') {
+                this.el = tag;
+            } else {
 
-            el.className = className;
+                var el  = document.createElement(tag);
 
-            attr = attr || {};
+                this.uniqId = counter++;
 
-            for(var k in attr) {
-                el.setAttribute(k, attr[k]);
+                el.className = className;
+
+                attr = attr || {};
+
+                for(var k in attr) {
+                    el.setAttribute(k, attr[k]);
+                }
+
+                this.el = el;
+            }
+        }
+
+        dom.prototype.closest = function (cls) {
+
+            var temp = this;
+            var checkCls = false;
+
+            while(!(checkCls = temp.hasClass(cls))) {
+                if (temp.el.parentNode) {
+                    temp = new dom(temp.el.parentNode);
+                } else {
+                    return null;
+                }
             }
 
-            this.el = el;
+            if (checkCls) {
+                return temp;
+            }
+
+            return null;
         }
 
         dom.prototype.removeClass = function (cls) {
@@ -426,6 +453,13 @@
             return {
                 top: rect.top + document.body.scrollTop,
                 left: rect.left + document.body.scrollLeft
+            };
+        }
+
+        dom.prototype.position = function () {
+            return {
+                top: parseFloat(this.el.style.top),
+                left: parseFloat(this.el.style.left)
             };
         }
 
@@ -574,16 +608,13 @@
         }
 
         function setMainColor(e) {
-            var offset = $color.offset();
+            e.preventDefault();
+            var pos = $root.position();         // position for screen
             var w = $color.width();
             var h = $color.height();
 
-            // This original calculation was resulting in incorrect drag/point selection behavior if the user had scrolled in the page
-            // var x = e.clientX - offset.left;
-            // var y = e.clientY - offset.top;
-            // The following calculations fix the issue
-            var x = e.pageX - offset.left;
-            var y = e.pageY - offset.top;
+            var x = e.clientX - pos.left;
+            var y = e.clientY - pos.top;
 
             if (x < 0) x = 0;
             else if (x > w) x = w;
@@ -936,10 +967,33 @@
             addEvent($formatChangeButton.el, 'click', EventFormatChangeClick)
         }
 
+        function checkColorPickerClass(el) {
+            var hasColorView = new dom(el).closest('codemirror-colorview');
+            var hasColorPicker = new dom(el).closest('codemirror-colorpicker');
+            var hasCodeMirror = new dom(el).closest('CodeMirror');
+            var IsInHtml = el.nodeName == 'HTML';
+
+            return !!(hasColorPicker || hasColorView || hasCodeMirror);
+        }
+
+        function checkInHtml (el) {
+            var IsInHtml = el.nodeName == 'HTML';
+
+            return IsInHtml;
+        }
+
         function EventDocumentMouseUp (e) {
             $color.data('isDown', false);
             $hue.data('isDown', false);
             $opacity.data('isDown', false);
+
+            // when color picker clicked in outside
+            if (checkInHtml(e.target)) {
+                //setHideDelay(hideDelay);
+            } else if (checkColorPickerClass(e.target) == false ) {
+                hide();
+            }
+
         }
 
         function EventDocumentMouseMove(e) {
@@ -1109,6 +1163,8 @@
         }
 
         function init() {
+            $body = new dom(document.body);
+
             $root = new dom('div', 'codemirror-colorpicker');
             $color = new dom('div', 'color');
             $drag_pointer = new dom('div', 'drag-pointer' );
@@ -1206,22 +1262,50 @@
             return rgb;
         }
 
+        function definePostion (opt) {
 
-        function show (pos, color,  callback) {
+            var width = $root.width();
+            var height = $root.height();
+
+            // set left position for color picker
+            var elementScreenLeft = opt.left - $body.el.scrollLeft ;
+            if (width + elementScreenLeft > window.innerWidth) {
+                elementScreenLeft -= (width + elementScreenLeft) - window.innerWidth;
+            }
+            if (elementScreenLeft < 0) { elementScreenLeft = 0; }
+
+            // set top position for color picker
+            var elementScreenTop = opt.top - $body.el.scrollTop ;
+            if (height + elementScreenTop > window.innerHeight) {
+                elementScreenTop -= (height + elementScreenTop) - window.innerHeight;
+            }
+            if (elementScreenTop < 0) { elementScreenTop = 0; }
+
+            // set position
+            $root.css({
+                left : elementScreenLeft + 'px',
+                top : elementScreenTop + 'px'
+            });
+        }
+
+        function show (opt, color,  callback) {
             destroy();
             initEvent();
             $root.appendTo(document.body);
 
             $root.css({
-                position: 'absolute',
-                left : pos.left + 'px',
-                top : pos.top + 'px'
+                position: 'fixed',  // color picker has fixed position
+                left : '-10000px',
+                top : '-10000px'
             });
 
             $root.show();
+
+            definePostion(opt);
+
             isColorPickerShow = true;
 
-            isShortCut = pos.isShortCut || false;
+            isShortCut = opt.isShortCut || false;
 
             initColor(color);
 
@@ -1230,6 +1314,32 @@
                 callback(colorString);
             }
 
+            // define hide delay
+            hideDelay = opt.hideDelay || 2000;
+            if (hideDelay > 0) {
+                setHideDelay(hideDelay);
+            }
+
+        }
+
+
+        var timerCloseColorPicker;
+        function setHideDelay (delayTime) {
+            delayTime = delayTime || 0;
+            removeEvent($root.el, 'mouseenter');
+            removeEvent($root.el, 'mouseleave');
+
+            addEvent($root.el, 'mouseenter', function () {
+               clearTimeout(timerCloseColorPicker);
+            });
+
+            addEvent($root.el, 'mouseleave', function () {
+                clearTimeout(timerCloseColorPicker);
+                timerCloseColorPicker = setTimeout(hide, delayTime);
+            });
+
+            clearTimeout(timerCloseColorPicker);
+            timerCloseColorPicker = setTimeout(hide, delayTime);
         }
 
         function hide () {

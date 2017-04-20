@@ -16,6 +16,8 @@
     },
     "offline_enabled": true,
     "permissions": [
+        "<all_urls>",
+        "tabs",
         "storage"
     ],
     "optional_permissions": [

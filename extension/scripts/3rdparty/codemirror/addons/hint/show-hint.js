@@ -91,7 +91,10 @@
 
     cursorActivity: function() {
       if (this.debounce) {
-        cancelAnimationFrame(this.debounce);
+        // See: http://stackoverflow.com/questions/42322248/typeerror-requestanimationframe-called-on-an-object-that-does-not-implement-i
+        //      The commented out code resulted in similar error on Firefox.
+        // cancelAnimationFrame(this.debounce);     // Somehow, this doesn't work well in showing hints for Firefox extension
+        window.cancelAnimationFrame(this.debounce); // But, this works fine
         this.debounce = 0;
       }
 
@@ -102,7 +105,10 @@
         this.close();
       } else {
         var self = this;
-        this.debounce = requestAnimationFrame(function() {self.update();});
+        // See: http://stackoverflow.com/questions/42322248/typeerror-requestanimationframe-called-on-an-object-that-does-not-implement-i
+        //      The commented out code resulted in similar error on Firefox.
+        // this.debounce = requestAnimationFrame(function() {self.update();});      // Somehow, this doesn't work well in showing hints for Firefox extension
+        this.debounce = window.requestAnimationFrame(function() {self.update();});  // But, this works fine
         if (this.widget) this.widget.disable();
       }
     },

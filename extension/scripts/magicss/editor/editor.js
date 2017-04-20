@@ -327,9 +327,24 @@
                 }, delay);
             });
 
-            cm.on('keypress', function(cm) {
-                if (CodeMirror.showHint) {
-                    CodeMirror.showHint(cm);
+            // http://stackoverflow.com/questions/4179708/how-to-detect-if-the-pressed-key-will-produce-a-character-inside-an-input-text/4180715#4180715
+            var isCharacterKeyPress = function (evt) {
+                if (typeof evt.which == "undefined") {
+                    // This is IE, which only fires keypress events for printable keys
+                    return true;
+                } else if (typeof evt.which == "number" && evt.which > 0) {
+                    // In other browsers except old versions of WebKit, evt.which is
+                    // only greater than zero if the keypress is a printable key.
+                    // We need to filter out backspace and ctrl/alt/meta key combinations
+                    return !evt.ctrlKey && !evt.metaKey && !evt.altKey && evt.which != 8;
+                }
+                return false;
+            };
+            cm.on('keypress', function(cm, evt) {
+                if (isCharacterKeyPress(evt)) {
+                    if (CodeMirror.showHint) {
+                        CodeMirror.showHint(cm);
+                    }
                 }
             });
 
@@ -418,6 +433,7 @@
                             );
                             if (iconOptions.uniqCls && iconOptions.onclick) {
                                 $(document).on('click', '.' + iconOptions.uniqCls, function(evt){
+                                    evt.preventDefault();   // Useful in preventing the opening of a new tab in Firefox if the anchor-tag icon has target="_blank"
                                     iconOptions.onclick(evt, editor, $moreIcon);
                                     $moreIcon.tooltipster('hide');
                                 });
@@ -537,12 +553,17 @@
             thisOb.container.style.padding = '7px';
 
             var isResizeSupported = false;
-            if (window.getComputedStyle && window.getComputedStyle(textarea, null).getPropertyValue('resize')) {
-                // If a CSS style is not supported, $(selector).css(styleName) returns:
-                //     null - Chrome
-                //     Blank string - IE 9, Firefox
-                //     undefined - IE 7, IE 8
-                isResizeSupported = true;
+            try {
+                // Using try...catch because there were some pages (eg: on stackoverflow.com), where an error was being thrown
+                if (window.getComputedStyle && window.getComputedStyle(textarea, null).getPropertyValue('resize')) {
+                    // If a CSS style is not supported, $(selector).css(styleName) returns:
+                    //     null - Chrome
+                    //     Blank string - IE 9, Firefox
+                    //     undefined - IE 7, IE 8
+                    isResizeSupported = true;
+                }
+            } catch (e) {
+                // Do nothing
             }
             if (isResizeSupported === false) {
                 thisOb.container.style.paddingBottom = '0';

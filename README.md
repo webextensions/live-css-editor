@@ -1,2 +1,2 @@
 # live-css-editor
-Code for Chrome extension Magic CSS (Live editor for CSS and LESS)
+Code for the Chrome/Firefox extension Magic CSS (Live editor for CSS and LESS)
