@@ -571,7 +571,7 @@
 
             var disableResize = !!options.disableResize;
             if (!disableResize) {
-                if (isResizeSupported && !$.browser.webkit) {
+                if (isResizeSupported) {
                     if (rememberDimensions) {
                         thisOb.initialWidth = thisOb.userPreference('ui-size-width');
                         thisOb.initialHeight = thisOb.userPreference('ui-size-height');

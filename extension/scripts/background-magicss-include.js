@@ -47,14 +47,14 @@ var main = function () {
         pathCodeMirror + 'addons/colorpicker/colorview.js',
         pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
-        path3rdparty + 'jquery-ui-1.8.21-lightness.custom.full.css',
+        path3rdparty + 'jquery-ui-1.12.1-custom.css',
 
         {
-            src: path3rdparty + 'jquery-1.7.2.js',
+            src: path3rdparty + 'jquery-3.2.1.js',
             skip: typeof jQuery === "undefined" || runningInBrowserExtension ? false : true
         },
 
-        path3rdparty + 'jquery-ui-1.8.20.js',
+        path3rdparty + 'jquery-ui-1.12.1-custom.js',
 
         path3rdparty + 'amplify.js',
 
