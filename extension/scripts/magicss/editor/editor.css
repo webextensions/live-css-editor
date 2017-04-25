@@ -21,3 +21,10 @@
     /* Source: http://www.iconfinder.com/icondetails/103172/128/add_plus_icon (http://www.iconfinder.com/icons/103172/download/png/16) ; https://creativecommons.org/licenses/by/3.0/ */
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gsNFBETrRJXUQAAAENJREFUOMtjYBjs4D8SDsWmgIlSG4aBAYxoAUYq8KXUBZxU9YILFvndSOxmBgaGQ2jy50cTEgMDCwF5JwYGBmZ8AQYAZQEMOYOgsd0AAAAASUVORK5CYII=");
 }
+
+/* Style the cursor for "Insert" mode */
+.CodeMirror-overwrite .CodeMirror-cursor {
+    width: 8px;
+    background-color: rgba(25, 25, 25, 0.25);
+    border-left: 0;
+}
