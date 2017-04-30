@@ -1,4 +1,8 @@
-/*globals jQuery, less, utils, sourceMap, extLib, chrome */
+/*globals jQuery, less, utils, sourceMap, extLib, chrome, CodeMirror */
+
+// TODO: Emmet might be integrated as mentioned in the example at: https://mikethedj4.github.io/kodeWeave/editor/#b9a99b76536392cb5ec5004bc37b8fcc
+// TODO: Add autoprefixer (https://github.com/postcss/autoprefixer) (https://autoprefixer.github.io/)
+// TODO: Detect error in CSS selector generation and ask the user to report the issue on GitHub
 
 (function($){
     if (window.MagiCSSEditor) {
@@ -12,6 +16,11 @@
         return;
     }
 
+    var ellipsis = function (str, limit) {
+        limit = limit || 12;
+        return (str.length <= limit) ? str : (str.substring(0, limit - 3) + '...');
+    };
+
     window.existingCSSSelectors = (function () {
         var selectorsOb = {};
         try {
@@ -23,11 +32,20 @@
                     if (cssRule.selectorText) {
                         var selectorsFound = cssRule.selectorText.split(', ');
                         for (var j = 0; j < selectorsFound.length; j++) {
-                            cssSelectors.push(selectorsFound[j]);
+                            // cssSelectors.push(selectorsFound[j]);
+                            cssSelectors.push({
+                                selector: selectorsFound[j],
+                                source: cssRule.parentStyleSheet.href ||
+                                    (cssRule.parentStyleSheet.ownerNode.tagName === 'STYLE' && '<style> tag') ||
+                                    ''
+                            });
                         }
                     }
                     if (includeMediaTitle && cssRule instanceof CSSMediaRule) {
                         cssSelectors.push(cssRule.cssText.substring(0, cssRule.cssText.indexOf('{')).trim());
+                    }
+                    if ((cssRule.styleSheet || {}).cssRules) {
+                        cssSelectors = cssSelectors.concat(getCSSSelectorsRecursively(cssRule.styleSheet.cssRules, includeMediaTitle));
                     }
                     if (cssRule.cssRules) {
                         cssSelectors = cssSelectors.concat(getCSSSelectorsRecursively(cssRule.cssRules, includeMediaTitle));
@@ -37,11 +55,14 @@
             };
             for (var i = 0; i < styleSheets.length; i++) {
                 var styleSheet = styleSheets[i];
+
                 var cssRules = (styleSheet || {}).cssRules || [];
                 var cssSelectors = getCSSSelectorsRecursively(cssRules, true);
-                cssSelectors = cssSelectors.sort();
                 cssSelectors.forEach(function (cssSelector) {
-                    selectorsOb[cssSelector] = true;
+                    selectorsOb[cssSelector.selector] = selectorsOb[cssSelector.selector] || [];
+                    if (selectorsOb[cssSelector.selector].indexOf(cssSelector.source) === -1) {
+                        selectorsOb[cssSelector.selector].push(cssSelector.source);
+                    }
                 });
             }
         } catch (e) {
@@ -61,6 +82,23 @@
 
         return selectorsOb;
     }());
+
+    var existingCSSSelectorsWithAutocompleteObjects = $.extend(true, {}, window.existingCSSSelectors);
+    Object.keys(existingCSSSelectorsWithAutocompleteObjects).forEach(function (key) {
+        var sources = '';
+        existingCSSSelectorsWithAutocompleteObjects[key].forEach(function (source) {
+            if (sources !== '') {
+                sources += ', ';
+            }
+            sources += ellipsis(source.substr(source.lastIndexOf('/') + 1), 50);
+        });
+
+        existingCSSSelectorsWithAutocompleteObjects[key] = {
+            sources: sources,
+            originalSelector: key,
+            text: key
+        };
+    });
 
     var isChrome = /Chrome/.test(navigator.userAgent),
         isFirefox = /Firefox/.test(navigator.userAgent);
@@ -133,8 +171,18 @@
         };
     }());
 
+    var htmlEscape = function (str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    };
+
     var showCSSSelectorMatches = function (cssSelector, editor) {
-        if (!cssSelector) {
+        var cssSelectorString = (cssSelector && cssSelector.originalSelector) || cssSelector;
+        if (!cssSelectorString) {
             utils.alertNote.hide();
         }
 
@@ -146,18 +194,19 @@
             });
         }
 
-        if (cssSelector) {
-            editor.styleHighlightingSelector.cssText = cssSelector + '{outline: 1px dashed red !important;}';
+        if (cssSelectorString) {
+            editor.styleHighlightingSelector.cssText = cssSelectorString + '{outline: 1px dashed red !important; fill: red !important; }';
+                                                                                                                 // Helps in highlighting SVG elements
         } else {
             editor.styleHighlightingSelector.cssText = '';
         }
         editor.styleHighlightingSelector.applyTag();
 
-        if (cssSelector) {
+        if (cssSelectorString) {
             var count;
 
             try {
-                count = $(cssSelector).length;
+                count = $(cssSelectorString).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
             } catch (e) {
                 return '';
             }
@@ -170,10 +219,12 @@
                 return str;
             };
 
+            var cssSelectorToShow = htmlEscape(trunc(cssSelectorString, 100));
+            var sourcesToShow = (cssSelector && cssSelector.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(cssSelector.sources) + '</span></span>') : '';
             if (count) {
-                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
+                utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
             } else {
-                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+                utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>' + sourcesToShow, 2500);
             }
         }
     };
@@ -193,6 +244,16 @@
         }
         cm.setOption('gutters', gutters);
         cm.setOption('lint', lint);
+    };
+
+    var enablePointAndClick = false;
+    var enablePointAndClickFunctionality = function (editor) {
+        enablePointAndClick = true;
+        $(editor.container).addClass('magicss-point-and-click-activated');
+    };
+    var disablePointAndClickFunctionality = function (editor) {
+        enablePointAndClick = false;
+        $(editor.container).removeClass('magicss-point-and-click-activated');
     };
 
     var enableAutocompleteSelectors = function (editor) {
@@ -242,6 +303,202 @@
                 // do nothing
             },
             fnSuccess: function () {
+                var currentNode = null;
+                $(document).on('mousemove', function(event) {
+                    if (!enablePointAndClick) {
+                        return;
+                    }
+
+                    if ($(event.target) !== currentNode) {
+                        currentNode = $(event.target);
+
+                        if ($(currentNode).hasClass('magicss-mouse-over-dom-element')) {
+                            // do nothing
+                        } else {
+                            $('.magicss-mouse-over-dom-element').removeClass('magicss-mouse-over-dom-element');
+                            if (currentNode.get(0) !== $('#MagiCSS-bookmarklet').get(0) && !$(currentNode).parents('#MagiCSS-bookmarklet').length) {
+                                $(currentNode).addClass('magicss-mouse-over-dom-element');
+                            }
+                        }
+                    }
+                });
+
+                $(document).on('mousedown', function(evt) {
+                    if (evt.which !== 1) {      // If it is not left click
+                        return;
+                    }
+                    if (!enablePointAndClick) {
+                        return;
+                    } else {
+                        if ($(evt.target).hasClass('magicss-point-and-click')) {
+                            // do nothing
+                        } else {
+                            disablePointAndClickFunctionality(window.MagiCSSEditor);
+                        }
+                    }
+
+                    var currentNode = $(evt.target);
+                    if (currentNode.get(0) === $('#MagiCSS-bookmarklet').get(0) || $(currentNode).parents('#MagiCSS-bookmarklet').length) {
+                        return;
+                    }
+
+                    var $div = $('<div></div>');
+                    $('body').append($div);
+                    $div.attr('class', 'magicss-block-click');
+                    $div.css('position', 'fixed');
+                    $div.css('background-color', 'rgba(0,0,0,0)');
+                    $div.css('z-index', '2147483647');
+                    $div.css('width', '100%');
+                    $div.css('height', '100%');
+                    $div.css('left', '0px');
+                    $div.css('top', '0px');
+
+                    $('.magicss-mouse-over-dom-element').removeClass('magicss-mouse-over-dom-element');
+                    $div.on('mouseup', function () {
+                        $div.remove();
+                    });
+
+                    var targetElement = evt.target;
+                    setTimeout(function () {
+                        var selector = window.generateFullSelector(targetElement);
+                        var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
+
+                        var matchAll = function (fullSelector, smallSelector) {
+                            var tokens = smallSelector.split('.').join(' ').split('#').join(' ').split(' ');
+                            var tokenNotAvailable = tokens.some(function tokenNotInFullSelector(token) {
+                                return fullSelector.indexOf(token) === -1;
+                            });
+                            if (tokenNotAvailable === false) {
+                                return true;
+                            }
+                        };
+
+                        var matchingSelectors = [];
+
+                        var suggestedSelectors = [];
+                        try {
+                            suggestedSelectors = [
+                                window.generateSelector(targetElement),
+                                window.generateSelector(targetElement, {reverseClasses: true}),
+                                window.generateSelector(targetElement, {sortClasses: true}),
+                                window.generateSelector(targetElement, {sortClasses: true, reverseClasses: true})
+                            ];
+                        } catch (e) {
+                            var errorMessage = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
+                            // Kind-of hack: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
+                            setTimeout(function() { utils.alertNote(errorMessage, 10000); }, 0);
+                            console.log(errorMessage);
+                            console.log(e);     // The user might wish to add these detais for the report/issue in GitHub about this error.
+                        }
+                        suggestedSelectors = suggestedSelectors.filter(function(item, pos, self) {
+                            return self.indexOf(item) == pos;
+                        });
+
+                        matchingSelectors = matchingSelectors.concat(suggestedSelectors);
+
+                        Object.keys(workingSetOfSelectors).forEach(function (key) {
+                            var existingSelector = key;
+                            var matchesAll = matchAll(selector, existingSelector);
+                            if (matchesAll) {
+                                if ($(targetElement).is(existingSelector)) {
+                                    if (matchingSelectors.indexOf(existingSelector) === -1) {
+                                        matchingSelectors.push(existingSelector);
+                                    }
+                                }
+                            }
+                        });
+
+                        var cm = window.MagiCSSEditor.cm;
+
+                        var currentLine = cm.getLine(cm.getCursor().line);
+                        var whitespaceCharactersInCurrentLine = ((currentLine.match(/^\s+/g)) || [''])[0];
+
+                        var originalCursorPosition = cm.getCursor();
+                        var anyCharacterAfterCurrentCursorPosition = true;
+                        var anyNonWhitespaceCharacterBeforeCurrentCursorPosition = true;
+
+                        var indexOfFirstNonWhitespaceCharacter = currentLine.length - currentLine.trimLeft().length;
+                        if (indexOfFirstNonWhitespaceCharacter >= originalCursorPosition.ch) {
+                            anyNonWhitespaceCharacterBeforeCurrentCursorPosition = false;
+                        }
+                        if (originalCursorPosition.ch === currentLine.length) {
+                            anyCharacterAfterCurrentCursorPosition = false;
+                        }
+
+                        var extraSpaces = whitespaceCharactersInCurrentLine;
+                        for (let i = 0; i < matchingSelectors.length; i++) {
+                            matchingSelectors[i] = {
+                                displayText: matchingSelectors[i],
+                                originalSelector: matchingSelectors[i],
+                                sources: (function () {
+                                    var sources = [];
+                                    if (suggestedSelectors.indexOf(matchingSelectors[i]) >= 0) {
+                                        sources.push('Suggested by Magic CSS');
+                                    }
+
+                                    if (window.existingCSSSelectors[matchingSelectors[i]]) {
+                                        sources = sources.concat(window.existingCSSSelectors[matchingSelectors[i]]);
+                                    }
+
+                                    return sources;
+                                }()),
+                                text: (anyNonWhitespaceCharacterBeforeCurrentCursorPosition ? ('\n' + extraSpaces) : '') +
+                                    matchingSelectors[i] + ' {' +
+                                    '\n' + extraSpaces + '    ' +
+                                    '\n' + extraSpaces + '}' +
+                                    (anyCharacterAfterCurrentCursorPosition ? ('\n' + extraSpaces) : '')
+                            };
+                        }
+
+                        for (let i = 0; i < matchingSelectors.length; i++) {
+                            var sources = '';
+                            matchingSelectors[i].sources.forEach(function (source) {
+                                if (sources !== '') {
+                                    sources += ', ';
+                                }
+                                sources += ellipsis(source.substr(source.lastIndexOf('/') + 1), 50);
+                            });
+
+                            matchingSelectors[i].sources = sources;
+                        }
+
+                        if (cm.showHint) {
+                            cm.focus();
+
+                            var ob = {
+                                from: cm.getDoc().getCursor(),
+                                to: cm.getDoc().getCursor(),
+                                list: matchingSelectors
+                            };
+
+                            CodeMirror.on(ob, 'select', function (selectedTextOb) {
+                                showCSSSelectorMatches(selectedTextOb, window.MagiCSSEditor);
+                            });
+
+                            CodeMirror.on(ob, 'pick', function () {
+                                var cursorPos = cm.getCursor();
+                                if (anyCharacterAfterCurrentCursorPosition) {
+                                    cm.setCursor({ line: cursorPos.line - 2 });
+                                } else {
+                                    cm.setCursor({ line: cursorPos.line - 1 });
+                                }
+                            });
+
+                            CodeMirror.on(ob, 'close', function () {
+                                window.MagiCSSEditor.styleHighlightingSelector.cssText = '';
+                                window.MagiCSSEditor.styleHighlightingSelector.applyTag();
+                            });
+
+                            cm.showHint({
+                                hint: function() {
+                                    return ob;
+                                }
+                            });
+                        }
+                    });
+                    return false;
+                });
+
                 // Don't let mouse scroll on CodeMirror hints pass on to the parent elements
                 // http://stackoverflow.com/questions/5802467/prevent-scrolling-of-parent-element/16324762#16324762
                 $(document).on('DOMMouseScroll mousewheel', '.CodeMirror-hints', function(ev) {
@@ -350,9 +607,11 @@
 
                         $(document).on('click', '.magicss-mode-css', function () {
                             setLanguageMode('css', editor);
+                            editor.focus();
                         });
                         $(document).on('click', '.magicss-mode-less', function () {
                             setLanguageMode('less', editor);
+                            editor.focus();
                         });
                         $(document).on('click', '.magicss-mode-switch', function () {
                             if ($('#' + id).hasClass('magicss-selected-mode-css')) {
@@ -360,6 +619,7 @@
                             } else {
                                 setLanguageMode('css', editor);
                             }
+                            editor.focus();
                         });
 
                         return $outer;
@@ -380,8 +640,8 @@
                                 if (editor.userPreference('autocomplete-selectors') === 'disabled') {
                                     return;
                                 }
-                                if (window.existingCSSSelectors) {
-                                    add(window.existingCSSSelectors, true);
+                                if (existingCSSSelectorsWithAutocompleteObjects) {
+                                    add(existingCSSSelectorsWithAutocompleteObjects, true);
                                 }
                             },
                             onCssHintSelectForSelector: function (selectedText) {
@@ -406,20 +666,38 @@
                             }
                         }
                     },
-                    bgColor: '68,88,174,0.7',
+                    bgColor: '68,88,174,0.85',
                     headerIcons: [
+                        {
+                            name: 'point-and-click',
+                            title: 'Select an element in the page to generate its CSS Selector',
+                            cls: 'magicss-point-and-click',
+                            onclick: function (evt, editor) {
+                                if (enablePointAndClick) {
+                                    disablePointAndClickFunctionality(editor);
+                                } else {
+                                    utils.alertNote('Select an element in the page to generate its CSS selector', 5000);
+                                    enablePointAndClickFunctionality(editor);
+                                }
+                                editor.focus();
+                            }
+                        },
                         {
                             name: 'beautify',
                             title: 'Beautify code',
                             cls: 'magicss-beautify magicss-gray-out',
                             onclick: function (evt, editor) {
-                                var textValue = editor.getTextValue(),
-                                    beautifiedCSS = utils.beautifyCSS(textValue);
-                                if (textValue.trim() !== beautifiedCSS.trim()) {
-                                    editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                    utils.alertNote('Your code has been beautified :-)', 5000);
+                                var textValue = editor.getTextValue();
+                                if (!textValue.trim()) {
+                                    utils.alertNote('Please type some code to be beautified', 5000);
                                 } else {
-                                    utils.alertNote('Your code already looks beautiful :-)', 5000);
+                                    var beautifiedCSS = utils.beautifyCSS(textValue);
+                                    if (textValue.trim() !== beautifiedCSS.trim()) {
+                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been beautified :-)', 5000);
+                                    } else {
+                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
+                                    }
                                 }
                                 editor.focus();
                             }
@@ -434,6 +712,7 @@
                                 } else {
                                     editor.disableEnableCSS('disable');
                                 }
+                                editor.focus();
                             },
                             afterrender: function (editor, divIcon) {
                                 /* HACK: Remove this hack which is being used to handle "divIcon.title" change
@@ -473,29 +752,35 @@
                             onclick: function (evt, editor) {
                                 if (getLanguageMode() === 'less') {
                                     var lessCode = editor.getTextValue();
-                                    utils.lessToCSS(lessCode, function (err, cssCode) {
-                                        if (err) {
-                                            utils.alertNote(
-                                                'Invalid LESS syntax.' +
-                                                '<br />Error in line: ' + err.line + ' column: ' + err.column +
-                                                '<br />Error message: ' + err.message,
-                                                10000
-                                            );
-                                            highlightErroneousLineTemporarily(editor, err.line - 1);
-                                            editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
-                                        } else {
-                                            var beautifiedLessCode = utils.beautifyCSS(utils.minifyCSS(lessCode));
-                                            cssCode = utils.beautifyCSS(utils.minifyCSS(cssCode));
-
-                                            if (cssCode === beautifiedLessCode) {
-                                                utils.alertNote('Your code is already in CSS', 5000);
-                                            } else {
-                                                editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                utils.alertNote('Your code has been converted from LESS to CSS :-)' + noteForUndo, 5000);
-                                            }
-                                        }
+                                    if (!lessCode.trim()) {
+                                        editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Please type some LESS code to use this feature', 5000);
                                         editor.focus();
-                                    });
+                                    } else {
+                                        utils.lessToCSS(lessCode, function (err, cssCode) {
+                                            if (err) {
+                                                utils.alertNote(
+                                                    'Invalid LESS syntax.' +
+                                                    '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                                    '<br />Error message: ' + err.message,
+                                                    10000
+                                                );
+                                                highlightErroneousLineTemporarily(editor, err.line - 1);
+                                                editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
+                                            } else {
+                                                var beautifiedLessCode = utils.beautifyCSS(utils.minifyCSS(lessCode));
+                                                cssCode = utils.beautifyCSS(utils.minifyCSS(cssCode));
+
+                                                if (cssCode === beautifiedLessCode) {
+                                                    utils.alertNote('Your code is already CSS compatible', 5000);
+                                                } else {
+                                                    editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                    utils.alertNote('Your code has been converted from LESS to CSS :-)' + noteForUndo, 5000);
+                                                }
+                                            }
+                                            editor.focus();
+                                        });
+                                    }
                                 } else {
                                     utils.alertNote('Please switch to editing code in LESS mode to enable this feature', 5000);
                                     editor.focus();
@@ -598,7 +883,7 @@
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
                                     editor.setTextValue('').reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                    utils.alertNote('Please write some code to be minified', 5000);
+                                    utils.alertNote('Please type some code to be minified', 5000);
                                 } else {
                                     var minifiedCSS = utils.minifyCSS(textValue);
                                     if (textValue !== minifiedCSS) {
@@ -739,7 +1024,8 @@
                             }
 
                             if (cssClass) {
-                                editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important;}';
+                                editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important; fill: red !important; }';
+                                                                                                                            // Helps in highlighting SVG elements
                             } else {
                                 editor.styleHighlightingSelector.cssText = '';
                             }
@@ -813,7 +1099,7 @@
                         var count;
 
                         try {
-                            count = $(cssClass).length;
+                            count = $(cssClass).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
                         } catch (e) {
                             return '';
                         }

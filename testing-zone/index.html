@@ -1,0 +1,123 @@
+<html>
+
+<head>
+    <title>This page is used for testing purposes</title>
+
+    <link rel="stylesheet" href="parent-css.css" />
+
+    <style>
+        body b {
+            color: blue;
+        }
+        body all {
+            color: red;
+        }
+
+        html body p {}
+        html body a {}
+        body p {}
+
+        .testClsT\:123 {
+            color: blue;
+        }
+        html .testClsT\:123 {
+            color: green;
+        }
+    </style>
+
+    <script src="../extension/scripts/3rdparty/jquery-3.2.1.js"></script>
+    <!-- <script src="../extension/scripts/3rdparty/cssesc.browserified.js"></script> -->
+    <script src="../extension/scripts/magicss/generate-selector.js"></script>
+</head>
+
+<body>
+    <div>
+        <p>
+            hello
+        </p>
+        world
+
+        <br />
+
+        <div id="content">
+            <div class="cls1 cls2 cls9 cls5">
+                <span class="span1">
+                    <b class="b1" id="bone">b1 - has id</b>
+                    <b class="b2">b2</b>
+                    <b class="b1">b1</b>
+                    <b class="b2">b2</b>
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <br />
+    <br />
+
+    <div class="test">
+        <div class="test1">.test1</div>
+        <div class="testCls:123">.testCls\:123</div>
+        <div class="testCls:123 testCls8">.testCls8</div>
+
+        <div class="testClsA testClsB">.testClsB</div>
+        <div class="testClsB testClsA">.testClsA</div>
+
+        <div class="testClsX:123 testClsY">.testClsY</div>
+        <div class="testClsX testClsY:123">.testClsX</div>
+        <div class="testClsY:123 testClsX">.testClsX</div>
+        <div class="testClsY testClsX:123">.testClsY</div>
+        <div class="testClsX:123 testClsY:123">.testClsX\:123.testClsY\:123</div>
+        <div class="testClsY:123 testClsX:123">.testClsY\:123.testClsX\:123</div>
+
+        <div class="testClsP:123 testClsQ">.testClsQ</div>
+        <div class="testClsP testClsQ:123">.testClsP</div>
+
+        <div class="testClsN:123 testClsM">.testClsM</div>
+        <div class="testClsN testClsM:123">.testClsN</div>
+
+        <div class="testClsS:123 testClsT:123">.testClsT\:123</div>
+        <div class="testClsT:123 testClsS:123">.testClsS\:123</div>
+
+        <div id="testId1">#testId1</div>
+        <div id="testIdA testIdB">#testIdA\ testIdB</div>
+        <div id="testId:456">#testId\:456</div>
+    </div>
+
+    <script>
+        jQuery(function ($) {
+            var $testOnlyTheseElements = $('.test .only');
+            if ($testOnlyTheseElements.length) {
+                console.log('Warning: The tests are running for only a few (.test .only) elements. (Note: "only" class would get removed)');
+                $testOnlyTheseElements.removeClass('only');
+            }
+
+            var $elementsToTest = $testOnlyTheseElements;
+            if (!$elementsToTest.length) {
+                $elementsToTest = $('.test *');
+            }
+
+            var $skipTestingForTheseElements = $('.test .skip');
+            if ($skipTestingForTheseElements.length) {
+                console.log('Warning: The tests are being skipped for a few (.test .skip) elements. (Note: "skip" class would get removed)');
+                $elementsToTest.removeClass('skip');
+            }
+            $elementsToTest = $elementsToTest.not($skipTestingForTheseElements);
+
+            var errorFound = false;
+            $elementsToTest.each(function (index, el) {
+                if (el.innerText !== generateSelector(el)) {
+                    console.log('Error: Expected el.innerText ("' + el.innerText + '") = generateSelector(el) ("' + generateSelector(el) + '") for', el);
+                    errorFound = true;
+                }
+            });
+
+            if (!errorFound) {
+                console.log('All tests for CSS selector generation completed successfully :-)');
+            }
+        })
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+@import "child-css.css";
+
+body a {
+    -color: green;
+}
+
+
+body p {
+    color: pink;
+}
+body p {
+    color: blue;
+}
+body p {
+    color: maroon;
+}
+
+body all {
+    color: red;
+}

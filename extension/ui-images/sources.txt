@@ -12,6 +12,9 @@ hash.svg
 hash_edited.svg
     Manual edit of "hash.svg"
 
+point-and-click.png
+    chrome-devtools://devtools/bundled/Images/toolbarButtonGlyphs_2x.png
+
 unordered-list.svg
     https://www.iconfinder.com/icons/383201/list_unordered_icon#size=128
     https://www.iconfinder.com/icons/383201/download/svg/128

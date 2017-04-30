@@ -1,0 +1,19 @@
+body p {
+    color: red;
+}
+
+body all {
+    color: red;
+}
+
+div p {
+
+}
+
+html div {
+    color: maroon;
+}
+
+html div p {
+    color: blue;
+}

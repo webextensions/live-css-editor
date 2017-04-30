@@ -88,6 +88,7 @@ var main = function () {
         pathEditor + 'editor.js',
 
         pathMagicss + 'magicss.css',
+        pathMagicss + 'generate-selector.js',
         pathMagicss + 'magicss.js'
     ], allFrames);
 };
@@ -126,9 +127,10 @@ var prerequisitesReady = function (main) {
                             if (url.indexOf('file:///') === 0) {
                                 alert(
                                     TR('Include_ToExecuteMagicssEditor', 'To execute Live editor for CSS and LESS (Magic CSS) on:') +
-                                    '\n        ' + url + '\n\n' +
-                                    TR('Include_GrantPermisssions', 'You need to grant permissions by going to:') +
-                                    '\n        chrome://extensions'
+                                    '\n        ' + url +
+                                    '\n\n' + TR('Include_YouNeedToGoTo', 'You need to go to:') +
+                                    '\n        chrome://extensions' +
+                                    '\n\n' + TR('Include_GrantPermisssions', 'And grant permissions by checking "Allow access to file URLs" for this extension')
                                 );
                             } else {
                                 alert(

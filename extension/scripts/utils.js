@@ -226,6 +226,7 @@ var utils = window.utils || {};
             b = d.body,
             div = d.createElement('div'),
             t;
+        div.id = 'topCenterAlertNote';
 
         // Hide functionality
         var h = function (div) {

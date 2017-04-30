@@ -38,8 +38,13 @@
     var result = [];
     function add(keywords, allowMatchAnywhere) {
       for (var name in keywords)
-        if (!word || name.lastIndexOf(word, 0) == 0)
-          result.push(name);
+        if (!word || name.lastIndexOf(word, 0) == 0) {
+          if (typeof keywords[name] === 'object') {
+            result.push(keywords[name]);
+          } else {
+            result.push(name);
+          }
+        }
       // If truthy allowMatchAnywhere is passed, the typed string would match the typed characters anywhere in the
       // available CSS selectors. The "anywhere" matches would be added to the bottom of the list in alphabetical order
       if (allowMatchAnywhere) {
@@ -48,7 +53,12 @@
           if (!word || name.lastIndexOf(word, 0) == 0) {
             // do nothing (those matches have already been added previously)
           } else if (!word || name.indexOf(word) >= 0) {
-            anywhereMatches.push(name);
+            // anywhereMatches.push(name);
+            if (typeof keywords[name] === 'object') {
+              anywhereMatches.push(keywords[name]);
+            } else {
+              anywhereMatches.push(name);
+            }
           }
         }
         anywhereMatches = anywhereMatches.sort();
@@ -114,6 +124,8 @@
         to: CodeMirror.Pos(cur.line, end)
       };
       if (isCssHintForSelector) {
+        ob.selectedHint = -1;   // Do not auto-select the first item if the hint is for CSS selector
+
         CodeMirror.on(ob, 'select', function (selectedText, selectedEl) {
           var onCssHintSelectForSelector = (((cm.options) || {}).hintOptions || {}).onCssHintSelectForSelector;
           if (onCssHintSelectForSelector) {

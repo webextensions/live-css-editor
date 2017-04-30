@@ -344,7 +344,8 @@
       else if (i < 0)
         i = avoidWrap ? 0  : this.data.list.length - 1;
       if (this.selectedHint == i) return;
-      var node = this.hints.childNodes[this.selectedHint];
+      // var node = this.hints.childNodes[this.selectedHint];
+      var node = this.hints.childNodes[this.selectedHint === -1 ? 0 : this.selectedHint];       // If this.selectedHint is -1 (-1 indicates do not select any item), get 0th hint childNode (which would always be there)
       node.className = node.className.replace(" " + ACTIVE_HINT_ELEMENT_CLASS, "");
       node = this.hints.childNodes[this.selectedHint = i];
       node.className += " " + ACTIVE_HINT_ELEMENT_CLASS;

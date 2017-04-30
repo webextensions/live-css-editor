@@ -9,7 +9,7 @@
         "message": "You can run it on other web pages and websites."
     },
     "Include_GrantPermisssions": {
-        "message": "You need to grant permissions by going to:"
+        "message": "And grant permissions by checking \"Allow access to file URLs\" for this extension"
     },
     "Include_MagicssDoesNotOperateOnSomeTabs": {
         "message": "Magic CSS does not operate on Chrome extension pages and some other native tabs."
@@ -22,5 +22,8 @@
     },
     "Include_UnableToStart": {
         "message": "Unable to start"
+    },
+    "Include_YouNeedToGoTo": {
+        "message": "You need to go to:"
     }
 }
