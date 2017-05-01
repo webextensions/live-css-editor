@@ -10,6 +10,7 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 **Featuring:**
 * Live editor for CSS/LESS code - Preview changes as you write code
 * Syntax Highlighting
+* Auto-generate CSS selectors with point-and-click
 * Autocomplete for CSS selectors, properties and values
 * Color picker (supports HEX, RGB, RGBA, HSL and HSLA)
 * Convert code from LESS to CSS
@@ -35,7 +36,6 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * The CSS/LESS code you write gets applied as you write it
 * With this code tester, you can develop and test the code at the same time
 * The code is saved in browser as soon as you write it
-* Use it along with your favorite Firefox/Chrome Developer tools
 * The code editor is resizable and draggable
 * The code you write is auto-saved at site level and can be used again for same or different pages
 * You can use "TAB" key to indent your code
@@ -44,6 +44,8 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * The code you write is added at the bottom of the <body> tag of the active page
 * It includes code beautifier and minifier
 * It highlights the DOM elements matching the CSS selectors
+* Use it along with your favorite Firefox/Chrome Developer tools
+* You might find it useful in creating your custom themes for websites based on Stylish / Stylist
 * This extension is also known as "MagiCSS - Live CSS Editor"
 
 **Credits for open source code and services used by this extension:**
@@ -59,6 +61,9 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * Less
 * Mozilla Source Map
 * Tooltipster
+
+**Inspirations:**
+* "Auto-generate CSS selectors with point-and-click" feature is partly inspired by the Chrome extensions SelectorGadget and Stylebot
 
 **Connect to us at:**
 * https://webextensions.org/
