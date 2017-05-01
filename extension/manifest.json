@@ -16,6 +16,7 @@
     },
     "offline_enabled": true,
     "permissions": [
+        "activeTab",
         "storage"
     ],
     "optional_permissions": [

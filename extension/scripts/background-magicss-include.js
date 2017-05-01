@@ -116,33 +116,39 @@ var prerequisitesReady = function (main) {
             }
 
             if (chrome.permissions) {
-                chrome.permissions.request(
-                    {
-                        origins: [url]
-                    },
-                    function (granted) {
-                        if (granted) {
-                            main();
-                        } else {
-                            if (url.indexOf('file:///') === 0) {
-                                alert(
-                                    TR('Include_ToExecuteMagicssEditor', 'To execute Live editor for CSS and LESS (Magic CSS) on:') +
-                                    '\n        ' + url +
-                                    '\n\n' + TR('Include_YouNeedToGoTo', 'You need to go to:') +
-                                    '\n        chrome://extensions' +
-                                    '\n\n' + TR('Include_GrantPermisssions', 'And grant permissions by checking "Allow access to file URLs" for this extension')
-                                );
-                            } else {
-                                alert(
-                                    TR('Include_UnableToStart', 'Unable to start') +
-                                    '\n        ' + TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + '\n\n' +
-                                    TR('Include_RequiresYourPermission', 'It requires your permission to execute on:') +
-                                    '\n        ' + url
-                                );
+                chrome.permissions.getAll(function (permissionsOb) {
+                    if (((permissionsOb || {}).permissions || []).indexOf('activeTab') >= 0) {
+                        main();
+                    } else {
+                        chrome.permissions.request(
+                            {
+                                origins: [url]
+                            },
+                            function (granted) {
+                                if (granted) {
+                                    main();
+                                } else {
+                                    if (url.indexOf('file:///') === 0) {
+                                        alert(
+                                            TR('Include_ToExecuteMagicssEditor', 'To execute Live editor for CSS and LESS (Magic CSS) on:') +
+                                            '\n        ' + url +
+                                            '\n\n' + TR('Include_YouNeedToGoTo', 'You need to go to:') +
+                                            '\n        chrome://extensions' +
+                                            '\n\n' + TR('Include_GrantPermisssions', 'And grant permissions by checking "Allow access to file URLs" for this extension')
+                                        );
+                                    } else {
+                                        alert(
+                                            TR('Include_UnableToStart', 'Unable to start') +
+                                            '\n        ' + TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + '\n\n' +
+                                            TR('Include_RequiresYourPermission', 'It requires your permission to execute on:') +
+                                            '\n        ' + url
+                                        );
+                                    }
+                                }
                             }
-                        }
+                        );
                     }
-                );
+                });
             } else {
                 try {
                     main();
