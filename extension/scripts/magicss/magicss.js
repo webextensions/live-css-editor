@@ -1,9 +1,5 @@
 /*globals jQuery, less, utils, sourceMap, extLib, chrome, CodeMirror */
 
-// TODO: Emmet might be integrated as mentioned in the example at: https://mikethedj4.github.io/kodeWeave/editor/#b9a99b76536392cb5ec5004bc37b8fcc
-// TODO: Add autoprefixer (https://github.com/postcss/autoprefixer) (https://autoprefixer.github.io/)
-// TODO: Detect error in CSS selector generation and ask the user to report the issue on GitHub
-
 (function($){
     if (window.MagiCSSEditor) {
         window.MagiCSSEditor.reposition();      // 'Magic CSS window is already there. Repositioning it.'
@@ -385,7 +381,9 @@
                             ];
                         } catch (e) {
                             var errorMessage = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
-                            // Kind-of hack: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
+                            // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
+                            //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
+                            //               always gets fired
                             setTimeout(function() { utils.alertNote(errorMessage, 10000); }, 0);
                             console.log(errorMessage);
                             console.log(e);     // The user might wish to add these detais for the report/issue in GitHub about this error.
