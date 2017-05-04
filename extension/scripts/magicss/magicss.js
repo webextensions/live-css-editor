@@ -1,5 +1,7 @@
 /*globals jQuery, less, utils, sourceMap, extLib, chrome, CodeMirror */
 
+/*! https://webextensions.org/ by Priyank Parashar | MIT license */
+
 (function($){
     if (window.MagiCSSEditor) {
         window.MagiCSSEditor.reposition();      // 'Magic CSS window is already there. Repositioning it.'
@@ -96,14 +98,25 @@
         };
     });
 
-    var isChrome = /Chrome/.test(navigator.userAgent),
-        isFirefox = /Firefox/.test(navigator.userAgent);
+    var isChrome = false,
+        isEdge = false,
+        isFirefox = false;
+
+    if (/Edge/.test(navigator.appVersion)) {            // Test for "Edge" first, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
+        isEdge = true;
+    } else if (/Chrome/.test(navigator.appVersion)) {
+        isChrome = true;
+    } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
+        isFirefox = true;
+    }
 
     var strCreatedVia = 'Created via Magic CSS extension';
     if (isChrome) {
         strCreatedVia += ' for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol';
     } else if (isFirefox) {
         strCreatedVia += ' for Firefox';
+    } else if (isEdge) {
+        strCreatedVia += ' for Edge';
     }
     var createGist = function (text, cb) {
         $.ajax({
@@ -117,7 +130,10 @@
                         return ' extension for Chrome';
                     } else if (isFirefox) {
                         return ' extension for Firefox';
+                    } else if (isEdge) {
+                        return ' extension for Edge';
                     }
+                    return '';
                 }()),
                 "public": true,
                 "files": {
@@ -907,7 +923,7 @@
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' (for Chrome %26 Firefox) ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
                         {
                             name: 'github-repo',

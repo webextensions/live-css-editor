@@ -31,4 +31,4 @@
 * Add translations/internationalization
 
 #### Miscellaneous
-* Show link to Magic CSS extension for other browsers (currently Chrome & Firefox)
+* Show link to Magic CSS extension for other browsers

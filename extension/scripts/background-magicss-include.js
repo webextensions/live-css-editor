@@ -11,7 +11,7 @@ var main = function () {
         pathEditor = pathMagicss + 'editor/',
         pathCodeMirror = path3rdparty + 'codemirror/';
 
-    var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:") ? true : false;
+    var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:" || document.location.protocol === "ms-browser-extension:") ? true : false;
     // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
     // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
@@ -20,6 +20,8 @@ var main = function () {
             src: path3rdparty + 'async.js',
             skip: typeof async === "undefined" || runningInBrowserExtension ? false : true
         },
+
+        path3rdparty + 'css.escape.js',
 
         path3rdparty + 'fiber.js',
 

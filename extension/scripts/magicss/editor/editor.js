@@ -552,42 +552,17 @@
 
             thisOb.container.style.padding = '7px';
 
-            var isResizeSupported = false;
-            try {
-                // Using try...catch because there were some pages (eg: on stackoverflow.com), where an error was being thrown
-                if (window.getComputedStyle && window.getComputedStyle(textarea, null).getPropertyValue('resize')) {
-                    // If a CSS style is not supported, $(selector).css(styleName) returns:
-                    //     null - Chrome
-                    //     Blank string - IE 9, Firefox
-                    //     undefined - IE 7, IE 8
-                    isResizeSupported = true;
-                }
-            } catch (e) {
-                // Do nothing
-            }
-            if (isResizeSupported === false) {
-                thisOb.container.style.paddingBottom = '0';
-            }
-
             var disableResize = !!options.disableResize;
             if (!disableResize) {
-                if (isResizeSupported) {
-                    if (rememberDimensions) {
-                        thisOb.initialWidth = thisOb.userPreference('ui-size-width');
-                        thisOb.initialHeight = thisOb.userPreference('ui-size-height');
-                    } else {
-                        thisOb.initialWidth = thisOb.defaultPreference('ui-size-width');
-                        thisOb.initialHeight = thisOb.defaultPreference('ui-size-height');
-                    }
+                if (rememberDimensions) {
+                    thisOb.initialWidth = thisOb.userPreference('ui-size-width');
+                    thisOb.initialHeight = thisOb.userPreference('ui-size-height');
                 } else {
-                    // TODO: make it resizable
+                    thisOb.initialWidth = thisOb.defaultPreference('ui-size-width');
+                    thisOb.initialHeight = thisOb.defaultPreference('ui-size-height');
                 }
             } else {
-                if (isResizeSupported) {
-                    textarea.style.resize = 'none';
-                } else {
-                    // do nothing
-                }
+                textarea.style.resize = 'none';
             }
 
             (function () {

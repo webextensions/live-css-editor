@@ -17,7 +17,12 @@
         "256": "icons/icon-256.png"
     },
     "offline_enabled": true,
+    "-ms-preload": {
+        "backgroundScript": "backgroundScriptsAPIBridge.js",
+        "contentScript": "contentScriptsAPIBridge.js"
+    },
     "permissions": [
+        "<all_urls>",
         "activeTab",
         "storage"
     ],

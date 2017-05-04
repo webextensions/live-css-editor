@@ -1,5 +1,5 @@
 # live-css-editor
-Code for the Chrome/Firefox extension **Live editor for CSS and LESS** *- Magic CSS*
+Code for the Chrome/Edge/Firefox extension **Live editor for CSS and LESS** *- Magic CSS*
 * https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
 * https://addons.mozilla.org/en-US/firefox/addon/live-editor-for-css-and-less/
 
@@ -44,7 +44,7 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * The code you write is added at the bottom of the <body> tag of the active page
 * It includes code beautifier and minifier
 * It highlights the DOM elements matching the CSS selectors
-* Use it along with your favorite Firefox/Chrome Developer tools
+* Use it along with your favorite Chrome/Edge/Firefox Developer tools
 * You might find it useful in creating your custom themes for websites based on Stylish / Stylist
 * This extension is also known as "MagiCSS - Live CSS Editor"
 
