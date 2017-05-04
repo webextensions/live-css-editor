@@ -3,3 +3,5 @@
 # node_modules ignored by default
 
 extension/scripts/3rdparty/
+extension/backgroundScriptsAPIBridge.js
+extension/contentScriptsAPIBridge.js
