@@ -114,9 +114,9 @@
     if (isChrome) {
         strCreatedVia += ' for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol';
     } else if (isFirefox) {
-        strCreatedVia += ' for Firefox';
+        strCreatedVia += ' for Firefox - https://webextensions.org/';
     } else if (isEdge) {
-        strCreatedVia += ' for Edge';
+        strCreatedVia += ' for Edge - https://webextensions.org/';
     }
     var createGist = function (text, languageMode, cb) {
         var files = {};
