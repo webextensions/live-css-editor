@@ -3,14 +3,27 @@ ban.svg
     https://www.iconfinder.com/icons/1608568/download/svg/128
 
 ban_edited.svg
-    Manual edit of "ban.svg"
+    Slightly modified version of "ban.svg"
 
 hash.svg
     https://www.iconfinder.com/icons/118664/hash_icon
     https://www.iconfinder.com/icons/118664/download/svg/512
 
 hash_edited.svg
-    Manual edit of "hash.svg"
+    Slightly modified version of "hash.svg"
+
+logo-firefox_edited.png
+    Resized version of /usr/lib/firefox/browser/icons/mozicon128.png
+    See: https://support.mozilla.org/en-US/questions/943506
+
+logo-google-chrome.svg
+    https://upload.wikimedia.org/wikipedia/commons/e/e2/Google_Chrome_icon_%282011%29.svg
+
+logo-microsoft-edge.svg
+    https://upload.wikimedia.org/wikipedia/commons/d/d6/Microsoft_Edge_logo.svg
+
+logo-microsoft-edge_edited.svg
+    Slightly modified version of "logo-microsoft-edge.svg"
 
 point-and-click.png
     chrome-devtools://devtools/bundled/Images/toolbarButtonGlyphs_2x.png
@@ -20,7 +33,7 @@ unordered-list.svg
     https://www.iconfinder.com/icons/383201/download/svg/128
 
 unordered-list_edited.svg
-    Manual edit (using http://www.drawsvg.org/) of "unordered-list.svg"
+    Slightly modified version (using http://www.drawsvg.org/) of "unordered-list.svg"
 
 warning.png
     https://www.iconfinder.com/icons/173946/warning_icon

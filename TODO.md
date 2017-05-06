@@ -30,8 +30,5 @@
 * Add translations/internationalization
 
 #### Releases
-* Upload to store for Microsoft Edge
-* Since this extension is pending review for Mozilla Firefox, upload a signed version on https://webextensions.org/
-
-#### Miscellaneous
-* Show link to Magic CSS extension for other browsers
+* Update the link once it becomes available on store for Microsoft Edge
+* Update the link once it becomes available on store for Mozilla Firefox

@@ -1,6 +1,6 @@
 {
   "name": "magicss",
-  "version": "5.4.1",
+  "version": "5.4.2",
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
     "zip-chrome-extension": "node ./zip-extension.js chrome",

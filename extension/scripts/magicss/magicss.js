@@ -1,4 +1,4 @@
-/*globals jQuery, less, utils, sourceMap, extLib, chrome, CodeMirror */
+/*globals jQuery, less, utils, sourceMap, chrome, CodeMirror */
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
@@ -607,6 +607,37 @@
                     return $('#' + id).hasClass('magicss-selected-mode-css') ? 'css' : 'less';
                 };
 
+                var getMagicCSSForChrome,
+                    getMagicCSSForEdge,
+                    getMagicCSSForFirefox;
+                getMagicCSSForChrome = {
+                    name: 'get-magic-css-for-chrome',
+                    title: 'Magic CSS for Chrome',
+                    uniqCls: 'get-magic-css-for-chrome',
+                    href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol'
+                };
+                getMagicCSSForEdge = {
+                    name: 'get-magic-css-for-edge',
+                    title: 'Magic CSS for Edge',
+                    uniqCls: 'get-magic-css-for-edge',
+                    href: 'https://webextensions.org/'
+                };
+                getMagicCSSForFirefox = {
+                    name: 'get-magic-css-for-firefox',
+                    title: 'Magic CSS for Firefox',
+                    uniqCls: 'get-magic-css-for-firefox',
+                    href: 'https://webextensions.org/'
+                };
+                if (isChrome) {
+                    getMagicCSSForChrome = null;
+                }
+                if (isEdge) {
+                    getMagicCSSForEdge = null;
+                }
+                if (isFirefox) {
+                    getMagicCSSForFirefox = null;
+                }
+
                 var options = {
                     id: id,
                     title: function ($, editor) {
@@ -919,12 +950,17 @@
                                 editor.focus();
                             }
                         },
+                        /*
                         {
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
                             href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
+                        /* */
+                        getMagicCSSForChrome,
+                        getMagicCSSForEdge,
+                        getMagicCSSForFirefox,
                         {
                             name: 'github-repo',
                             title: 'Contribute / Report issue',
