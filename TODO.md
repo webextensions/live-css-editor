@@ -10,7 +10,6 @@
 * CodeMirror autocomplete suggestions should have fixed position OR they should not let scroll event pass through to parent-elements/body OR both
 
 #### Environments
-* Add support for Microsoft Edge
 * Make "editor" a standalone project, so that it can be added to an HTML page as well
 * Make "Magic CSS" a standalone project, so that it can be added to an HTML page as well
 
@@ -29,6 +28,10 @@
 
 #### Language Support
 * Add translations/internationalization
+
+#### Releases
+* Upload to store for Microsoft Edge
+* Since this extension is pending review for Mozilla Firefox, upload a signed version on https://webextensions.org/
 
 #### Miscellaneous
 * Show link to Magic CSS extension for other browsers
