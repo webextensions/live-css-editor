@@ -118,7 +118,11 @@
     } else if (isEdge) {
         strCreatedVia += ' for Edge';
     }
-    var createGist = function (text, cb) {
+    var createGist = function (text, languageMode, cb) {
+        var files = {};
+        files[languageMode === 'less' ? 'styles.less' : 'styles.css'] = {
+            "content": text + '\r\n\r\n/* ' + strCreatedVia + ' */\r\n'
+        };
         $.ajax({
             url: 'https://api.github.com/gists',
             type: 'POST',
@@ -136,11 +140,7 @@
                     return '';
                 }()),
                 "public": true,
-                "files": {
-                    "styles.css": {
-                        "content": text + '\r\n\r\n/* ' + strCreatedVia + ' */\r\n'
-                    }
-                }
+                "files": files
             }),
             error: function () {
                 utils.alertNote('An unexpected error has occured.<br />We could not reach GitHub Gist.', 10000);
@@ -157,7 +157,7 @@
     var createGistAndEmail = (function () {
         var lastMailedValue = null,
             lastSuccessNote = '';
-        return function (text) {
+        return function (text, languageMode) {
             text = $.trim(text);
             if (text === '') {
                 utils.alertNote('Please type some code to be shared', 5000);
@@ -168,7 +168,7 @@
                 if (!wishToContinue) {
                     return;
                 }
-                createGist(text, function (gistUrl) {
+                createGist(text, languageMode, function (gistUrl) {
                     var anchor = '<a target="_blank" href="' + gistUrl + '">' + gistUrl + '</a>';
                     lastMailedValue = text;
                     lastSuccessNote = 'The GitHub Gist was successfully created: ' +
@@ -671,7 +671,7 @@
                         extraKeys: {
                             'Ctrl-S': function () {
                                 var editor = window.MagiCSSEditor;
-                                createGistAndEmail(editor.getTextValue());
+                                createGistAndEmail(editor.getTextValue(), getLanguageMode());
                                 editor.focus();
                             },
                             'Ctrl-D': function () {
@@ -915,7 +915,7 @@
                             title: 'Mail code (via Gist)',
                             uniqCls: 'magicss-email',
                             onclick: function (evt, editor) {
-                                createGistAndEmail(editor.getTextValue());
+                                createGistAndEmail(editor.getTextValue(), getLanguageMode());
                                 editor.focus();
                             }
                         },
