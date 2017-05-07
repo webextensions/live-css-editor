@@ -1,5 +1,5 @@
 # Live editor for CSS and LESS (Magic CSS)
-Source code for the Chrome/Edge/Firefox extension **Live editor for CSS and LESS** *(Magic CSS)*
+Extension **Live editor for CSS and LESS** *(Magic CSS)* for Google Chrome, Microsoft Edge and Mozilla Firefox.
 
 <img width="32" alt="Google Chrome Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-google-chrome.svg"> &nbsp; https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
 
