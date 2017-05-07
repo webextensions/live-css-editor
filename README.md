@@ -1,7 +1,11 @@
-# live-css-editor
-Code for the Chrome/Edge/Firefox extension **Live editor for CSS and LESS** *- Magic CSS*
-* https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
-* https://addons.mozilla.org/en-US/firefox/addon/live-editor-for-css-and-less/
+# Live editor for CSS and LESS (Magic CSS)
+Source code for the Chrome/Edge/Firefox extension **Live editor for CSS and LESS** *(Magic CSS)*
+
+<img width="32" alt="Google Chrome Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-google-chrome.svg"> &nbsp; https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
+
+<img width="32" alt="Microsoft Edge Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-microsoft-edge.svg"> &nbsp; https://webextensions.org/ (manual installation)
+
+<img width="32" alt="Mozilla Firefox Logo" src="extension/ui-images/logo-firefox_edited.png"> &nbsp; https://webextensions.org/ (self distributed installation)
 
 **Live preview of CSS/LESS code with an in-page editor. Featuring autocomplete, LESS code to CSS conversion, beautify, minify, etc.**
 
@@ -22,10 +26,11 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 **Open source:**
 * https://github.com/webextensions/live-css-editor
 
-This extension is available for:
+**This extension is available for:**
 * Google Chrome
 * Microsoft Edge
 * Mozilla Firefox
+
 Visit https://webextensions.org/ for further details
 
 **Created by:**
