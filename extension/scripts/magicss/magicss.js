@@ -21,6 +21,20 @@
 
     window.existingCSSSelectors = (function () {
         var selectorsOb = {};
+        var handleErrorInReadingCSS = function (e) {
+            if (e.name === 'SecurityError') {   // This may happen due to cross-domain CSS resources
+                // do nothing
+            } else {
+                console.log(
+                    'If you are seeing this message, it means that Magic CSS extension encountered an unexpected error' +
+                    ' when trying to read the list of existing CSS selectors.' +
+                    '\n\nDon\'t worry :-) This would not cause any issue at all in usage of this extension.' +
+                    ' But we would be glad if you report about this error message at https://github.com/webextensions/live-css-editor/issues' +
+                    ' so that we can investigate this minor bug and provide better experience for you and other web developers.'
+                );
+            }
+        };
+
         try {
             var styleSheets = document.styleSheets;
             var getCSSSelectorsRecursively = function (cssRules, includeMediaTitle) {
@@ -51,10 +65,18 @@
                 }
                 return cssSelectors;
             };
+
             for (var i = 0; i < styleSheets.length; i++) {
                 var styleSheet = styleSheets[i];
 
-                var cssRules = (styleSheet || {}).cssRules || [];
+                var cssRules;
+                try {
+                    cssRules = (styleSheet || {}).cssRules;
+                } catch (e) {
+                    handleErrorInReadingCSS(e);
+                }
+                cssRules = cssRules || [];
+
                 var cssSelectors = getCSSSelectorsRecursively(cssRules, true);
                 cssSelectors.forEach(function (cssSelector) {
                     selectorsOb[cssSelector.selector] = selectorsOb[cssSelector.selector] || [];
@@ -64,17 +86,7 @@
                 });
             }
         } catch (e) {
-            if (e.name === 'SecurityError') {   // This may happen due to cross-domain CSS resources
-                // do nothing
-            } else {
-                console.log(
-                    'If you are seeing this message, it means that Magic CSS extension encountered an unexpected error' +
-                    ' when trying to read the list of existing CSS selectors.' +
-                    '\n\nDon\'t worry :-) This would not cause any issue at all in usage of this extension.' +
-                    ' But we would be glad if you report about this error message at https://github.com/webextensions/live-css-editor/issues' +
-                    ' so that we can investigate this minor bug and provide better experience for you and other web developers.'
-                );
-            }
+            handleErrorInReadingCSS(e);
             return {};
         }
 
