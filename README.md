@@ -22,6 +22,12 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 **Open source:**
 * https://github.com/webextensions/live-css-editor
 
+This extension is available for:
+* Google Chrome
+* Microsoft Edge
+* Mozilla Firefox
+Visit https://webextensions.org/ for further details
+
 **Created by:**
 * Priyank Parashar
 
