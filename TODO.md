@@ -17,7 +17,6 @@
 * Customize indentation (allow using tab/n-spaces)
 
 #### Compilation and Build
-* Add script for generating zip files for the extension to be uploaded to Browsers' stores
 * Add webpack based compilation (currently, it is split into too many files which increases load time)
 
 #### Refactoring
