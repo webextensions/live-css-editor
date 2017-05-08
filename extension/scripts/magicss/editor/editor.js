@@ -260,6 +260,8 @@
                     if (options.rememberDimensions) {
                         thisOb.savePosition({ top: ui.position.top, left: ui.position.left });
                     }
+
+                    thisOb.focus();
                 }
             });
         }
