@@ -19,7 +19,91 @@
         return (str.length <= limit) ? str : (str.substring(0, limit - 3) + '...');
     };
 
-    window.existingCSSSelectors = (function () {
+    var reloadCSSInPage = function () {
+        // http://stackoverflow.com/questions/10830357/javascript-toisostring-ignores-timezone-offset/28149561#28149561
+        var tzoffset = (new Date()).getTimezoneOffset() * 60000, //offset in milliseconds
+            localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0,-1);
+        localISOTime = localISOTime.slice(0, -4).replace('T', '_');
+
+        // The disabled <link> tags are not loaded when href is changed, so don't include them
+        // Don't include the elements which don't have a value set for href
+        var $links = $('link[rel~="stylesheet"]:not([disabled])').filter(function () {
+            if (this.reloadingActiveWithMagicCSS) {
+                return false;
+            }
+            if (!$(this).attr('href')) {
+                return false;
+            }
+            return true;
+        });
+
+        var successCount = 0,
+            errorCount = 0;
+        var checkCompletion = function () {
+            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + $links.length);
+            if ($links.length === successCount + errorCount) {
+                setTimeout(function () {
+                    if (errorCount) {
+                        if (errorCount === 1) {
+                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tag failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                        } else {
+                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                        }
+                    } else {
+                        utils.alertNote(htmlEscape('All active CSS <link> tags got reloaded successfully :-)'));
+                    }
+                }, 750);
+
+                var tagsToExclude = jQuery.makeArray(jQuery('[data-style-created-by="magicss"]'));
+                updateExistingCSSSelectorsAndAutocomplete(tagsToExclude);
+            }
+        };
+        if ($links.length) {
+            checkCompletion();
+            $links.each(function () {
+                var link = this,
+                    $link = $(link),
+                    href = $link.attr('href');
+                if (href.indexOf('reloadedAt=') >= 0) {
+                    href = href.replace(/[\?\&]reloadedAt\=[\d-_\:]+/, '');
+                }
+                var newHref;
+                if (href.indexOf('?') >= 0) {
+                    newHref = href + '&reloadedAt=' + localISOTime;
+                } else {
+                    newHref = href + '?reloadedAt=' + localISOTime;
+                }
+
+                var $newLink = $link.clone(),
+                    newLink = $newLink.get(0);
+                newLink.onload = function () {
+                    delete newLink.reloadingActiveWithMagicCSS;
+                    delete link.reloadingActiveWithMagicCSS;
+                    $link.remove();
+                    successCount++;
+                    checkCompletion();
+                };
+                newLink.onerror = function () {
+                    delete newLink.reloadingActiveWithMagicCSS;
+                    delete link.reloadingActiveWithMagicCSS;
+                    $newLink.remove();
+                    errorCount++;
+                    checkCompletion();
+                };
+
+                newLink.reloadingActiveWithMagicCSS = true;
+                link.reloadingActiveWithMagicCSS = true;
+
+                $newLink.attr('href', newHref);
+                $link.after($newLink);
+            });
+        } else {
+            utils.alertNote(htmlEscape('There are no active CSS <link> tags to be reloaded.'));
+        }
+    };
+
+    var getExistingCSSSelectors = function (tagsToExclude) {
+        tagsToExclude = tagsToExclude || [];
         var selectorsOb = {};
         var handleErrorInReadingCSS = function (e) {
             if (e.name === 'SecurityError') {   // This may happen due to cross-domain CSS resources
@@ -69,6 +153,15 @@
             for (var i = 0; i < styleSheets.length; i++) {
                 var styleSheet = styleSheets[i];
 
+                var shouldTagBeExcluded = tagsToExclude.some(function (tagsToExclude) {
+                    if (styleSheet.ownerNode === tagsToExclude) {
+                        return true;
+                    }
+                });
+                if (shouldTagBeExcluded) {
+                    continue;
+                }
+
                 var cssRules;
                 try {
                     cssRules = (styleSheet || {}).cssRules;
@@ -91,24 +184,35 @@
         }
 
         return selectorsOb;
-    }());
+    };
 
-    var existingCSSSelectorsWithAutocompleteObjects = $.extend(true, {}, window.existingCSSSelectors);
-    Object.keys(existingCSSSelectorsWithAutocompleteObjects).forEach(function (key) {
-        var sources = '';
-        existingCSSSelectorsWithAutocompleteObjects[key].forEach(function (source) {
-            if (sources !== '') {
-                sources += ', ';
-            }
-            sources += ellipsis(source.substr(source.lastIndexOf('/') + 1), 50);
+    var existingCSSSelectorsWithAutocompleteObjects = {};
+    var updateExistingCSSSelectorsAndAutocomplete = function (tagsToExclude) {
+        window.existingCSSSelectors = getExistingCSSSelectors(tagsToExclude);
+
+        existingCSSSelectorsWithAutocompleteObjects = $.extend(true, {}, window.existingCSSSelectors);
+        Object.keys(existingCSSSelectorsWithAutocompleteObjects).forEach(function (key) {
+            var sources = '';
+            existingCSSSelectorsWithAutocompleteObjects[key].forEach(function (source) {
+                if (sources !== '') {
+                    sources += ', ';
+                }
+                sources += ellipsis(
+                    source
+                        .replace(/[\?\&]reloadedAt\=[\d-_\:]+/, '')
+                        .substr(source.lastIndexOf('/') + 1),
+                    50
+                );
+            });
+
+            existingCSSSelectorsWithAutocompleteObjects[key] = {
+                sources: sources,
+                originalSelector: key,
+                text: key
+            };
         });
-
-        existingCSSSelectorsWithAutocompleteObjects[key] = {
-            sources: sources,
-            originalSelector: key,
-            text: key
-        };
-    });
+    };
+    updateExistingCSSSelectorsAndAutocomplete();
 
     var isChrome = false,
         isEdge = false,
@@ -214,6 +318,10 @@
             editor.styleHighlightingSelector = new utils.StyleTag({
                 id: 'magicss-higlight-by-selector',
                 parentTag: 'body',
+                attributes: [{
+                    name: 'data-style-created-by',
+                    value: 'magicss'
+                }],
                 overwriteExistingStyleTagWithSameId: true
             });
         }
@@ -562,6 +670,10 @@
                     newStyleTag = new utils.StyleTag({
                         id: newStyleTagId,
                         parentTag: 'body',
+                        attributes: [{
+                            name: 'data-style-created-by',
+                            value: 'magicss'
+                        }],
                         overwriteExistingStyleTagWithSameId: true
                     });
 
@@ -913,6 +1025,15 @@
                             }
                         },
                         {
+                            name: 'reload-css-resources',
+                            title: 'Reload CSS resources',
+                            uniqCls: 'magicss-reload-css-resources',
+                            onclick: function (evt, editor) {
+                                reloadCSSInPage();
+                                editor.focus();
+                            }
+                        },
+                        {
                             name: 'disable-autocomplete-selectors',
                             title: 'Disable autocomplete for CSS selectors',
                             uniqCls: 'magicss-disable-autocomplete-selectors',
@@ -1004,6 +1125,10 @@
                     events: {
                         launched: function (editor) {
                             utils.addStyleTag({
+                                attributes: [{
+                                    name: 'data-style-created-by',
+                                    value: 'magicss'
+                                }],
                                 cssText: (
                                     // Setting display style for UI components generated using this extension
                                     '#' + id + ','
@@ -1020,6 +1145,10 @@
                             }, 750);
 
                             utils.addStyleTag({
+                                attributes: [{
+                                    name: 'data-style-created-by',
+                                    value: 'magicss'
+                                }],
                                 cssText: (
                                     // Setting display style for UI components generated using this extension
                                     '#' + id + ' .cancelDragHandle'
@@ -1081,6 +1210,10 @@
                                 editor.styleHighlightingSelector = new utils.StyleTag({
                                     id: 'magicss-higlight-by-selector',
                                     parentTag: 'body',
+                                    attributes: [{
+                                        name: 'data-style-created-by',
+                                        value: 'magicss'
+                                    }],
                                     overwriteExistingStyleTagWithSameId: true
                                 });
                             }

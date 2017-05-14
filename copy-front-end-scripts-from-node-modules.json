@@ -1,0 +1,6 @@
+[
+    {
+        "from": "node_modules/jquery/dist/jquery.js",
+        "to": "extension/scripts/3rdparty/jquery-3.2.1.js"
+    }
+]

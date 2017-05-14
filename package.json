@@ -3,13 +3,18 @@
   "version": "5.4.5",
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
+    "postinstall": "copy-files-from-to copy-front-end-scripts-from-node-modules.json",
     "zip-chrome-extension": "node ./zip-extension.js chrome",
     "zip-edge-extension": "node ./zip-extension.js edge",
     "zip-firefox-extension": "node ./zip-extension.js firefox"
   },
+  "dependencies": {
+    "jquery": "3.2.1"
+  },
   "devDependencies": {
     "archiver": "1.3.0",
     "chalk": "1.1.3",
+    "copy-files-from-to": "0.0.3",
     "cp-file": "4.1.1",
     "del": "2.2.2",
     "eslint": "3.19.0"

@@ -81,6 +81,11 @@ var utils = window.utils || {};
                 styleNode.id = id;
             }
         }
+        var attributes = config.attributes || [],
+            $styleNode = jQuery(styleNode);
+        attributes.forEach(function (attribute) {
+            $styleNode.attr(attribute.name, attribute.value);
+        });
 
         var cssText = config.cssText;
         /* browser detection (based on prototype.js) */
@@ -119,6 +124,7 @@ var utils = window.utils || {};
 
             proto.applyTag = function () {
                 utils.addStyleTag({
+                    attributes: config.attributes,
                     cssText: this.cssText,
                     id: this.id,
                     parentTag: this.parentTag,
