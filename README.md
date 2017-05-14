@@ -21,6 +21,7 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * Beautify / Format code
 * Minify code
 * Highlight DOM elements matching the CSS selectors
+* CSS Reloader
 * Create GitHub Gist & E-mail
 
 **Open source:**
@@ -41,6 +42,7 @@ Visit https://webextensions.org/ for further details
 * Speed-up development and testing of your styling code by doing it directly on your page
 * Develop and test your code before finalizing your changes into the project files
 * Apply some temporary styles (like hiding some components)
+* Reload CSS resources without refreshing the page
 * Test styling changes even when you cannot modify the original source code
 
 **Notes:**
@@ -53,7 +55,7 @@ Visit https://webextensions.org/ for further details
 * Running Magic CSS again, while it is already loaded, will restore it to its original position and size
 * Press "Esc" or click on close to hide it and run it again to continue making changes
 * The code you write is added at the bottom of the <body> tag of the active page
-* It includes code beautifier and minifier
+* It includes CSS/LESS beautifier and minifier
 * It highlights the DOM elements matching the CSS selectors
 * Use it along with your favorite Chrome/Edge/Firefox Developer tools
 * You might find it useful in creating your custom themes for websites based on Stylish / Stylist
