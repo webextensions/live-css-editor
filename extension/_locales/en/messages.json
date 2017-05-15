@@ -1,6 +1,6 @@
 {
     "Extension_Description": {
-        "message": "Live preview of CSS/LESS code with an in-page editor. Featuring autocomplete, LESS code to CSS conversion, beautify, minify, etc."
+        "message": "Live preview of CSS/LESS code with an in-page editor. Autocomplete, convert LESS to CSS, beautify, minify, CSS reloader, linter, ..."
     },
     "Extension_Name": {
         "message": "Live editor for CSS and LESS - Magic CSS"

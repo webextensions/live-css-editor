@@ -7,9 +7,9 @@ Extension **Live editor for CSS and LESS** *(Magic CSS)* for Google Chrome, Micr
 
 <img width="32" alt="Mozilla Firefox Logo" src="extension/ui-images/logo-firefox_edited.png"> &nbsp; https://webextensions.org/ (self distributed installation)
 
-**Live preview of CSS/LESS code with an in-page editor. Featuring autocomplete, LESS code to CSS conversion, beautify, minify, etc.**
+**Live preview of CSS/LESS code with an in-page editor. Autocomplete, convert LESS to CSS, beautify, minify, CSS reloader, linter, ...**
 
-Run this extension and start writing your CSS/LESS code which gets applied immediately. The code you write will be stored on your browser's local storage at site level.
+Run this extension and start writing your CSS/LESS code which gets applied immediately. The code you write will be saved in your browser's local storage at site level.
 
 **Featuring:**
 * Live editor for CSS/LESS code - Preview changes as you write code
@@ -21,7 +21,7 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * Beautify / Format code
 * Minify code
 * Highlight DOM elements matching the CSS selectors
-* CSS Reloader
+* CSS reloader
 * Create GitHub Gist & E-mail
 
 **Open source:**
@@ -38,7 +38,7 @@ Visit https://webextensions.org/ for further details
 * Priyank Parashar
 
 **Uses:**
-* No need to reload pages to test your CSS/LESS code
+* No need to refresh pages to test your CSS/LESS code
 * Speed-up development and testing of your styling code by doing it directly on your page
 * Develop and test your code before finalizing your changes into the project files
 * Apply some temporary styles (like hiding some components)
