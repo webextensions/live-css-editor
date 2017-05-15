@@ -22,6 +22,7 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * Minify code
 * Highlight DOM elements matching the CSS selectors
 * CSS reloader
+* Lint CSS code
 * Create GitHub Gist & E-mail
 
 **Open source:**
@@ -47,7 +48,7 @@ Visit https://webextensions.org/ for further details
 
 **Notes:**
 * The CSS/LESS code you write gets applied as you write it
-* With this code tester, you can develop and test the code at the same time
+* With this styling code tester, you can develop and test the code at the same time
 * The code is saved in browser as soon as you write it
 * The code editor is resizable and draggable
 * The code you write is auto-saved at site level and can be used again for same or different pages
