@@ -14,8 +14,8 @@
   	overflow-y: auto;
 }
 
-#MagiCSS-bookmarklet.container {
-	width: auto;	/* better solution would be to change the generic class name ".container" */
+#MagiCSS-bookmarklet {
+	width: auto;
 }
 
 #MagiCSS-bookmarklet .CodeMirror-activeline-background {

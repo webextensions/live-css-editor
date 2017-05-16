@@ -643,7 +643,7 @@
             if (options.cls) {
                 $(thisOb.container).addClass(options.cls);
             }
-            $(thisOb.container).addClass('container');
+            $(thisOb.container).addClass('magic-css-container');
             thisOb.container.style.position = 'fixed';
             if (rememberDimensions) {
                 thisOb.container.style.top = thisOb.userPreference('ui-position-top') + 'px';
