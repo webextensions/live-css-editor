@@ -230,7 +230,7 @@
     if (isChrome) {
         strCreatedVia += ' for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol';
     } else if (isFirefox) {
-        strCreatedVia += ' for Firefox - https://webextensions.org/';
+        strCreatedVia += ' for Firefox - https://addons.mozilla.org/en-US/firefox/addon/live-editor-for-css-and-less/';
     } else if (isEdge) {
         strCreatedVia += ' for Edge - https://webextensions.org/';
     }
@@ -750,7 +750,7 @@
                     name: 'get-magic-css-for-firefox',
                     title: 'Magic CSS for Firefox',
                     uniqCls: 'get-magic-css-for-firefox',
-                    href: 'https://webextensions.org/'
+                    href: 'https://addons.mozilla.org/en-US/firefox/addon/live-editor-for-css-and-less/'
                 };
                 if (isChrome) {
                     getMagicCSSForChrome = null;

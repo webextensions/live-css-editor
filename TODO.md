@@ -17,7 +17,7 @@
 * Customize indentation (allow using tab/n-spaces)
 
 #### Compilation and Build
-* Add webpack based compilation (currently, it is split into too many files which increases load time)
+* Add webpack based compilation (currently, it is split into too many files, which increases load time)
 
 #### Refactoring
 * Refactor code
@@ -30,4 +30,4 @@
 
 #### Releases
 * Update the link once it becomes available on store for Microsoft Edge
-* Update the link once it becomes available on store for Mozilla Firefox
+* Add/update the link once it becomes available on store for Opera
