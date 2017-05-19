@@ -5,7 +5,7 @@ Extension **Live editor for CSS and LESS** *(Magic CSS)* for Google Chrome, Micr
 
 <img width="32" alt="Microsoft Edge Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-microsoft-edge.svg"> &nbsp; https://webextensions.org/ (manual installation)
 
-<img width="32" alt="Mozilla Firefox Logo" src="extension/ui-images/logo-firefox_edited.png"> &nbsp; https://webextensions.org/ (self distributed installation)
+<img width="32" alt="Mozilla Firefox Logo" src="extension/ui-images/logo-firefox_edited.png"> &nbsp; https://addons.mozilla.org/en-US/firefox/addon/live-editor-for-css-and-less/
 
 **Live preview of CSS/LESS code with an in-page editor. Autocomplete, convert LESS to CSS, beautify, minify, CSS reloader, linter, ...**
 
