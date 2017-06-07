@@ -29,5 +29,4 @@
 * Add translations/internationalization
 
 #### Releases
-* Update the link once it becomes available on store for Microsoft Edge
 * Add/update the link once it becomes available on store for Opera

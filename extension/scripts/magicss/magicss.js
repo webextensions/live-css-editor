@@ -232,7 +232,7 @@
     } else if (isFirefox) {
         strCreatedVia += ' for Firefox - https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/';
     } else if (isEdge) {
-        strCreatedVia += ' for Edge - https://webextensions.org/';
+        strCreatedVia += ' for Edge - https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1';
     }
     var createGist = function (text, languageMode, cb) {
         var files = {};
@@ -744,7 +744,7 @@
                     name: 'get-magic-css-for-edge',
                     title: 'Magic CSS for Edge',
                     uniqCls: 'get-magic-css-for-edge',
-                    href: 'https://webextensions.org/'
+                    href: 'https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1'
                 };
                 getMagicCSSForFirefox = {
                     name: 'get-magic-css-for-firefox',
