@@ -217,6 +217,11 @@
     var isChrome = false,
         isEdge = false,
         isFirefox = false;
+    var extensionUrl = {
+        chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
+        edge: 'https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1',
+        firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/'
+    };
 
     if (/Edge/.test(navigator.appVersion)) {            // Test for "Edge" first, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
         isEdge = true;
@@ -228,11 +233,11 @@
 
     var strCreatedVia = 'Created via Magic CSS extension';
     if (isChrome) {
-        strCreatedVia += ' for Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol';
-    } else if (isFirefox) {
-        strCreatedVia += ' for Firefox - https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/';
+        strCreatedVia += ' for Chrome - ' + extensionUrl.chrome;
     } else if (isEdge) {
-        strCreatedVia += ' for Edge - https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1';
+        strCreatedVia += ' for Edge - ' + extensionUrl.edge;
+    } else if (isFirefox) {
+        strCreatedVia += ' for Firefox - ' + extensionUrl.firefox;
     }
     var createGist = function (text, languageMode, cb) {
         var files = {};
@@ -245,13 +250,13 @@
             timeout: 20000,
             contentType: 'application/json',
             data: JSON.stringify({
-                "description": window.location.origin + ' - via Magic CSS' + (function () {
+                "description": window.location.origin + ' - via Magic CSS extension' + (function () {
                     if (isChrome) {
-                        return ' extension for Chrome';
-                    } else if (isFirefox) {
-                        return ' extension for Firefox';
+                        return ' for Chrome - ' + extensionUrl.chrome;
                     } else if (isEdge) {
-                        return ' extension for Edge';
+                        return ' for Edge - ' + extensionUrl.edge;
+                    } else if (isFirefox) {
+                        return ' for Firefox - ' + extensionUrl.firefox;
                     }
                     return '';
                 }()),
@@ -731,35 +736,32 @@
                     return $('#' + id).hasClass('magicss-selected-mode-css') ? 'css' : 'less';
                 };
 
-                var getMagicCSSForChrome,
-                    getMagicCSSForEdge,
-                    getMagicCSSForFirefox;
-                getMagicCSSForChrome = {
-                    name: 'get-magic-css-for-chrome',
-                    title: 'Magic CSS for Chrome',
-                    uniqCls: 'get-magic-css-for-chrome',
-                    href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol'
-                };
-                getMagicCSSForEdge = {
-                    name: 'get-magic-css-for-edge',
-                    title: 'Magic CSS for Edge',
-                    uniqCls: 'get-magic-css-for-edge',
-                    href: 'https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1'
-                };
-                getMagicCSSForFirefox = {
-                    name: 'get-magic-css-for-firefox',
-                    title: 'Magic CSS for Firefox',
-                    uniqCls: 'get-magic-css-for-firefox',
-                    href: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/'
-                };
-                if (isChrome) {
-                    getMagicCSSForChrome = null;
-                }
-                if (isEdge) {
-                    getMagicCSSForEdge = null;
-                }
-                if (isFirefox) {
+                var getMagicCSSForChrome = null,
+                    getMagicCSSForEdge = null,
                     getMagicCSSForFirefox = null;
+                if (!isChrome) {
+                    getMagicCSSForChrome = {
+                        name: 'get-magic-css-for-chrome',
+                        title: 'Magic CSS for Chrome',
+                        uniqCls: 'get-magic-css-for-chrome',
+                        href: extensionUrl.chrome
+                    };
+                }
+                if (!isEdge) {
+                    getMagicCSSForEdge = {
+                        name: 'get-magic-css-for-edge',
+                        title: 'Magic CSS for Edge',
+                        uniqCls: 'get-magic-css-for-edge',
+                        href: extensionUrl.edge
+                    };
+                }
+                if (!isFirefox) {
+                    getMagicCSSForFirefox = {
+                        name: 'get-magic-css-for-firefox',
+                        title: 'Magic CSS for Firefox',
+                        uniqCls: 'get-magic-css-for-firefox',
+                        href: extensionUrl.firefox
+                    };
                 }
 
                 var options = {
@@ -908,7 +910,7 @@
                                     name: 'rate-on-webstore',
                                     title: 'Rate us on Chrome Web Store',
                                     cls: 'magicss-rate-on-webstore',
-                                    href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol/reviews'
+                                    href: extensionUrl.chrome + '/reviews'
                                 };
                             }
                         }())
@@ -1088,7 +1090,7 @@
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=' + extensionUrl.chrome + '&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
                         /* */
                         getMagicCSSForChrome,
@@ -1111,7 +1113,7 @@
                                     name: 'rate-on-webstore',
                                     title: 'Rate us on Chrome Web Store',
                                     cls: 'magicss-rate-on-webstore',
-                                    href: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol/reviews'
+                                    href: extensionUrl.chrome + '/reviews'
                                 };
                             }
                         }())
