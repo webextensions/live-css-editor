@@ -2,6 +2,7 @@
 * Add Emmet (Reference: https://mikethedj4.github.io/kodeWeave/editor/#b9a99b76536392cb5ec5004bc37b8fcc)
 * Add Autoprefixer (References: https://github.com/postcss/autoprefixer https://autoprefixer.github.io/)
 * Add support for editing and saving the CSS/Less files (back-end would need to support saving those files)
+* Add a "copy-to-clipboard" button
 
 #### Improvements
 * If there are many small iframes in a page, we may not want to load Magic CSS in all of them (this might be added as a global setting)
