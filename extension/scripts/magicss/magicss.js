@@ -852,9 +852,8 @@
                                         // Move the cursor to the end of the current line
                                         // Which helps in avoiding the scenario that when the user does point-and-click,
                                         // the text insertion does not happen in the middle of the text
-                                        editor.cm.setCursor({ line: editor.cm.getCursor().line });
+                                        editor.setCursor({line: editor.cm.getCursor().line}, {pleaseIgnoreCursorActivity: true});
                                     }
-                                    // Use utils.alertNote after the cursor activity (to override any previous alertNote due to that cursor activity)
                                     utils.alertNote('Select an element in the page to generate its CSS selector', 5000);
                                     enablePointAndClickFunctionality(editor);
                                 }
