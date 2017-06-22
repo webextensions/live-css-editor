@@ -7,7 +7,7 @@
         return;
     }
 
-	// for HTML frameset pages, this value would be 'FRAMESET'
+    // for HTML frameset pages, this value would be 'FRAMESET'
     // chrome.tabs.executeScript uses allFrames: true, to run inside all frames
     if (document.body.tagName !== 'BODY') {
         return;

@@ -157,7 +157,7 @@ var utils = window.utils || {};
             })
 
             /* Remove Regexes */
-            .replace(/([^\/])(\/(?!\*|\/)(\\\/|.)+?\/[gim]{0,3})/g, function(match, $1, $2){
+            .replace(/([^/])(\/(?!\*|\/)(\\\/|.)+?\/[gim]{0,3})/g, function(match, $1, $2){
                 primatives[primIndex] = $2;
                 return $1 + (uid + '') + primIndex++;
             })
@@ -285,9 +285,8 @@ var utils = window.utils || {};
 
     utils.beautifyCSS = function (cssCode) {
         return csspretty({
-            mode: 'beautify',
-                    // Doing beautify twice, otherwise it doesn't beautify code like the following one in single go:
-                    //     .box-shadow(@style,@alpha: 50%) when (isnumber(@alpha)){.box-shadow(@style, rgba(0, 0, 0, @alpha))}
+            mode: 'beautify',   /* Doing beautify twice, otherwise it doesn't beautify code like the following one in single go:
+                                       .box-shadow(@style,@alpha: 50%) when (isnumber(@alpha)){.box-shadow(@style, rgba(0, 0, 0, @alpha))} */
             source: csspretty({
                 mode: 'beautify',
                 source: cssCode

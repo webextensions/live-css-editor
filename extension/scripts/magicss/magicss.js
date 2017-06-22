@@ -65,7 +65,7 @@
                     $link = $(link),
                     href = $link.attr('href');
                 if (href.indexOf('reloadedAt=') >= 0) {
-                    href = href.replace(/[\?\&]reloadedAt\=[\d-_\:]+/, '');
+                    href = href.replace(/[?&]reloadedAt=[\d-_:]+/, '');
                 }
                 var newHref;
                 if (href.indexOf('?') >= 0) {
@@ -199,7 +199,7 @@
                 }
                 sources += ellipsis(
                     source
-                        .replace(/[\?\&]reloadedAt\=[\d-_\:]+/, '')
+                        .replace(/[?&]reloadedAt=[\d-_:]+/, '')
                         .substr(source.lastIndexOf('/') + 1),
                     50
                 );
@@ -332,8 +332,8 @@
         }
 
         if (cssSelectorString) {
+            // Helps in highlighting SVG elements
             editor.styleHighlightingSelector.cssText = cssSelectorString + '{outline: 1px dashed red !important; fill: red !important; }';
-                                                                                                                 // Helps in highlighting SVG elements
         } else {
             editor.styleHighlightingSelector.cssText = '';
         }
@@ -819,9 +819,9 @@
                                 var editor = window.MagiCSSEditor;
                                 showCSSSelectorMatches(selectedText, editor);
                             },
-                            onCssHintShownForSelector: function () {    // As per current CodeMirror/css-hint architecture,
-                                                                        // "select" is called before "shown".
-                                                                        // The "select" operation would also show the number  e are hiding the alertNote
+                            onCssHintShownForSelector: function () {    /* As per current CodeMirror/css-hint architecture,
+                                                                           "select" is called before "shown".
+                                                                           The "select" operation would also show the number  e are hiding the alertNote */
                                 utils.alertNote.hide();
                             }
                         },
@@ -958,10 +958,11 @@
                                 }
                             },
                             beforeShow: function (origin, tooltip, editor) {
-                                tooltip.addClass(getLanguageMode() === 'less' ? 'tooltipster-selected-mode-less' : 'tooltipster-selected-mode-css')
-                                       .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
-                                       .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
-                                       .addClass(editor.userPreference('autocomplete-selectors') === 'disabled' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
+                                tooltip
+                                    .addClass(getLanguageMode() === 'less' ? 'tooltipster-selected-mode-less' : 'tooltipster-selected-mode-css')
+                                    .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
+                                    .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
+                                    .addClass(editor.userPreference('autocomplete-selectors') === 'disabled' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
                             }
                         },
                         /*
@@ -1221,8 +1222,8 @@
                             }
 
                             if (cssClass) {
+                                // Helps in highlighting SVG elements
                                 editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important; fill: red !important; }';
-                                                                                                                            // Helps in highlighting SVG elements
                             } else {
                                 editor.styleHighlightingSelector.cssText = '';
                             }
@@ -1282,8 +1283,8 @@
                             charJ === ',' ||
                             charJ === '{' ||
                             charJ === '}' ||
-                            (charJ === '*' && charJNext === '\/') ||
-                            (charJ === '\/' && charJNext === '*')
+                            (charJ === '*' && charJNext === '/') ||
+                            (charJ === '/' && charJNext === '*')
                         ) {
                             break;
                         }

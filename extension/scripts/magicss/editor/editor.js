@@ -147,8 +147,8 @@
                 }
 
                 if (animationRequired === false) {
-                    thisOb.focus();     // This is required if the text editor panel is being opened through some
-                                        // component which causes the textarea to lose focus.
+                    thisOb.focus();     /* This is required if the text editor panel is being opened through some
+                                           component which causes the textarea to lose focus. */
                     thisOb.triggerEvent('reInitialized', {
                         animDuration: 0,
                         targetWidth: defaultWidth,
