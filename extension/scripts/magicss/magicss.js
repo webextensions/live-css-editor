@@ -849,10 +849,14 @@
                                 } else {
                                     // If currently, there is no text selection
                                     if (!editor.cm.getSelection()) {
-                                        // Move the cursor to the end of the current line
-                                        // Which helps in avoiding the scenario that when the user does point-and-click,
-                                        // the text insertion does not happen in the middle of the text
-                                        editor.setCursor({line: editor.cm.getCursor().line}, {pleaseIgnoreCursorActivity: true});
+                                        var cursorPosition = editor.cm.getCursor();
+                                        // If there is any non-whitespace character before the cursor in the current line
+                                        if (editor.cm.getLine(cursorPosition.line).substr(0, cursorPosition.ch).trim()) {
+                                            // Move the cursor to the end of the current line
+                                            // Which helps in avoiding the scenario that when the user does point-and-click,
+                                            // the text insertion does not happen in the middle of the text
+                                            editor.setCursor({line: cursorPosition.line}, {pleaseIgnoreCursorActivity: true});
+                                        }
                                     }
                                     utils.alertNote('Select an element in the page to generate its CSS selector', 5000);
                                     enablePointAndClickFunctionality(editor);
