@@ -830,15 +830,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 showCSSSelectorMatches(selectedTextOb, window.MagiCSSEditor);
                             });
 
-                            // Commenting out temporarily for temporary branch temp-display-none-on-point-and-click
-                            // CodeMirror.on(ob, 'pick', function () {
-                            //     var cursorPos = cm.getCursor();
-                            //     if (anyCharacterAfterCurrentCursorPosition) {
-                            //         cm.setCursor({ line: cursorPos.line - 2 });
-                            //     } else {
-                            //         cm.setCursor({ line: cursorPos.line - 1 });
-                            //     }
-                            // });
+                            CodeMirror.on(ob, 'pick', function () {
+                                window.MagiCSSEditor.bringCursorToView({pleaseIgnoreCursorActivity: true});
+                                // Commenting out temporarily for temporary branch temp-display-none-on-point-and-click
+                                // var cursorPos = cm.getCursor();
+                                // if (anyCharacterAfterCurrentCursorPosition) {
+                                //     cm.setCursor({ line: cursorPos.line - 2 });
+                                // } else {
+                                //     cm.setCursor({ line: cursorPos.line - 1 });
+                                // }
+                            });
 
                             CodeMirror.on(ob, 'close', function () {
                                 window.MagiCSSEditor.styleHighlightingSelector.cssText = '';
