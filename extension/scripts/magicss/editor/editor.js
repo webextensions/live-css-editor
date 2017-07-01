@@ -294,16 +294,21 @@
                 indentWithTabs: false,
                 undoDepth: 1000,
 
-                extraKeys:{
+                extraKeys: {
                     // https://github.com/codemirror/CodeMirror/issues/988
                     Tab: function (cm) {
                         if (cm.doc.somethingSelected()) {
                             return CodeMirror.Pass;
                         }
-                        var spacesPerTab = cm.getOption('indentUnit'),
-                            spacesToInsert = spacesPerTab - (cm.doc.getCursor('start').ch % spacesPerTab),
-                            spaces = Array(spacesToInsert + 1).join(' ');
-                        cm.replaceSelection(spaces, 'end', '+input');
+                        var emmetExpanded = cm.execCommand('emmetExpandAbbreviation');
+                        if (emmetExpanded === CodeMirror.Pass) {       // If it didn't expand, then "emmetExpanded === CodeMirror.Pass function"
+                            var spacesPerTab = cm.getOption('indentUnit'),
+                                spacesToInsert = spacesPerTab - (cm.doc.getCursor('start').ch % spacesPerTab),
+                                spaces = Array(spacesToInsert + 1).join(' ');
+                            cm.replaceSelection(spaces, 'end', '+input');
+                        } else {
+                            return;
+                        }
                     },
                     Esc: function () {
                         if (closeOnEscapeKey) {

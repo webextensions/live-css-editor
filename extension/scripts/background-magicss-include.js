@@ -49,6 +49,8 @@ var main = function () {
         pathCodeMirror + 'addons/colorpicker/colorview.js',
         pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
+        pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
+
         path3rdparty + 'jquery-ui-1.12.1-custom.css',
 
         {

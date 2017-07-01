@@ -84,7 +84,15 @@
     if (st == "pseudo" || token.type == "variable-3") {
       add(pseudoClasses);
     } else if (st == "block" || st == "maybeprop") {
+      /*
       add(spec.propertyKeywords);
+      */
+      var onAddingAutoCompleteOptionsForCSSProperty = (((cm.options) || {}).hintOptions || {}).onAddingAutoCompleteOptionsForCSSProperty;
+      if (onAddingAutoCompleteOptionsForCSSProperty) {
+        onAddingAutoCompleteOptionsForCSSProperty(add);
+      } else {
+        add(spec.propertyKeywords);
+      }
     } else if (st == "prop" || st == "parens" || st == "at" || st == "params") {
       add(spec.valueKeywords);
       add(spec.colorKeywords);

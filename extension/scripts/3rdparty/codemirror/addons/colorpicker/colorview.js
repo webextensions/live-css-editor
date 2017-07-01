@@ -92,8 +92,7 @@
     }
 
     function has_class(el, cls) {
-        if (!el.className)
-        {
+        if (!el || !el.className) {
             return false;
         } else {
             var newClass = ' ' + el.className + ' ';
@@ -297,7 +296,7 @@
     }
 
     codemirror_colorpicker.prototype.color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|(\w+))/gi;
-
+    
     codemirror_colorpicker.prototype.match_result = function (lineHandle) {
         return lineHandle.text.match(this.color_regexp);
     }

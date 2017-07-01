@@ -638,6 +638,16 @@
                     return false;
                 });
 
+                var csSpec = CodeMirror.resolveMode('text/css'),
+                    cssPropertyKeywords = csSpec.propertyKeywords,
+                    cssPropertyKeywordsAutocompleteObject = {};
+                Object.keys(cssPropertyKeywords).forEach(function (key) {
+                    cssPropertyKeywordsAutocompleteObject[key] = {
+                        displayText: key,
+                        text: key + ': '
+                    };
+                });
+
                 // Don't let mouse scroll on CodeMirror hints pass on to the parent elements
                 // http://stackoverflow.com/questions/5802467/prevent-scrolling-of-parent-element/16324762#16324762
                 $(document).on('DOMMouseScroll mousewheel', '.CodeMirror-hints', function(ev) {
@@ -814,6 +824,9 @@
                                 if (existingCSSSelectorsWithAutocompleteObjects) {
                                     add(existingCSSSelectorsWithAutocompleteObjects, true);
                                 }
+                            },
+                            onAddingAutoCompleteOptionsForCSSProperty: function (add) {
+                                add(cssPropertyKeywordsAutocompleteObject, true);
                             },
                             onCssHintSelectForSelector: function (selectedText) {
                                 var editor = window.MagiCSSEditor;

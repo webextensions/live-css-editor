@@ -2,5 +2,9 @@
     {
         "from": "node_modules/jquery/dist/jquery.js",
         "to": "extension/scripts/3rdparty/jquery-3.2.1.js"
+    },
+    {
+        "from": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js",
+        "to": "extension/scripts/3rdparty/codemirror/addons/emmet/emmet-codemirror-plugin.js"
     }
 ]

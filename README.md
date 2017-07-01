@@ -16,6 +16,7 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * Syntax Highlighting
 * Auto-generate CSS selectors with point-and-click
 * Autocomplete for CSS selectors, properties and values
+* Emmet support helps in quickly expanding abbreviations to CSS code (https://docs.emmet.io/css-abbreviations/)
 * Color picker (supports HEX, RGB, RGBA, HSL and HSLA)
 * Convert code from LESS to CSS
 * Beautify / Format code
@@ -67,6 +68,7 @@ Visit https://webextensions.org/ for further details
 * Browserify
 * Code Mirror
 * [codemirror-colorpicker](https://github.com/easylogic/codemirror-colorpicker)
+* [emmetio/codemirror-plugin](https://github.com/emmetio/codemirror-plugin)
 * CSS Pretty
 * CSSLint
 * GitHub Gist
