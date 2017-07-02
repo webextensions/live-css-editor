@@ -28,3 +28,13 @@
     background-color: rgba(25, 25, 25, 0.25);
     border-left: 0;
 }
+
+/* Style the brackets when cursor is placed around them */
+div.CodeMirror span.CodeMirror-matchingbracket {
+    color: #000;
+    background-color: #ccc;
+}
+div.CodeMirror span.CodeMirror-nonmatchingbracket {
+    background-color: #fbb;
+    color: #f22;
+}

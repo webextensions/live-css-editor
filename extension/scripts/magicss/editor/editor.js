@@ -290,6 +290,8 @@
                     nonEmpty: true
                 },
 
+                matchBrackets: true,
+
                 indentUnit: 4,
                 indentWithTabs: false,
                 undoDepth: 1000,
