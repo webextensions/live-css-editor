@@ -17,6 +17,7 @@
     },
     "offline_enabled": true,
     "permissions": [
+        "<all_urls>",
         "activeTab",
         "storage",
         "<all_urls>"
@@ -53,6 +54,8 @@
         }
     },
     "web_accessible_resources": [
+        "background-magicss.html",
+        "scripts/*",
         "ui-images/*.*"
     ],
     "-ms-preload": {

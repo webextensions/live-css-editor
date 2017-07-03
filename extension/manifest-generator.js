@@ -29,6 +29,7 @@ var generateManifest = function (whichBrowser) {
         "offline_enabled": true,
         "permissions": (function () {
             var permissions = [
+                "<all_urls>",
                 "activeTab",
                 "storage"
             ];
@@ -69,6 +70,8 @@ var generateManifest = function (whichBrowser) {
             }
         },
         "web_accessible_resources": [
+            "background-magicss.html",
+            "scripts/*",
             "ui-images/*.*"
         ]
     };

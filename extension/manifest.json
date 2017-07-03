@@ -17,6 +17,7 @@
     },
     "offline_enabled": true,
     "permissions": [
+        "<all_urls>",
         "activeTab",
         "storage"
     ],
@@ -52,6 +53,8 @@
         }
     },
     "web_accessible_resources": [
+        "background-magicss.html",
+        "scripts/*",
         "ui-images/*.*"
     ]
 }
