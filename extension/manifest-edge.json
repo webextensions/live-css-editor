@@ -1,12 +1,11 @@
 {
-    "version": "5.5.12.0",
+    "version": "5.5.13.0",
     "manifest_version": 2,
     "author": "Priyank Parashar",
     "default_locale": "en",
     "name": "__MSG_Extension_Name__",
     "description": "__MSG_Extension_Description__",
     "homepage_url": "https://github.com/webextensions/live-css-editor",
-
     "icons": {
         "16": "icons/icon-16.png",
         "24": "icons/icon-24.png",
@@ -17,14 +16,10 @@
         "256": "icons/icon-256.png"
     },
     "offline_enabled": true,
-    "-ms-preload": {
-        "backgroundScript": "backgroundScriptsAPIBridge.js",
-        "contentScript": "contentScriptsAPIBridge.js"
-    },
     "permissions": [
-        "<all_urls>",
         "activeTab",
-        "storage"
+        "storage",
+        "<all_urls>"
     ],
     "optional_permissions": [
         "<all_urls>"
@@ -59,5 +54,9 @@
     },
     "web_accessible_resources": [
         "ui-images/*.*"
-    ]
+    ],
+    "-ms-preload": {
+        "backgroundScript": "backgroundScriptsAPIBridge.js",
+        "contentScript": "contentScriptsAPIBridge.js"
+    }
 }

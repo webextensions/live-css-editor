@@ -74,6 +74,7 @@ try {
         cwd: __dirname + '/extension',
         ignore: (function () {
             var filesToIgnore = [
+                'manifest-generator.js',
                 'manifest-edge.json',
                 'manifest-chrome-firefox.json',
                 'ui-images/**/*.*',     // Exclude files in "ui-images" folder
