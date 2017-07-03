@@ -30,11 +30,12 @@
 }
 
 /* Style the brackets when cursor is placed around them */
-div.CodeMirror span.CodeMirror-matchingbracket {
+/* Using 'html' to increase selector specificity for overriding default styles, for cases this editor is loaded as a browser extension and the webpage has its own CodeMirror (CSS) */
+html div.CodeMirror span.CodeMirror-matchingbracket {
     color: #000;
     background-color: #ccc;
 }
-div.CodeMirror span.CodeMirror-nonmatchingbracket {
+html div.CodeMirror span.CodeMirror-nonmatchingbracket {
     background-color: #fbb;
     color: #f22;
 }
