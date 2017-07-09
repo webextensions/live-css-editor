@@ -23,10 +23,8 @@ var main = function () {
 
         path3rdparty + 'css.escape.js',
 
-        path3rdparty + 'fiber.js',
-
         pathCodeMirror + 'codemirror.css',
-        pathCodeMirror + 'magicss-codemirror.css',
+        path3rdpartyCustomFixes + 'codemirror/magicss-codemirror.css',
         pathCodeMirror + 'codemirror.js',
         pathCodeMirror + 'mode/css.js',
         pathCodeMirror + 'addons/display/placeholder.js',
@@ -34,16 +32,16 @@ var main = function () {
         pathCodeMirror + 'addons/edit/closebrackets.js',
         pathCodeMirror + 'addons/edit/matchbrackets.js',
 
-        path3rdparty + 'csslint/csslint.js',
+        path3rdparty + 'csslint/csslint_customized.js',
         path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
         pathCodeMirror + 'addons/lint/lint.css',
-        path3rdpartyCustomFixes + 'codemirror-addon-lint/tooltip.css',
+        path3rdpartyCustomFixes + 'codemirror/addons/lint/tooltip.css',
         pathCodeMirror + 'addons/lint/lint.js',
         pathCodeMirror + 'addons/lint/css-lint.js',
 
         pathCodeMirror + 'addons/hint/show-hint.css',
-        pathCodeMirror + 'addons/hint/show-hint.js',
-        pathCodeMirror + 'addons/hint/css-hint.js',
+        pathCodeMirror + 'addons/hint/show-hint_customized.js',
+        pathCodeMirror + 'addons/hint/css-hint_customized.js',
 
         // https://github.com/easylogic/codemirror-colorpicker
         pathCodeMirror + 'addons/colorpicker/colorpicker.css',
@@ -52,14 +50,12 @@ var main = function () {
 
         pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
 
-        path3rdparty + 'jquery-ui-1.12.1-custom.css',
-
         {
             src: path3rdparty + 'jquery-3.2.1.js',
             skip: typeof jQuery === "undefined" || runningInBrowserExtension ? false : true
         },
-
-        path3rdparty + 'jquery-ui-1.12.1-custom.js',
+        path3rdparty + 'jquery-ui_customized.css',
+        path3rdparty + 'jquery-ui.js',
 
         path3rdparty + 'amplify.js',
 
@@ -74,7 +70,7 @@ var main = function () {
 
         // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
         // path3rdparty + 'less.js',
-        path3rdparty + 'less.browserified.js',
+        path3rdparty + 'less.browserified.uglified.js',
 
         path3rdparty + 'source-map.js',
 

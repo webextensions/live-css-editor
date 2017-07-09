@@ -91,7 +91,10 @@
 
     cursorActivity: function() {
       if (this.debounce) {
-        cancelAnimationFrame(this.debounce);
+        // See: http://stackoverflow.com/questions/42322248/typeerror-requestanimationframe-called-on-an-object-that-does-not-implement-i
+        //      The commented out code resulted in similar error on Firefox.
+        // cancelAnimationFrame(this.debounce);     // Somehow, this doesn't work well in showing hints for Firefox extension
+        window.cancelAnimationFrame(this.debounce); // But, this works fine
         this.debounce = 0;
       }
 
@@ -102,7 +105,10 @@
         this.close();
       } else {
         var self = this;
-        this.debounce = requestAnimationFrame(function() {self.update();});
+        // See: http://stackoverflow.com/questions/42322248/typeerror-requestanimationframe-called-on-an-object-that-does-not-implement-i
+        //      The commented out code resulted in similar error on Firefox.
+        // this.debounce = requestAnimationFrame(function() {self.update();});      // Somehow, this doesn't work well in showing hints for Firefox extension
+        this.debounce = window.requestAnimationFrame(function() {self.update();});  // But, this works fine
         if (this.widget) this.widget.disable();
       }
     },
@@ -338,7 +344,8 @@
       else if (i < 0)
         i = avoidWrap ? 0  : this.data.list.length - 1;
       if (this.selectedHint == i) return;
-      var node = this.hints.childNodes[this.selectedHint];
+      // var node = this.hints.childNodes[this.selectedHint];
+      var node = this.hints.childNodes[this.selectedHint === -1 ? 0 : this.selectedHint];       // If this.selectedHint is -1 (-1 indicates do not select any item), get 0th hint childNode (which would always be there)
       node.className = node.className.replace(" " + ACTIVE_HINT_ELEMENT_CLASS, "");
       node = this.hints.childNodes[this.selectedHint = i];
       node.className += " " + ACTIVE_HINT_ELEMENT_CLASS;

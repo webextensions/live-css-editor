@@ -62,16 +62,18 @@ var generateManifest = function (whichBrowser) {
                 }
             }
         },
-        "applications": {
-            "gecko": {
-                "id": "{a42eb16c-2fab-4c06-b1f3-5f15adebb0e3}",
-                "strict_min_version": "48.0"
-            }
-        },
         "web_accessible_resources": [
             "ui-images/*.*"
         ]
     };
+    if (whichBrowser === "firefox") {
+        manifest["applications"] = {
+            "gecko": {
+                "id": "{a42eb16c-2fab-4c06-b1f3-5f15adebb0e3}",
+                "strict_min_version": "48.0"
+            }
+        };
+    }
     if (whichBrowser === "edge") {
         manifest["-ms-preload"] = {
             "backgroundScript": "backgroundScriptsAPIBridge.js",
@@ -81,9 +83,11 @@ var generateManifest = function (whichBrowser) {
 
     var targetFileName;
     switch (whichBrowser) {
-        case "edge":            targetFileName = "manifest-edge.json";             break;
-        case "chrome-firefox":  targetFileName = "manifest-chrome-firefox.json";   break;
-        default:                targetFileName = "manifest.json";                  break;
+        case "chrome":  targetFileName = "manifest-chrome.json";  break;
+        case "edge":    targetFileName = "manifest-edge.json";    break;
+        case "firefox": targetFileName = "manifest-firefox.json"; break;
+        case "opera":   targetFileName = "manifest-opera.json";   break;
+        default:        targetFileName = "manifest.json";         break;
     }
     process.stdout.write("Generating " + targetFileName + " : ");
     jsonfile.writeFileSync(path.join(__dirname, targetFileName), manifest, {spaces: 4});
@@ -91,5 +95,7 @@ var generateManifest = function (whichBrowser) {
 };
 
 generateManifest("default");
-generateManifest("chrome-firefox");
+generateManifest("chrome");
 generateManifest("edge");
+generateManifest("firefox");
+generateManifest("opera");

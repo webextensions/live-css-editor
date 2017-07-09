@@ -22,7 +22,8 @@ THE SOFTWARE.
 
 */
 
-var CSSLint = (function(){
+// var CSSLint = (function(){   // When using with Firefox extension, this doesn't make the variable available as window.CSSLint
+window.CSSLint = (function(){
   var module = module || {},
       exports = exports || {};
 

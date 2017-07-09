@@ -1,5 +1,5 @@
 {
-    "version": "5.5.13.0",
+    "version": "5.5.14.0",
     "manifest_version": 2,
     "author": "Priyank Parashar",
     "default_locale": "en",
@@ -44,12 +44,6 @@
             "suggested_key": {
                 "default": "Alt+Shift+C"
             }
-        }
-    },
-    "applications": {
-        "gecko": {
-            "id": "{a42eb16c-2fab-4c06-b1f3-5f15adebb0e3}",
-            "strict_min_version": "48.0"
         }
     },
     "web_accessible_resources": [

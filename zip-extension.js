@@ -10,7 +10,7 @@ var fs = require('fs'),
 var processCommand = process.title + ' ' + require('path').relative(__dirname, process.argv[1]);
 console.log(chalk.gray([
     '',
-    'Format:   ' + processCommand + ' [chrome/edge/firefox]',
+    'Format:   ' + processCommand + ' [chrome/edge/firefox/opera]',
     'Examples: ' + processCommand,
     '          ' + processCommand + ' chrome',
     '          ' + processCommand + ' edge',
@@ -20,17 +20,18 @@ console.log(chalk.gray([
 var whichBrowser = process.argv[2] || 'chrome';
 
 var zipFileName = null;
-if (whichBrowser === 'edge') {
-    zipFileName = 'extension-edge.zip';
-} else if (whichBrowser === 'chrome' || whichBrowser === 'firefox') {
-    zipFileName = 'extension-chrome-firefox.zip';
-} else {
-    console.log(chalk.red('Error: Please pass a supported browser name as parameter (or no parameters)'));
-    process.exit(1);
+switch (whichBrowser) {
+    case 'chrome':  zipFileName = 'extension-chrome.zip';  break;
+    case 'edge':    zipFileName = 'extension-edge.zip';    break;
+    case 'firefox': zipFileName = 'extension-firefox.zip'; break;
+    case 'opera':   zipFileName = 'extension-opera.zip';   break;
+    default:
+        console.log(chalk.red('Error: Please pass a supported browser name as parameter (or no parameters)'));
+        process.exit(1);
 }
 
-if (fs.readFileSync(__dirname + '/extension/manifest.json', 'utf8') !== fs.readFileSync(__dirname + '/extension/manifest-chrome-firefox.json', 'utf8')) {
-    console.log(chalk.yellow('Warning: extension/manifest.json & extension/manifest-chrome-firefox.json do not match.\nThey must have same contents before zipping the extension with this script. Exiting.'));
+if (fs.readFileSync(__dirname + '/extension/manifest.json', 'utf8') !== fs.readFileSync(__dirname + '/extension/manifest-chrome.json', 'utf8')) {
+    console.log(chalk.yellow('Warning: extension/manifest.json & extension/manifest-chrome.json do not match.\nThey must have same contents before zipping the extension with this script. Exiting.'));
     process.exit(1);
 }
 
@@ -49,7 +50,7 @@ var warnUserToCheckManifestFile = function (e) {
 output.on('close', function() {
     try {
         del.sync(['extension/manifest.json']);
-        cpFile.sync('extension/manifest-chrome-firefox.json', 'extension/manifest.json', {overwrite: false});
+        cpFile.sync('extension/manifest-chrome.json', 'extension/manifest.json', {overwrite: false});
 
         console.log(chalk.green('The extension has been zipped as: ' + zipFileName + ' (' + archive.pointer() + ' bytes)'));
     } catch (e) {
@@ -68,15 +69,30 @@ archive.pipe(output);
 
 try {
     del.sync(['extension/manifest.json']);
-    cpFile.sync('extension/' + (whichBrowser === 'edge' ? 'manifest-edge.json' : 'manifest-chrome-firefox.json'), 'extension/manifest.json', {overwrite: false});
+    cpFile.sync(
+        'extension/' +
+            (function () {
+                switch (whichBrowser) {
+                    case 'chrome':  return 'manifest-chrome.json';
+                    case 'edge':    return 'manifest-edge.json';
+                    case 'firefox': return 'manifest-firefox.json';
+                    case 'opera':   return 'manifest-opera.json';
+                    default:        return 'manifest-chrome.json';
+                }
+            }()),
+        'extension/manifest.json',
+        {overwrite: false}
+    );
 
     archive.glob('**/*', {
         cwd: __dirname + '/extension',
         ignore: (function () {
             var filesToIgnore = [
                 'manifest-generator.js',
+                'manifest-chrome.json',
                 'manifest-edge.json',
-                'manifest-chrome-firefox.json',
+                'manifest-firefox.json',
+                'manifest-opera.json',
                 'ui-images/**/*.*',     // Exclude files in "ui-images" folder
                 'ui-images',            // Avoid "ui-images" folder from getting created
             ];

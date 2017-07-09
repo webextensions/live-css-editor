@@ -1,21 +1,23 @@
 {
   "name": "magicss",
-  "version": "5.5.13",
+  "version": "5.5.14",
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
-    "postinstall": "copy-files-from-to copy-front-end-scripts-from-node-modules.json",
+    "postinstall": "copy-files-from-to copy-third-party-front-end-scripts.json",
     "zip-chrome-extension": "node ./zip-extension.js chrome",
     "zip-edge-extension": "node ./zip-extension.js edge",
-    "zip-firefox-extension": "node ./zip-extension.js firefox"
+    "zip-firefox-extension": "node ./zip-extension.js firefox",
+    "zip-opera-extension": "node ./zip-extension.js opera"
   },
   "dependencies": {
+    "codemirror": "5.25.0",
     "emmetio-codemirror-plugin-webextensions": "0.3.7",
     "jquery": "3.2.1"
   },
   "devDependencies": {
     "archiver": "1.3.0",
     "chalk": "2.0.1",
-    "copy-files-from-to": "0.0.3",
+    "copy-files-from-to": "0.1.0",
     "cp-file": "4.2.0",
     "del": "3.0.0",
     "eslint": "4.1.1",

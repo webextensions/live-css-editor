@@ -1,8 +1,12 @@
 # Zipped extension files and directories
-extension-chrome-firefox.zip
-extension-chrome-firefox/
+extension-chrome.zip
+extension-chrome/
 extension-edge.zip
 extension-edge/
+extension-firefox.zip
+extension-firefox/
+extension-opera.zip
+extension-opera/
 
 # Logs
 logs

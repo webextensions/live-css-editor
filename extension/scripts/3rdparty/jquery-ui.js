@@ -1,4 +1,4 @@
-/*! jQuery UI - v1.12.1 - 2017-04-20
+/*! jQuery UI - v1.12.1 - 2017-07-08
 * http://jqueryui.com
 * Includes: widget.js, data.js, disable-selection.js, scroll-parent.js, widgets/draggable.js, widgets/resizable.js, widgets/mouse.js
 * Copyright jQuery Foundation and other contributors; Licensed MIT */

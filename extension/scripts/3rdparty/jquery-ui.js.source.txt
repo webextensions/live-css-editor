@@ -1,0 +1,13 @@
+Steps to generate jquery-ui.js
+==============================
+
+    - Go to https://jqueryui.com/download/
+    - Under "Version", select "1.12.1 (Stable, for jQuery1.7+)"
+    - Under "Components", uncheck "Toggle All". This deselects all other packages below that.
+    - Under "Interactions", check "Draggable" and "Resizable". This would automatically select a few other packages.
+    - Under "Theme", select "UI lightness"
+    - Under "CSS Scope", type "#MagiCSS-bookmarklet" (without double-quotes)
+    - Click on "Download"
+    - This would download a file called "jquery-ui-1.12.1.custom.zip"
+    - Extract "jquery-ui-1.12.1.custom.zip"
+    - Use "jquery-ui.js" from the extracted folder

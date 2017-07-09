@@ -1,0 +1,1 @@
+https://raw.githubusercontent.com/iamceege/tooltipster/28fa8412cc1ae89de13c0d4d9fa30e1874e9d397/js/jquery.tooltipster.js
