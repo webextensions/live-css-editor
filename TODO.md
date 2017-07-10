@@ -29,6 +29,3 @@
 
 #### Language Support
 * Add translations/internationalization
-
-#### Releases
-* Add/update the link once it becomes available on store for Opera

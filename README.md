@@ -1,11 +1,13 @@
 # Live editor for CSS and LESS (Magic CSS)
-Extension **Live editor for CSS and LESS** *(Magic CSS)* for Google Chrome, Microsoft Edge and Mozilla Firefox.
+Extension **Live editor for CSS and LESS** *(Magic CSS)* for Google Chrome, Microsoft Edge, Mozilla Firefox and Opera.
 
 <img width="32" alt="Google Chrome Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-google-chrome.svg"> &nbsp; https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
 
 <img width="32" alt="Microsoft Edge Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-microsoft-edge.svg"> &nbsp; https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1
 
 <img width="32" alt="Mozilla Firefox Logo" src="extension/ui-images/logo-firefox_edited.png"> &nbsp; https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/
+
+<img width="32" alt="Opera Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-opera.svg"> &nbsp; https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/
 
 **Live preview of CSS/LESS code with an in-page editor. Autocomplete, convert LESS to CSS, beautify, minify, CSS reloader, linter, ...**
 
@@ -33,6 +35,7 @@ Run this extension and start writing your CSS/LESS code which gets applied immed
 * Google Chrome
 * Microsoft Edge
 * Mozilla Firefox
+* Opera
 
 Visit https://webextensions.org/ for further details
 
@@ -59,7 +62,7 @@ Visit https://webextensions.org/ for further details
 * The code you write is added at the bottom of the <body> tag of the active page
 * It includes CSS/LESS beautifier and minifier
 * It highlights the DOM elements matching the CSS selectors
-* Use it along with your favorite Chrome/Edge/Firefox Developer tools
+* Use it along with your favorite Chrome/Edge/Firefox/Opera Developer tools
 * You might find it useful in creating your custom themes for websites based on Stylish / Stylist
 * This extension is also known as "MagiCSS - Live CSS Editor"
 

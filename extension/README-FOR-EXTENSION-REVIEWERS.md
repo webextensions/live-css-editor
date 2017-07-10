@@ -7,6 +7,7 @@ Magic CSS published in various extension stores
 - Google Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
 - Microsoft Edge - https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1
 - Mozilla Firefox - https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/
+- Opera - https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/
 
 Notes about usage of 3rdparty code
 ==================================

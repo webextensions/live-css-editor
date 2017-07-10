@@ -25,6 +25,9 @@ logo-microsoft-edge.svg
 logo-microsoft-edge_edited.svg
     Slightly modified version of "logo-microsoft-edge.svg"
 
+logo-opera.svg
+    https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg
+
 point-and-click.png
     chrome-devtools://devtools/bundled/Images/toolbarButtonGlyphs_2x.png
 
