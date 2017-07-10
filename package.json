@@ -1,14 +1,14 @@
 {
   "name": "magicss",
-  "version": "5.5.14",
+  "version": "5.5.15",
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
     "postinstall": "copy-files-from-to copy-third-party-front-end-scripts.json",
-    "zip-extension": "npm run zip-chrome-extension && npm run zip-edge-extension && npm run zip-firefox-extension && npm run zip-opera-extension",
     "zip-chrome-extension": "node ./zip-extension.js chrome",
     "zip-edge-extension": "node ./zip-extension.js edge",
     "zip-firefox-extension": "node ./zip-extension.js firefox",
-    "zip-opera-extension": "node ./zip-extension.js opera"
+    "zip-opera-extension": "node ./zip-extension.js opera",
+    "zip-extension": "npm run zip-chrome-extension && npm run zip-edge-extension && npm run zip-firefox-extension && npm run zip-opera-extension"
   },
   "dependencies": {
     "codemirror": "5.25.0",

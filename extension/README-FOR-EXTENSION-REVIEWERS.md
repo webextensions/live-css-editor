@@ -16,7 +16,6 @@ Notes about usage of 3rdparty code
     `<3rd-party-filename>.<ext>.source.txt`
 - A list of most of those files and their origins can also be seen at:
     https://github.com/webextensions/live-css-editor/blob/master/copy-third-party-front-end-scripts.json
-- Since the sources for many of the files are referred from the `master` branch of those libraries open sourced on GitHub, the online version of those sources may get updated with time
 
 3rdparty code which was used "as-is" from GitHub
 ------------------------------------------------

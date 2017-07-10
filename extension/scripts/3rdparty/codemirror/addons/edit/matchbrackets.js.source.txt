@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/matchbrackets.js
+https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/edit/matchbrackets.js

@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/codemirror/CodeMirror/aab23579713141613399605e3bb6a4a25a1c13dd/mode/css/css.js
+https://raw.githubusercontent.com/codemirror/CodeMirror/5.25.0/mode/css/css.js

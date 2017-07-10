@@ -6,5 +6,7 @@ extension/scripts/3rdparty/
 extension/backgroundScriptsAPIBridge.js
 extension/contentScriptsAPIBridge.js
 
-extension-chrome-firefox/
+extension-chrome/
 extension-edge/
+extension-firefox/
+extension-opera/

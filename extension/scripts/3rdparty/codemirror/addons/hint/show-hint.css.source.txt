@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.css
+https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/hint/show-hint.css

@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/display/placeholder.js
+https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/display/placeholder.js

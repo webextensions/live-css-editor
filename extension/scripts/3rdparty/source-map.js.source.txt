@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/mozilla/source-map/92fbfc86a9d5de98c1e66b0fc8aa8bc19cac2648/dist/source-map.js
+https://raw.githubusercontent.com/mozilla/source-map/0.5.1/dist/source-map.js
