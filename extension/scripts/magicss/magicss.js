@@ -216,15 +216,19 @@
 
     var isChrome = false,
         isEdge = false,
-        isFirefox = false;
+        isFirefox = false,
+        isOpera = false;
     var extensionUrl = {
         chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
         edge: 'https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1',
-        firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/'
+        firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/',
+        opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
     };
 
-    if (/Edge/.test(navigator.appVersion)) {            // Test for "Edge" first, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
+    if (/Edge/.test(navigator.appVersion)) {            // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
         isEdge = true;
+    } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
+        isOpera = true;
     } else if (/Chrome/.test(navigator.appVersion)) {
         isChrome = true;
     } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
@@ -238,6 +242,8 @@
         strCreatedVia += ' for Edge - ' + extensionUrl.edge;
     } else if (isFirefox) {
         strCreatedVia += ' for Firefox - ' + extensionUrl.firefox;
+    } else if (isOpera) {
+        strCreatedVia += ' for Opera - ' + extensionUrl.opera;
     }
     var createGist = function (text, languageMode, cb) {
         var files = {};
@@ -257,6 +263,8 @@
                         return ' for Edge - ' + extensionUrl.edge;
                     } else if (isFirefox) {
                         return ' for Firefox - ' + extensionUrl.firefox;
+                    } else if (isOpera) {
+                        return ' for Opera - ' + extensionUrl.opera;
                     }
                     return '';
                 }()),
