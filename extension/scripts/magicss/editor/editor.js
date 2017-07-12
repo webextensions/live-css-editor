@@ -1,9 +1,19 @@
-/*global amplify: false, console: false, utils, CodeMirror, jQuery */
+/*global amplify: false, console: false, utils, CodeMirror, jQuery, chrome */
 
 // TODO: If remember text option is on, detect text change in another instance of this extension in some different tab
 
+// TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
+var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
+
 (function ($) {
     'use strict';
+
+    var chromeStorage;
+    try {
+        chromeStorage = chrome.storage.sync || chrome.storage.local;
+    } catch (e) {
+        // do nothing
+    }
 
     var runOnceFor = function (fn, delay) {
         clearTimeout(fn.timer);
@@ -71,15 +81,7 @@
         }
 
         defaultPreference(pref) {
-            var defaultPreferences = {
-                'language-mode': 'css',
-                'syntax-highlighting': 'yes',
-                'textarea-value': '',
-                'ui-position-left': 20,
-                'ui-position-top': 20,
-                'ui-size-height': 250,
-                'ui-size-width': 300
-            };
+            var defaultPreferences = Editor.defaultPreferences;
             if (defaultPreferences[pref] !== undefined) {
                 return defaultPreferences[pref];
             } else {
@@ -278,6 +280,7 @@
                 closeOnEscapeKey = false;
             }
 
+            var indentWithTabs = thisOb.userPreference('use-tab-for-indentation') === 'yes';
             var codemirrorOptions = {
                 value: thisOb.textarea.value,
                 placeholder: thisOb.getOption('placeholder'),
@@ -292,8 +295,8 @@
 
                 matchBrackets: true,
 
-                indentUnit: 4,
-                indentWithTabs: false,
+                indentWithTabs: indentWithTabs,
+                indentUnit: (!indentWithTabs && parseInt(thisOb.userPreference('indentation-spaces-count'), 10)) || 4,
                 undoDepth: 1000,
 
                 extraKeys: {
@@ -304,12 +307,13 @@
                         }
                         var emmetExpanded = cm.execCommand('emmetExpandAbbreviation');
                         if (emmetExpanded === CodeMirror.Pass) {       // If it didn't expand, then "emmetExpanded === CodeMirror.Pass function"
+                            if (indentWithTabs) {
+                                return CodeMirror.Pass;
+                            }
                             var spacesPerTab = cm.getOption('indentUnit'),
                                 spacesToInsert = spacesPerTab - (cm.doc.getCursor('start').ch % spacesPerTab),
                                 spaces = Array(spacesToInsert + 1).join(' ');
                             cm.replaceSelection(spaces, 'end', '+input');
-                        } else {
-                            return;
                         }
                     },
                     Esc: function () {
@@ -905,8 +909,50 @@
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
         }
     }
+    Editor.defaultPreferences = {
+        'language-mode': 'css',
+        'use-tab-for-indentation': 'no',
+        'indentation-spaces-count': '4',
+        [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',
+        'syntax-highlighting': 'yes',
+        'textarea-value': '',
+        'ui-position-left': 20,
+        'ui-position-top': 20,
+        'ui-size-height': 250,
+        'ui-size-width': 300
+    };
 
     window.Editor = Editor;
 
-    Editor.usable = true;
+    try {
+        // TODO: Avoid this code structure full of callbacks
+        chromeStorage.get('use-less-by-default', function (values) {
+            if (values && values['use-less-by-default'] === 'yes') {
+                Editor.defaultPreferences['language-mode'] = 'less';
+            }
+
+            chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
+                if (values && values[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] === 'no') {
+                    Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] = 'no';
+                }
+
+                chromeStorage.get('use-tab-for-indentation', function (values) {
+                    if (values && values['use-tab-for-indentation'] === 'yes') {
+                        Editor.defaultPreferences['use-tab-for-indentation'] = 'yes';
+                    }
+
+                    chromeStorage.get('indentation-spaces-count', function (values) {
+                        var value = parseInt(values && values['indentation-spaces-count'], 10);
+                        if (!isNaN(value)) {
+                            Editor.defaultPreferences['indentation-spaces-count'] = '' + value;
+                        }
+
+                        Editor.usable = true;
+                    });
+                });
+            });
+        });
+    } catch (e) {
+        Editor.usable = true;
+    }
 }(jQuery));

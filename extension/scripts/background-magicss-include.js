@@ -15,6 +15,22 @@ var main = function () {
     // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
     // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
+    if (!window.openOptionsPageListenerAdded) {
+        chrome.runtime.onMessage.addListener(
+            function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
+                if (request.openOptionsPage) {
+                    // https://developer.chrome.com/extensions/optionsV2
+                    if (chrome.runtime.openOptionsPage) {
+                        chrome.runtime.openOptionsPage();
+                    } else {
+                        window.open(chrome.runtime.getURL('options.html'));
+                    }
+                }
+            }
+        );
+        window.openOptionsPageListenerAdded = true;
+    }
+
     extLib.loadJSCSS([
         {
             src: path3rdparty + 'async.js',

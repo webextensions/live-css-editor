@@ -55,6 +55,10 @@ var generateManifest = function (whichBrowser) {
             "persistent": false,
             "page": "background-magicss.html"
         },
+        "options_ui": {
+            "page": "options.html",
+            "chrome_style": true
+        },
         "commands": {
             "_execute_browser_action": {
                 "suggested_key": {

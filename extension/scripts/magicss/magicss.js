@@ -2,7 +2,17 @@
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
+// TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
+var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
+
 (function($){
+    var chromeStorage;
+    try {
+        chromeStorage = chrome.storage.sync || chrome.storage.local;
+    } catch (e) {
+        // do nothing
+    }
+
     if (window.MagiCSSEditor) {
         window.MagiCSSEditor.reposition();      // 'Magic CSS window is already there. Repositioning it.'
         return;
@@ -403,11 +413,10 @@
 
     var enableAutocompleteSelectors = function (editor) {
         $(editor.container).removeClass('magicss-autocomplete-selectors-disabled').addClass('magicss-autocomplete-selectors-enabled');
-        editor.userPreference('autocomplete-selectors', 'enabled');
     };
+
     var disableAutocompleteSelectors = function (editor) {
         $(editor.container).removeClass('magicss-autocomplete-selectors-enabled').addClass('magicss-autocomplete-selectors-disabled');
-        editor.userPreference('autocomplete-selectors', 'disabled');
     };
 
     var highlightErroneousLineTemporarily = function (editor, errorInLine) {
@@ -448,6 +457,16 @@
                 // do nothing
             },
             fnSuccess: function () {
+                var beautifyCSS = function (cssCode) {
+                    var options = {};
+                    if (window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes') {
+                        options.useTabs = true;
+                    } else {
+                        options.useSpaceCount = parseInt(window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10) || 4;
+                    }
+                    return utils.beautifyCSS(cssCode, options);
+                };
+
                 var currentNode = null;
                 $(document).on('mousemove', function(event) {
                     if (!enablePointAndClick) {
@@ -572,6 +591,15 @@
                             anyCharacterAfterCurrentCursorPosition = false;
                         }
 
+                        var useTabs = window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes';
+                        var whitespaceToAdd;
+                        if (useTabs) {
+                            whitespaceToAdd = '\t';
+                        } else {
+                            var indentationSpacesCount = parseInt(window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10);
+                            whitespaceToAdd = ' '.repeat(indentationSpacesCount || 4);
+                        }
+
                         var extraSpaces = whitespaceCharactersInCurrentLine;
                         for (let i = 0; i < matchingSelectors.length; i++) {
                             matchingSelectors[i] = {
@@ -591,7 +619,7 @@
                                 }()),
                                 text: (anyNonWhitespaceCharacterBeforeCurrentCursorPosition ? ('\n' + extraSpaces) : '') +
                                     matchingSelectors[i] + ' {' +
-                                    '\n' + extraSpaces + '    ' +
+                                    '\n' + extraSpaces + whitespaceToAdd +
                                     '\n' + extraSpaces + '}' +
                                     (anyCharacterAfterCurrentCursorPosition ? ('\n' + extraSpaces) : '')
                             };
@@ -826,7 +854,7 @@
                             closeCharacters: /[(){};:,]/,               // Custom override
                             onAddingAutoCompleteOptionsForSelector: function (add) {
                                 var editor = window.MagiCSSEditor;
-                                if (editor.userPreference('autocomplete-selectors') === 'disabled') {
+                                if (editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS) === 'no') {
                                     return;
                                 }
                                 if (existingCSSSelectorsWithAutocompleteObjects) {
@@ -894,7 +922,7 @@
                                 if (!textValue.trim()) {
                                     utils.alertNote('Please type some code to be beautified', 5000);
                                 } else {
-                                    var beautifiedCSS = utils.beautifyCSS(textValue);
+                                    var beautifiedCSS = beautifyCSS(textValue);
                                     if (textValue.trim() !== beautifiedCSS.trim()) {
                                         editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Your code has been beautified :-)', 5000);
@@ -971,8 +999,8 @@
                                                 highlightErroneousLineTemporarily(editor, err.line - 1);
                                                 editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                             } else {
-                                                var beautifiedLessCode = utils.beautifyCSS(utils.minifyCSS(lessCode));
-                                                cssCode = utils.beautifyCSS(utils.minifyCSS(cssCode));
+                                                var beautifiedLessCode = beautifyCSS(utils.minifyCSS(lessCode));
+                                                cssCode = beautifyCSS(utils.minifyCSS(cssCode));
 
                                                 if (cssCode === beautifiedLessCode) {
                                                     utils.alertNote('Your code is already CSS compatible', 5000);
@@ -994,7 +1022,7 @@
                                     .addClass(getLanguageMode() === 'less' ? 'tooltipster-selected-mode-less' : 'tooltipster-selected-mode-css')
                                     .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
                                     .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
-                                    .addClass(editor.userPreference('autocomplete-selectors') === 'disabled' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
+                                    .addClass(editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS) === 'no' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
                             }
                         },
                         /*
@@ -1069,26 +1097,6 @@
                             }
                         },
                         {
-                            name: 'disable-autocomplete-selectors',
-                            title: 'Disable autocomplete for CSS selectors',
-                            uniqCls: 'magicss-disable-autocomplete-selectors',
-                            onclick: function (evt, editor) {
-                                disableAutocompleteSelectors(editor);
-                                utils.alertNote('Disabled autocomplete for CSS selectors', 5000);
-                                editor.focus();
-                            }
-                        },
-                        {
-                            name: 'enable-autocomplete-selectors',
-                            title: 'Enable autocomplete for CSS selectors',
-                            uniqCls: 'magicss-enable-autocomplete-selectors',
-                            onclick: function (evt, editor) {
-                                enableAutocompleteSelectors(editor);
-                                utils.alertNote('Enabled autocomplete for CSS selectors', 5000);
-                                editor.focus();
-                            }
-                        },
-                        {
                             name: 'minify',
                             title: 'Minify',
                             uniqCls: 'magicss-minify',
@@ -1149,7 +1157,16 @@
                                     href: extensionUrl.chrome + '/reviews'
                                 };
                             }
-                        }())
+                        }()),
+                        {
+                            name: 'options',
+                            title: 'More options',
+                            uniqCls: 'magicss-options',
+                            onclick: function (evt, editor) {
+                                chrome.runtime.sendMessage({openOptionsPage: true});
+                                editor.focus();
+                            }
+                        }
                     ],
                     footer: function ($) {
                         var $footerItems = $('<div></div>'),
@@ -1201,8 +1218,8 @@
                                 $(editor.container).addClass('magicss-selected-mode-css');
                             }
 
-                            var autocompleteSelectors = editor.userPreference('autocomplete-selectors');
-                            if (autocompleteSelectors === 'disabled') {
+                            var autocompleteSelectors = editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
+                            if (autocompleteSelectors === 'no') {
                                 $(editor.container).addClass('magicss-autocomplete-selectors-disabled');
                             } else {
                                 $(editor.container).addClass('magicss-autocomplete-selectors-enabled');
@@ -1414,6 +1431,18 @@
 
                 window.MagiCSSEditor = new StylesEditor(options);
 
+                try {
+                    chromeStorage.get('use-autocomplete-for-css-selectors', function (values) {
+                        if (values['use-autocomplete-for-css-selectors'] === false) {
+                            disableAutocompleteSelectors(window.MagiCSSEditor);
+                        } else {
+                            enableAutocompleteSelectors(window.MagiCSSEditor);
+                        }
+                    });
+                } catch (e) {
+                    enableAutocompleteSelectors(window.MagiCSSEditor);
+                }
+
                 if (executionCounter && !isNaN(executionCounter)) {
                     try {
                         chromeStorage.set({'magicss-execution-counter': executionCounter}, function() {
@@ -1429,10 +1458,9 @@
 
     var executionCounter = 0;
     try {
-        var chromeStorage = chrome.storage.sync;
         chromeStorage.get('magicss-execution-counter', function (values) {
             try {
-                executionCounter = parseInt(values['magicss-execution-counter'], 10);
+                executionCounter = parseInt(values && values['magicss-execution-counter'], 10);
                 executionCounter = isNaN(executionCounter) ? 0 : executionCounter;
                 executionCounter = executionCounter < 0 ? 0 : executionCounter;
                 executionCounter++;

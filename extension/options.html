@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Live editor for CSS and LESS - Magic CSS</title>
+
+    <style>
+        body {
+            font-size: 13px;
+        }
+        .option-heading {
+            font-weight: bold;
+            padding-bottom: 7px;
+        }
+        .option-value {
+            padding-bottom: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div class="option" style="margin-top:35px">
+            <div class="option-heading">Indentation:</div>
+            <div style="margin-left:20px">
+                <div class="option-value">
+                    <label><input type="radio" name="indentation" value="tab" /> Tab character</label>
+                </div>
+                <div class="option-value">
+                    <label><input type="radio" name="indentation" value="spaces" /> Space characters: </label>
+                    <select class="indentation-spaces-count">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="option" style="margin-top:20px">
+            <div class="option-heading">Autocomplete:</div>
+            <div style="margin-left:20px">
+                <div class="option-value">
+                    <label><input type="checkbox" id="autocomplete-selectors" /> Use autocomplete for CSS selectors</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option" style="margin-top:20px">
+            <div class="option-heading">Default mode:</div>
+            <div style="margin-left:20px">
+                <div class="option-value">
+                    <label><input type="radio" name="language-mode" value="css" /> CSS</label>
+                </div>
+                <div class="option-value">
+                    <label><input type="radio" name="language-mode" value="less" /> Less</label>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:35px">
+            <button id="done">Done</button>
+        </div>
+    </div>
+
+    <script src="scripts/3rdparty/jquery-3.2.1.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="options.js"></script>
+</body>
+
+</html>

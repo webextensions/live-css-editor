@@ -1,5 +1,5 @@
 {
-    "version": "5.5.15",
+    "version": "6.0.0",
     "manifest_version": 2,
     "author": "Priyank Parashar",
     "default_locale": "en",
@@ -37,6 +37,10 @@
     "background": {
         "persistent": false,
         "page": "background-magicss.html"
+    },
+    "options_ui": {
+        "page": "options.html",
+        "chrome_style": true
     },
     "commands": {
         "_execute_browser_action": {

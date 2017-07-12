@@ -34,6 +34,10 @@ point-and-click.png
 reload.svg
     https://www.iconfinder.com/icons/326543/loop_reload_replay_icon#size=128
 
+settings.svg
+    https://www.iconfinder.com/icons/326699/settings_icon#size=128
+    https://www.iconfinder.com/icons/326699/download/svg/128
+
 unordered-list.svg
     https://www.iconfinder.com/icons/383201/list_unordered_icon#size=128
     https://www.iconfinder.com/icons/383201/download/svg/128

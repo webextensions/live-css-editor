@@ -283,12 +283,30 @@ var utils = window.utils || {};
         return alertNote;
     }());
 
-    utils.beautifyCSS = function (cssCode) {
+    utils.beautifyCSS = function (cssCode, options) {
+        var useTabs = options.useTabs,
+            useSpaceCount = options.useSpaceCount;
+
+        var inchar,
+            insize;
+
+        if (useTabs) {
+            inchar = '\t';
+            insize = 1;
+        } else {
+            inchar = ' ';
+            insize = useSpaceCount || 4;
+        }
+
         return csspretty({
             mode: 'beautify',   /* Doing beautify twice, otherwise it doesn't beautify code like the following one in single go:
                                        .box-shadow(@style,@alpha: 50%) when (isnumber(@alpha)){.box-shadow(@style, rgba(0, 0, 0, @alpha))} */
+            insize: insize,
+            inchar: inchar,
             source: csspretty({
                 mode: 'beautify',
+                insize: insize,
+                inchar: inchar,
                 source: cssCode
             })
         });
