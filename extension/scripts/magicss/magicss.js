@@ -228,13 +228,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         isEdge = false,
         isFirefox = false,
         isOpera = false;
-    var extensionUrl = {
-        chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
-        edge: 'https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1',
-        firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/',
-        opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
-    };
-
     if (/Edge/.test(navigator.appVersion)) {            // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
         isEdge = true;
     } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
@@ -244,6 +237,19 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
     } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
         isFirefox = true;
     }
+
+    var extensionUrl = {
+        chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
+        edge: 'https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1',
+        firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/',
+        opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
+    };
+    extensionUrl.forThisBrowser = (function () {
+        if (isEdge)         { return extensionUrl.edge;    }
+        else if (isFirefox) { return extensionUrl.firefox; }
+        else if (isOpera)   { return extensionUrl.opera;   }
+        else                { return extensionUrl.chrome;  }
+    }());
 
     var strCreatedVia = 'Created via Magic CSS extension';
     if (isChrome) {
@@ -1158,6 +1164,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 };
                             }
                         }()),
+                        {
+                            name: 'share-on-facebook',
+                            title: 'Share us on Facebook',
+                            uniqCls: 'magicss-share-on-facebook',
+                            href: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser)
+                        },
                         {
                             name: 'options',
                             title: 'More options',

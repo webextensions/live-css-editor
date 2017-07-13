@@ -3,14 +3,20 @@ ban.svg
     https://www.iconfinder.com/icons/1608568/download/svg/128
 
 ban_edited.svg
-    Slightly modified version of "ban.svg"
+    Slightly edited version of "ban.svg"
 
 hash.svg
     https://www.iconfinder.com/icons/118664/hash_icon
     https://www.iconfinder.com/icons/118664/download/svg/512
 
 hash_edited.svg
-    Slightly modified version of "hash.svg"
+    Slightly edited version of "hash.svg"
+
+logo-facebook.svg
+    https://upload.wikimedia.org/wikipedia/commons/c/c2/F_icon.svg
+
+logo-facebook_edited.svg
+    Slightly edited version of logo-facebook.svg
 
 logo-firefox_edited.png
     Resized version of /usr/lib/firefox/browser/icons/mozicon128.png
@@ -23,7 +29,7 @@ logo-microsoft-edge.svg
     https://upload.wikimedia.org/wikipedia/commons/d/d6/Microsoft_Edge_logo.svg
 
 logo-microsoft-edge_edited.svg
-    Slightly modified version of "logo-microsoft-edge.svg"
+    Slightly edited version of "logo-microsoft-edge.svg"
 
 logo-opera.svg
     https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg
@@ -43,7 +49,7 @@ unordered-list.svg
     https://www.iconfinder.com/icons/383201/download/svg/128
 
 unordered-list_edited.svg
-    Slightly modified version (using http://www.drawsvg.org/) of "unordered-list.svg"
+    Slightly edited version (using http://www.drawsvg.org/) of "unordered-list.svg"
 
 warning.png
     https://www.iconfinder.com/icons/173946/warning_icon
