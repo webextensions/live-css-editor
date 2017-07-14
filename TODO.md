@@ -1,6 +1,6 @@
 #### New Features
 * Add Autoprefixer (References: https://github.com/postcss/autoprefixer https://autoprefixer.github.io/)
-* Add support for editing and saving the CSS/Less files (back-end would need to support saving those files)
+* Add support for editing and saving the CSS/Less files (back-end would need to support saving those files, while keeping a check on line-ending)
 * Add a "copy-to-clipboard" button
 
 #### Improvements
@@ -14,9 +14,6 @@
 #### Environments
 * Make "editor" a standalone project, so that it can be added to an HTML page as well
 * Make "Magic CSS" a standalone project, so that it can be added to an HTML page as well
-
-#### Options Page
-* Add an option to select line-ending (LF/CRLF)
 
 #### Compilation and Build
 * Add webpack based compilation (currently, it is split into too many files, which increases load time)
