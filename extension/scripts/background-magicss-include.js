@@ -86,7 +86,7 @@ var main = function () {
 
         // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
         // path3rdparty + 'less.js',
-        path3rdparty + 'less.browserified.uglified.js',
+        path3rdparty + 'basic-less-with-sourcemap-support.browserified.uglified.js',
 
         path3rdparty + 'source-map.js',
 

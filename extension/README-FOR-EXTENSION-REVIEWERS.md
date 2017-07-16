@@ -33,9 +33,9 @@ Please note that:
 - https://www.npmjs.com/package/emmetio-codemirror-plugin-webextensions is published from https://github.com/webextensions/codemirror-plugin
 - https://github.com/webextensions/codemirror-plugin is a fork of https://github.com/emmetio/codemirror-plugin and differs from the original repository only with the commit https://github.com/webextensions/codemirror-plugin/commit/687c68a76804a8b20371ad54ddca803bfc66ed30 (the commit adds option to bundle a non-minified browser version of the library)
 
-3rdparty code which was compiled/minified without any customization
--------------------------------------------------------------------
-The file, `<extension>/scripts/3rdparty/less.browserified.uglified.js`, has been generated from a popular open-source library (https://github.com/less/less.js/) using the steps mentioned in `<extension>/scripts/3rdparty/less.browserified.uglified.js.source.txt`
+3rdparty code which was compiled/minified with minor customization (after forking from the official GitHub repository)
+----------------------------------------------------------------------------------------------------------------------
+The file, `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js`, has been fetched from https://github.com/webextensions/less.js which is a fork of a popular open-source library (https://github.com/less/less.js/). More details about those minor changes can be found in `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js.source.description.txt`
 
 3rdparty code which was customized
 ----------------------------------

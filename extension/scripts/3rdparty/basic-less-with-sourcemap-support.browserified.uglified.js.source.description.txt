@@ -1,0 +1,33 @@
+Steps to manually generate basic-less-with-sourcemap-support.browserified.uglified.js
+=====================================================================================
+
+    # Clone GitHub repository of webextensions/less.js which is a fork of GitHub repository less/less.js
+    #     Notes about the GitHub repository https://github.com/webextensions/less.js.git :
+    #     * The repository https://github.com/webextensions/less.js.git is a fork of https://github.com/less/less.js (from the point https://github.com/less/less.js/tree/8ca5af109d992cf3a1d4e23262de005e105408d3)
+    #     * For the purpose of usage in Magic CSS extension, please use the branch "build-less-for-magic-css" (https://github.com/webextensions/less.js/tree/build-less-for-magic-css)
+    #     * To create the above mentioned customized build, the commit added after forking can be found at https://github.com/webextensions/less.js/commit/ffd4f094cff8288e0fc5155b6e299e5699b890e9
+    $ git clone https://github.com/webextensions/less.js.git
+
+    # Change directory to the cloned repository
+    $ cd less.js
+
+    # Checkout the version from date 2017-07-16 (https://github.com/webextensions/less.js/tree/ffd4f094cff8288e0fc5155b6e299e5699b890e9)
+    $ git checkout ffd4f094cff8288e0fc5155b6e299e5699b890e9
+
+    # Use Node 8.1.4
+    $ nvm install 8.1.4
+
+    # Install packages required by the project's package.json
+    $ npm install
+
+    # You may wish to remove the pre-existing version of the file, under the "dist" directory
+    $ rm dist/basic-less-with-sourcemap-support.browserified.js
+    $ rm dist/basic-less-with-sourcemap-support.browserified.uglified.js
+
+    # Generate basic-less-with-sourcemap-support.browserified.uglified.js inside "dist" directory using an npm script
+    # This npm script would basically run two commands:
+    #     > browserify --entry lib/less-node/index-basic-less-with-sourcemap-support.js --outfile dist/basic-less-with-sourcemap-support.browserified.js --standalone less
+    #     > uglifyjs dist/basic-less-with-sourcemap-support.browserified.js --compress sequences=false --beautify beautify=false,semicolons=false,comments=some --output dist/basic-less-with-sourcemap-support.browserified.uglified.js
+    $ npm run build-less-for-magic-css
+
+    # Done! Now, the file is available at dist/basic-less-with-sourcemap-support.browserified.uglified.js
