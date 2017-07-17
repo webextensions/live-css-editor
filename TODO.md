@@ -20,7 +20,6 @@
 
 #### Refactoring
 * Refactor code
-* Update all 3rd party libraries to their latest versions
 * Move some functionalities into their own projects, for example, generate selectors, get existing selectors, point-and-click etc
 * Use Shadow DOM for Magic CSS UI (and remove some code which would not be required after that)
 
