@@ -48,12 +48,12 @@ var main = function () {
         pathCodeMirror + 'addons/edit/closebrackets.js',
         pathCodeMirror + 'addons/edit/matchbrackets.js',
 
-        path3rdparty + 'csslint/csslint_customized.js',
+        path3rdparty + 'csslint/csslint.js',
         path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
         pathCodeMirror + 'addons/lint/lint.css',
         path3rdpartyCustomFixes + 'codemirror/addons/lint/tooltip.css',
         pathCodeMirror + 'addons/lint/lint.js',
-        pathCodeMirror + 'addons/lint/css-lint.js',
+        pathCodeMirror + 'addons/lint/css-lint_customized.js',
 
         pathCodeMirror + 'addons/hint/show-hint.css',
         pathCodeMirror + 'addons/hint/show-hint_customized.js',
