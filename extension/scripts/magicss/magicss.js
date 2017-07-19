@@ -1055,6 +1055,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             uniqCls: 'magicss-show-line-numbers',
                             onclick: function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', true);
+                                editor.userPreference('show-line-numbers', 'yes');
                                 editor.focus();
                             }
                         },
@@ -1064,6 +1065,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             uniqCls: 'magicss-hide-line-numbers',
                             onclick: function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', false);
+                                editor.userPreference('show-line-numbers', 'no');
                                 editor.focus();
                             }
                         },

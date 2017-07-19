@@ -5,7 +5,7 @@
 
 #### Improvements
 * If there are many small iframes in a page, we may not want to load Magic CSS in all of them (this might be added as a global setting)
-* Currently, for the next load, we don't remember if the user had activated line numbers and CSS lint previously. The reasoning behind this is that we try to maximize the code viewability and those might be more of hindrance than use. But that reasoning may not be correct for all users, so we might make change to remember those settings.
+* Currently, for the next load, we don't remember if the user had activated CSS lint previously. The reasoning behind this is that we try to maximize the code viewability and those might be more of hindrance than use. But that reasoning may not be correct for all users, so we might make change to remember those settings.
 * "Reload CSS resources" feature should try to detect and reload @import instructions through <style> and <link> tags
 * CodeMirror autocomplete suggestions should have fixed position OR they should not let scroll event pass through to parent-elements/body OR both
 * Review if it is possible to fix https://github.com/webextensions/live-css-editor/issues/2 (Changes aren't applied after reload until extension is opened) while keeping security concerns in mind

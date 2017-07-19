@@ -285,7 +285,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                 value: thisOb.textarea.value,
                 placeholder: thisOb.getOption('placeholder'),
 
-                lineNumbers: false,
+                lineNumbers: thisOb.userPreference('show-line-numbers') === 'yes' ? true : false,
                 gutters: [],
                 lint: false,
 
@@ -915,6 +915,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         'indentation-spaces-count': '4',
         [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',
         'syntax-highlighting': 'yes',
+        'show-line-numbers': 'no',
         'textarea-value': '',
         'ui-position-left': 20,
         'ui-position-top': 20,
