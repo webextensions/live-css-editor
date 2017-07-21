@@ -735,6 +735,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     });
 
                 var fnApplyTextAsCSS = function (editor) {
+                    var disabled = false;
+                    if (editor.userPreference('disable-styles') === 'yes') {
+                        disabled = true;
+                    }
+
                     if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
@@ -756,6 +761,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             } else {
                                 var strCssCode = output.css;
                                 newStyleTag.cssText = strCssCode;
+                                newStyleTag.disabled = disabled;
                                 newStyleTag.applyTag();
                                 var rawSourceMap = output.map;
                                 if (rawSourceMap) {
@@ -766,6 +772,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     } else {
                         var cssCode = editor.getTextValue();
                         newStyleTag.cssText = cssCode;
+                        newStyleTag.disabled = disabled;
                         newStyleTag.applyTag();
                     }
                 };
@@ -1206,10 +1213,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 parentTag: 'body'
                             });
 
-                            window.setTimeout(function () {
-                                fnApplyTextAsCSS(editor);
-                            }, 750);
-
                             utils.addStyleTag({
                                 attributes: [{
                                     name: 'data-style-created-by',
@@ -1231,6 +1234,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             } else {
                                 $(editor.container).addClass('magicss-selected-mode-css');
                             }
+
+                            var disableStyles = editor.userPreference('disable-styles') === 'yes';
+                            if (disableStyles) {
+                                editor.indicateEnabledDisabled('disabled');
+                            } else {
+                                editor.indicateEnabledDisabled('enabled');
+                            }
+                            window.setTimeout(function () {
+                                fnApplyTextAsCSS(editor);
+                            }, 100);
 
                             var autocompleteSelectors = editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
                             if (autocompleteSelectors === 'no') {
@@ -1430,10 +1443,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     }
 
                     disableEnableCSS(doWhat) {
-                        newStyleTag.disabled = doWhat === 'disable';
+                        var disabled = doWhat === 'disable';
+                        newStyleTag.disabled = disabled;
                         newStyleTag.applyTag();
+                        this.userPreference('disable-styles', disabled ? 'yes' : 'no');
 
-                        if (doWhat === 'disable') {
+                        if (disabled) {
                             this.indicateEnabledDisabled('disabled');
                             utils.alertNote('Deactivated the code', 5000);
                         } else {
