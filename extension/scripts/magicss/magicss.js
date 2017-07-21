@@ -1253,6 +1253,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             }
                         },
                         reInitialized: function (editor, cfg) {
+                            editor.disableEnableCSS('disable');
+
                             cfg = cfg || {};
                             var duration = cfg.animDuration,
                                 targetWidth = cfg.targetWidth,
@@ -1266,7 +1268,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 function () {
                                     editor.saveDimensions({width: targetWidth, height: targetHeight});
                                     editor.bringCursorToView({pleaseIgnoreCursorActivity: true});
-                                    editor.disableEnableCSS('disable');
                                 }
                             );
                         },

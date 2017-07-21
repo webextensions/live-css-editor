@@ -45,7 +45,7 @@
 }
 
 .magicss-mode-switch {
-    width: 30px;
+    width: 25px;
     height: 10px;
     background-color: #ccc;
     border-radius: 10px;
@@ -53,7 +53,7 @@
 }
 
 .magicss-mode-switch-selected {
-    width: 15px;
+    width: 14px;
     height: 10px;
     float: right;
     background-color: rgb(34, 186, 17);
