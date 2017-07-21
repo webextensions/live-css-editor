@@ -5,6 +5,10 @@ ban.svg
 ban_edited.svg
     Slightly edited version of "ban.svg"
 
+compress.svg
+    https://www.iconfinder.com/icons/1608651/compress_icon#size=128
+    https://www.iconfinder.com/icons/1608651/download/svg/128
+
 hash.svg
     https://www.iconfinder.com/icons/118664/hash_icon
     https://www.iconfinder.com/icons/118664/download/svg/512
@@ -16,7 +20,7 @@ logo-facebook.svg
     https://upload.wikimedia.org/wikipedia/commons/c/c2/F_icon.svg
 
 logo-facebook_edited.svg
-    Slightly edited version of logo-facebook.svg
+    Slightly edited version of "logo-facebook.svg"
 
 logo-firefox_edited.png
     Resized version of /usr/lib/firefox/browser/icons/mozicon128.png
@@ -33,6 +37,13 @@ logo-microsoft-edge_edited.svg
 
 logo-opera.svg
     https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg
+
+mail.svg
+    https://www.iconfinder.com/icons/1814108/email_envenlope_letter_mail_icon#size=128
+    https://www.iconfinder.com/icons/1814108/download/svg/128
+
+mail_edited.svg
+    Slightly edited version (using http://vectorpaint.yaks.co.nz/) of "mail.svg"
 
 point-and-click.png
     chrome-devtools://devtools/bundled/Images/toolbarButtonGlyphs_2x.png
@@ -51,5 +62,6 @@ unordered-list.svg
 unordered-list_edited.svg
     Slightly edited version (using http://www.drawsvg.org/) of "unordered-list.svg"
 
-warning.png
-    https://www.iconfinder.com/icons/173946/warning_icon
+warning.svg
+    https://www.iconfinder.com/icons/293711/warning_icon#size=128
+    https://www.iconfinder.com/icons/293711/download/svg/128
