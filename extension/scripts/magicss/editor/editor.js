@@ -126,8 +126,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
             var thisOb = this,
                 containerEl = thisOb.container;
 
-            var isContainerHidden = ($(thisOb.container).filter(':visible').length === 0) ? true : false;
-            if (isContainerHidden) {
+            var isContainerHidden = $(thisOb.container).is(':visible') ? false : true,
+                isContainerTrulyHidden = isContainerHidden && $(thisOb.container).parent().is(':visible');
+            if (isContainerTrulyHidden) {
                 thisOb.options.editorOb.show();
             } else {
                 var defaultLeft = thisOb.defaultPreference('ui-position-left'),
