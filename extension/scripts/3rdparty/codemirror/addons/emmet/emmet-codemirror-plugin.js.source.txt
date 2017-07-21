@@ -1,1 +1,1 @@
-node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js
+node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.min.js
