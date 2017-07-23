@@ -3,32 +3,154 @@
         "addLinkToSourceOfOrigin": true
     },
     "filesToCopy": [
-        { "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorpicker.css",                 "from": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.8/addon/colorpicker/colorpicker.css",  "latestVersion": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorpicker.css"  },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorpicker.js",                  "from": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.8/addon/colorpicker/colorpicker.js",   "latestVersion": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorpicker.js"   },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorview.js",                    "from": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.8/addon/colorpicker/colorview.js",     "latestVersion": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorview.js"     },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/display/placeholder.js",                      "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/display/placeholder.js",                  "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/display/placeholder.js"                  },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/edit/closebrackets.js",                       "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/edit/closebrackets.js",                   "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/closebrackets.js"                   },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/edit/matchbrackets.js",                       "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/edit/matchbrackets.js",                   "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/matchbrackets.js"                   },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/emmet/emmet-codemirror-plugin.js",            "from": { "default": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.min.js",    "dev": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js" }                                     },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/hint/css-hint.js",                            "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/hint/css-hint.js",                        "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/css-hint.js"                        },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/hint/show-hint.css",                          "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/hint/show-hint.css",                      "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.css"                      },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/hint/show-hint.js",                           "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/hint/show-hint.js",                       "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.js"                       },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/lint/css-lint.js",                            "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/lint/css-lint.js",                        "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/css-lint.js"                        },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/lint/lint.css",                               "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/lint/lint.css",                           "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.css"                           },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/lint/lint.js",                                "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/lint/lint.js",                            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.js"                            },
-        { "to": "extension/scripts/3rdparty/codemirror/addons/selection/active-line.js",                    "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/selection/active-line.js",                "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/selection/active-line.js"                },
-        { "to": "extension/scripts/3rdparty/codemirror/mode/css.js",                                        "from": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/mode/css/css.js",                               "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/mode/css/css.js"                               },
-        { "to": "extension/scripts/3rdparty/codemirror/codemirror.css",                                     "from": "node_modules/codemirror/lib/codemirror.css" },
-        { "to": "extension/scripts/3rdparty/codemirror/codemirror.js",                                      "from": "node_modules/codemirror/lib/codemirror.js" },
-        { "to": "extension/scripts/3rdparty/csslint/csslint.js",                                            "from": "https://raw.githubusercontent.com/CSSLint/csslint/v1.0.5/dist/csslint.js",                                     "latestVersion": "https://raw.githubusercontent.com/CSSLint/csslint/master/dist/csslint.js"                                     },
-        { "to": "extension/scripts/3rdparty/csspretty/csspretty.js",                                        "from": "https://raw.githubusercontent.com/prettydiff/prettydiff/v1.16.28/lib/csspretty.js",                            "latestVersion": "https://raw.githubusercontent.com/prettydiff/prettydiff/master/lib/csspretty.js"                              },
-        { "to": "extension/scripts/3rdparty/tooltipster/jquery.tooltipster.js",                             "from": { "default": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.min.js",   "dev": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.js" },   "latestVersion": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/js/tooltipster.main.js" },
-        { "to": "extension/scripts/3rdparty/tooltipster/tooltipster.css",                                   "from": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/css/tooltipster.css",                             "latestVersion": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/css/tooltipster.main.css"                  },
-        { "to": "extension/scripts/3rdparty/amplify.js",                                                    "from": { "default": "https://raw.githubusercontent.com/mikehostetler/amplify/1.1.2/lib/amplify.min.js",            "dev": "https://raw.githubusercontent.com/mikehostetler/amplify/1.1.2/lib/amplify.js" },            "latestVersion": "https://raw.githubusercontent.com/mikehostetler/amplify/master/lib/amplify.js" },
-        { "to": "extension/scripts/3rdparty/async.js",                                                      "from": { "default": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.min.js",   "dev": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.js" },       "latestVersion": "https://raw.githubusercontent.com/caolan/async/master/dist/async.js" },
-        { "to": "extension/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js",    "from": "https://raw.githubusercontent.com/webextensions/less.js/ffd4f094cff8288e0fc5155b6e299e5699b890e9/dist/basic-less-with-sourcemap-support.browserified.uglified.js",   "latestVersion": "https://raw.githubusercontent.com/webextensions/less.js/build-less-for-magic-css/dist/basic-less-with-sourcemap-support.browserified.uglified.js" },
-        { "to": "extension/scripts/3rdparty/css.escape.js",                                                 "from": "https://raw.githubusercontent.com/mathiasbynens/CSS.escape/v1.5.1/css.escape.js",                              "latestVersion": "https://raw.githubusercontent.com/mathiasbynens/CSS.escape/master/css.escape.js"                              },
-        { "to": "extension/scripts/3rdparty/jquery-3.2.1.js",                                               "from": { "default": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",                            "dev": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js" }                                                             },
-        { "to": "extension/scripts/3rdparty/source-map.js",                                                 "from": { "default": "https://raw.githubusercontent.com/mozilla/source-map/0.5.6/dist/source-map.min.js",           "dev": "https://raw.githubusercontent.com/mozilla/source-map/0.5.6/dist/source-map.debug.js" },     "latestVersion": "https://raw.githubusercontent.com/mozilla/source-map/master/dist/source-map.min.js" }
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorpicker.css",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.8/addon/colorpicker/colorpicker.css" } },
+            "latestVersion": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorpicker.css"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorpicker.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.8/addon/colorpicker/colorpicker.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorpicker.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorview.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.8/addon/colorpicker/colorview.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorview.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/display/placeholder.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/display/placeholder.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/display/placeholder.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/edit/closebrackets.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/edit/closebrackets.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/closebrackets.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/edit/matchbrackets.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/edit/matchbrackets.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/matchbrackets.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/emmet/emmet-codemirror-plugin.js",
+            "from": {
+                "default": { "src": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.min.js" },
+                "dev": { "src": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js" }
+            }
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/hint/css-hint.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/hint/css-hint.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/css-hint.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/hint/show-hint.css",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/hint/show-hint.css" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.css"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/hint/show-hint.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/hint/show-hint.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/lint/css-lint.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/lint/css-lint.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/css-lint.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/lint/lint.css",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/lint/lint.css" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.css"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/lint/lint.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/lint/lint.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/addons/selection/active-line.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/selection/active-line.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/selection/active-line.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/mode/css.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/mode/css/css.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/mode/css/css.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/codemirror.css",
+            "from": { "default": { "src": "node_modules/codemirror/lib/codemirror.css" } }
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/codemirror.js",
+            "from": { "default": { "src": "node_modules/codemirror/lib/codemirror.js", "uglify": true } }
+        },
+        {
+            "to": "extension/scripts/3rdparty/csslint/csslint.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/CSSLint/csslint/v1.0.5/dist/csslint.js", "uglify": true } },
+            "latestVersion": "https://raw.githubusercontent.com/CSSLint/csslint/master/dist/csslint.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/csspretty/csspretty.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/prettydiff/prettydiff/v1.16.28/lib/csspretty.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/prettydiff/prettydiff/master/lib/csspretty.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/tooltipster/jquery.tooltipster.js",
+            "from": {
+                "default": { "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.min.js" },
+                "dev": { "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.js" }
+            },
+            "latestVersion": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/js/tooltipster.main.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/tooltipster/tooltipster.css",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/css/tooltipster.css" } },
+            "latestVersion": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/css/tooltipster.main.css"
+        },
+        {
+            "to": "extension/scripts/3rdparty/amplify.js",
+            "from": {
+                "default": { "src": "https://raw.githubusercontent.com/mikehostetler/amplify/1.1.2/lib/amplify.min.js" },
+                "dev": { "src": "https://raw.githubusercontent.com/mikehostetler/amplify/1.1.2/lib/amplify.js"}
+            },
+            "latestVersion": "https://raw.githubusercontent.com/mikehostetler/amplify/master/lib/amplify.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/async.js",
+            "from": {
+                "default": { "src": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.min.js" },
+                "dev": { "src": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.js" }
+            },
+            "latestVersion": "https://raw.githubusercontent.com/caolan/async/master/dist/async.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/webextensions/less.js/ffd4f094cff8288e0fc5155b6e299e5699b890e9/dist/basic-less-with-sourcemap-support.browserified.uglified.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/webextensions/less.js/build-less-for-magic-css/dist/basic-less-with-sourcemap-support.browserified.uglified.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/css.escape.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/mathiasbynens/CSS.escape/v1.5.1/css.escape.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/mathiasbynens/CSS.escape/master/css.escape.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/jquery-3.2.1.js",
+            "from": {
+                "default": { "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" },
+                "dev": { "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js" }
+            }
+        },
+        {
+            "to": "extension/scripts/3rdparty/source-map.js",
+            "from": {
+                "default": { "src": "https://raw.githubusercontent.com/mozilla/source-map/0.5.6/dist/source-map.min.js" },
+                "dev": { "src": "https://raw.githubusercontent.com/mozilla/source-map/0.5.6/dist/source-map.debug.js" }
+            },
+            "latestVersion": "https://raw.githubusercontent.com/mozilla/source-map/master/dist/source-map.min.js"
+        }
     ]
 }
