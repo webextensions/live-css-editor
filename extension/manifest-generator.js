@@ -65,10 +65,14 @@ var generateManifest = function (whichBrowser) {
                     "default": "Alt+Shift+C"
                 }
             }
-        },
+        }
+        /*
+        // "web_accessible_resources" might be required on some platforms (but currently we are using data-uri for images, so no need yet)
+
         "web_accessible_resources": [
             "ui-images/*.*"
         ]
+        /* */
     };
     if (whichBrowser === "firefox") {
         manifest["applications"] = {

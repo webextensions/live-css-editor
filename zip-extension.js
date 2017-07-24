@@ -94,7 +94,7 @@ try {
                 'manifest-firefox.json',
                 'manifest-opera.json',
                 'ui-images/**/*.*',     // Exclude files in "ui-images" folder
-                'ui-images',            // Avoid "ui-images" folder from getting created
+                'ui-images'             // Avoid "ui-images" folder from getting created
             ];
             if (whichBrowser !== 'edge') {
                 filesToIgnore.push('backgroundScriptsAPIBridge.js');

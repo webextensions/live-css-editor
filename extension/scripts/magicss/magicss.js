@@ -826,6 +826,52 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     };
                 }
 
+                var iconForRateUs = function (options) {
+                    options = options || {};
+                    var icon = null;
+                    if (isChrome || isEdge || isFirefox || isOpera) {
+                        if (isChrome) {
+                            icon = {
+                                name: 'rate-on-webstore',
+                                title: 'Rate us on Chrome Web Store',
+                                cls: 'magicss-rate-on-webstore',
+                                uniqCls: 'icon-chrome-web-store',
+                                href: extensionUrl.chrome + '/reviews'
+                            };
+                        } else if (isEdge) {
+                            icon = {
+                                name: 'rate-on-webstore',
+                                title: 'Rate us on Microsoft Store',
+                                cls: 'magicss-rate-on-webstore',
+                                uniqCls: 'icon-microsoft-store',
+                                href: extensionUrl.edge + '#ratings-reviews'
+                            };
+                        } else if (isFirefox) {
+                            icon = {
+                                name: 'rate-on-webstore',
+                                title: 'Rate us on Firefox Add-ons Store',
+                                cls: 'magicss-rate-on-webstore',
+                                uniqCls: 'icon-firefox-add-ons-store',
+                                href: extensionUrl.firefox + 'reviews/'
+                            };
+                        } else if (isOpera) {
+                            icon = {
+                                name: 'rate-on-webstore',
+                                title: 'Rate us on Opera Add-ons Store',
+                                cls: 'magicss-rate-on-webstore',
+                                uniqCls: 'icon-opera-add-ons-store',
+                                href: extensionUrl.opera + '#feedback-container'
+                            };
+                        }
+                        if (icon && icon.cls) {
+                            if (options.addOpaqueOnHoverClass) {
+                                icon.cls += ' magicss-opaque-on-hover';
+                            }
+                        }
+                    }
+                    return icon;
+                };
+
                 var options = {
                     id: id,
                     title: function ($, editor) {
@@ -987,18 +1033,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             }
                         },
                         (function () {
-                            if (!isChrome) {
-                                return null;
-                            }
                             if (executionCounter < 25 || 50 <= executionCounter) {
                                 return null;
                             } else {
-                                return {
-                                    name: 'rate-on-webstore',
-                                    title: 'Rate us on Chrome Web Store',
-                                    cls: 'magicss-rate-on-webstore',
-                                    href: extensionUrl.chrome + '/reviews'
-                                };
+                                return iconForRateUs({addOpaqueOnHoverClass: true});
                             }
                         }())
                     ],
@@ -1173,18 +1211,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             href: 'https://github.com/webextensions/live-css-editor'
                         },
                         (function () {
-                            if (!isChrome) {
-                                return null;
-                            }
                             if (executionCounter < 50) {
                                 return null;
                             } else {
-                                return {
-                                    name: 'rate-on-webstore',
-                                    title: 'Rate us on Chrome Web Store',
-                                    cls: 'magicss-rate-on-webstore',
-                                    href: extensionUrl.chrome + '/reviews'
-                                };
+                                return iconForRateUs();
                             }
                         }()),
                         {

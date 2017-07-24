@@ -4,6 +4,7 @@
 * Add a "copy-to-clipboard" button
 
 #### Improvements
+* Use black-and-white/grayscale + transparent/translucent for all icons under "+"
 * If there are many small iframes in a page, we may not want to load Magic CSS in all of them (this might be added as a global setting)
 * "Reload CSS resources" feature should try to detect and reload @import instructions through <style> and <link> tags
 * CodeMirror autocomplete suggestions should have fixed position OR they should not let scroll event pass through to parent-elements/body OR both

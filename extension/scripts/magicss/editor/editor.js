@@ -503,7 +503,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     if (divIcon.style.styleFloat !== undefined) {
                         divIcon.style.styleFloat = 'right';
                     }
-                    divIcon.className = (iconOptions.cls || '') + ' editor-icon';
+                    divIcon.className = (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + ' editor-icon';
                     if (iconOptions.title) {
                         divIcon.title = iconOptions.title;
                     }
