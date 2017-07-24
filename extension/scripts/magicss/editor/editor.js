@@ -286,9 +286,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                 value: thisOb.textarea.value,
                 placeholder: thisOb.getOption('placeholder'),
 
-                lineNumbers: thisOb.userPreference('show-line-numbers') === 'yes' ? true : false,
                 gutters: [],
                 lint: false,
+                lineNumbers: thisOb.userPreference('show-line-numbers') === 'yes' ? true : false,   // Eventually, lineNumbers also adds a value in "gutters" array
 
                 styleActiveLine: {
                     nonEmpty: true
@@ -324,7 +324,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     }
                 }
             };
-            codemirrorOptions = $.extend(true, {}, codemirrorOptions, options.codemirrorOptions);
+
+            var passedOptionsCombined = $.extend(
+                true,
+                {},
+                options.codemirrorOptions,
+                options.codemirrorOptions.optionsBasedOnUserPreference(thisOb.userPreference.bind(this))
+            );
+            delete passedOptionsCombined.optionsBasedOnUserPreference;  // Just cleaning up the object (not a compulsory thing to do)
+            codemirrorOptions = $.extend(true, {}, codemirrorOptions, passedOptionsCombined);
 
             var cm = thisOb.cm = CodeMirror(newDiv.get(0), codemirrorOptions);
 
@@ -912,6 +920,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
     }
     Editor.defaultPreferences = {
         'language-mode': 'css',
+        'use-css-linting': 'no',
         'disable-styles': 'no',
         'use-tab-for-indentation': 'no',
         'indentation-spaces-count': '4',
@@ -950,7 +959,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             Editor.defaultPreferences['indentation-spaces-count'] = '' + value;
                         }
 
-                        Editor.usable = true;
+                        chromeStorage.get('use-css-linting', function (values) {
+                            if (values && values['use-css-linting'] === 'yes') {
+                                Editor.defaultPreferences['use-css-linting'] = 'yes';
+                            }
+
+                            Editor.usable = true;
+                        });
                     });
                 });
             });

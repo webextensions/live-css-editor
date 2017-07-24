@@ -390,18 +390,21 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         }
     };
 
-    var setCodeMirrorCSSLinting = function (cm, enableOrDisable) {
-        var lint,
+    var setCodeMirrorCSSLinting = function (editor, enableOrDisable) {
+        var cm = editor.cm,
+            lint,
             gutters = [].concat(cm.getOption('gutters') || []);
         if (enableOrDisable === 'enable') {
             lint = true;
-            gutters.push('CodeMirror-lint-markers');
+            gutters.unshift('CodeMirror-lint-markers');     // Using ".unshift()" rather than ".push()" to ensure that the "gutter" for "line-number" always comes after gutter for "linting"
+            editor.userPreference('use-css-linting', 'yes');
         } else {
             lint = false;
             var index = gutters.indexOf('CodeMirror-lint-markers');
             if (index > -1) {
                 gutters.splice(index, 1);
             }
+            editor.userPreference('use-css-linting', 'no');
         }
         cm.setOption('gutters', gutters);
         cm.setOption('lint', lint);
@@ -781,7 +784,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     if (languageMode === 'less') {
                         $(editor.container).removeClass('magicss-selected-mode-css').addClass('magicss-selected-mode-less');
                         editor.userPreference('language-mode', 'less');
-                        setCodeMirrorCSSLinting(editor.cm, 'disable');
+                        setCodeMirrorCSSLinting(editor, 'disable');
                         utils.alertNote('Now editing code in LESS mode', 5000);
                     } else {
                         $(editor.container).removeClass('magicss-selected-mode-less').addClass('magicss-selected-mode-css');
@@ -897,6 +900,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 // TODO: Implement select-next-occurrence-of-current-selection
                                 //       This link might be of some help: https://codereview.chromium.org/219583002/
                             }
+                        },
+                        optionsBasedOnUserPreference: function (userPreference) {
+                            var options = {};
+                            if (userPreference('use-css-linting') === 'yes' && userPreference('language-mode') === 'css') {
+                                options.gutters = ['CodeMirror-lint-markers'];
+                                options.lint = true;
+                            } else {
+                                options.gutters = [];
+                                options.lint = false;
+                            }
+                            return options;
                         }
                     },
                     bgColor: '68,88,174,0.85',
@@ -1057,6 +1071,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         },
                         /* */
                         {
+                            name: 'reload-css-resources',
+                            title: 'Reload CSS resources',
+                            uniqCls: 'magicss-reload-css-resources',
+                            onclick: function (evt, editor) {
+                                reloadCSSInPage();
+                                editor.focus();
+                            }
+                        },
+                        {
                             name: 'showLineNumbers',
                             title: 'Show line numbers',
                             uniqCls: 'magicss-show-line-numbers',
@@ -1082,7 +1105,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             uniqCls: 'magicss-enable-css-linting',
                             onclick: function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
-                                    setCodeMirrorCSSLinting(editor.cm, 'enable');
+                                    setCodeMirrorCSSLinting(editor, 'enable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
@@ -1095,19 +1118,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             uniqCls: 'magicss-disable-css-linting',
                             onclick: function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
-                                    setCodeMirrorCSSLinting(editor.cm, 'disable');
+                                    setCodeMirrorCSSLinting(editor, 'disable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
-                                editor.focus();
-                            }
-                        },
-                        {
-                            name: 'reload-css-resources',
-                            title: 'Reload CSS resources',
-                            uniqCls: 'magicss-reload-css-resources',
-                            onclick: function (evt, editor) {
-                                reloadCSSInPage();
                                 editor.focus();
                             }
                         },
