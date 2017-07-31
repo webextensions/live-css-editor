@@ -2,6 +2,7 @@
 * Add Autoprefixer (References: https://github.com/postcss/autoprefixer https://autoprefixer.github.io/)
 * Add support for editing and saving the CSS/Less files (back-end would need to support saving those files, while keeping a check on line-ending)
 * Add a "copy-to-clipboard" button
+* Add support for running JavaScript code as well
 
 #### Improvements
 * Use black-and-white/grayscale + transparent/translucent for all icons under "+"
