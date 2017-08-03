@@ -3,6 +3,7 @@
 * Add support for editing and saving the CSS/Less files (back-end would need to support saving those files, while keeping a check on line-ending)
 * Add a "copy-to-clipboard" button
 * Add support for running JavaScript code as well
+* Provide a way to share CSS across computers. Approach 1 (would work for same person): Make the code reusable via "sync". Approach 2 (would work for multiple users): Make the code reusable+shareable via "GitHub Gist".
 
 #### Improvements
 * Use black-and-white/grayscale + transparent/translucent for all icons under "+"
