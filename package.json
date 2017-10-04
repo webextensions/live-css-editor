@@ -11,17 +11,17 @@
     "zip-extension": "npm run zip-chrome-extension && npm run zip-edge-extension && npm run zip-firefox-extension && npm run zip-opera-extension"
   },
   "dependencies": {
-    "codemirror": "5.25.0",
+    "codemirror": "5.30.0",
     "emmetio-codemirror-plugin-webextensions": "0.3.7",
     "jquery": "3.2.1"
   },
   "devDependencies": {
-    "archiver": "1.3.0",
-    "chalk": "2.0.1",
+    "archiver": "2.0.3",
+    "chalk": "2.1.0",
     "copy-files-from-to": "0.2.0",
-    "cp-file": "4.2.0",
+    "cp-file": "5.0.0",
     "del": "3.0.0",
-    "eslint": "4.2.0",
-    "jsonfile": "3.0.1"
+    "eslint": "4.8.0",
+    "jsonfile": "4.0.0"
   }
 }

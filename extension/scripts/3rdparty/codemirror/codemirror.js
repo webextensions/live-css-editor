@@ -37,9 +37,10 @@ else{nothing.prototype=base
 inst=new nothing}props&&copyObj(props,inst)
 return inst}function isWordCharBasic(ch){return/\w/.test(ch)||ch>""&&(ch.toUpperCase()!=ch.toLowerCase()||nonASCIISingleCaseWordChar.test(ch))}function isWordChar(ch,helper){return helper?!!(helper.source.indexOf("\\w")>-1&&isWordCharBasic(ch))||helper.test(ch):isWordCharBasic(ch)}function isEmpty(obj){for(var n in obj)if(obj.hasOwnProperty(n)&&obj[n])return!1
 return!0}function isExtendingChar(ch){return ch.charCodeAt(0)>=768&&extendingChars.test(ch)}function skipExtendingChars(str,pos,dir){for(;(dir<0?pos>0:pos<str.length)&&isExtendingChar(str.charAt(pos));)pos+=dir
-return pos}function findFirst(pred,from,to){for(;;){if(Math.abs(from-to)<=1)return pred(from)?from:to
-var mid=Math.floor((from+to)/2)
-pred(mid)?to=mid:from=mid}}function Display(place,doc,input){var d=this
+return pos}function findFirst(pred,from,to){for(var dir=from>to?-1:1;;){if(from==to)return from
+var midF=(from+to)/2,mid=dir<0?Math.ceil(midF):Math.floor(midF)
+if(mid==from)return pred(mid)?from:to
+pred(mid)?to=mid:from=mid+dir}}function Display(place,doc,input){var d=this
 this.input=input
 d.scrollbarFiller=elt("div",null,"CodeMirror-scrollbar-filler")
 d.scrollbarFiller.setAttribute("cm-not-content","true")
@@ -185,9 +186,9 @@ d.maxLineLength=lineLength(d.maxLine)
 d.maxLineChanged=!0
 doc.iter(function(line){var len=lineLength(line)
 if(len>d.maxLineLength){d.maxLineLength=len
-d.maxLine=line}})}function iterateBidiSections(order,from,to,f){if(!order)return f(from,to,"ltr")
+d.maxLine=line}})}function iterateBidiSections(order,from,to,f){if(!order)return f(from,to,"ltr",0)
 for(var found=!1,i=0;i<order.length;++i){var part=order[i]
-if(part.from<to&&part.to>from||from==to&&part.to==from){f(Math.max(part.from,from),Math.min(part.to,to),1==part.level?"rtl":"ltr")
+if(part.from<to&&part.to>from||from==to&&part.to==from){f(Math.max(part.from,from),Math.min(part.to,to),1==part.level?"rtl":"ltr",i)
 found=!0}}found||f(from,to,"ltr")}function getBidiPartAt(order,ch,sticky){var found
 bidiOther=null
 for(var i=0;i<order.length;++i){var cur=order[i]
@@ -195,33 +196,7 @@ if(cur.from<ch&&cur.to>ch)return i
 cur.to==ch&&(cur.from!=cur.to&&"before"==sticky?found=i:bidiOther=i)
 cur.from==ch&&(cur.from!=cur.to&&"before"!=sticky?found=i:bidiOther=i)}return null!=found?found:bidiOther}function getOrder(line,direction){var order=line.order
 null==order&&(order=line.order=bidiOrdering(line.text,direction))
-return order}function moveCharLogically(line,ch,dir){var target=skipExtendingChars(line.text,ch+dir,dir)
-return target<0||target>line.text.length?null:target}function moveLogically(line,start,dir){var ch=moveCharLogically(line,start.ch,dir)
-return null==ch?null:new Pos(start.line,ch,dir<0?"after":"before")}function endOfLine(visually,cm,lineObj,lineNo,dir){if(visually){var order=getOrder(lineObj,cm.doc.direction)
-if(order){var ch,part=dir<0?lst(order):order[0],sticky=dir<0==(1==part.level)?"after":"before"
-if(part.level>0){var prep=prepareMeasureForLine(cm,lineObj)
-ch=dir<0?lineObj.text.length-1:0
-var targetTop=measureCharPrepared(cm,prep,ch).top
-ch=findFirst(function(ch){return measureCharPrepared(cm,prep,ch).top==targetTop},dir<0==(1==part.level)?part.from:part.to-1,ch)
-"before"==sticky&&(ch=moveCharLogically(lineObj,ch,1,!0))}else ch=dir<0?part.to:part.from
-return new Pos(lineNo,ch,sticky)}}return new Pos(lineNo,dir<0?lineObj.text.length:0,dir<0?"before":"after")}function moveVisually(cm,line,start,dir){var bidi=getOrder(line,cm.doc.direction)
-if(!bidi)return moveLogically(line,start,dir)
-if(start.ch>=line.text.length){start.ch=line.text.length
-start.sticky="before"}else if(start.ch<=0){start.ch=0
-start.sticky="after"}var partPos=getBidiPartAt(bidi,start.ch,start.sticky),part=bidi[partPos]
-if("ltr"==cm.doc.direction&&part.level%2==0&&(dir>0?part.to>start.ch:part.from<start.ch))return moveLogically(line,start,dir)
-var prep,mv=function(pos,dir){return moveCharLogically(line,pos instanceof Pos?pos.ch:pos,dir)},getWrappedLineExtent=function(ch){if(!cm.options.lineWrapping)return{begin:0,end:line.text.length}
-prep=prep||prepareMeasureForLine(cm,line)
-return wrappedLineExtentChar(cm,line,prep,ch)},wrappedLineExtent=getWrappedLineExtent("before"==start.sticky?mv(start,-1):start.ch)
-if("rtl"==cm.doc.direction||1==part.level){var moveInStorageOrder=1==part.level==dir<0,ch=mv(start,moveInStorageOrder?1:-1)
-if(null!=ch&&(moveInStorageOrder?ch<=part.to&&ch<=wrappedLineExtent.end:ch>=part.from&&ch>=wrappedLineExtent.begin)){var sticky=moveInStorageOrder?"before":"after"
-return new Pos(start.line,ch,sticky)}}var searchInVisualLine=function(partPos,dir,wrappedLineExtent){for(var getRes=function(ch,moveInStorageOrder){return moveInStorageOrder?new Pos(start.line,mv(ch,1),"before"):new Pos(start.line,ch,"after")};partPos>=0&&partPos<bidi.length;partPos+=dir){var part=bidi[partPos],moveInStorageOrder=dir>0==(1!=part.level),ch=moveInStorageOrder?wrappedLineExtent.begin:mv(wrappedLineExtent.end,-1)
-if(part.from<=ch&&ch<part.to)return getRes(ch,moveInStorageOrder)
-ch=moveInStorageOrder?part.from:mv(part.to,-1)
-if(wrappedLineExtent.begin<=ch&&ch<wrappedLineExtent.end)return getRes(ch,moveInStorageOrder)}},res=searchInVisualLine(partPos+dir,dir,wrappedLineExtent)
-if(res)return res
-var nextCh=dir>0?wrappedLineExtent.end:mv(wrappedLineExtent.begin,-1)
-return null==nextCh||dir>0&&nextCh==line.text.length||!(res=searchInVisualLine(dir>0?0:bidi.length-1,dir,getWrappedLineExtent(nextCh)))?null:res}function getHandlers(emitter,type){return emitter._handlers&&emitter._handlers[type]||noHandlers}function off(emitter,type,f){if(emitter.removeEventListener)emitter.removeEventListener(type,f,!1)
+return order}function getHandlers(emitter,type){return emitter._handlers&&emitter._handlers[type]||noHandlers}function off(emitter,type,f){if(emitter.removeEventListener)emitter.removeEventListener(type,f,!1)
 else if(emitter.detachEvent)emitter.detachEvent("on"+type,f)
 else{var map$$1=emitter._handlers,arr=map$$1&&map$$1[type]
 if(arr){var index=indexOf(arr,f)
@@ -262,63 +237,67 @@ var nstate={}
 for(var n in state){var val=state[n]
 val instanceof Array&&(val=val.concat([]))
 nstate[n]=val}return nstate}function innerMode(mode,state){for(var info;mode.innerMode&&(info=mode.innerMode(state))&&info.mode!=mode;){state=info.state
-mode=info.mode}return info||{mode:mode,state:state}}function startState(mode,a1,a2){return!mode.startState||mode.startState(a1,a2)}function highlightLine(cm,line,state,forceToEnd){var st=[cm.state.modeGen],lineClasses={}
-runMode(cm,line.text,cm.doc.mode,state,function(end,style){return st.push(end,style)},lineClasses,forceToEnd)
-for(var o=0;o<cm.state.overlays.length;++o)!function(o){var overlay=cm.state.overlays[o],i=1,at=0
-runMode(cm,line.text,overlay.mode,!0,function(end,style){for(var start=i;at<end;){var i_end=st[i]
+mode=info.mode}return info||{mode:mode,state:state}}function startState(mode,a1,a2){return!mode.startState||mode.startState(a1,a2)}function highlightLine(cm,line,context,forceToEnd){var st=[cm.state.modeGen],lineClasses={}
+runMode(cm,line.text,cm.doc.mode,context,function(end,style){return st.push(end,style)},lineClasses,forceToEnd)
+for(var state=context.state,o=0;o<cm.state.overlays.length;++o)!function(o){var overlay=cm.state.overlays[o],i=1,at=0
+context.state=!0
+runMode(cm,line.text,overlay.mode,context,function(end,style){for(var start=i;at<end;){var i_end=st[i]
 i_end>end&&st.splice(i,1,end,st[i+1],i_end)
 i+=2
 at=Math.min(end,i_end)}if(style)if(overlay.opaque){st.splice(start,i-start,end,"overlay "+style)
 i=start+2}else for(;start<i;start+=2){var cur=st[start+1]
 st[start+1]=(cur?cur+" ":"")+"overlay "+style}},lineClasses)}(o)
-return{styles:st,classes:lineClasses.bgClass||lineClasses.textClass?lineClasses:null}}function getLineStyles(cm,line,updateFrontier){if(!line.styles||line.styles[0]!=cm.state.modeGen){var state=getStateBefore(cm,lineNo(line)),result=highlightLine(cm,line,line.text.length>cm.options.maxHighlightLength?copyState(cm.doc.mode,state):state)
-line.stateAfter=state
+context.state=state
+return{styles:st,classes:lineClasses.bgClass||lineClasses.textClass?lineClasses:null}}function getLineStyles(cm,line,updateFrontier){if(!line.styles||line.styles[0]!=cm.state.modeGen){var context=getContextBefore(cm,lineNo(line)),resetState=line.text.length>cm.options.maxHighlightLength&&copyState(cm.doc.mode,context.state),result=highlightLine(cm,line,context)
+resetState&&(context.state=resetState)
+line.stateAfter=context.save(!resetState)
 line.styles=result.styles
 result.classes?line.styleClasses=result.classes:line.styleClasses&&(line.styleClasses=null)
-updateFrontier===cm.doc.frontier&&cm.doc.frontier++}return line.styles}function getStateBefore(cm,n,precise){var doc=cm.doc,display=cm.display
-if(!doc.mode.startState)return!0
-var pos=findStartLine(cm,n,precise),state=pos>doc.first&&getLine(doc,pos-1).stateAfter
-state=state?copyState(doc.mode,state):startState(doc.mode)
-doc.iter(pos,n,function(line){processLine(cm,line.text,state)
-var save=pos==n-1||pos%5==0||pos>=display.viewFrom&&pos<display.viewTo
-line.stateAfter=save?copyState(doc.mode,state):null;++pos})
-precise&&(doc.frontier=pos)
-return state}function processLine(cm,text,state,startAt){var mode=cm.doc.mode,stream=new StringStream(text,cm.options.tabSize)
+updateFrontier===cm.doc.highlightFrontier&&(cm.doc.modeFrontier=Math.max(cm.doc.modeFrontier,++cm.doc.highlightFrontier))}return line.styles}function getContextBefore(cm,n,precise){var doc=cm.doc,display=cm.display
+if(!doc.mode.startState)return new Context(doc,!0,n)
+var start=findStartLine(cm,n,precise),saved=start>doc.first&&getLine(doc,start-1).stateAfter,context=saved?Context.fromSaved(doc,saved,start):new Context(doc,startState(doc.mode),start)
+doc.iter(start,n,function(line){processLine(cm,line.text,context)
+var pos=context.line
+line.stateAfter=pos==n-1||pos%5==0||pos>=display.viewFrom&&pos<display.viewTo?context.save():null
+context.nextLine()})
+precise&&(doc.modeFrontier=context.line)
+return context}function processLine(cm,text,context,startAt){var mode=cm.doc.mode,stream=new StringStream(text,cm.options.tabSize,context)
 stream.start=stream.pos=startAt||0
-""==text&&callBlankLine(mode,state)
-for(;!stream.eol();){readToken(mode,stream,state)
+""==text&&callBlankLine(mode,context.state)
+for(;!stream.eol();){readToken(mode,stream,context.state)
 stream.start=stream.pos}}function callBlankLine(mode,state){if(mode.blankLine)return mode.blankLine(state)
 if(mode.innerMode){var inner=innerMode(mode,state)
 return inner.mode.blankLine?inner.mode.blankLine(inner.state):void 0}}function readToken(mode,stream,state,inner){for(var i=0;i<10;i++){inner&&(inner[0]=innerMode(mode,state).mode)
 var style=mode.token(stream,state)
-if(stream.pos>stream.start)return style}throw new Error("Mode "+mode.name+" failed to advance stream.")}function takeToken(cm,pos,precise,asArray){var style,getObj=function(copy){return{start:stream.start,end:stream.pos,string:stream.current(),type:style||null,state:copy?copyState(doc.mode,state):state}},doc=cm.doc,mode=doc.mode
-pos=clipPos(doc,pos)
-var tokens,line=getLine(doc,pos.line),state=getStateBefore(cm,pos.line,precise),stream=new StringStream(line.text,cm.options.tabSize)
+if(stream.pos>stream.start)return style}throw new Error("Mode "+mode.name+" failed to advance stream.")}function takeToken(cm,pos,precise,asArray){var style,tokens,doc=cm.doc,mode=doc.mode,line=getLine(doc,(pos=clipPos(doc,pos)).line),context=getContextBefore(cm,pos.line,precise),stream=new StringStream(line.text,cm.options.tabSize,context)
 asArray&&(tokens=[])
 for(;(asArray||stream.pos<pos.ch)&&!stream.eol();){stream.start=stream.pos
-style=readToken(mode,stream,state)
-asArray&&tokens.push(getObj(!0))}return asArray?tokens:getObj()}function extractLineClasses(type,output){if(type)for(;;){var lineClass=type.match(/(?:^|\s+)line-(background-)?(\S+)/)
+style=readToken(mode,stream,context.state)
+asArray&&tokens.push(new Token(stream,style,copyState(doc.mode,context.state)))}return asArray?tokens:new Token(stream,style,context.state)}function extractLineClasses(type,output){if(type)for(;;){var lineClass=type.match(/(?:^|\s+)line-(background-)?(\S+)/)
 if(!lineClass)break
 type=type.slice(0,lineClass.index)+type.slice(lineClass.index+lineClass[0].length)
 var prop=lineClass[1]?"bgClass":"textClass"
-null==output[prop]?output[prop]=lineClass[2]:new RegExp("(?:^|s)"+lineClass[2]+"(?:$|s)").test(output[prop])||(output[prop]+=" "+lineClass[2])}return type}function runMode(cm,text,mode,state,f,lineClasses,forceToEnd){var flattenSpans=mode.flattenSpans
+null==output[prop]?output[prop]=lineClass[2]:new RegExp("(?:^|s)"+lineClass[2]+"(?:$|s)").test(output[prop])||(output[prop]+=" "+lineClass[2])}return type}function runMode(cm,text,mode,context,f,lineClasses,forceToEnd){var flattenSpans=mode.flattenSpans
 null==flattenSpans&&(flattenSpans=cm.options.flattenSpans)
-var style,curStart=0,curStyle=null,stream=new StringStream(text,cm.options.tabSize),inner=cm.options.addModeClass&&[null]
-""==text&&extractLineClasses(callBlankLine(mode,state),lineClasses)
+var style,curStart=0,curStyle=null,stream=new StringStream(text,cm.options.tabSize,context),inner=cm.options.addModeClass&&[null]
+""==text&&extractLineClasses(callBlankLine(mode,context.state),lineClasses)
 for(;!stream.eol();){if(stream.pos>cm.options.maxHighlightLength){flattenSpans=!1
-forceToEnd&&processLine(cm,text,state,stream.pos)
+forceToEnd&&processLine(cm,text,context,stream.pos)
 stream.pos=text.length
-style=null}else style=extractLineClasses(readToken(mode,stream,state,inner),lineClasses)
+style=null}else style=extractLineClasses(readToken(mode,stream,context.state,inner),lineClasses)
 if(inner){var mName=inner[0].name
 mName&&(style="m-"+(style?mName+" "+style:mName))}if(!flattenSpans||curStyle!=style){for(;curStart<stream.start;)f(curStart=Math.min(stream.start,curStart+5e3),curStyle)
 curStyle=style}stream.start=stream.pos}for(;curStart<stream.pos;){var pos=Math.min(stream.pos,curStart+5e3)
 f(pos,curStyle)
 curStart=pos}}function findStartLine(cm,n,precise){for(var minindent,minline,doc=cm.doc,lim=precise?-1:n-(cm.doc.mode.innerMode?1e3:100),search=n;search>lim;--search){if(search<=doc.first)return doc.first
-var line=getLine(doc,search-1)
-if(line.stateAfter&&(!precise||search<=doc.frontier))return search
+var line=getLine(doc,search-1),after=line.stateAfter
+if(after&&(!precise||search+(after instanceof SavedContext?after.lookAhead:0)<=doc.modeFrontier))return search
 var indented=countColumn(line.text,null,cm.options.tabSize)
 if(null==minline||minindent>indented){minline=search-1
-minindent=indented}}return minline}function updateLine(line,text,markedSpans,estimateHeight){line.text=text
+minindent=indented}}return minline}function retreatFrontier(doc,n){doc.modeFrontier=Math.min(doc.modeFrontier,n)
+if(!(doc.highlightFrontier<n-10)){for(var start=doc.first,line=n-1;line>start;line--){var saved=getLine(doc,line).stateAfter
+if(saved&&(!(saved instanceof SavedContext)||line+saved.lookAhead<n)){start=line+1
+break}}doc.highlightFrontier=Math.min(doc.highlightFrontier,start)}}function updateLine(line,text,markedSpans,estimateHeight){line.text=text
 line.stateAfter&&(line.stateAfter=null)
 line.styles&&(line.styles=null)
 null!=line.order&&(line.order=null)
@@ -545,9 +524,11 @@ removeChildren(cm.display.lineMeasure)
 for(var i=0;i<cm.display.view.length;i++)clearLineMeasurementCacheFor(cm.display.view[i])}function clearCaches(cm){clearLineMeasurementCache(cm)
 cm.display.cachedCharWidth=cm.display.cachedTextHeight=cm.display.cachedPaddingH=null
 cm.options.lineWrapping||(cm.display.maxLineChanged=!0)
-cm.display.lineNumChars=null}function pageScrollX(){return window.pageXOffset||(document.documentElement||document.body).scrollLeft}function pageScrollY(){return window.pageYOffset||(document.documentElement||document.body).scrollTop}function intoCoordSystem(cm,lineObj,rect,context,includeWidgets){if(!includeWidgets&&lineObj.widgets)for(var i=0;i<lineObj.widgets.length;++i)if(lineObj.widgets[i].above){var size=widgetHeight(lineObj.widgets[i])
-rect.top+=size
-rect.bottom+=size}if("line"==context)return rect
+cm.display.lineNumChars=null}function pageScrollX(){return chrome&&android?-(document.body.getBoundingClientRect().left-parseInt(getComputedStyle(document.body).marginLeft)):window.pageXOffset||(document.documentElement||document.body).scrollLeft}function pageScrollY(){return chrome&&android?-(document.body.getBoundingClientRect().top-parseInt(getComputedStyle(document.body).marginTop)):window.pageYOffset||(document.documentElement||document.body).scrollTop}function widgetTopHeight(lineObj){var height=0
+if(lineObj.widgets)for(var i=0;i<lineObj.widgets.length;++i)lineObj.widgets[i].above&&(height+=widgetHeight(lineObj.widgets[i]))
+return height}function intoCoordSystem(cm,lineObj,rect,context,includeWidgets){if(!includeWidgets){var height=widgetTopHeight(lineObj)
+rect.top+=height
+rect.bottom+=height}if("line"==context)return rect
 context||(context="local")
 var yOff=heightAtLine(lineObj)
 "local"==context?yOff+=paddingTop(cm.display):yOff-=cm.display.viewOffset
@@ -566,7 +547,7 @@ top+=localBox.top}var lineSpaceBox=cm.display.lineSpace.getBoundingClientRect()
 return{left:left-lineSpaceBox.left,top:top-lineSpaceBox.top}}function charCoords(cm,pos,context,lineObj,bias){lineObj||(lineObj=getLine(cm.doc,pos.line))
 return intoCoordSystem(cm,lineObj,measureChar(cm,lineObj,pos.ch,bias),context)}function cursorCoords(cm,pos,context,lineObj,preparedMeasure,varHeight){function get(ch,right){var m=measureCharPrepared(cm,preparedMeasure,ch,right?"right":"left",varHeight)
 right?m.left=m.right:m.right=m.left
-return intoCoordSystem(cm,lineObj,m,context)}function getBidi(ch,partPos,invert){var right=order[partPos].level%2!=0
+return intoCoordSystem(cm,lineObj,m,context)}function getBidi(ch,partPos,invert){var right=1==order[partPos].level
 return get(invert?ch-1:ch,right!=invert)}lineObj=lineObj||getLine(cm.doc,pos.line)
 preparedMeasure||(preparedMeasure=prepareMeasureForLine(cm,lineObj))
 var order=getOrder(lineObj,cm.doc.direction),ch=pos.ch,sticky=pos.sticky
@@ -589,23 +570,36 @@ if(lineN>last)return PosWithInfo(doc.first+doc.size-1,getLine(doc,last).text.len
 x<0&&(x=0)
 for(var lineObj=getLine(doc,lineN);;){var found=coordsCharInner(cm,lineObj,lineN,x,y),merged=collapsedSpanAtEnd(lineObj),mergedPos=merged&&merged.find(0,!0)
 if(!merged||!(found.ch>mergedPos.from.ch||found.ch==mergedPos.from.ch&&found.xRel>0))return found
-lineN=lineNo(lineObj=mergedPos.to.line)}}function wrappedLineExtent(cm,lineObj,preparedMeasure,y){var measure=function(ch){return intoCoordSystem(cm,lineObj,measureCharPrepared(cm,preparedMeasure,ch),"line")},end=lineObj.text.length,begin=findFirst(function(ch){return measure(ch-1).bottom<=y},end,0)
-return{begin:begin,end:end=findFirst(function(ch){return measure(ch).top>y},begin,end)}}function wrappedLineExtentChar(cm,lineObj,preparedMeasure,target){return wrappedLineExtent(cm,lineObj,preparedMeasure,intoCoordSystem(cm,lineObj,measureCharPrepared(cm,preparedMeasure,target),"line").top)}function coordsCharInner(cm,lineObj,lineNo$$1,x,y){y-=heightAtLine(lineObj)
-var pos,begin=0,end=lineObj.text.length,preparedMeasure=prepareMeasureForLine(cm,lineObj)
-if(getOrder(lineObj,cm.doc.direction)){if(cm.options.lineWrapping){var assign
-begin=(assign=wrappedLineExtent(cm,lineObj,preparedMeasure,y)).begin,end=assign.end}pos=new Pos(lineNo$$1,begin)
-var prevDiff,prevPos,beginLeft=cursorCoords(cm,pos,"line",lineObj,preparedMeasure).left,dir=beginLeft<x?1:-1,diff=beginLeft-x
-do{prevDiff=diff
-prevPos=pos
-if(null==(pos=moveVisually(cm,lineObj,pos,dir))||pos.ch<begin||end<=("before"==pos.sticky?pos.ch-1:pos.ch)){pos=prevPos
-break}diff=cursorCoords(cm,pos,"line",lineObj,preparedMeasure).left-x}while(dir<0!=diff<0&&Math.abs(diff)<=Math.abs(prevDiff))
-if(Math.abs(diff)>Math.abs(prevDiff)){if(diff<0==prevDiff<0)throw new Error("Broke out of infinite loop in coordsCharInner")
-pos=prevPos}}else{var ch=findFirst(function(ch){var box=intoCoordSystem(cm,lineObj,measureCharPrepared(cm,preparedMeasure,ch),"line")
-if(box.top>y){end=Math.min(ch,end)
-return!0}return!(box.bottom<=y)&&(box.left>x||!(box.right<x)&&x-box.left<box.right-x)},begin,end)
-pos=new Pos(lineNo$$1,ch=skipExtendingChars(lineObj.text,ch,1),ch==end?"before":"after")}var coords=cursorCoords(cm,pos,"line",lineObj,preparedMeasure);(y<coords.top||coords.bottom<y)&&(pos.outside=!0)
-pos.xRel=x<coords.left?-1:x>coords.right?1:0
-return pos}function textHeight(display){if(null!=display.cachedTextHeight)return display.cachedTextHeight
+lineN=lineNo(lineObj=mergedPos.to.line)}}function wrappedLineExtent(cm,lineObj,preparedMeasure,y){y-=widgetTopHeight(lineObj)
+var end=lineObj.text.length,begin=findFirst(function(ch){return measureCharPrepared(cm,preparedMeasure,ch-1).bottom<=y},end,0)
+return{begin:begin,end:end=findFirst(function(ch){return measureCharPrepared(cm,preparedMeasure,ch).top>y},begin,end)}}function wrappedLineExtentChar(cm,lineObj,preparedMeasure,target){preparedMeasure||(preparedMeasure=prepareMeasureForLine(cm,lineObj))
+return wrappedLineExtent(cm,lineObj,preparedMeasure,intoCoordSystem(cm,lineObj,measureCharPrepared(cm,preparedMeasure,target),"line").top)}function boxIsAfter(box,x,y,left){return!(box.bottom<=y)&&(box.top>y||(left?box.left:box.right)>x)}function coordsCharInner(cm,lineObj,lineNo$$1,x,y){y-=heightAtLine(lineObj)
+var preparedMeasure=prepareMeasureForLine(cm,lineObj),widgetHeight$$1=widgetTopHeight(lineObj),begin=0,end=lineObj.text.length,ltr=!0,order=getOrder(lineObj,cm.doc.direction)
+if(order){var part=(cm.options.lineWrapping?coordsBidiPartWrapped:coordsBidiPart)(cm,lineObj,lineNo$$1,preparedMeasure,order,x,y)
+begin=(ltr=1!=part.level)?part.from:part.to-1
+end=ltr?part.to:part.from-1}var baseX,sticky,chAround=null,boxAround=null,ch=findFirst(function(ch){var box=measureCharPrepared(cm,preparedMeasure,ch)
+box.top+=widgetHeight$$1
+box.bottom+=widgetHeight$$1
+if(!boxIsAfter(box,x,y,!1))return!1
+if(box.top<=y&&box.left<=x){chAround=ch
+boxAround=box}return!0},begin,end),outside=!1
+if(boxAround){var atLeft=x-boxAround.left<boxAround.right-x,atStart=atLeft==ltr
+ch=chAround+(atStart?0:1)
+sticky=atStart?"after":"before"
+baseX=atLeft?boxAround.left:boxAround.right}else{ltr||ch!=end&&ch!=begin||ch++
+sticky=0==ch?"after":ch==lineObj.text.length?"before":measureCharPrepared(cm,preparedMeasure,ch-(ltr?1:0)).bottom+widgetHeight$$1<=y==ltr?"after":"before"
+var coords=cursorCoords(cm,Pos(lineNo$$1,ch,sticky),"line",lineObj,preparedMeasure)
+baseX=coords.left
+outside=y<coords.top||y>=coords.bottom}return PosWithInfo(lineNo$$1,ch=skipExtendingChars(lineObj.text,ch,1),sticky,outside,x-baseX)}function coordsBidiPart(cm,lineObj,lineNo$$1,preparedMeasure,order,x,y){var index=findFirst(function(i){var part=order[i],ltr=1!=part.level
+return boxIsAfter(cursorCoords(cm,Pos(lineNo$$1,ltr?part.to:part.from,ltr?"before":"after"),"line",lineObj,preparedMeasure),x,y,!0)},0,order.length-1),part=order[index]
+if(index>0){var ltr=1!=part.level,start=cursorCoords(cm,Pos(lineNo$$1,ltr?part.from:part.to,ltr?"after":"before"),"line",lineObj,preparedMeasure)
+boxIsAfter(start,x,y,!0)&&start.top>y&&(part=order[index-1])}return part}function coordsBidiPartWrapped(cm,lineObj,_lineNo,preparedMeasure,order,x,y){for(var ref=wrappedLineExtent(cm,lineObj,preparedMeasure,y),begin=ref.begin,end=ref.end,part=null,closestDist=null,i=0;i<order.length;i++){var p=order[i]
+if(!(p.from>=end||p.to<=begin)){var endX=measureCharPrepared(cm,preparedMeasure,1!=p.level?Math.min(end,p.to)-1:Math.max(begin,p.from)).right,dist=endX<x?x-endX+1e9:endX-x
+if(!part||closestDist>dist){part=p
+closestDist=dist}}}part||(part=order[order.length-1])
+part.from<begin&&(part={from:begin,to:part.to,level:part.level})
+part.to>end&&(part={from:part.from,to:end,level:part.level})
+return part}function textHeight(display){if(null!=display.cachedTextHeight)return display.cachedTextHeight
 if(null==measureText){measureText=elt("pre")
 for(var i=0;i<49;++i){measureText.appendChild(document.createTextNode("x"))
 measureText.appendChild(elt("br"))}measureText.appendChild(document.createTextNode("x"))}removeChildrenAndAdd(display.measure,measureText)
@@ -632,7 +626,8 @@ y=e.clientY-space.top}catch(e){return null}var line,coords=coordsChar(cm,x,y)
 if(forRect&&1==coords.xRel&&(line=getLine(cm.doc,coords.line).text).length==coords.ch){var colDiff=countColumn(line,line.length,cm.options.tabSize)-line.length
 coords=Pos(coords.line,Math.max(0,Math.round((x-paddingH(cm.display).left)/charWidth(cm.display))-colDiff))}return coords}function findViewIndex(cm,n){if(n>=cm.display.viewTo)return null
 if((n-=cm.display.viewFrom)<0)return null
-for(var view=cm.display.view,i=0;i<view.length;i++)if((n-=view[i].size)<0)return i}function updateSelection(cm){cm.display.input.showSelection(cm.display.input.prepareSelection())}function prepareSelection(cm,primary){for(var doc=cm.doc,result={},curFragment=result.cursors=document.createDocumentFragment(),selFragment=result.selection=document.createDocumentFragment(),i=0;i<doc.sel.ranges.length;i++)if(!1!==primary||i!=doc.sel.primIndex){var range$$1=doc.sel.ranges[i]
+for(var view=cm.display.view,i=0;i<view.length;i++)if((n-=view[i].size)<0)return i}function updateSelection(cm){cm.display.input.showSelection(cm.display.input.prepareSelection())}function prepareSelection(cm,primary){void 0===primary&&(primary=!0)
+for(var doc=cm.doc,result={},curFragment=result.cursors=document.createDocumentFragment(),selFragment=result.selection=document.createDocumentFragment(),i=0;i<doc.sel.ranges.length;i++)if(primary||i!=doc.sel.primIndex){var range$$1=doc.sel.ranges[i]
 if(!(range$$1.from().line>=cm.display.viewTo||range$$1.to().line<cm.display.viewFrom)){var collapsed=range$$1.empty();(collapsed||cm.options.showCursorWhenSelecting)&&drawSelectionCursor(cm,range$$1.head,curFragment)
 collapsed||drawSelectionRange(cm,range$$1,selFragment)}}return result}function drawSelectionCursor(cm,head,output){var pos=cursorCoords(cm,head,"div",null,null,!cm.options.singleCursorHeightPerLine),cursor=output.appendChild(elt("div"," ","CodeMirror-cursor"))
 cursor.style.left=pos.left+"px"
@@ -642,22 +637,25 @@ if(pos.other){var otherCursor=output.appendChild(elt("div"," ","CodeMirror-curs
 otherCursor.style.display=""
 otherCursor.style.left=pos.other.left+"px"
 otherCursor.style.top=pos.other.top+"px"
-otherCursor.style.height=.85*(pos.other.bottom-pos.other.top)+"px"}}function drawSelectionRange(cm,range$$1,output){function add(left,top,width,bottom){top<0&&(top=0)
+otherCursor.style.height=.85*(pos.other.bottom-pos.other.top)+"px"}}function cmpCoords(a,b){return a.top-b.top||a.left-b.left}function drawSelectionRange(cm,range$$1,output){function add(left,top,width,bottom){top<0&&(top=0)
 top=Math.round(top)
 bottom=Math.round(bottom)
-fragment.appendChild(elt("div",null,"CodeMirror-selected","position: absolute; left: "+left+"px;\n                             top: "+top+"px; width: "+(null==width?rightSide-left:width)+"px;\n                             height: "+(bottom-top)+"px"))}function drawForLine(line,fromArg,toArg){function coords(ch,bias){return charCoords(cm,Pos(line,ch),"div",lineObj,bias)}var start,end,lineObj=getLine(doc,line),lineLen=lineObj.text.length
-iterateBidiSections(getOrder(lineObj,doc.direction),fromArg||0,null==toArg?lineLen:toArg,function(from,to,dir){var rightPos,left,right,leftPos=coords(from,"left")
-if(from==to){rightPos=leftPos
-left=right=leftPos.left}else{rightPos=coords(to-1,"right")
-if("rtl"==dir){var tmp=leftPos
-leftPos=rightPos
-rightPos=tmp}left=leftPos.left
-right=rightPos.right}null==fromArg&&0==from&&(left=leftSide)
-if(rightPos.top-leftPos.top>3){add(left,leftPos.top,null,leftPos.bottom)
-left=leftSide
-leftPos.bottom<rightPos.top&&add(left,leftPos.bottom,null,rightPos.top)}null==toArg&&to==lineLen&&(right=rightSide);(!start||leftPos.top<start.top||leftPos.top==start.top&&leftPos.left<start.left)&&(start=leftPos);(!end||rightPos.bottom>end.bottom||rightPos.bottom==end.bottom&&rightPos.right>end.right)&&(end=rightPos)
-left<leftSide+1&&(left=leftSide)
-add(left,rightPos.top,right-left,rightPos.bottom)})
+fragment.appendChild(elt("div",null,"CodeMirror-selected","position: absolute; left: "+left+"px;\n                             top: "+top+"px; width: "+(null==width?rightSide-left:width)+"px;\n                             height: "+(bottom-top)+"px"))}function drawForLine(line,fromArg,toArg){function coords(ch,bias){return charCoords(cm,Pos(line,ch),"div",lineObj,bias)}var start,end,lineObj=getLine(doc,line),lineLen=lineObj.text.length,order=getOrder(lineObj,doc.direction)
+iterateBidiSections(order,fromArg||0,null==toArg?lineLen:toArg,function(from,to,dir,i){var fromPos=coords(from,"ltr"==dir?"left":"right"),toPos=coords(to-1,"ltr"==dir?"right":"left")
+if("ltr"==dir){var fromLeft=null==fromArg&&0==from?leftSide:fromPos.left,toRight=null==toArg&&to==lineLen?rightSide:toPos.right
+if(toPos.top-fromPos.top<=3)add(fromLeft,toPos.top,toRight-fromLeft,toPos.bottom)
+else{add(fromLeft,fromPos.top,null,fromPos.bottom)
+fromPos.bottom<toPos.top&&add(leftSide,fromPos.bottom,null,toPos.top)
+add(leftSide,toPos.top,toPos.right,toPos.bottom)}}else if(from<to){var fromRight=null==fromArg&&0==from?rightSide:fromPos.right,toLeft=null==toArg&&to==lineLen?leftSide:toPos.left
+if(toPos.top-fromPos.top<=3)add(toLeft,toPos.top,fromRight-toLeft,toPos.bottom)
+else{var topLeft=leftSide
+if(i){var topEnd=wrappedLineExtentChar(cm,lineObj,null,from).end
+topLeft=coords(topEnd-(/\s/.test(lineObj.text.charAt(topEnd-1))?2:1),"left").left}add(topLeft,fromPos.top,fromRight-topLeft,fromPos.bottom)
+fromPos.bottom<toPos.top&&add(leftSide,fromPos.bottom,null,toPos.top)
+var botWidth=null;(order.length,0)||(botWidth=coords(wrappedLineExtentChar(cm,lineObj,null,to).begin,"right").right-toLeft)
+add(toLeft,toPos.top,botWidth,toPos.bottom)}}(!start||cmpCoords(fromPos,start)<0)&&(start=fromPos)
+cmpCoords(toPos,start)<0&&(start=toPos);(!end||cmpCoords(fromPos,end)<0)&&(end=fromPos)
+cmpCoords(toPos,end)<0&&(end=toPos)})
 return{start:start,end:end}}var display=cm.display,doc=cm.doc,fragment=document.createDocumentFragment(),padding=paddingH(cm.display),leftSide=padding.left,rightSide=Math.max(display.sizerWidth,displayWidth(cm)-display.sizer.offsetLeft)-padding.right,sFrom=range$$1.from(),sTo=range$$1.to()
 if(sFrom.line==sTo.line)drawForLine(sFrom.line,sFrom.ch,sTo.ch)
 else{var fromLine=getLine(doc,sFrom.line),toLine=getLine(doc,sTo.line),singleVLine=visualLine(fromLine)==visualLine(toLine),leftEnd=drawForLine(sFrom.line,sFrom.ch,singleVLine?fromLine.text.length+1:null).end,rightStart=drawForLine(sTo.line,singleVLine?0:null,sTo.ch).start
@@ -678,7 +676,21 @@ if(!cm.curOp&&cm.display.selForContextMenu!=cm.doc.sel){cm.display.input.reset()
 webkit&&setTimeout(function(){return cm.display.input.reset(!0)},20)}cm.display.input.receivedFocus()}restartBlink(cm)}}function onBlur(cm,e){if(!cm.state.delayingBlurEvent){if(cm.state.focused){signal(cm,"blur",cm,e)
 cm.state.focused=!1
 rmClass(cm.display.wrapper,"CodeMirror-focused")}clearInterval(cm.display.blinker)
-setTimeout(function(){cm.state.focused||(cm.display.shift=!1)},150)}}function alignHorizontally(cm){var display=cm.display,view=display.view
+setTimeout(function(){cm.state.focused||(cm.display.shift=!1)},150)}}function updateHeightsInViewport(cm){for(var display=cm.display,prevBottom=display.lineDiv.offsetTop,i=0;i<display.view.length;i++){var cur=display.view[i],height=void 0
+if(!cur.hidden){if(ie&&ie_version<8){var bot=cur.node.offsetTop+cur.node.offsetHeight
+height=bot-prevBottom
+prevBottom=bot}else{var box=cur.node.getBoundingClientRect()
+height=box.bottom-box.top}var diff=cur.line.height-height
+height<2&&(height=textHeight(display))
+if(diff>.005||diff<-.005){updateLineHeight(cur.line,height)
+updateWidgetHeight(cur.line)
+if(cur.rest)for(var j=0;j<cur.rest.length;j++)updateWidgetHeight(cur.rest[j])}}}}function updateWidgetHeight(line){if(line.widgets)for(var i=0;i<line.widgets.length;++i)line.widgets[i].height=line.widgets[i].node.parentNode.offsetHeight}function visibleLines(display,doc,viewport){var top=viewport&&null!=viewport.top?Math.max(0,viewport.top):display.scroller.scrollTop
+top=Math.floor(top-paddingTop(display))
+var bottom=viewport&&null!=viewport.bottom?viewport.bottom:top+display.wrapper.clientHeight,from=lineAtHeight(doc,top),to=lineAtHeight(doc,bottom)
+if(viewport&&viewport.ensure){var ensureFrom=viewport.ensure.from.line,ensureTo=viewport.ensure.to.line
+if(ensureFrom<from){from=ensureFrom
+to=lineAtHeight(doc,heightAtLine(getLine(doc,ensureFrom))+display.wrapper.clientHeight)}else if(Math.min(ensureTo,doc.lastLine())>=to){from=lineAtHeight(doc,heightAtLine(getLine(doc,ensureTo))-display.wrapper.clientHeight)
+to=ensureTo}}return{from:from,to:Math.max(to,from+1)}}function alignHorizontally(cm){var display=cm.display,view=display.view
 if(display.alignWidgets||display.gutters.firstChild&&cm.options.fixedGutter){for(var comp=compensateForHScroll(display)-display.scroller.scrollLeft+cm.doc.scrollLeft,gutterW=display.gutters.offsetWidth,left=comp+"px",i=0;i<view.length;i++)if(!view[i].hidden){if(cm.options.fixedGutter){view[i].gutter&&(view[i].gutter.style.left=left)
 view[i].gutterBackground&&(view[i].gutterBackground.style.left=left)}var align=view[i].alignable
 if(align)for(var j=0;j<align.length;j++)align[j].style.left=left}cm.options.fixedGutter&&(display.gutters.style.left=comp+gutterW+"px")}}function maybeUpdateLineNumberWidth(cm){if(!cm.options.lineNumbers)return!1
@@ -690,49 +702,49 @@ display.lineNumWidth=display.lineNumInnerWidth+padding
 display.lineNumChars=display.lineNumInnerWidth?last.length:-1
 display.lineGutter.style.width=display.lineNumWidth+"px"
 updateGutterSpace(cm)
-return!0}return!1}function updateHeightsInViewport(cm){for(var display=cm.display,prevBottom=display.lineDiv.offsetTop,i=0;i<display.view.length;i++){var cur=display.view[i],height=void 0
-if(!cur.hidden){if(ie&&ie_version<8){var bot=cur.node.offsetTop+cur.node.offsetHeight
-height=bot-prevBottom
-prevBottom=bot}else{var box=cur.node.getBoundingClientRect()
-height=box.bottom-box.top}var diff=cur.line.height-height
-height<2&&(height=textHeight(display))
-if(diff>.001||diff<-.001){updateLineHeight(cur.line,height)
-updateWidgetHeight(cur.line)
-if(cur.rest)for(var j=0;j<cur.rest.length;j++)updateWidgetHeight(cur.rest[j])}}}}function updateWidgetHeight(line){if(line.widgets)for(var i=0;i<line.widgets.length;++i)line.widgets[i].height=line.widgets[i].node.parentNode.offsetHeight}function visibleLines(display,doc,viewport){var top=viewport&&null!=viewport.top?Math.max(0,viewport.top):display.scroller.scrollTop
-top=Math.floor(top-paddingTop(display))
-var bottom=viewport&&null!=viewport.bottom?viewport.bottom:top+display.wrapper.clientHeight,from=lineAtHeight(doc,top),to=lineAtHeight(doc,bottom)
-if(viewport&&viewport.ensure){var ensureFrom=viewport.ensure.from.line,ensureTo=viewport.ensure.to.line
-if(ensureFrom<from){from=ensureFrom
-to=lineAtHeight(doc,heightAtLine(getLine(doc,ensureFrom))+display.wrapper.clientHeight)}else if(Math.min(ensureTo,doc.lastLine())>=to){from=lineAtHeight(doc,heightAtLine(getLine(doc,ensureTo))-display.wrapper.clientHeight)
-to=ensureTo}}return{from:from,to:Math.max(to,from+1)}}function setScrollTop(cm,val){if(!(Math.abs(cm.doc.scrollTop-val)<2)){cm.doc.scrollTop=val
-gecko||updateDisplaySimple(cm,{top:val})
-cm.display.scroller.scrollTop!=val&&(cm.display.scroller.scrollTop=val)
-cm.display.scrollbars.setScrollTop(val)
+return!0}return!1}function maybeScrollWindow(cm,rect){if(!signalDOMEvent(cm,"scrollCursorIntoView")){var display=cm.display,box=display.sizer.getBoundingClientRect(),doScroll=null
+rect.top+box.top<0?doScroll=!0:rect.bottom+box.top>(window.innerHeight||document.documentElement.clientHeight)&&(doScroll=!1)
+if(null!=doScroll&&!phantom){var scrollNode=elt("div","​",null,"position: absolute;\n                         top: "+(rect.top-display.viewOffset-paddingTop(cm.display))+"px;\n                         height: "+(rect.bottom-rect.top+scrollGap(cm)+display.barHeight)+"px;\n                         left: "+rect.left+"px; width: "+Math.max(2,rect.right-rect.left)+"px;")
+cm.display.lineSpace.appendChild(scrollNode)
+scrollNode.scrollIntoView(doScroll)
+cm.display.lineSpace.removeChild(scrollNode)}}}function scrollPosIntoView(cm,pos,end,margin){null==margin&&(margin=0)
+var rect
+cm.options.lineWrapping||pos!=end||(end="before"==(pos=pos.ch?Pos(pos.line,"before"==pos.sticky?pos.ch-1:pos.ch,"after"):pos).sticky?Pos(pos.line,pos.ch+1,"before"):pos)
+for(var limit=0;limit<5;limit++){var changed=!1,coords=cursorCoords(cm,pos),endCoords=end&&end!=pos?cursorCoords(cm,end):coords,scrollPos=calculateScrollPos(cm,rect={left:Math.min(coords.left,endCoords.left),top:Math.min(coords.top,endCoords.top)-margin,right:Math.max(coords.left,endCoords.left),bottom:Math.max(coords.bottom,endCoords.bottom)+margin}),startTop=cm.doc.scrollTop,startLeft=cm.doc.scrollLeft
+if(null!=scrollPos.scrollTop){updateScrollTop(cm,scrollPos.scrollTop)
+Math.abs(cm.doc.scrollTop-startTop)>1&&(changed=!0)}if(null!=scrollPos.scrollLeft){setScrollLeft(cm,scrollPos.scrollLeft)
+Math.abs(cm.doc.scrollLeft-startLeft)>1&&(changed=!0)}if(!changed)break}return rect}function scrollIntoView(cm,rect){var scrollPos=calculateScrollPos(cm,rect)
+null!=scrollPos.scrollTop&&updateScrollTop(cm,scrollPos.scrollTop)
+null!=scrollPos.scrollLeft&&setScrollLeft(cm,scrollPos.scrollLeft)}function calculateScrollPos(cm,rect){var display=cm.display,snapMargin=textHeight(cm.display)
+rect.top<0&&(rect.top=0)
+var screentop=cm.curOp&&null!=cm.curOp.scrollTop?cm.curOp.scrollTop:display.scroller.scrollTop,screen=displayHeight(cm),result={}
+rect.bottom-rect.top>screen&&(rect.bottom=rect.top+screen)
+var docBottom=cm.doc.height+paddingVert(display),atTop=rect.top<snapMargin,atBottom=rect.bottom>docBottom-snapMargin
+if(rect.top<screentop)result.scrollTop=atTop?0:rect.top
+else if(rect.bottom>screentop+screen){var newTop=Math.min(rect.top,(atBottom?docBottom:rect.bottom)-screen)
+newTop!=screentop&&(result.scrollTop=newTop)}var screenleft=cm.curOp&&null!=cm.curOp.scrollLeft?cm.curOp.scrollLeft:display.scroller.scrollLeft,screenw=displayWidth(cm)-(cm.options.fixedGutter?display.gutters.offsetWidth:0),tooWide=rect.right-rect.left>screenw
+tooWide&&(rect.right=rect.left+screenw)
+rect.left<10?result.scrollLeft=0:rect.left<screenleft?result.scrollLeft=Math.max(0,rect.left-(tooWide?0:10)):rect.right>screenw+screenleft-3&&(result.scrollLeft=rect.right+(tooWide?0:10)-screenw)
+return result}function addToScrollTop(cm,top){if(null!=top){resolveScrollToPos(cm)
+cm.curOp.scrollTop=(null==cm.curOp.scrollTop?cm.doc.scrollTop:cm.curOp.scrollTop)+top}}function ensureCursorVisible(cm){resolveScrollToPos(cm)
+var cur=cm.getCursor()
+cm.curOp.scrollToPos={from:cur,to:cur,margin:cm.options.cursorScrollMargin}}function scrollToCoords(cm,x,y){null==x&&null==y||resolveScrollToPos(cm)
+null!=x&&(cm.curOp.scrollLeft=x)
+null!=y&&(cm.curOp.scrollTop=y)}function scrollToRange(cm,range$$1){resolveScrollToPos(cm)
+cm.curOp.scrollToPos=range$$1}function resolveScrollToPos(cm){var range$$1=cm.curOp.scrollToPos
+if(range$$1){cm.curOp.scrollToPos=null
+scrollToCoordsRange(cm,estimateCoords(cm,range$$1.from),estimateCoords(cm,range$$1.to),range$$1.margin)}}function scrollToCoordsRange(cm,from,to,margin){var sPos=calculateScrollPos(cm,{left:Math.min(from.left,to.left),top:Math.min(from.top,to.top)-margin,right:Math.max(from.right,to.right),bottom:Math.max(from.bottom,to.bottom)+margin})
+scrollToCoords(cm,sPos.scrollLeft,sPos.scrollTop)}function updateScrollTop(cm,val){if(!(Math.abs(cm.doc.scrollTop-val)<2)){gecko||updateDisplaySimple(cm,{top:val})
+setScrollTop(cm,val,!0)
 gecko&&updateDisplaySimple(cm)
-startWorker(cm,100)}}function setScrollLeft(cm,val,isScroller){if(!(isScroller?val==cm.doc.scrollLeft:Math.abs(cm.doc.scrollLeft-val)<2)){val=Math.min(val,cm.display.scroller.scrollWidth-cm.display.scroller.clientWidth)
-cm.doc.scrollLeft=val
+startWorker(cm,100)}}function setScrollTop(cm,val,forceScroll){val=Math.min(cm.display.scroller.scrollHeight-cm.display.scroller.clientHeight,val)
+if(cm.display.scroller.scrollTop!=val||forceScroll){cm.doc.scrollTop=val
+cm.display.scrollbars.setScrollTop(val)
+cm.display.scroller.scrollTop!=val&&(cm.display.scroller.scrollTop=val)}}function setScrollLeft(cm,val,isScroller,forceScroll){val=Math.min(val,cm.display.scroller.scrollWidth-cm.display.scroller.clientWidth)
+if(!(isScroller?val==cm.doc.scrollLeft:Math.abs(cm.doc.scrollLeft-val)<2)||forceScroll){cm.doc.scrollLeft=val
 alignHorizontally(cm)
 cm.display.scroller.scrollLeft!=val&&(cm.display.scroller.scrollLeft=val)
-cm.display.scrollbars.setScrollLeft(val)}}function wheelEventDelta(e){var dx=e.wheelDeltaX,dy=e.wheelDeltaY
-null==dx&&e.detail&&e.axis==e.HORIZONTAL_AXIS&&(dx=e.detail)
-null==dy&&e.detail&&e.axis==e.VERTICAL_AXIS?dy=e.detail:null==dy&&(dy=e.wheelDelta)
-return{x:dx,y:dy}}function wheelEventPixels(e){var delta=wheelEventDelta(e)
-delta.x*=wheelPixelsPerUnit
-delta.y*=wheelPixelsPerUnit
-return delta}function onScrollWheel(cm,e){var delta=wheelEventDelta(e),dx=delta.x,dy=delta.y,display=cm.display,scroll=display.scroller,canScrollX=scroll.scrollWidth>scroll.clientWidth,canScrollY=scroll.scrollHeight>scroll.clientHeight
-if(dx&&canScrollX||dy&&canScrollY){if(dy&&mac&&webkit)outer:for(var cur=e.target,view=display.view;cur!=scroll;cur=cur.parentNode)for(var i=0;i<view.length;i++)if(view[i].node==cur){cm.display.currentWheelTarget=cur
-break outer}if(!dx||gecko||presto||null==wheelPixelsPerUnit){if(dy&&null!=wheelPixelsPerUnit){var pixels=dy*wheelPixelsPerUnit,top=cm.doc.scrollTop,bot=top+display.wrapper.clientHeight
-pixels<0?top=Math.max(0,top+pixels-50):bot=Math.min(cm.doc.height,bot+pixels+50)
-updateDisplaySimple(cm,{top:top,bottom:bot})}if(wheelSamples<20)if(null==display.wheelStartX){display.wheelStartX=scroll.scrollLeft
-display.wheelStartY=scroll.scrollTop
-display.wheelDX=dx
-display.wheelDY=dy
-setTimeout(function(){if(null!=display.wheelStartX){var movedX=scroll.scrollLeft-display.wheelStartX,movedY=scroll.scrollTop-display.wheelStartY,sample=movedY&&display.wheelDY&&movedY/display.wheelDY||movedX&&display.wheelDX&&movedX/display.wheelDX
-display.wheelStartX=display.wheelStartY=null
-if(sample){wheelPixelsPerUnit=(wheelPixelsPerUnit*wheelSamples+sample)/(wheelSamples+1);++wheelSamples}}},200)}else{display.wheelDX+=dx
-display.wheelDY+=dy}}else{dy&&canScrollY&&setScrollTop(cm,Math.max(0,Math.min(scroll.scrollTop+dy*wheelPixelsPerUnit,scroll.scrollHeight-scroll.clientHeight)))
-setScrollLeft(cm,Math.max(0,Math.min(scroll.scrollLeft+dx*wheelPixelsPerUnit,scroll.scrollWidth-scroll.clientWidth)));(!dy||dy&&canScrollY)&&e_preventDefault(e)
-display.wheelStartX=null}}}function measureForScrollbars(cm){var d=cm.display,gutterW=d.gutters.offsetWidth,docH=Math.round(cm.doc.height+paddingVert(cm.display))
+cm.display.scrollbars.setScrollLeft(val)}}function measureForScrollbars(cm){var d=cm.display,gutterW=d.gutters.offsetWidth,docH=Math.round(cm.doc.height+paddingVert(cm.display))
 return{clientHeight:d.scroller.clientHeight,viewHeight:d.wrapper.clientHeight,scrollWidth:d.scroller.scrollWidth,clientWidth:d.scroller.clientWidth,viewWidth:d.wrapper.clientWidth,barLeft:cm.options.fixedGutter?gutterW:0,docHeight:docH,scrollHeight:docH+scrollGap(cm)+d.barHeight,nativeBarWidth:d.nativeBarWidth,gutterWidth:gutterW}}function updateScrollbars(cm,measure){measure||(measure=measureForScrollbars(cm))
 var startWidth=cm.display.barWidth,startHeight=cm.display.barHeight
 updateScrollbarsInner(cm,measure)
@@ -751,37 +763,8 @@ d.gutterFiller.style.height=sizes.bottom+"px"
 d.gutterFiller.style.width=measure.gutterWidth+"px"}else d.gutterFiller.style.display=""}function initScrollbars(cm){if(cm.display.scrollbars){cm.display.scrollbars.clear()
 cm.display.scrollbars.addClass&&rmClass(cm.display.wrapper,cm.display.scrollbars.addClass)}cm.display.scrollbars=new scrollbarModel[cm.options.scrollbarStyle](function(node){cm.display.wrapper.insertBefore(node,cm.display.scrollbarFiller)
 on(node,"mousedown",function(){cm.state.focused&&setTimeout(function(){return cm.display.input.focus()},0)})
-node.setAttribute("cm-not-content","true")},function(pos,axis){"horizontal"==axis?setScrollLeft(cm,pos):setScrollTop(cm,pos)},cm)
-cm.display.scrollbars.addClass&&addClass(cm.display.wrapper,cm.display.scrollbars.addClass)}function maybeScrollWindow(cm,rect){if(!signalDOMEvent(cm,"scrollCursorIntoView")){var display=cm.display,box=display.sizer.getBoundingClientRect(),doScroll=null
-rect.top+box.top<0?doScroll=!0:rect.bottom+box.top>(window.innerHeight||document.documentElement.clientHeight)&&(doScroll=!1)
-if(null!=doScroll&&!phantom){var scrollNode=elt("div","​",null,"position: absolute;\n                         top: "+(rect.top-display.viewOffset-paddingTop(cm.display))+"px;\n                         height: "+(rect.bottom-rect.top+scrollGap(cm)+display.barHeight)+"px;\n                         left: "+rect.left+"px; width: "+Math.max(2,rect.right-rect.left)+"px;")
-cm.display.lineSpace.appendChild(scrollNode)
-scrollNode.scrollIntoView(doScroll)
-cm.display.lineSpace.removeChild(scrollNode)}}}function scrollPosIntoView(cm,pos,end,margin){null==margin&&(margin=0)
-for(var rect,limit=0;limit<5;limit++){var changed=!1,coords=cursorCoords(cm,pos),endCoords=end&&end!=pos?cursorCoords(cm,end):coords,scrollPos=calculateScrollPos(cm,rect={left:Math.min(coords.left,endCoords.left),top:Math.min(coords.top,endCoords.top)-margin,right:Math.max(coords.left,endCoords.left),bottom:Math.max(coords.bottom,endCoords.bottom)+margin}),startTop=cm.doc.scrollTop,startLeft=cm.doc.scrollLeft
-if(null!=scrollPos.scrollTop){setScrollTop(cm,scrollPos.scrollTop)
-Math.abs(cm.doc.scrollTop-startTop)>1&&(changed=!0)}if(null!=scrollPos.scrollLeft){setScrollLeft(cm,scrollPos.scrollLeft)
-Math.abs(cm.doc.scrollLeft-startLeft)>1&&(changed=!0)}if(!changed)break}return rect}function scrollIntoView(cm,rect){var scrollPos=calculateScrollPos(cm,rect)
-null!=scrollPos.scrollTop&&setScrollTop(cm,scrollPos.scrollTop)
-null!=scrollPos.scrollLeft&&setScrollLeft(cm,scrollPos.scrollLeft)}function calculateScrollPos(cm,rect){var display=cm.display,snapMargin=textHeight(cm.display)
-rect.top<0&&(rect.top=0)
-var screentop=cm.curOp&&null!=cm.curOp.scrollTop?cm.curOp.scrollTop:display.scroller.scrollTop,screen=displayHeight(cm),result={}
-rect.bottom-rect.top>screen&&(rect.bottom=rect.top+screen)
-var docBottom=cm.doc.height+paddingVert(display),atTop=rect.top<snapMargin,atBottom=rect.bottom>docBottom-snapMargin
-if(rect.top<screentop)result.scrollTop=atTop?0:rect.top
-else if(rect.bottom>screentop+screen){var newTop=Math.min(rect.top,(atBottom?docBottom:rect.bottom)-screen)
-newTop!=screentop&&(result.scrollTop=newTop)}var screenleft=cm.curOp&&null!=cm.curOp.scrollLeft?cm.curOp.scrollLeft:display.scroller.scrollLeft,screenw=displayWidth(cm)-(cm.options.fixedGutter?display.gutters.offsetWidth:0),tooWide=rect.right-rect.left>screenw
-tooWide&&(rect.right=rect.left+screenw)
-rect.left<10?result.scrollLeft=0:rect.left<screenleft?result.scrollLeft=Math.max(0,rect.left-(tooWide?0:10)):rect.right>screenw+screenleft-3&&(result.scrollLeft=rect.right+(tooWide?0:10)-screenw)
-return result}function addToScrollPos(cm,left,top){null==left&&null==top||resolveScrollToPos(cm)
-null!=left&&(cm.curOp.scrollLeft=(null==cm.curOp.scrollLeft?cm.doc.scrollLeft:cm.curOp.scrollLeft)+left)
-null!=top&&(cm.curOp.scrollTop=(null==cm.curOp.scrollTop?cm.doc.scrollTop:cm.curOp.scrollTop)+top)}function ensureCursorVisible(cm){resolveScrollToPos(cm)
-var cur=cm.getCursor(),from=cur,to=cur
-if(!cm.options.lineWrapping){from=cur.ch?Pos(cur.line,cur.ch-1):cur
-to=Pos(cur.line,cur.ch+1)}cm.curOp.scrollToPos={from:from,to:to,margin:cm.options.cursorScrollMargin}}function resolveScrollToPos(cm){var range$$1=cm.curOp.scrollToPos
-if(range$$1){cm.curOp.scrollToPos=null
-var from=estimateCoords(cm,range$$1.from),to=estimateCoords(cm,range$$1.to),sPos=calculateScrollPos(cm,{left:Math.min(from.left,to.left),top:Math.min(from.top,to.top)-range$$1.margin,right:Math.max(from.right,to.right),bottom:Math.max(from.bottom,to.bottom)+range$$1.margin})
-cm.scrollTo(sPos.scrollLeft,sPos.scrollTop)}}function startOperation(cm){cm.curOp={cm:cm,viewChanged:!1,startHeight:cm.doc.height,forceUpdate:!1,updateInput:null,typing:!1,changeObjs:null,cursorActivityHandlers:null,cursorActivityCalled:0,selectionChanged:!1,updateMaxLine:!1,scrollLeft:null,scrollTop:null,scrollToPos:null,focus:!1,id:++nextOpId}
+node.setAttribute("cm-not-content","true")},function(pos,axis){"horizontal"==axis?setScrollLeft(cm,pos):updateScrollTop(cm,pos)},cm)
+cm.display.scrollbars.addClass&&addClass(cm.display.wrapper,cm.display.scrollbars.addClass)}function startOperation(cm){cm.curOp={cm:cm,viewChanged:!1,startHeight:cm.doc.height,forceUpdate:!1,updateInput:null,typing:!1,changeObjs:null,cursorActivityHandlers:null,cursorActivityCalled:0,selectionChanged:!1,updateMaxLine:!1,scrollLeft:null,scrollTop:null,scrollToPos:null,focus:!1,id:++nextOpId}
 pushOperation(cm.curOp)}function endOperation(cm){finishOperation(cm.curOp,function(group){for(var i=0;i<group.ops.length;i++)group.ops[i].cm.curOp=null
 endOperations(group)})}function endOperations(group){for(var ops=group.ops,i=0;i<ops.length;i++)endOperation_R1(ops[i])
 for(var i$1=0;i$1<ops.length;i$1++)endOperation_W1(ops[i$1])
@@ -797,10 +780,10 @@ op.barMeasure=measureForScrollbars(cm)
 if(display.maxLineChanged&&!cm.options.lineWrapping){op.adjustWidthTo=measureChar(cm,display.maxLine,display.maxLine.text.length).left+3
 cm.display.sizerWidth=op.adjustWidthTo
 op.barMeasure.scrollWidth=Math.max(display.scroller.clientWidth,display.sizer.offsetLeft+op.adjustWidthTo+scrollGap(cm)+cm.display.barWidth)
-op.maxScrollLeft=Math.max(0,display.sizer.offsetLeft+op.adjustWidthTo-displayWidth(cm))}(op.updatedDisplay||op.selectionChanged)&&(op.preparedSelection=display.input.prepareSelection(op.focus))}function endOperation_W2(op){var cm=op.cm
+op.maxScrollLeft=Math.max(0,display.sizer.offsetLeft+op.adjustWidthTo-displayWidth(cm))}(op.updatedDisplay||op.selectionChanged)&&(op.preparedSelection=display.input.prepareSelection())}function endOperation_W2(op){var cm=op.cm
 if(null!=op.adjustWidthTo){cm.display.sizer.style.minWidth=op.adjustWidthTo+"px"
 op.maxScrollLeft<cm.doc.scrollLeft&&setScrollLeft(cm,Math.min(cm.display.scroller.scrollLeft,op.maxScrollLeft),!0)
-cm.display.maxLineChanged=!1}var takeFocus=op.focus&&op.focus==activeElt()&&(!document.hasFocus||document.hasFocus())
+cm.display.maxLineChanged=!1}var takeFocus=op.focus&&op.focus==activeElt()
 op.preparedSelection&&cm.display.input.showSelection(op.preparedSelection,takeFocus);(op.updatedDisplay||op.startHeight!=cm.doc.height)&&updateScrollbars(cm,op.barMeasure)
 op.updatedDisplay&&setDocumentHeight(cm,op.barMeasure)
 op.selectionChanged&&restartBlink(cm)
@@ -808,12 +791,9 @@ cm.state.focused&&op.updateInput&&cm.display.input.reset(op.typing)
 takeFocus&&ensureFocus(op.cm)}function endOperation_finish(op){var cm=op.cm,display=cm.display,doc=cm.doc
 op.updatedDisplay&&postUpdateDisplay(cm,op.update)
 null==display.wheelStartX||null==op.scrollTop&&null==op.scrollLeft&&!op.scrollToPos||(display.wheelStartX=display.wheelStartY=null)
-if(null!=op.scrollTop&&(display.scroller.scrollTop!=op.scrollTop||op.forceScroll)){doc.scrollTop=Math.max(0,Math.min(display.scroller.scrollHeight-display.scroller.clientHeight,op.scrollTop))
-display.scrollbars.setScrollTop(doc.scrollTop)
-display.scroller.scrollTop=doc.scrollTop}if(null!=op.scrollLeft&&(display.scroller.scrollLeft!=op.scrollLeft||op.forceScroll)){doc.scrollLeft=Math.max(0,Math.min(display.scroller.scrollWidth-display.scroller.clientWidth,op.scrollLeft))
-display.scrollbars.setScrollLeft(doc.scrollLeft)
-display.scroller.scrollLeft=doc.scrollLeft
-alignHorizontally(cm)}op.scrollToPos&&maybeScrollWindow(cm,scrollPosIntoView(cm,clipPos(doc,op.scrollToPos.from),clipPos(doc,op.scrollToPos.to),op.scrollToPos.margin))
+null!=op.scrollTop&&setScrollTop(cm,op.scrollTop,op.forceScroll)
+null!=op.scrollLeft&&setScrollLeft(cm,op.scrollLeft,!0,!0)
+op.scrollToPos&&maybeScrollWindow(cm,scrollPosIntoView(cm,clipPos(doc,op.scrollToPos.from),clipPos(doc,op.scrollToPos.to),op.scrollToPos.margin))
 var hidden=op.maybeHiddenMarkers,unhidden=op.maybeUnhiddenMarkers
 if(hidden)for(var i=0;i<hidden.length;++i)hidden[i].lines.length||signal(hidden[i],"hide")
 if(unhidden)for(var i$1=0;i$1<unhidden.length;++i$1)unhidden[i$1].lines.length&&signal(unhidden[i$1],"unhide")
@@ -866,25 +846,42 @@ if(0==display.view.length||from>=display.viewTo||to<=display.viewFrom){display.v
 display.viewFrom=from}else{display.viewFrom>from?display.view=buildViewArray(cm,from,display.viewFrom).concat(display.view):display.viewFrom<from&&(display.view=display.view.slice(findViewIndex(cm,from)))
 display.viewFrom=from
 display.viewTo<to?display.view=display.view.concat(buildViewArray(cm,display.viewTo,to)):display.viewTo>to&&(display.view=display.view.slice(0,findViewIndex(cm,to)))}display.viewTo=to}function countDirtyView(cm){for(var view=cm.display.view,dirty=0,i=0;i<view.length;i++){var lineView=view[i]
-lineView.hidden||lineView.node&&!lineView.changes||++dirty}return dirty}function startWorker(cm,time){cm.doc.mode.startState&&cm.doc.frontier<cm.display.viewTo&&cm.state.highlight.set(time,bind(highlightWorker,cm))}function highlightWorker(cm){var doc=cm.doc
-doc.frontier<doc.first&&(doc.frontier=doc.first)
-if(!(doc.frontier>=cm.display.viewTo)){var end=+new Date+cm.options.workTime,state=copyState(doc.mode,getStateBefore(cm,doc.frontier)),changedLines=[]
-doc.iter(doc.frontier,Math.min(doc.first+doc.size,cm.display.viewTo+500),function(line){if(doc.frontier>=cm.display.viewFrom){var oldStyles=line.styles,tooLong=line.text.length>cm.options.maxHighlightLength,highlighted=highlightLine(cm,line,tooLong?copyState(doc.mode,state):state,!0)
+lineView.hidden||lineView.node&&!lineView.changes||++dirty}return dirty}function startWorker(cm,time){cm.doc.highlightFrontier<cm.display.viewTo&&cm.state.highlight.set(time,bind(highlightWorker,cm))}function highlightWorker(cm){var doc=cm.doc
+if(!(doc.highlightFrontier>=cm.display.viewTo)){var end=+new Date+cm.options.workTime,context=getContextBefore(cm,doc.highlightFrontier),changedLines=[]
+doc.iter(context.line,Math.min(doc.first+doc.size,cm.display.viewTo+500),function(line){if(context.line>=cm.display.viewFrom){var oldStyles=line.styles,resetState=line.text.length>cm.options.maxHighlightLength?copyState(doc.mode,context.state):null,highlighted=highlightLine(cm,line,context,!0)
+resetState&&(context.state=resetState)
 line.styles=highlighted.styles
 var oldCls=line.styleClasses,newCls=highlighted.classes
 newCls?line.styleClasses=newCls:oldCls&&(line.styleClasses=null)
 for(var ischange=!oldStyles||oldStyles.length!=line.styles.length||oldCls!=newCls&&(!oldCls||!newCls||oldCls.bgClass!=newCls.bgClass||oldCls.textClass!=newCls.textClass),i=0;!ischange&&i<oldStyles.length;++i)ischange=oldStyles[i]!=line.styles[i]
-ischange&&changedLines.push(doc.frontier)
-line.stateAfter=tooLong?state:copyState(doc.mode,state)}else{line.text.length<=cm.options.maxHighlightLength&&processLine(cm,line.text,state)
-line.stateAfter=doc.frontier%5==0?copyState(doc.mode,state):null}++doc.frontier
-if(+new Date>end){startWorker(cm,cm.options.workDelay)
+ischange&&changedLines.push(context.line)
+line.stateAfter=context.save()
+context.nextLine()}else{line.text.length<=cm.options.maxHighlightLength&&processLine(cm,line.text,context)
+line.stateAfter=context.line%5==0?context.save():null
+context.nextLine()}if(+new Date>end){startWorker(cm,cm.options.workDelay)
 return!0}})
+doc.highlightFrontier=context.line
+doc.modeFrontier=Math.max(doc.modeFrontier,context.line)
 changedLines.length&&runInOp(cm,function(){for(var i=0;i<changedLines.length;i++)regLineChange(cm,changedLines[i],"text")})}}function maybeClipScrollbars(cm){var display=cm.display
 if(!display.scrollbarsClipped&&display.scroller.offsetWidth){display.nativeBarWidth=display.scroller.offsetWidth-display.scroller.clientWidth
 display.heightForcer.style.height=scrollGap(cm)+"px"
 display.sizer.style.marginBottom=-display.nativeBarWidth+"px"
 display.sizer.style.borderRightWidth=scrollGap(cm)+"px"
-display.scrollbarsClipped=!0}}function updateDisplayIfNeeded(cm,update){var display=cm.display,doc=cm.doc
+display.scrollbarsClipped=!0}}function selectionSnapshot(cm){if(cm.hasFocus())return null
+var active=activeElt()
+if(!active||!contains(cm.display.lineDiv,active))return null
+var result={activeElt:active}
+if(window.getSelection){var sel=window.getSelection()
+if(sel.anchorNode&&sel.extend&&contains(cm.display.lineDiv,sel.anchorNode)){result.anchorNode=sel.anchorNode
+result.anchorOffset=sel.anchorOffset
+result.focusNode=sel.focusNode
+result.focusOffset=sel.focusOffset}}return result}function restoreSelection(snapshot){if(snapshot&&snapshot.activeElt&&snapshot.activeElt!=activeElt()){snapshot.activeElt.focus()
+if(snapshot.anchorNode&&contains(document.body,snapshot.anchorNode)&&contains(document.body,snapshot.focusNode)){var sel=window.getSelection(),range$$1=document.createRange()
+range$$1.setEnd(snapshot.anchorNode,snapshot.anchorOffset)
+range$$1.collapse(!1)
+sel.removeAllRanges()
+sel.addRange(range$$1)
+sel.extend(snapshot.focusNode,snapshot.focusOffset)}}}function updateDisplayIfNeeded(cm,update){var display=cm.display,doc=cm.doc
 if(update.editorIsHidden){resetView(cm)
 return!1}if(!update.force&&update.visible.from>=display.viewFrom&&update.visible.to<=display.viewTo&&(null==display.updateLineNumbers||display.updateLineNumbers>=display.viewTo)&&display.renderedView==display.view&&0==countDirtyView(cm))return!1
 if(maybeUpdateLineNumberWidth(cm)){resetView(cm)
@@ -898,12 +895,12 @@ display.viewOffset=heightAtLine(getLine(cm.doc,display.viewFrom))
 cm.display.mover.style.top=display.viewOffset+"px"
 var toUpdate=countDirtyView(cm)
 if(!different&&0==toUpdate&&!update.force&&display.renderedView==display.view&&(null==display.updateLineNumbers||display.updateLineNumbers>=display.viewTo))return!1
-var focused=activeElt()
+var selSnapshot=selectionSnapshot(cm)
 toUpdate>4&&(display.lineDiv.style.display="none")
 patchDisplay(cm,display.updateLineNumbers,update.dims)
 toUpdate>4&&(display.lineDiv.style.display="")
 display.renderedView=display.view
-focused&&activeElt()!=focused&&focused.offsetHeight&&focused.focus()
+restoreSelection(selSnapshot)
 removeChildren(display.cursorDiv)
 removeChildren(display.selectionDiv)
 display.gutters.style.height=display.sizer.style.minHeight=0
@@ -917,7 +914,8 @@ updateHeightsInViewport(cm)
 var barMeasure=measureForScrollbars(cm)
 updateSelection(cm)
 updateScrollbars(cm,barMeasure)
-setDocumentHeight(cm,barMeasure)}update.signal(cm,"update",cm)
+setDocumentHeight(cm,barMeasure)
+update.force=!1}update.signal(cm,"update",cm)
 if(cm.display.viewFrom!=cm.display.reportedViewFrom||cm.display.viewTo!=cm.display.reportedViewTo){update.signal(cm,"viewportChange",cm,cm.display.viewFrom,cm.display.viewTo)
 cm.display.reportedViewFrom=cm.display.viewFrom
 cm.display.reportedViewTo=cm.display.viewTo}}function updateDisplaySimple(cm,viewport){var update=new DisplayUpdate(cm,viewport)
@@ -946,7 +944,26 @@ gElt.style.width=(cm.display.lineNumWidth||1)+"px"}}gutters.style.display=i?"":"
 updateGutterSpace(cm)}function setGuttersForLineNumbers(options){var found=indexOf(options.gutters,"CodeMirror-linenumbers")
 if(-1==found&&options.lineNumbers)options.gutters=options.gutters.concat(["CodeMirror-linenumbers"])
 else if(found>-1&&!options.lineNumbers){options.gutters=options.gutters.slice(0)
-options.gutters.splice(found,1)}}function normalizeSelection(ranges,primIndex){var prim=ranges[primIndex]
+options.gutters.splice(found,1)}}function wheelEventDelta(e){var dx=e.wheelDeltaX,dy=e.wheelDeltaY
+null==dx&&e.detail&&e.axis==e.HORIZONTAL_AXIS&&(dx=e.detail)
+null==dy&&e.detail&&e.axis==e.VERTICAL_AXIS?dy=e.detail:null==dy&&(dy=e.wheelDelta)
+return{x:dx,y:dy}}function wheelEventPixels(e){var delta=wheelEventDelta(e)
+delta.x*=wheelPixelsPerUnit
+delta.y*=wheelPixelsPerUnit
+return delta}function onScrollWheel(cm,e){var delta=wheelEventDelta(e),dx=delta.x,dy=delta.y,display=cm.display,scroll=display.scroller,canScrollX=scroll.scrollWidth>scroll.clientWidth,canScrollY=scroll.scrollHeight>scroll.clientHeight
+if(dx&&canScrollX||dy&&canScrollY){if(dy&&mac&&webkit)outer:for(var cur=e.target,view=display.view;cur!=scroll;cur=cur.parentNode)for(var i=0;i<view.length;i++)if(view[i].node==cur){cm.display.currentWheelTarget=cur
+break outer}if(!dx||gecko||presto||null==wheelPixelsPerUnit){if(dy&&null!=wheelPixelsPerUnit){var pixels=dy*wheelPixelsPerUnit,top=cm.doc.scrollTop,bot=top+display.wrapper.clientHeight
+pixels<0?top=Math.max(0,top+pixels-50):bot=Math.min(cm.doc.height,bot+pixels+50)
+updateDisplaySimple(cm,{top:top,bottom:bot})}if(wheelSamples<20)if(null==display.wheelStartX){display.wheelStartX=scroll.scrollLeft
+display.wheelStartY=scroll.scrollTop
+display.wheelDX=dx
+display.wheelDY=dy
+setTimeout(function(){if(null!=display.wheelStartX){var movedX=scroll.scrollLeft-display.wheelStartX,movedY=scroll.scrollTop-display.wheelStartY,sample=movedY&&display.wheelDY&&movedY/display.wheelDY||movedX&&display.wheelDX&&movedX/display.wheelDX
+display.wheelStartX=display.wheelStartY=null
+if(sample){wheelPixelsPerUnit=(wheelPixelsPerUnit*wheelSamples+sample)/(wheelSamples+1);++wheelSamples}}},200)}else{display.wheelDX+=dx
+display.wheelDY+=dy}}else{dy&&canScrollY&&updateScrollTop(cm,Math.max(0,scroll.scrollTop+dy*wheelPixelsPerUnit))
+setScrollLeft(cm,Math.max(0,scroll.scrollLeft+dx*wheelPixelsPerUnit));(!dy||dy&&canScrollY)&&e_preventDefault(e)
+display.wheelStartX=null}}}function normalizeSelection(ranges,primIndex){var prim=ranges[primIndex]
 ranges.sort(function(a,b){return cmp(a.from(),b.from())})
 primIndex=indexOf(ranges,prim)
 for(var i=1;i<ranges.length;i++){var cur=ranges[i],prev=ranges[i-1]
@@ -964,7 +981,7 @@ if("around"==hint){var range=doc.sel.ranges[i],inv=cmp(range.head,range.anchor)<
 out[i]=new Range(inv?to:from,inv?from:to)}else out[i]=new Range(from,from)}return new Selection(out,doc.sel.primIndex)}function loadMode(cm){cm.doc.mode=getMode(cm.options,cm.doc.modeOption)
 resetModeState(cm)}function resetModeState(cm){cm.doc.iter(function(line){line.stateAfter&&(line.stateAfter=null)
 line.styles&&(line.styles=null)})
-cm.doc.frontier=cm.doc.first
+cm.doc.modeFrontier=cm.doc.highlightFrontier=cm.doc.first
 startWorker(cm,100)
 cm.state.modeGen++
 cm.curOp&&regChange(cm)}function isWholeLineUpdate(doc,change){return 0==change.from.ch&&0==change.to.ch&&""==lst(change.text)&&(!doc.cm||doc.cm.options.wholeLineUpdateBefore)}function updateDoc(doc,change,markedSpans,estimateHeight$$1){function spansFor(n){return markedSpans?markedSpans[n]:null}function update(line,text,spans){updateLine(line,text,spans,estimateHeight$$1)
@@ -1046,10 +1063,11 @@ copy.push({changes:newChanges})
 for(var j=0;j<changes.length;++j){var change=changes[j],m=void 0
 newChanges.push({from:change.from,to:change.to,text:change.text})
 if(newGroup)for(var prop in change)if((m=prop.match(/^spans_(\d+)$/))&&indexOf(newGroup,Number(m[1]))>-1){lst(newChanges)[prop]=change[prop]
-delete change[prop]}}}}return copy}function extendRange(doc,range,head,other){if(doc.cm&&doc.cm.display.shift||doc.extend){var anchor=range.anchor
+delete change[prop]}}}}return copy}function extendRange(range,head,other,extend){if(extend){var anchor=range.anchor
 if(other){var posBefore=cmp(head,anchor)<0
 if(posBefore!=cmp(other,anchor)<0){anchor=head
-head=other}else posBefore!=cmp(head,other)<0&&(head=other)}return new Range(anchor,head)}return new Range(other||head,head)}function extendSelection(doc,head,other,options){setSelection(doc,new Selection([extendRange(doc,doc.sel.primary(),head,other)],0),options)}function extendSelections(doc,heads,options){for(var out=[],i=0;i<doc.sel.ranges.length;i++)out[i]=extendRange(doc,doc.sel.ranges[i],heads[i],null)
+head=other}else posBefore!=cmp(head,other)<0&&(head=other)}return new Range(anchor,head)}return new Range(other||head,head)}function extendSelection(doc,head,other,options,extend){null==extend&&(extend=doc.cm&&(doc.cm.display.shift||doc.extend))
+setSelection(doc,new Selection([extendRange(doc.sel.primary(),head,other,extend)],0),options)}function extendSelections(doc,heads,options){for(var out=[],extend=doc.cm&&(doc.cm.display.shift||doc.extend),i=0;i<doc.sel.ranges.length;i++)out[i]=extendRange(doc.sel.ranges[i],heads[i],null,extend)
 setSelection(doc,normalizeSelection(out,doc.sel.primIndex),options)}function replaceOneSelection(doc,i,range,options){var ranges=doc.sel.ranges.slice(0)
 ranges[i]=range
 setSelection(doc,normalizeSelection(ranges,doc.sel.primIndex),options)}function setSimpleSelection(doc,anchor,head,options){setSelection(doc,simpleSelection(anchor,head),options)}function filterSelectionChange(doc,sel,options){var obj={ranges:sel.ranges,update:function(ranges){var this$1=this
@@ -1064,7 +1082,7 @@ addSelectionToHistory(doc,doc.sel,doc.cm?doc.cm.curOp.id:NaN,options)}function s
 setSelectionInner(doc,skipAtomicInSelection(doc,sel,options&&options.bias||(cmp(sel.primary().head,doc.sel.primary().head)<0?-1:1),!0))
 options&&!1===options.scroll||!doc.cm||ensureCursorVisible(doc.cm)}function setSelectionInner(doc,sel){if(!sel.equals(doc.sel)){doc.sel=sel
 if(doc.cm){doc.cm.curOp.updateInput=doc.cm.curOp.selectionChanged=!0
-signalCursorActivity(doc.cm)}signalLater(doc,"cursorActivity",doc)}}function reCheckSelection(doc){setSelectionInner(doc,skipAtomicInSelection(doc,doc.sel,null,!1),sel_dontScroll)}function skipAtomicInSelection(doc,sel,bias,mayClear){for(var out,i=0;i<sel.ranges.length;i++){var range=sel.ranges[i],old=sel.ranges.length==doc.sel.ranges.length&&doc.sel.ranges[i],newAnchor=skipAtomic(doc,range.anchor,old&&old.anchor,bias,mayClear),newHead=skipAtomic(doc,range.head,old&&old.head,bias,mayClear)
+signalCursorActivity(doc.cm)}signalLater(doc,"cursorActivity",doc)}}function reCheckSelection(doc){setSelectionInner(doc,skipAtomicInSelection(doc,doc.sel,null,!1))}function skipAtomicInSelection(doc,sel,bias,mayClear){for(var out,i=0;i<sel.ranges.length;i++){var range=sel.ranges[i],old=sel.ranges.length==doc.sel.ranges.length&&doc.sel.ranges[i],newAnchor=skipAtomic(doc,range.anchor,old&&old.anchor,bias,mayClear),newHead=skipAtomic(doc,range.head,old&&old.head,bias,mayClear)
 if(out||newAnchor!=range.anchor||newHead!=range.head){out||(out=sel.ranges.slice(0,i))
 out[i]=new Range(newAnchor,newHead)}}return out?normalizeSelection(out,sel.primIndex):sel}function skipAtomicInner(doc,pos,oldPos,dir,mayClear){var line=getLine(doc,pos.line)
 if(line.markedSpans)for(var i=0;i<line.markedSpans.length;++i){var sp=line.markedSpans[i],m=sp.marker
@@ -1084,7 +1102,7 @@ signal(doc,"beforeChange",doc,obj)
 doc.cm&&signal(doc.cm,"beforeChange",doc.cm,obj)
 return obj.canceled?null:{from:obj.from,to:obj.to,text:obj.text,origin:obj.origin}}function makeChange(doc,change,ignoreReadOnly){if(doc.cm){if(!doc.cm.curOp)return operation(doc.cm,makeChange)(doc,change,ignoreReadOnly)
 if(doc.cm.state.suppressEdits)return}if(!(hasHandler(doc,"beforeChange")||doc.cm&&hasHandler(doc.cm,"beforeChange"))||(change=filterChange(doc,change,!0))){var split=sawReadOnlySpans&&!ignoreReadOnly&&removeReadOnlyRanges(doc,change.from,change.to)
-if(split)for(var i=split.length-1;i>=0;--i)makeChangeInner(doc,{from:split[i].from,to:split[i].to,text:i?[""]:change.text})
+if(split)for(var i=split.length-1;i>=0;--i)makeChangeInner(doc,{from:split[i].from,to:split[i].to,text:i?[""]:change.text,origin:change.origin})
 else makeChangeInner(doc,change)}}function makeChangeInner(doc,change){if(1!=change.text.length||""!=change.text[0]||0!=cmp(change.from,change.to)){var selAfter=computeSelAfterChange(doc,change)
 addChangeToHistory(doc,change,selAfter,doc.cm?doc.cm.curOp.id:NaN)
 makeChangeSingleDoc(doc,change,selAfter,stretchSpansOverChange(doc,change))
@@ -1130,7 +1148,7 @@ if(len>display.maxLineLength){display.maxLine=line
 display.maxLineLength=len
 display.maxLineChanged=!0
 recomputeMaxLength=!1}})
-recomputeMaxLength&&(cm.curOp.updateMaxLine=!0)}doc.frontier=Math.min(doc.frontier,from.line)
+recomputeMaxLength&&(cm.curOp.updateMaxLine=!0)}retreatFrontier(doc,from.line)
 startWorker(cm,400)
 var lendiff=change.text.length-(to.line-from.line)-1
 change.full?regChange(cm):from.line!=to.line||1!=change.text.length||isWholeLineUpdate(cm.doc,change)?regChange(cm,from.line,to.line+1,lendiff):regLineChange(cm,from.line,"text")
@@ -1138,9 +1156,8 @@ var changesHandler=hasHandler(cm,"changes"),changeHandler=hasHandler(cm,"change"
 if(changeHandler||changesHandler){var obj={from:from,to:to,text:change.text,removed:change.removed,origin:change.origin}
 changeHandler&&signalLater(cm,"change",cm,obj)
 changesHandler&&(cm.curOp.changeObjs||(cm.curOp.changeObjs=[])).push(obj)}cm.display.selForContextMenu=null}function replaceRange(doc,code,from,to,origin){to||(to=from)
-if(cmp(to,from)<0){var tmp=to
-to=from
-from=tmp}"string"==typeof code&&(code=doc.splitLines(code))
+if(cmp(to,from)<0){var assign
+from=(assign=[to,from])[0],to=assign[1]}"string"==typeof code&&(code=doc.splitLines(code))
 makeChange(doc,{from:from,to:to,text:code,origin:origin})}function rebaseHistSelSingle(pos,from,to,diff){if(to<pos.line)pos.line+=diff
 else if(from<pos.line){pos.line=from
 pos.ch=0}}function rebaseHistArray(array,from,to,diff){for(var i=0;i<array.length;++i){var sub=array[i],ok=!0
@@ -1156,14 +1173,25 @@ rebaseHistArray(hist.undone,from,to,diff)}function changeLine(doc,handle,changeT
 "number"==typeof handle?line=getLine(doc,clipLine(doc,handle)):no=lineNo(handle)
 if(null==no)return null
 op(line,no)&&doc.cm&&regLineChange(doc.cm,no,changeType)
-return line}function adjustScrollWhenAboveVisible(cm,line,diff){heightAtLine(line)<(cm.curOp&&cm.curOp.scrollTop||cm.doc.scrollTop)&&addToScrollPos(cm,null,diff)}function addLineWidget(doc,handle,node,options){var widget=new LineWidget(doc,node,options),cm=doc.cm
+return line}function LeafChunk(lines){var this$1=this
+this.lines=lines
+this.parent=null
+for(var height=0,i=0;i<lines.length;++i){lines[i].parent=this$1
+height+=lines[i].height}this.height=height}function BranchChunk(children){var this$1=this
+this.children=children
+for(var size=0,height=0,i=0;i<children.length;++i){var ch=children[i]
+size+=ch.chunkSize()
+height+=ch.height
+ch.parent=this$1}this.size=size
+this.height=height
+this.parent=null}function adjustScrollWhenAboveVisible(cm,line,diff){heightAtLine(line)<(cm.curOp&&cm.curOp.scrollTop||cm.doc.scrollTop)&&addToScrollTop(cm,diff)}function addLineWidget(doc,handle,node,options){var widget=new LineWidget(doc,node,options),cm=doc.cm
 cm&&widget.noHScroll&&(cm.display.alignWidgets=!0)
 changeLine(doc,handle,"widget",function(line){var widgets=line.widgets||(line.widgets=[])
 null==widget.insertAt?widgets.push(widget):widgets.splice(Math.min(widgets.length-1,Math.max(0,widget.insertAt)),0,widget)
 widget.line=line
 if(cm&&!lineIsHidden(doc,line)){var aboveVisible=heightAtLine(line)<doc.scrollTop
 updateLineHeight(line,line.height+widgetHeight(widget))
-aboveVisible&&addToScrollPos(cm,null,widget.height)
+aboveVisible&&addToScrollTop(cm,widget.height)
 cm.curOp.forceUpdate=!0}return!0})
 signalLater(cm,"lineWidgetAdded",cm,widget,"number"==typeof handle?handle:lineNo(handle))
 return widget}function markText(doc,from,to,options,type){if(options&&options.shared)return markTextShared(doc,from,to,options,type)
@@ -1233,7 +1261,7 @@ if(pos){var frag=document.createDocumentFragment()
 drawSelectionCursor(cm,pos,frag)
 if(!cm.display.dragCursor){cm.display.dragCursor=elt("div",null,"CodeMirror-cursors CodeMirror-dragcursors")
 cm.display.lineSpace.insertBefore(cm.display.dragCursor,cm.display.cursorDiv)}removeChildrenAndAdd(cm.display.dragCursor,frag)}}function clearDragCursor(cm){if(cm.display.dragCursor){cm.display.lineSpace.removeChild(cm.display.dragCursor)
-cm.display.dragCursor=null}}function forEachCodeMirror(f){if(document.body.getElementsByClassName)for(var byClass=document.body.getElementsByClassName("CodeMirror"),i=0;i<byClass.length;i++){var cm=byClass[i].CodeMirror
+cm.display.dragCursor=null}}function forEachCodeMirror(f){if(document.getElementsByClassName)for(var byClass=document.getElementsByClassName("CodeMirror"),i=0;i<byClass.length;i++){var cm=byClass[i].CodeMirror
 cm&&f(cm)}}function ensureGlobalHandlers(){if(!globalsRegistered){registerGlobalHandlers()
 globalsRegistered=!0}}function registerGlobalHandlers(){var resizeTimer
 on(window,"resize",function(){null==resizeTimer&&(resizeTimer=setTimeout(function(){resizeTimer=null
@@ -1268,15 +1296,41 @@ if(null!=found&&handle(found))return"handled"
 if(map$$1.fallthrough){if("[object Array]"!=Object.prototype.toString.call(map$$1.fallthrough))return lookupKey(key,map$$1.fallthrough,handle,context)
 for(var i=0;i<map$$1.fallthrough.length;i++){var result=lookupKey(key,map$$1.fallthrough[i],handle,context)
 if(result)return result}}}function isModifierKey(value){var name="string"==typeof value?value:keyNames[value.keyCode]
-return"Ctrl"==name||"Alt"==name||"Shift"==name||"Mod"==name}function keyName(event,noShift){if(presto&&34==event.keyCode&&event.char)return!1
-var base=keyNames[event.keyCode],name=base
-if(null==name||event.altGraphKey)return!1
+return"Ctrl"==name||"Alt"==name||"Shift"==name||"Mod"==name}function addModifierNames(name,event,noShift){var base=name
 event.altKey&&"Alt"!=base&&(name="Alt-"+name);(flipCtrlCmd?event.metaKey:event.ctrlKey)&&"Ctrl"!=base&&(name="Ctrl-"+name);(flipCtrlCmd?event.ctrlKey:event.metaKey)&&"Cmd"!=base&&(name="Cmd-"+name)
 !noShift&&event.shiftKey&&"Shift"!=base&&(name="Shift-"+name)
-return name}function getKeyMap(val){return"string"==typeof val?keyMap[val]:val}function deleteNearSelection(cm,compute){for(var ranges=cm.doc.sel.ranges,kill=[],i=0;i<ranges.length;i++){for(var toKill=compute(ranges[i]);kill.length&&cmp(toKill.from,lst(kill).to)<=0;){var replaced=kill.pop()
+return name}function keyName(event,noShift){if(presto&&34==event.keyCode&&event.char)return!1
+var name=keyNames[event.keyCode]
+return null!=name&&!event.altGraphKey&&addModifierNames(name,event,noShift)}function getKeyMap(val){return"string"==typeof val?keyMap[val]:val}function deleteNearSelection(cm,compute){for(var ranges=cm.doc.sel.ranges,kill=[],i=0;i<ranges.length;i++){for(var toKill=compute(ranges[i]);kill.length&&cmp(toKill.from,lst(kill).to)<=0;){var replaced=kill.pop()
 if(cmp(replaced.from,toKill.from)<0){toKill.from=replaced.from
 break}}kill.push(toKill)}runInOp(cm,function(){for(var i=kill.length-1;i>=0;i--)replaceRange(cm.doc,"",kill[i].from,kill[i].to,"+delete")
-ensureCursorVisible(cm)})}function lineStart(cm,lineN){var line=getLine(cm.doc,lineN),visual=visualLine(line)
+ensureCursorVisible(cm)})}function moveCharLogically(line,ch,dir){var target=skipExtendingChars(line.text,ch+dir,dir)
+return target<0||target>line.text.length?null:target}function moveLogically(line,start,dir){var ch=moveCharLogically(line,start.ch,dir)
+return null==ch?null:new Pos(start.line,ch,dir<0?"after":"before")}function endOfLine(visually,cm,lineObj,lineNo,dir){if(visually){var order=getOrder(lineObj,cm.doc.direction)
+if(order){var ch,part=dir<0?lst(order):order[0],sticky=dir<0==(1==part.level)?"after":"before"
+if(part.level>0){var prep=prepareMeasureForLine(cm,lineObj)
+ch=dir<0?lineObj.text.length-1:0
+var targetTop=measureCharPrepared(cm,prep,ch).top
+ch=findFirst(function(ch){return measureCharPrepared(cm,prep,ch).top==targetTop},dir<0==(1==part.level)?part.from:part.to-1,ch)
+"before"==sticky&&(ch=moveCharLogically(lineObj,ch,1))}else ch=dir<0?part.to:part.from
+return new Pos(lineNo,ch,sticky)}}return new Pos(lineNo,dir<0?lineObj.text.length:0,dir<0?"before":"after")}function moveVisually(cm,line,start,dir){var bidi=getOrder(line,cm.doc.direction)
+if(!bidi)return moveLogically(line,start,dir)
+if(start.ch>=line.text.length){start.ch=line.text.length
+start.sticky="before"}else if(start.ch<=0){start.ch=0
+start.sticky="after"}var partPos=getBidiPartAt(bidi,start.ch,start.sticky),part=bidi[partPos]
+if("ltr"==cm.doc.direction&&part.level%2==0&&(dir>0?part.to>start.ch:part.from<start.ch))return moveLogically(line,start,dir)
+var prep,mv=function(pos,dir){return moveCharLogically(line,pos instanceof Pos?pos.ch:pos,dir)},getWrappedLineExtent=function(ch){if(!cm.options.lineWrapping)return{begin:0,end:line.text.length}
+prep=prep||prepareMeasureForLine(cm,line)
+return wrappedLineExtentChar(cm,line,prep,ch)},wrappedLineExtent=getWrappedLineExtent("before"==start.sticky?mv(start,-1):start.ch)
+if("rtl"==cm.doc.direction||1==part.level){var moveInStorageOrder=1==part.level==dir<0,ch=mv(start,moveInStorageOrder?1:-1)
+if(null!=ch&&(moveInStorageOrder?ch<=part.to&&ch<=wrappedLineExtent.end:ch>=part.from&&ch>=wrappedLineExtent.begin)){var sticky=moveInStorageOrder?"before":"after"
+return new Pos(start.line,ch,sticky)}}var searchInVisualLine=function(partPos,dir,wrappedLineExtent){for(var getRes=function(ch,moveInStorageOrder){return moveInStorageOrder?new Pos(start.line,mv(ch,1),"before"):new Pos(start.line,ch,"after")};partPos>=0&&partPos<bidi.length;partPos+=dir){var part=bidi[partPos],moveInStorageOrder=dir>0==(1!=part.level),ch=moveInStorageOrder?wrappedLineExtent.begin:mv(wrappedLineExtent.end,-1)
+if(part.from<=ch&&ch<part.to)return getRes(ch,moveInStorageOrder)
+ch=moveInStorageOrder?part.from:mv(part.to,-1)
+if(wrappedLineExtent.begin<=ch&&ch<wrappedLineExtent.end)return getRes(ch,moveInStorageOrder)}},res=searchInVisualLine(partPos+dir,dir,wrappedLineExtent)
+if(res)return res
+var nextCh=dir>0?wrappedLineExtent.end:mv(wrappedLineExtent.begin,-1)
+return null==nextCh||dir>0&&nextCh==line.text.length||!(res=searchInVisualLine(dir>0?0:bidi.length-1,dir,getWrappedLineExtent(nextCh)))?null:res}function lineStart(cm,lineN){var line=getLine(cm.doc,lineN),visual=visualLine(line)
 visual!=line&&(lineN=lineNo(visual))
 return endOfLine(!0,cm,visual,lineN,1)}function lineEnd(cm,lineN){var line=getLine(cm.doc,lineN),visual=visualLineEnd(line)
 visual!=line&&(lineN=lineNo(visual))
@@ -1316,49 +1370,67 @@ signalDOMEvent(this,e)}function onKeyPress(e){var cm=this
 if(!(eventInWidget(cm.display,e)||signalDOMEvent(cm,e)||e.ctrlKey&&!e.altKey||mac&&e.metaKey)){var keyCode=e.keyCode,charCode=e.charCode
 if(presto&&keyCode==lastStoppedKey){lastStoppedKey=null
 e_preventDefault(e)}else if(!presto||e.which&&!(e.which<10)||!handleKeyBinding(cm,e)){var ch=String.fromCharCode(null==charCode?keyCode:charCode)
-"\b"!=ch&&(handleCharBinding(cm,e,ch)||cm.display.input.onKeyPress(e))}}}function onMouseDown(e){var cm=this,display=cm.display
+"\b"!=ch&&(handleCharBinding(cm,e,ch)||cm.display.input.onKeyPress(e))}}}function clickRepeat(pos,button){var now=+new Date
+if(lastDoubleClick&&lastDoubleClick.compare(now,pos,button)){lastClick=lastDoubleClick=null
+return"triple"}if(lastClick&&lastClick.compare(now,pos,button)){lastDoubleClick=new PastClick(now,pos,button)
+lastClick=null
+return"double"}lastClick=new PastClick(now,pos,button)
+lastDoubleClick=null
+return"single"}function onMouseDown(e){var cm=this,display=cm.display
 if(!(signalDOMEvent(cm,e)||display.activeTouch&&display.input.supportsTouch())){display.input.ensurePolled()
 display.shift=e.shiftKey
 if(eventInWidget(display,e)){if(!webkit){display.scroller.draggable=!1
-setTimeout(function(){return display.scroller.draggable=!0},100)}}else if(!clickInGutter(cm,e)){var start=posFromMouse(cm,e)
+setTimeout(function(){return display.scroller.draggable=!0},100)}}else if(!clickInGutter(cm,e)){var pos=posFromMouse(cm,e),button=e_button(e),repeat=pos?clickRepeat(pos,button):"single"
 window.focus()
-switch(e_button(e)){case 1:cm.state.selectingText?cm.state.selectingText(e):start?leftButtonDown(cm,e,start):e_target(e)==display.scroller&&e_preventDefault(e)
-break
-case 2:webkit&&(cm.state.lastMiddleDown=+new Date)
-start&&extendSelection(cm.doc,start)
-setTimeout(function(){return display.input.focus()},20)
-e_preventDefault(e)
-break
-case 3:captureRightClick?onContextMenu(cm,e):delayBlurEvent(cm)}}}}function leftButtonDown(cm,e,start){ie?setTimeout(bind(ensureFocus,cm),0):cm.curOp.focus=activeElt()
-var type,now=+new Date
-if(lastDoubleClick&&lastDoubleClick.time>now-400&&0==cmp(lastDoubleClick.pos,start))type="triple"
-else if(lastClick&&lastClick.time>now-400&&0==cmp(lastClick.pos,start)){type="double"
-lastDoubleClick={time:now,pos:start}}else{type="single"
-lastClick={time:now,pos:start}}var contained,sel=cm.doc.sel,modifier=mac?e.metaKey:e.ctrlKey
-cm.options.dragDrop&&dragAndDrop&&!cm.isReadOnly()&&"single"==type&&(contained=sel.contains(start))>-1&&(cmp((contained=sel.ranges[contained]).from(),start)<0||start.xRel>0)&&(cmp(contained.to(),start)>0||start.xRel<0)?leftButtonStartDrag(cm,e,start,modifier):leftButtonSelect(cm,e,start,type,modifier)}function leftButtonStartDrag(cm,e,start,modifier){var display=cm.display,startTime=+new Date,dragEnd=operation(cm,function(e2){webkit&&(display.scroller.draggable=!1)
+1==button&&cm.state.selectingText&&cm.state.selectingText(e)
+if(!pos||!handleMappedButton(cm,button,pos,repeat,e))if(1==button)pos?leftButtonDown(cm,pos,repeat,e):e_target(e)==display.scroller&&e_preventDefault(e)
+else if(2==button){pos&&extendSelection(cm.doc,pos)
+setTimeout(function(){return display.input.focus()},20)}else 3==button&&(captureRightClick?onContextMenu(cm,e):delayBlurEvent(cm))}}}function handleMappedButton(cm,button,pos,repeat,event){var name="Click"
+"double"==repeat?name="Double"+name:"triple"==repeat&&(name="Triple"+name)
+return dispatchKey(cm,addModifierNames(name=(1==button?"Left":2==button?"Middle":"Right")+name,event),event,function(bound){"string"==typeof bound&&(bound=commands[bound])
+if(!bound)return!1
+var done=!1
+try{cm.isReadOnly()&&(cm.state.suppressEdits=!0)
+done=bound(cm,pos)!=Pass}finally{cm.state.suppressEdits=!1}return done})}function configureMouse(cm,repeat,event){var option=cm.getOption("configureMouse"),value=option?option(cm,repeat,event):{}
+if(null==value.unit){var rect=chromeOS?event.shiftKey&&event.metaKey:event.altKey
+value.unit=rect?"rectangle":"single"==repeat?"char":"double"==repeat?"word":"line"}(null==value.extend||cm.doc.extend)&&(value.extend=cm.doc.extend||event.shiftKey)
+null==value.addNew&&(value.addNew=mac?event.metaKey:event.ctrlKey)
+null==value.moveOnDrag&&(value.moveOnDrag=!(mac?event.altKey:event.ctrlKey))
+return value}function leftButtonDown(cm,pos,repeat,event){ie?setTimeout(bind(ensureFocus,cm),0):cm.curOp.focus=activeElt()
+var contained,behavior=configureMouse(cm,repeat,event),sel=cm.doc.sel
+cm.options.dragDrop&&dragAndDrop&&!cm.isReadOnly()&&"single"==repeat&&(contained=sel.contains(pos))>-1&&(cmp((contained=sel.ranges[contained]).from(),pos)<0||pos.xRel>0)&&(cmp(contained.to(),pos)>0||pos.xRel<0)?leftButtonStartDrag(cm,event,pos,behavior):leftButtonSelect(cm,event,pos,behavior)}function leftButtonStartDrag(cm,event,pos,behavior){var display=cm.display,moved=!1,dragEnd=operation(cm,function(e){webkit&&(display.scroller.draggable=!1)
 cm.state.draggingText=!1
 off(document,"mouseup",dragEnd)
+off(document,"mousemove",mouseMove)
+off(display.scroller,"dragstart",dragStart)
 off(display.scroller,"drop",dragEnd)
-if(Math.abs(e.clientX-e2.clientX)+Math.abs(e.clientY-e2.clientY)<10){e_preventDefault(e2)
-!modifier&&+new Date-200<startTime&&extendSelection(cm.doc,start)
+if(!moved){e_preventDefault(e)
+behavior.addNew||extendSelection(cm.doc,pos,null,null,behavior.extend)
 webkit||ie&&9==ie_version?setTimeout(function(){document.body.focus()
-display.input.focus()},20):display.input.focus()}})
+display.input.focus()},20):display.input.focus()}}),mouseMove=function(e2){moved=moved||Math.abs(event.clientX-e2.clientX)+Math.abs(event.clientY-e2.clientY)>=10},dragStart=function(){return moved=!0}
 webkit&&(display.scroller.draggable=!0)
 cm.state.draggingText=dragEnd
-dragEnd.copy=mac?e.altKey:e.ctrlKey
+dragEnd.copy=!behavior.moveOnDrag
 display.scroller.dragDrop&&display.scroller.dragDrop()
 on(document,"mouseup",dragEnd)
-on(display.scroller,"drop",dragEnd)}function leftButtonSelect(cm,e,start,type,addNew){function extendTo(pos){if(0!=cmp(lastPos,pos)){lastPos=pos
-if("rect"==type){for(var ranges=[],tabSize=cm.options.tabSize,startCol=countColumn(getLine(doc,start.line).text,start.ch,tabSize),posCol=countColumn(getLine(doc,pos.line).text,pos.ch,tabSize),left=Math.min(startCol,posCol),right=Math.max(startCol,posCol),line=Math.min(start.line,pos.line),end=Math.min(cm.lastLine(),Math.max(start.line,pos.line));line<=end;line++){var text=getLine(doc,line).text,leftPos=findColumn(text,left,tabSize)
+on(document,"mousemove",mouseMove)
+on(display.scroller,"dragstart",dragStart)
+on(display.scroller,"drop",dragEnd)
+delayBlurEvent(cm)
+setTimeout(function(){return display.input.focus()},20)}function rangeForUnit(cm,pos,unit){if("char"==unit)return new Range(pos,pos)
+if("word"==unit)return cm.findWordAt(pos)
+if("line"==unit)return new Range(Pos(pos.line,0),clipPos(cm.doc,Pos(pos.line+1,0)))
+var result=unit(cm,pos)
+return new Range(result.from,result.to)}function leftButtonSelect(cm,event,start,behavior){function extendTo(pos){if(0!=cmp(lastPos,pos)){lastPos=pos
+if("rectangle"==behavior.unit){for(var ranges=[],tabSize=cm.options.tabSize,startCol=countColumn(getLine(doc,start.line).text,start.ch,tabSize),posCol=countColumn(getLine(doc,pos.line).text,pos.ch,tabSize),left=Math.min(startCol,posCol),right=Math.max(startCol,posCol),line=Math.min(start.line,pos.line),end=Math.min(cm.lastLine(),Math.max(start.line,pos.line));line<=end;line++){var text=getLine(doc,line).text,leftPos=findColumn(text,left,tabSize)
 left==right?ranges.push(new Range(Pos(line,leftPos),Pos(line,leftPos))):text.length>leftPos&&ranges.push(new Range(Pos(line,leftPos),Pos(line,findColumn(text,right,tabSize))))}ranges.length||ranges.push(new Range(start,start))
 setSelection(doc,normalizeSelection(startSel.ranges.slice(0,ourIndex).concat(ranges),ourIndex),{origin:"*mouse",scroll:!1})
-cm.scrollIntoView(pos)}else{var oldRange=ourRange,anchor=oldRange.anchor,head=pos
-if("single"!=type){var range$$1
-if(cmp((range$$1="double"==type?cm.findWordAt(pos):new Range(Pos(pos.line,0),clipPos(doc,Pos(pos.line+1,0)))).anchor,anchor)>0){head=range$$1.head
+cm.scrollIntoView(pos)}else{var head,oldRange=ourRange,range$$1=rangeForUnit(cm,pos,behavior.unit),anchor=oldRange.anchor
+if(cmp(range$$1.anchor,anchor)>0){head=range$$1.head
 anchor=minPos(oldRange.from(),range$$1.anchor)}else{head=range$$1.anchor
-anchor=maxPos(oldRange.to(),range$$1.head)}}var ranges$1=startSel.ranges.slice(0)
-ranges$1[ourIndex]=new Range(clipPos(doc,anchor),head)
-setSelection(doc,normalizeSelection(ranges$1,ourIndex),sel_mouse)}}}function extend(e){var curCount=++counter,cur=posFromMouse(cm,e,!0,"rect"==type)
+anchor=maxPos(oldRange.to(),range$$1.head)}var ranges$1=startSel.ranges.slice(0)
+ranges$1[ourIndex]=bidiSimplify(cm,new Range(clipPos(doc,anchor),head))
+setSelection(doc,normalizeSelection(ranges$1,ourIndex),sel_mouse)}}}function extend(e){var curCount=++counter,cur=posFromMouse(cm,e,!0,"rectangle"==behavior.unit)
 if(cur)if(0!=cmp(cur,lastPos)){cm.curOp.focus=activeElt()
 extendTo(cur)
 var visible=visibleLines(display,doc);(cur.line>=visible.to||cur.line<visible.from)&&setTimeout(operation(cm,function(){counter==curCount&&extend(e)}),150)}else{var outside=e.clientY<editorSize.top?-20:e.clientY>editorSize.bottom?20:0
@@ -1370,26 +1442,36 @@ display.input.focus()
 off(document,"mousemove",move)
 off(document,"mouseup",up)
 doc.history.lastSelOrigin=null}var display=cm.display,doc=cm.doc
-e_preventDefault(e)
+e_preventDefault(event)
 var ourRange,ourIndex,startSel=doc.sel,ranges=startSel.ranges
-if(addNew&&!e.shiftKey){ourIndex=doc.sel.contains(start)
+if(behavior.addNew&&!behavior.extend){ourIndex=doc.sel.contains(start)
 ourRange=ourIndex>-1?ranges[ourIndex]:new Range(start,start)}else{ourRange=doc.sel.primary()
-ourIndex=doc.sel.primIndex}if(chromeOS?e.shiftKey&&e.metaKey:e.altKey){type="rect"
-addNew||(ourRange=new Range(start,start))
-start=posFromMouse(cm,e,!0,!0)
-ourIndex=-1}else if("double"==type){var word=cm.findWordAt(start)
-ourRange=cm.display.shift||doc.extend?extendRange(doc,ourRange,word.anchor,word.head):word}else if("triple"==type){var line=new Range(Pos(start.line,0),clipPos(doc,Pos(start.line+1,0)))
-ourRange=cm.display.shift||doc.extend?extendRange(doc,ourRange,line.anchor,line.head):line}else ourRange=extendRange(doc,ourRange,start)
-if(addNew)if(-1==ourIndex){ourIndex=ranges.length
-setSelection(doc,normalizeSelection(ranges.concat([ourRange]),ourIndex),{scroll:!1,origin:"*mouse"})}else if(ranges.length>1&&ranges[ourIndex].empty()&&"single"==type&&!e.shiftKey){setSelection(doc,normalizeSelection(ranges.slice(0,ourIndex).concat(ranges.slice(ourIndex+1)),0),{scroll:!1,origin:"*mouse"})
+ourIndex=doc.sel.primIndex}if("rectangle"==behavior.unit){behavior.addNew||(ourRange=new Range(start,start))
+start=posFromMouse(cm,event,!0,!0)
+ourIndex=-1}else{var range$$1=rangeForUnit(cm,start,behavior.unit)
+ourRange=behavior.extend?extendRange(ourRange,range$$1.anchor,range$$1.head,behavior.extend):range$$1}if(behavior.addNew)if(-1==ourIndex){ourIndex=ranges.length
+setSelection(doc,normalizeSelection(ranges.concat([ourRange]),ourIndex),{scroll:!1,origin:"*mouse"})}else if(ranges.length>1&&ranges[ourIndex].empty()&&"char"==behavior.unit&&!behavior.extend){setSelection(doc,normalizeSelection(ranges.slice(0,ourIndex).concat(ranges.slice(ourIndex+1)),0),{scroll:!1,origin:"*mouse"})
 startSel=doc.sel}else replaceOneSelection(doc,ourIndex,ourRange,sel_mouse)
 else{ourIndex=0
 setSelection(doc,new Selection([ourRange],0),sel_mouse)
 startSel=doc.sel}var lastPos=start,editorSize=display.wrapper.getBoundingClientRect(),counter=0,move=operation(cm,function(e){e_button(e)?extend(e):done(e)}),up=operation(cm,done)
 cm.state.selectingText=up
 on(document,"mousemove",move)
-on(document,"mouseup",up)}function gutterEvent(cm,e,type,prevent){var mX,mY
-try{mX=e.clientX
+on(document,"mouseup",up)}function bidiSimplify(cm,range$$1){var anchor=range$$1.anchor,head=range$$1.head,anchorLine=getLine(cm.doc,anchor.line)
+if(0==cmp(anchor,head)&&anchor.sticky==head.sticky)return range$$1
+var order=getOrder(anchorLine)
+if(!order)return range$$1
+var index=getBidiPartAt(order,anchor.ch,anchor.sticky),part=order[index]
+if(part.from!=anchor.ch&&part.to!=anchor.ch)return range$$1
+var boundary=index+(part.from==anchor.ch==(1!=part.level)?0:1)
+if(0==boundary||boundary==order.length)return range$$1
+var leftSide
+if(head.line!=anchor.line)leftSide=(head.line-anchor.line)*("ltr"==cm.doc.direction?1:-1)>0
+else{var headIndex=getBidiPartAt(order,head.ch,head.sticky),dir=headIndex-index||(head.ch-anchor.ch)*(1==part.level?-1:1)
+leftSide=headIndex==boundary-1||headIndex==boundary?dir<0:dir>0}var usePart=order[boundary+(leftSide?-1:0)],from=leftSide==(1==usePart.level),ch=from?usePart.from:usePart.to,sticky=from?"after":"before"
+return anchor.ch==ch&&anchor.sticky==sticky?range$$1:new Range(new Pos(anchor.line,ch,sticky),head)}function gutterEvent(cm,e,type,prevent){var mX,mY
+if(e.touches){mX=e.touches[0].clientX
+mY=e.touches[0].clientY}else try{mX=e.clientX
 mY=e.clientY}catch(e){return!1}if(mX>=Math.floor(cm.display.gutters.getBoundingClientRect().right))return!1
 prevent&&e_preventDefault(e)
 var display=cm.display,lineBox=display.lineDiv.getBoundingClientRect()
@@ -1451,7 +1533,7 @@ var word=cm.findWordAt(pos)
 extendSelection(cm.doc,word.anchor,word.head)}}})):on(d.scroller,"dblclick",function(e){return signalDOMEvent(cm,e)||e_preventDefault(e)})
 captureRightClick||on(d.scroller,"contextmenu",function(e){return onContextMenu(cm,e)})
 var touchFinished,prevTouch={end:0}
-on(d.scroller,"touchstart",function(e){if(!signalDOMEvent(cm,e)&&!isMouseLikeTouchEvent(e)){d.input.ensurePolled()
+on(d.scroller,"touchstart",function(e){if(!signalDOMEvent(cm,e)&&!isMouseLikeTouchEvent(e)&&!clickInGutter(cm,e)){d.input.ensurePolled()
 clearTimeout(touchFinished)
 var now=+new Date
 d.activeTouch={start:now,moved:!1,prev:now-prevTouch.end<=300?prevTouch:null}
@@ -1465,7 +1547,7 @@ cm.setSelection(range.anchor,range.head)
 cm.focus()
 e_preventDefault(e)}finishTouch()})
 on(d.scroller,"touchcancel",finishTouch)
-on(d.scroller,"scroll",function(){if(d.scroller.clientHeight){setScrollTop(cm,d.scroller.scrollTop)
+on(d.scroller,"scroll",function(){if(d.scroller.clientHeight){updateScrollTop(cm,d.scroller.scrollTop)
 setScrollLeft(cm,d.scroller.scrollLeft,!0)
 signal(cm,"scroll",cm)}})
 on(d.scroller,"mousewheel",function(e){return onScrollWheel(cm,e)})
@@ -1480,7 +1562,7 @@ on(inp,"keypress",operation(cm,onKeyPress))
 on(inp,"focus",function(e){return onFocus(cm,e)})
 on(inp,"blur",function(e){return onBlur(cm,e)})}function indentLine(cm,n,how,aggressive){var state,doc=cm.doc
 null==how&&(how="add")
-"smart"==how&&(doc.mode.indent?state=getStateBefore(cm,n):how="prev")
+"smart"==how&&(doc.mode.indent?state=getContextBefore(cm,n).state:how="prev")
 var tabSize=cm.options.tabSize,line=getLine(doc,n),curSpace=countColumn(line.text,null,tabSize)
 line.stateAfter&&(line.stateAfter=null)
 var indentation,curSpaceString=line.text.match(/^\s*/)[0]
@@ -1501,7 +1583,7 @@ cm.display.shift=!1
 sel||(sel=doc.sel)
 var paste=cm.state.pasteIncoming||"paste"==origin,textLines=splitLinesAuto(inserted),multiPaste=null
 if(paste&&sel.ranges.length>1)if(lastCopied&&lastCopied.text.join("\n")==inserted){if(sel.ranges.length%lastCopied.text.length==0){multiPaste=[]
-for(var i=0;i<lastCopied.text.length;i++)multiPaste.push(doc.splitLines(lastCopied.text[i]))}}else textLines.length==sel.ranges.length&&(multiPaste=map(textLines,function(l){return[l]}))
+for(var i=0;i<lastCopied.text.length;i++)multiPaste.push(doc.splitLines(lastCopied.text[i]))}}else textLines.length==sel.ranges.length&&cm.options.pasteLinesPerSelection&&(multiPaste=map(textLines,function(l){return[l]}))
 for(var updateInput,i$1=sel.ranges.length-1;i$1>=0;i$1--){var range$$1=sel.ranges[i$1],from=range$$1.from(),to=range$$1.to()
 range$$1.empty()&&(deleted&&deleted>0?from=Pos(from.line,from.ch-deleted):cm.state.overwrite&&!paste?to=Pos(to.line,Math.min(getLine(doc,to.line).text.length,to.ch+lst(textLines).length)):lastCopied&&lastCopied.lineWise&&lastCopied.text.join("\n")==inserted&&(from=to=Pos(from.line,0)))
 updateInput=cm.curOp.updateInput
@@ -1560,7 +1642,7 @@ text+=str}}function walk(node){if(1==node.nodeType){var cmText=node.getAttribute
 if(null!=cmText){addText(cmText||node.textContent.replace(/\u200b/g,""))
 return}var range$$1,markerID=node.getAttribute("cm-marker")
 if(markerID){var found=cm.findMarks(Pos(fromLine,0),Pos(toLine+1,0),recognizeMarker(+markerID))
-found.length&&(range$$1=found[0].find())&&addText(getBetween(cm.doc,range$$1.from,range$$1.to).join(lineSep))
+found.length&&(range$$1=found[0].find(0))&&addText(getBetween(cm.doc,range$$1.from,range$$1.to).join(lineSep))
 return}if("false"==node.getAttribute("contenteditable"))return
 var isBlock=/^(pre|div|p)$/i.test(node.nodeName)
 isBlock&&close()
@@ -1647,11 +1729,12 @@ pos=nl+1}}return result}:function(string){return string.split(/\r\n?|\n/)},hasSe
 try{range$$1=te.ownerDocument.selection.createRange()}catch(e){}return!(!range$$1||range$$1.parentElement()!=te)&&0!=range$$1.compareEndPoints("StartToEnd",range$$1)},hasCopyEvent=function(){var e=elt("div")
 if("oncopy"in e)return!0
 e.setAttribute("oncopy","return;")
-return"function"==typeof e.oncopy}(),badZoomedRects=null,modes={},mimeModes={},modeExtensions={},StringStream=function(string,tabSize){this.pos=this.start=0
+return"function"==typeof e.oncopy}(),badZoomedRects=null,modes={},mimeModes={},modeExtensions={},StringStream=function(string,tabSize,lineOracle){this.pos=this.start=0
 this.string=string
 this.tabSize=tabSize||8
 this.lastColumnPos=this.lastColumnValue=0
-this.lineStart=0}
+this.lineStart=0
+this.lineOracle=lineOracle}
 StringStream.prototype.eol=function(){return this.pos>=this.string.length}
 StringStream.prototype.sol=function(){return this.pos==this.lineStart}
 StringStream.prototype.peek=function(){return this.string.charAt(this.pos)||void 0}
@@ -1679,14 +1762,31 @@ return!0}}
 StringStream.prototype.current=function(){return this.string.slice(this.start,this.pos)}
 StringStream.prototype.hideFirstChars=function(n,inner){this.lineStart+=n
 try{return inner()}finally{this.lineStart-=n}}
-var Line=function(text,markedSpans,estimateHeight){this.text=text
+StringStream.prototype.lookAhead=function(n){var oracle=this.lineOracle
+return oracle&&oracle.lookAhead(n)}
+var SavedContext=function(state,lookAhead){this.state=state
+this.lookAhead=lookAhead},Context=function(doc,state,line,lookAhead){this.state=state
+this.doc=doc
+this.line=line
+this.maxLookAhead=lookAhead||0}
+Context.prototype.lookAhead=function(n){var line=this.doc.getLine(this.line+n)
+null!=line&&n>this.maxLookAhead&&(this.maxLookAhead=n)
+return line}
+Context.prototype.nextLine=function(){this.line++
+this.maxLookAhead>0&&this.maxLookAhead--}
+Context.fromSaved=function(doc,saved,line){return saved instanceof SavedContext?new Context(doc,copyState(doc.mode,saved.state),line,saved.lookAhead):new Context(doc,copyState(doc.mode,saved),line)}
+Context.prototype.save=function(copy){var state=!1!==copy?copyState(this.doc.mode,this.state):this.state
+return this.maxLookAhead>0?new SavedContext(state,this.maxLookAhead):state}
+var Token=function(stream,type,state){this.start=stream.start
+this.end=stream.pos
+this.string=stream.current()
+this.type=type||null
+this.state=state},Line=function(text,markedSpans,estimateHeight){this.text=text
 attachMarkedSpans(this,markedSpans)
 this.height=estimateHeight?estimateHeight(this):1}
 Line.prototype.lineNo=function(){return lineNo(this)}
 eventMixin(Line)
-var measureText,styleToClassCache={},styleToClassCacheWithMode={},operationGroup=null,orphanDelayedCallbacks=null,nullRect={left:0,right:0,top:0,bottom:0},wheelSamples=0,wheelPixelsPerUnit=null
-ie?wheelPixelsPerUnit=-.53:gecko?wheelPixelsPerUnit=15:chrome?wheelPixelsPerUnit=-.7:safari&&(wheelPixelsPerUnit=-1/3)
-var NativeScrollbars=function(place,scroll,cm){this.cm=cm
+var measureText,styleToClassCache={},styleToClassCacheWithMode={},operationGroup=null,orphanDelayedCallbacks=null,nullRect={left:0,right:0,top:0,bottom:0},NativeScrollbars=function(place,scroll,cm){this.cm=cm
 var vert=this.vert=elt("div",[elt("div",null,null,"min-width: 1px")],"CodeMirror-vscrollbar"),horiz=this.horiz=elt("div",[elt("div",null,null,"height: 100%; min-height: 1px")],"CodeMirror-hscrollbar")
 place(vert)
 place(horiz)
@@ -1707,16 +1807,15 @@ this.horiz.firstChild.style.width=Math.max(0,measure.scrollWidth-measure.clientW
 this.horiz.firstChild.style.width="0"}if(!this.checkedZeroWidth&&measure.clientHeight>0){0==sWidth&&this.zeroWidthHack()
 this.checkedZeroWidth=!0}return{right:needsV?sWidth:0,bottom:needsH?sWidth:0}}
 NativeScrollbars.prototype.setScrollLeft=function(pos){this.horiz.scrollLeft!=pos&&(this.horiz.scrollLeft=pos)
-this.disableHoriz&&this.enableZeroWidthBar(this.horiz,this.disableHoriz)}
+this.disableHoriz&&this.enableZeroWidthBar(this.horiz,this.disableHoriz,"horiz")}
 NativeScrollbars.prototype.setScrollTop=function(pos){this.vert.scrollTop!=pos&&(this.vert.scrollTop=pos)
-this.disableVert&&this.enableZeroWidthBar(this.vert,this.disableVert)}
+this.disableVert&&this.enableZeroWidthBar(this.vert,this.disableVert,"vert")}
 NativeScrollbars.prototype.zeroWidthHack=function(){var w=mac&&!mac_geMountainLion?"12px":"18px"
 this.horiz.style.height=this.vert.style.width=w
 this.horiz.style.pointerEvents=this.vert.style.pointerEvents="none"
 this.disableHoriz=new Delayed
 this.disableVert=new Delayed}
-NativeScrollbars.prototype.enableZeroWidthBar=function(bar,delay){function maybeDisable(){var box=bar.getBoundingClientRect()
-document.elementFromPoint(box.left+1,box.bottom-1)!=bar?bar.style.pointerEvents="none":delay.set(1e3,maybeDisable)}bar.style.pointerEvents="auto"
+NativeScrollbars.prototype.enableZeroWidthBar=function(bar,delay,type){function maybeDisable(){var box=bar.getBoundingClientRect();("vert"==type?document.elementFromPoint(box.right-1,(box.top+box.bottom)/2):document.elementFromPoint((box.right+box.left)/2,box.bottom-1))!=bar?bar.style.pointerEvents="none":delay.set(1e3,maybeDisable)}bar.style.pointerEvents="auto"
 delay.set(1e3,maybeDisable)}
 NativeScrollbars.prototype.clear=function(){var parent=this.horiz.parentNode
 parent.removeChild(this.horiz)
@@ -1738,6 +1837,8 @@ this.dims=getDimensions(cm)
 this.events=[]}
 DisplayUpdate.prototype.signal=function(emitter,type){hasHandler(emitter,type)&&this.events.push(arguments)}
 DisplayUpdate.prototype.finish=function(){for(var this$1=this,i=0;i<this.events.length;i++)signal.apply(null,this$1.events[i])}
+var wheelSamples=0,wheelPixelsPerUnit=null
+ie?wheelPixelsPerUnit=-.53:gecko?wheelPixelsPerUnit=15:chrome?wheelPixelsPerUnit=-.7:safari&&(wheelPixelsPerUnit=-1/3)
 var Selection=function(ranges,primIndex){this.ranges=ranges
 this.primIndex=primIndex}
 Selection.prototype.primary=function(){return this.ranges[this.primIndex]}
@@ -1759,32 +1860,14 @@ this.head=head}
 Range.prototype.from=function(){return minPos(this.anchor,this.head)}
 Range.prototype.to=function(){return maxPos(this.anchor,this.head)}
 Range.prototype.empty=function(){return this.head.line==this.anchor.line&&this.head.ch==this.anchor.ch}
-var LeafChunk=function(lines){var this$1=this
-this.lines=lines
-this.parent=null
-for(var height=0,i=0;i<lines.length;++i){lines[i].parent=this$1
-height+=lines[i].height}this.height=height}
-LeafChunk.prototype.chunkSize=function(){return this.lines.length}
-LeafChunk.prototype.removeInner=function(at,n){for(var this$1=this,i=at,e=at+n;i<e;++i){var line=this$1.lines[i]
+LeafChunk.prototype={chunkSize:function(){return this.lines.length},removeInner:function(at,n){for(var this$1=this,i=at,e=at+n;i<e;++i){var line=this$1.lines[i]
 this$1.height-=line.height
 cleanUpLine(line)
-signalLater(line,"delete")}this.lines.splice(at,n)}
-LeafChunk.prototype.collapse=function(lines){lines.push.apply(lines,this.lines)}
-LeafChunk.prototype.insertInner=function(at,lines,height){var this$1=this
+signalLater(line,"delete")}this.lines.splice(at,n)},collapse:function(lines){lines.push.apply(lines,this.lines)},insertInner:function(at,lines,height){var this$1=this
 this.height+=height
 this.lines=this.lines.slice(0,at).concat(lines).concat(this.lines.slice(at))
-for(var i=0;i<lines.length;++i)lines[i].parent=this$1}
-LeafChunk.prototype.iterN=function(at,n,op){for(var this$1=this,e=at+n;at<e;++at)if(op(this$1.lines[at]))return!0}
-var BranchChunk=function(children){var this$1=this
-this.children=children
-for(var size=0,height=0,i=0;i<children.length;++i){var ch=children[i]
-size+=ch.chunkSize()
-height+=ch.height
-ch.parent=this$1}this.size=size
-this.height=height
-this.parent=null}
-BranchChunk.prototype.chunkSize=function(){return this.size}
-BranchChunk.prototype.removeInner=function(at,n){var this$1=this
+for(var i=0;i<lines.length;++i)lines[i].parent=this$1},iterN:function(at,n,op){for(var this$1=this,e=at+n;at<e;++at)if(op(this$1.lines[at]))return!0}}
+BranchChunk.prototype={chunkSize:function(){return this.size},removeInner:function(at,n){var this$1=this
 this.size-=n
 for(var i=0;i<this.children.length;++i){var child=this$1.children[i],sz=child.chunkSize()
 if(at<sz){var rm=Math.min(n,sz-at),oldHeight=child.height
@@ -1795,9 +1878,7 @@ child.parent=null}if(0==(n-=rm))break
 at=0}else at-=sz}if(this.size-n<25&&(this.children.length>1||!(this.children[0]instanceof LeafChunk))){var lines=[]
 this.collapse(lines)
 this.children=[new LeafChunk(lines)]
-this.children[0].parent=this}}
-BranchChunk.prototype.collapse=function(lines){for(var this$1=this,i=0;i<this.children.length;++i)this$1.children[i].collapse(lines)}
-BranchChunk.prototype.insertInner=function(at,lines,height){var this$1=this
+this.children[0].parent=this}},collapse:function(lines){for(var this$1=this,i=0;i<this.children.length;++i)this$1.children[i].collapse(lines)},insertInner:function(at,lines,height){var this$1=this
 this.size+=lines.length
 this.height+=height
 for(var i=0;i<this.children.length;++i){var child=this$1.children[i],sz=child.chunkSize()
@@ -1806,9 +1887,8 @@ if(child.lines&&child.lines.length>50){for(var remaining=child.lines.length%25+2
 child.height-=leaf.height
 this$1.children.splice(++i,0,leaf)
 leaf.parent=this$1}child.lines=child.lines.slice(0,remaining)
-this$1.maybeSpill()}break}at-=sz}}
-BranchChunk.prototype.maybeSpill=function(){if(!(this.children.length<=10)){var me=this
-do{var spilled=me.children.splice(me.children.length-5,5),sibling=new BranchChunk(spilled)
+this$1.maybeSpill()}break}at-=sz}},maybeSpill:function(){if(!(this.children.length<=10)){var me=this
+do{var sibling=new BranchChunk(me.children.splice(me.children.length-5,5))
 if(me.parent){me.size-=sibling.size
 me.height-=sibling.height
 var myIndex=indexOf(me.parent.children,me)
@@ -1816,12 +1896,11 @@ me.parent.children.splice(myIndex+1,0,sibling)}else{var copy=new BranchChunk(me.
 copy.parent=me
 me.children=[copy,sibling]
 me=copy}sibling.parent=me.parent}while(me.children.length>10)
-me.parent.maybeSpill()}}
-BranchChunk.prototype.iterN=function(at,n,op){for(var this$1=this,i=0;i<this.children.length;++i){var child=this$1.children[i],sz=child.chunkSize()
+me.parent.maybeSpill()}},iterN:function(at,n,op){for(var this$1=this,i=0;i<this.children.length;++i){var child=this$1.children[i],sz=child.chunkSize()
 if(at<sz){var used=Math.min(n,sz-at)
 if(child.iterN(at,used,op))return!0
 if(0==(n-=used))break
-at=0}else at-=sz}}
+at=0}else at-=sz}}}
 var LineWidget=function(doc,node,options){var this$1=this
 if(options)for(var opt in options)options.hasOwnProperty(opt)&&(this$1[opt]=options[opt])
 this.doc=doc
@@ -1900,7 +1979,7 @@ this.first=firstLine
 this.scrollTop=this.scrollLeft=0
 this.cantEdit=!1
 this.cleanGeneration=1
-this.frontier=firstLine
+this.modeFrontier=this.highlightFrontier=firstLine
 var start=Pos(firstLine,0)
 this.sel=simpleSelection(start)
 this.history=new History(null)
@@ -1916,7 +1995,8 @@ Doc.prototype=createObj(BranchChunk.prototype,{constructor:Doc,iter:function(fro
 this.insertInner(at-this.first,lines,height)},remove:function(at,n){this.removeInner(at-this.first,n)},getValue:function(lineSep){var lines=getLines(this,this.first,this.first+this.size)
 return!1===lineSep?lines:lines.join(lineSep||this.lineSeparator())},setValue:docMethodOp(function(code){var top=Pos(this.first,0),last=this.first+this.size-1
 makeChange(this,{from:top,to:Pos(last,getLine(this,last).text.length),text:this.splitLines(code),origin:"setValue",full:!0},!0)
-setSelection(this,simpleSelection(top))}),replaceRange:function(code,from,to,origin){replaceRange(this,code,from=clipPos(this,from),to=to?clipPos(this,to):from,origin)},getRange:function(from,to,lineSep){var lines=getBetween(this,clipPos(this,from),clipPos(this,to))
+this.cm&&scrollToCoords(this.cm,0,0)
+setSelection(this,simpleSelection(top),sel_dontScroll)}),replaceRange:function(code,from,to,origin){replaceRange(this,code,from=clipPos(this,from),to=to?clipPos(this,to):from,origin)},getRange:function(from,to,lineSep){var lines=getBetween(this,clipPos(this,from),clipPos(this,to))
 return!1===lineSep?lines:lines.join(lineSep||this.lineSeparator())},getLine:function(line){var l=this.getLineHandle(line)
 return l&&l.text},getLineHandle:function(line){if(isLine(this,line))return getLine(this,line)},getLineNumber:function(line){return lineNo(line)},getLineHandleVisualStart:function(line){"number"==typeof line&&(line=getLine(this,line))
 return visualLine(line)},lineCount:function(){return this.size},firstLine:function(){return this.first},lastLine:function(){return this.first+this.size-1},clipPos:function(pos){return clipPos(this,pos)},getCursor:function(start){var range$$1=this.sel.primary()
@@ -2011,12 +2091,12 @@ keyMap.pcDefault={"Ctrl-A":"selectAll","Ctrl-D":"deleteLine","Ctrl-Z":"undo","Sh
 keyMap.emacsy={"Ctrl-F":"goCharRight","Ctrl-B":"goCharLeft","Ctrl-P":"goLineUp","Ctrl-N":"goLineDown","Alt-F":"goWordRight","Alt-B":"goWordLeft","Ctrl-A":"goLineStart","Ctrl-E":"goLineEnd","Ctrl-V":"goPageDown","Shift-Ctrl-V":"goPageUp","Ctrl-D":"delCharAfter","Ctrl-H":"delCharBefore","Alt-D":"delWordAfter","Alt-Backspace":"delWordBefore","Ctrl-K":"killLine","Ctrl-T":"transposeChars","Ctrl-O":"openLine"}
 keyMap.macDefault={"Cmd-A":"selectAll","Cmd-D":"deleteLine","Cmd-Z":"undo","Shift-Cmd-Z":"redo","Cmd-Y":"redo","Cmd-Home":"goDocStart","Cmd-Up":"goDocStart","Cmd-End":"goDocEnd","Cmd-Down":"goDocEnd","Alt-Left":"goGroupLeft","Alt-Right":"goGroupRight","Cmd-Left":"goLineLeft","Cmd-Right":"goLineRight","Alt-Backspace":"delGroupBefore","Ctrl-Alt-Backspace":"delGroupAfter","Alt-Delete":"delGroupAfter","Cmd-S":"save","Cmd-F":"find","Cmd-G":"findNext","Shift-Cmd-G":"findPrev","Cmd-Alt-F":"replace","Shift-Cmd-Alt-F":"replaceAll","Cmd-[":"indentLess","Cmd-]":"indentMore","Cmd-Backspace":"delWrappedLineLeft","Cmd-Delete":"delWrappedLineRight","Cmd-U":"undoSelection","Shift-Cmd-U":"redoSelection","Ctrl-Up":"goDocStart","Ctrl-Down":"goDocEnd",fallthrough:["basic","emacsy"]}
 keyMap.default=mac?keyMap.macDefault:keyMap.pcDefault
-var lastClick,lastDoubleClick,commands={selectAll:selectAll,singleSelection:function(cm){return cm.setSelection(cm.getCursor("anchor"),cm.getCursor("head"),sel_dontScroll)},killLine:function(cm){return deleteNearSelection(cm,function(range){if(range.empty()){var len=getLine(cm.doc,range.head.line).text.length
+var commands={selectAll:selectAll,singleSelection:function(cm){return cm.setSelection(cm.getCursor("anchor"),cm.getCursor("head"),sel_dontScroll)},killLine:function(cm){return deleteNearSelection(cm,function(range){if(range.empty()){var len=getLine(cm.doc,range.head.line).text.length
 return range.head.ch==len&&range.head.line<cm.lastLine()?{from:range.head,to:Pos(range.head.line+1,0)}:{from:range.head,to:Pos(range.head.line,len)}}return{from:range.from(),to:range.to()}})},deleteLine:function(cm){return deleteNearSelection(cm,function(range){return{from:Pos(range.from().line,0),to:clipPos(cm.doc,Pos(range.to().line+1,0))}})},delLineLeft:function(cm){return deleteNearSelection(cm,function(range){return{from:Pos(range.from().line,0),to:range.from()}})},delWrappedLineLeft:function(cm){return deleteNearSelection(cm,function(range){var top=cm.charCoords(range.head,"div").top+5
 return{from:cm.coordsChar({left:0,top:top},"div"),to:range.from()}})},delWrappedLineRight:function(cm){return deleteNearSelection(cm,function(range){var top=cm.charCoords(range.head,"div").top+5,rightPos=cm.coordsChar({left:cm.display.lineDiv.offsetWidth+100,top:top},"div")
-return{from:range.from(),to:rightPos}})},undo:function(cm){return cm.undo()},redo:function(cm){return cm.redo()},undoSelection:function(cm){return cm.undoSelection()},redoSelection:function(cm){return cm.redoSelection()},goDocStart:function(cm){return cm.extendSelection(Pos(cm.firstLine(),0))},goDocEnd:function(cm){return cm.extendSelection(Pos(cm.lastLine()))},goLineStart:function(cm){return cm.extendSelectionsBy(function(range){return lineStart(cm,range.head.line)},{origin:"+move",bias:1})},goLineStartSmart:function(cm){return cm.extendSelectionsBy(function(range){return lineStartSmart(cm,range.head)},{origin:"+move",bias:1})},goLineEnd:function(cm){return cm.extendSelectionsBy(function(range){return lineEnd(cm,range.head.line)},{origin:"+move",bias:-1})},goLineRight:function(cm){return cm.extendSelectionsBy(function(range){var top=cm.charCoords(range.head,"div").top+5
-return cm.coordsChar({left:cm.display.lineDiv.offsetWidth+100,top:top},"div")},sel_move)},goLineLeft:function(cm){return cm.extendSelectionsBy(function(range){var top=cm.charCoords(range.head,"div").top+5
-return cm.coordsChar({left:0,top:top},"div")},sel_move)},goLineLeftSmart:function(cm){return cm.extendSelectionsBy(function(range){var top=cm.charCoords(range.head,"div").top+5,pos=cm.coordsChar({left:0,top:top},"div")
+return{from:range.from(),to:rightPos}})},undo:function(cm){return cm.undo()},redo:function(cm){return cm.redo()},undoSelection:function(cm){return cm.undoSelection()},redoSelection:function(cm){return cm.redoSelection()},goDocStart:function(cm){return cm.extendSelection(Pos(cm.firstLine(),0))},goDocEnd:function(cm){return cm.extendSelection(Pos(cm.lastLine()))},goLineStart:function(cm){return cm.extendSelectionsBy(function(range){return lineStart(cm,range.head.line)},{origin:"+move",bias:1})},goLineStartSmart:function(cm){return cm.extendSelectionsBy(function(range){return lineStartSmart(cm,range.head)},{origin:"+move",bias:1})},goLineEnd:function(cm){return cm.extendSelectionsBy(function(range){return lineEnd(cm,range.head.line)},{origin:"+move",bias:-1})},goLineRight:function(cm){return cm.extendSelectionsBy(function(range){var top=cm.cursorCoords(range.head,"div").top+5
+return cm.coordsChar({left:cm.display.lineDiv.offsetWidth+100,top:top},"div")},sel_move)},goLineLeft:function(cm){return cm.extendSelectionsBy(function(range){var top=cm.cursorCoords(range.head,"div").top+5
+return cm.coordsChar({left:0,top:top},"div")},sel_move)},goLineLeftSmart:function(cm){return cm.extendSelectionsBy(function(range){var top=cm.cursorCoords(range.head,"div").top+5,pos=cm.coordsChar({left:0,top:top},"div")
 return pos.ch<cm.getLine(pos.line).search(/\S/)?lineStartSmart(cm,range.head):pos},sel_move)},goLineUp:function(cm){return cm.moveV(-1,"line")},goLineDown:function(cm){return cm.moveV(1,"line")},goPageUp:function(cm){return cm.moveV(-1,"page")},goPageDown:function(cm){return cm.moveV(1,"page")},goCharLeft:function(cm){return cm.moveH(-1,"char")},goCharRight:function(cm){return cm.moveH(1,"char")},goColumnLeft:function(cm){return cm.moveH(-1,"column")},goColumnRight:function(cm){return cm.moveH(1,"column")},goWordLeft:function(cm){return cm.moveH(-1,"word")},goGroupRight:function(cm){return cm.moveH(1,"group")},goGroupLeft:function(cm){return cm.moveH(-1,"group")},goWordRight:function(cm){return cm.moveH(1,"word")},delCharBefore:function(cm){return cm.deleteH(-1,"char")},delCharAfter:function(cm){return cm.deleteH(1,"char")},delWordBefore:function(cm){return cm.deleteH(-1,"word")},delWordAfter:function(cm){return cm.deleteH(1,"word")},delGroupBefore:function(cm){return cm.deleteH(-1,"group")},delGroupAfter:function(cm){return cm.deleteH(1,"group")},indentAuto:function(cm){return cm.indentSelection("smart")},indentMore:function(cm){return cm.indentSelection("add")},indentLess:function(cm){return cm.indentSelection("subtract")},insertTab:function(cm){return cm.replaceSelection("\t")},insertSoftTab:function(cm){for(var spaces=[],ranges=cm.listSelections(),tabSize=cm.options.tabSize,i=0;i<ranges.length;i++){var pos=ranges[i].from(),col=countColumn(cm.getLine(pos.line),pos.ch,tabSize)
 spaces.push(spaceStr(tabSize-col%tabSize))}cm.replaceSelections(spaces)},defaultTab:function(cm){cm.somethingSelected()?cm.indentSelection("add"):cm.execCommand("insertTab")},transposeChars:function(cm){return runInOp(cm,function(){for(var ranges=cm.listSelections(),newSel=[],i=0;i<ranges.length;i++)if(ranges[i].empty()){var cur=ranges[i].head,line=getLine(cm.doc,cur.line).text
 if(line){cur.ch==line.length&&(cur=new Pos(cur.line,cur.ch-1))
@@ -2026,7 +2106,11 @@ if(prev){cur=new Pos(cur.line,1)
 cm.replaceRange(line.charAt(0)+cm.doc.lineSeparator()+prev.charAt(prev.length-1),Pos(cur.line-1,prev.length-1),cur,"+transpose")}}}newSel.push(new Range(cur,cur))}cm.setSelections(newSel)})},newlineAndIndent:function(cm){return runInOp(cm,function(){for(var sels=cm.listSelections(),i=sels.length-1;i>=0;i--)cm.replaceRange(cm.doc.lineSeparator(),sels[i].anchor,sels[i].head,"+input")
 sels=cm.listSelections()
 for(var i$1=0;i$1<sels.length;i$1++)cm.indentLine(sels[i$1].from().line,null,!0)
-ensureCursorVisible(cm)})},openLine:function(cm){return cm.replaceSelection("\n","start")},toggleOverwrite:function(cm){return cm.toggleOverwrite()}},stopSeq=new Delayed,lastStoppedKey=null,Init={toString:function(){return"CodeMirror.Init"}},defaults={},optionHandlers={}
+ensureCursorVisible(cm)})},openLine:function(cm){return cm.replaceSelection("\n","start")},toggleOverwrite:function(cm){return cm.toggleOverwrite()}},stopSeq=new Delayed,lastStoppedKey=null,PastClick=function(time,pos,button){this.time=time
+this.pos=pos
+this.button=button}
+PastClick.prototype.compare=function(time,pos,button){return this.time+400>time&&0==cmp(pos,this.pos)&&button==this.button}
+var lastClick,lastDoubleClick,Init={toString:function(){return"CodeMirror.Init"}},defaults={},optionHandlers={}
 CodeMirror$1.defaults=defaults
 CodeMirror$1.optionHandlers=optionHandlers
 var initHooks=[]
@@ -2069,16 +2153,16 @@ result.focus=this.cm.state.focused
 return result}
 ContentEditableInput.prototype.showSelection=function(info,takeFocus){if(info&&this.cm.display.view.length){(info.focus||takeFocus)&&this.showPrimarySelection()
 this.showMultipleSelections(info)}}
-ContentEditableInput.prototype.showPrimarySelection=function(){var sel=window.getSelection(),prim=this.cm.doc.sel.primary(),curAnchor=domToPos(this.cm,sel.anchorNode,sel.anchorOffset),curFocus=domToPos(this.cm,sel.focusNode,sel.focusOffset)
-if(!curAnchor||curAnchor.bad||!curFocus||curFocus.bad||0!=cmp(minPos(curAnchor,curFocus),prim.from())||0!=cmp(maxPos(curAnchor,curFocus),prim.to())){var start=posToDOM(this.cm,prim.from()),end=posToDOM(this.cm,prim.to())
-if(start||end){var view=this.cm.display.view,old=sel.rangeCount&&sel.getRangeAt(0)
-if(start){if(!end){var measure=view[view.length-1].measure,map$$1=measure.maps?measure.maps[measure.maps.length-1]:measure.map
-end={node:map$$1[map$$1.length-1],offset:map$$1[map$$1.length-2]-map$$1[map$$1.length-3]}}}else start={node:view[0].measure.map[2],offset:0}
-var rng
-try{rng=range(start.node,start.offset,end.offset,end.node)}catch(e){}if(rng){if(!gecko&&this.cm.state.focused){sel.collapse(start.node,start.offset)
+ContentEditableInput.prototype.showPrimarySelection=function(){var sel=window.getSelection(),cm=this.cm,prim=cm.doc.sel.primary(),from=prim.from(),to=prim.to()
+if(cm.display.viewTo==cm.display.viewFrom||from.line>=cm.display.viewTo||to.line<cm.display.viewFrom)sel.removeAllRanges()
+else{var curAnchor=domToPos(cm,sel.anchorNode,sel.anchorOffset),curFocus=domToPos(cm,sel.focusNode,sel.focusOffset)
+if(!curAnchor||curAnchor.bad||!curFocus||curFocus.bad||0!=cmp(minPos(curAnchor,curFocus),from)||0!=cmp(maxPos(curAnchor,curFocus),to)){var view=cm.display.view,start=from.line>=cm.display.viewFrom&&posToDOM(cm,from)||{node:view[0].measure.map[2],offset:0},end=to.line<cm.display.viewTo&&posToDOM(cm,to)
+if(!end){var measure=view[view.length-1].measure,map$$1=measure.maps?measure.maps[measure.maps.length-1]:measure.map
+end={node:map$$1[map$$1.length-1],offset:map$$1[map$$1.length-2]-map$$1[map$$1.length-3]}}if(start&&end){var rng,old=sel.rangeCount&&sel.getRangeAt(0)
+try{rng=range(start.node,start.offset,end.offset,end.node)}catch(e){}if(rng){if(!gecko&&cm.state.focused){sel.collapse(start.node,start.offset)
 if(!rng.collapsed){sel.removeAllRanges()
 sel.addRange(rng)}}else{sel.removeAllRanges()
-sel.addRange(rng)}old&&null==sel.anchorNode?sel.addRange(old):gecko&&this.startGracePeriod()}this.rememberSelection()}else sel.removeAllRanges()}}
+sel.addRange(rng)}old&&null==sel.anchorNode?sel.addRange(old):gecko&&this.startGracePeriod()}this.rememberSelection()}else sel.removeAllRanges()}}}
 ContentEditableInput.prototype.startGracePeriod=function(){var this$1=this
 clearTimeout(this.gracePeriod)
 this.gracePeriod=setTimeout(function(){this$1.gracePeriod=!1
@@ -2160,14 +2244,10 @@ var TextareaInput=function(cm){this.cm=cm
 this.prevInput=""
 this.pollingFast=!1
 this.polling=new Delayed
-this.inaccurateSelection=!1
 this.hasSelection=!1
 this.composing=null}
-TextareaInput.prototype.init=function(display){function prepareCopyCut(e){if(!signalDOMEvent(cm,e)){if(cm.somethingSelected()){setLastCopied({lineWise:!1,text:cm.getSelections()})
-if(input.inaccurateSelection){input.prevInput=""
-input.inaccurateSelection=!1
-te.value=lastCopied.text.join("\n")
-selectInput(te)}}else{if(!cm.options.lineWiseCopyCut)return
+TextareaInput.prototype.init=function(display){function prepareCopyCut(e){if(!signalDOMEvent(cm,e)){if(cm.somethingSelected())setLastCopied({lineWise:!1,text:cm.getSelections()})
+else{if(!cm.options.lineWiseCopyCut)return
 var ranges=copyableRanges(cm)
 setLastCopied({lineWise:!0,text:ranges.text})
 if("cut"==e.type)cm.setSelections(ranges.ranges,null,sel_dontScroll)
@@ -2200,13 +2280,13 @@ removeChildrenAndAdd(display.cursorDiv,drawn.cursors)
 removeChildrenAndAdd(display.selectionDiv,drawn.selection)
 if(null!=drawn.teTop){this.wrapper.style.top=drawn.teTop+"px"
 this.wrapper.style.left=drawn.teLeft+"px"}}
-TextareaInput.prototype.reset=function(typing){if(!this.contextMenuPending){var minimal,selected,cm=this.cm,doc=cm.doc
+TextareaInput.prototype.reset=function(typing){if(!this.contextMenuPending&&!this.composing){var cm=this.cm
 if(cm.somethingSelected()){this.prevInput=""
-var range$$1=doc.sel.primary(),content=(minimal=hasCopyEvent&&(range$$1.to().line-range$$1.from().line>100||(selected=cm.getSelection()).length>1e3))?"-":selected||cm.getSelection()
+var content=cm.getSelection()
 this.textarea.value=content
 cm.state.focused&&selectInput(this.textarea)
 ie&&ie_version>=9&&(this.hasSelection=content)}else if(!typing){this.prevInput=this.textarea.value=""
-ie&&ie_version>=9&&(this.hasSelection=null)}this.inaccurateSelection=minimal}}
+ie&&ie_version>=9&&(this.hasSelection=null)}}}
 TextareaInput.prototype.getField=function(){return this.textarea}
 TextareaInput.prototype.supportsTouch=function(){return!1}
 TextareaInput.prototype.focus=function(){if("nocursor"!=this.cm.options.readOnly&&(!mobile||activeElt()!=this.textarea))try{this.textarea.focus()}catch(e){}}
@@ -2273,7 +2353,8 @@ if(captureRightClick){e_stop(e)
 var mouseup=function(){off(window,"mouseup",mouseup)
 setTimeout(rehide,20)}
 on(window,"mouseup",mouseup)}else setTimeout(rehide,50)}}
-TextareaInput.prototype.readOnlyChanged=function(val){val||this.reset()}
+TextareaInput.prototype.readOnlyChanged=function(val){val||this.reset()
+this.textarea.disabled="nocursor"==val}
 TextareaInput.prototype.setUneditable=function(){}
 TextareaInput.prototype.needsContentAttribute=!1
 !function(CodeMirror){function option(name,deflt,handle,notOnInit){CodeMirror.defaults[name]=deflt
@@ -2310,6 +2391,7 @@ option("keyMap","default",function(cm,val,old){var next=getKeyMap(val),prev=old!
 prev&&prev.detach&&prev.detach(cm,next)
 next.attach&&next.attach(cm,prev||null)})
 option("extraKeys",null)
+option("configureMouse",null)
 option("lineWrapping",!1,wrappingChanged,!0)
 option("gutters",[],function(cm){setGuttersForLineNumbers(cm.options)
 guttersChanged(cm)},!0)
@@ -2327,10 +2409,9 @@ option("lineNumberFormatter",function(integer){return integer},guttersChanged,!0
 option("showCursorWhenSelecting",!1,updateSelection,!0)
 option("resetSelectionOnContextMenu",!0)
 option("lineWiseCopyCut",!0)
+option("pasteLinesPerSelection",!0)
 option("readOnly",!1,function(cm,val){if("nocursor"==val){onBlur(cm)
-cm.display.input.blur()
-cm.display.disabled=!0}else cm.display.disabled=!1
-cm.display.input.readOnlyChanged(val)})
+cm.display.input.blur()}cm.display.input.readOnlyChanged(val)})
 option("disableInput",!1,function(cm,val){val||cm.display.input.reset()},!0)
 option("dragDrop",!0,dragDropChanged)
 option("allowDropFileTypes",null)
@@ -2389,7 +2470,7 @@ else if(mode[type])for(var i=0;i<mode[type].length;i++){var val=help[mode[type][
 val&&found.push(val)}else mode.helperType&&help[mode.helperType]?found.push(help[mode.helperType]):help[mode.name]&&found.push(help[mode.name])
 for(var i$1=0;i$1<help._global.length;i$1++){var cur=help._global[i$1]
 cur.pred(mode,this$1)&&-1==indexOf(found,cur.val)&&found.push(cur.val)}return found},getStateAfter:function(line,precise){var doc=this.doc
-return getStateBefore(this,(line=clipLine(doc,null==line?doc.first+doc.size-1:line))+1,precise)},cursorCoords:function(start,mode){var range$$1=this.doc.sel.primary()
+return getContextBefore(this,(line=clipLine(doc,null==line?doc.first+doc.size-1:line))+1,precise).state},cursorCoords:function(start,mode){var range$$1=this.doc.sel.primary()
 return cursorCoords(this,null==start?range$$1.head:"object"==typeof start?clipPos(this.doc,start):start?range$$1.from():range$$1.to(),mode||"page")},charCoords:function(pos,mode){return charCoords(this,clipPos(this.doc,pos),mode||"page")},coordsChar:function(coords,mode){return coordsChar(this,(coords=fromCoordSystem(this,coords,mode||"page")).left,coords.top)},lineAtHeight:function(height,mode){height=fromCoordSystem(this,{top:height,left:0},mode||"page").top
 return lineAtHeight(this.doc,height+this.display.viewOffset)},heightAtLine:function(line,mode,includeWidgets){var lineObj,end=!1
 if("number"==typeof line){var last=this.doc.first+this.doc.size-1
@@ -2407,7 +2488,7 @@ left+node.offsetWidth>hspace&&(left=hspace-node.offsetWidth)}node.style.top=top+
 node.style.left=node.style.right=""
 if("right"==horiz){left=display.sizer.clientWidth-node.offsetWidth
 node.style.right="0px"}else{"left"==horiz?left=0:"middle"==horiz&&(left=(display.sizer.clientWidth-node.offsetWidth)/2)
-node.style.left=left+"px"}scroll&&scrollIntoView(this,{left:left,top:top,right:left+node.offsetWidth,bottom:top+node.offsetHeight})},triggerOnKeyDown:methodOp(onKeyDown),triggerOnKeyPress:methodOp(onKeyPress),triggerOnKeyUp:onKeyUp,execCommand:function(cmd){if(commands.hasOwnProperty(cmd))return commands[cmd].call(null,this)},triggerElectric:methodOp(function(text){triggerElectric(this,text)}),findPosH:function(from,amount,unit,visually){var this$1=this,dir=1
+node.style.left=left+"px"}scroll&&scrollIntoView(this,{left:left,top:top,right:left+node.offsetWidth,bottom:top+node.offsetHeight})},triggerOnKeyDown:methodOp(onKeyDown),triggerOnKeyPress:methodOp(onKeyPress),triggerOnKeyUp:onKeyUp,triggerOnMouseDown:methodOp(onMouseDown),execCommand:function(cmd){if(commands.hasOwnProperty(cmd))return commands[cmd].call(null,this)},triggerElectric:methodOp(function(text){triggerElectric(this,text)}),findPosH:function(from,amount,unit,visually){var this$1=this,dir=1
 if(amount<0){dir=-1
 amount=-amount}for(var cur=clipPos(this.doc,from),i=0;i<amount&&!(cur=findPosH(this$1.doc,cur,dir,unit,visually)).hitSide;++i);return cur},moveH:methodOp(function(dir,unit){var this$1=this
 this.extendSelectionsBy(function(range$$1){return this$1.display.shift||this$1.doc.extend||range$$1.empty()?findPosH(this$1.doc,range$$1.head,dir,unit,this$1.options.rtlMoveVisually):dir<0?range$$1.from():range$$1.to()},sel_move)}),deleteH:methodOp(function(dir,unit){var sel=this.doc.sel,doc=this.doc
@@ -2422,23 +2503,19 @@ var headPos=cursorCoords(this$1,range$$1.head,"div")
 null!=range$$1.goalColumn&&(headPos.left=range$$1.goalColumn)
 goals.push(headPos.left)
 var pos=findPosV(this$1,headPos,dir,unit)
-"page"==unit&&range$$1==doc.sel.primary()&&addToScrollPos(this$1,null,charCoords(this$1,pos,"div").top-headPos.top)
+"page"==unit&&range$$1==doc.sel.primary()&&addToScrollTop(this$1,charCoords(this$1,pos,"div").top-headPos.top)
 return pos},sel_move)
 if(goals.length)for(var i=0;i<doc.sel.ranges.length;i++)doc.sel.ranges[i].goalColumn=goals[i]}),findWordAt:function(pos){var line=getLine(this.doc,pos.line).text,start=pos.ch,end=pos.ch
 if(line){var helper=this.getHelper(pos,"wordChars")
 "before"!=pos.sticky&&end!=line.length||!start?++end:--start
 for(var startChar=line.charAt(start),check=isWordChar(startChar,helper)?function(ch){return isWordChar(ch,helper)}:/\s/.test(startChar)?function(ch){return/\s/.test(ch)}:function(ch){return!/\s/.test(ch)&&!isWordChar(ch)};start>0&&check(line.charAt(start-1));)--start
 for(;end<line.length&&check(line.charAt(end));)++end}return new Range(Pos(pos.line,start),Pos(pos.line,end))},toggleOverwrite:function(value){if(null==value||value!=this.state.overwrite){(this.state.overwrite=!this.state.overwrite)?addClass(this.display.cursorDiv,"CodeMirror-overwrite"):rmClass(this.display.cursorDiv,"CodeMirror-overwrite")
-signal(this,"overwriteToggle",this,this.state.overwrite)}},hasFocus:function(){return this.display.input.getField()==activeElt()},isReadOnly:function(){return!(!this.options.readOnly&&!this.doc.cantEdit)},scrollTo:methodOp(function(x,y){null==x&&null==y||resolveScrollToPos(this)
-null!=x&&(this.curOp.scrollLeft=x)
-null!=y&&(this.curOp.scrollTop=y)}),getScrollInfo:function(){var scroller=this.display.scroller
+signal(this,"overwriteToggle",this,this.state.overwrite)}},hasFocus:function(){return this.display.input.getField()==activeElt()},isReadOnly:function(){return!(!this.options.readOnly&&!this.doc.cantEdit)},scrollTo:methodOp(function(x,y){scrollToCoords(this,x,y)}),getScrollInfo:function(){var scroller=this.display.scroller
 return{left:scroller.scrollLeft,top:scroller.scrollTop,height:scroller.scrollHeight-scrollGap(this)-this.display.barHeight,width:scroller.scrollWidth-scrollGap(this)-this.display.barWidth,clientHeight:displayHeight(this),clientWidth:displayWidth(this)}},scrollIntoView:methodOp(function(range$$1,margin){if(null==range$$1){range$$1={from:this.doc.sel.primary().head,to:null}
 null==margin&&(margin=this.options.cursorScrollMargin)}else"number"==typeof range$$1?range$$1={from:Pos(range$$1,0),to:null}:null==range$$1.from&&(range$$1={from:range$$1,to:null})
 range$$1.to||(range$$1.to=range$$1.from)
 range$$1.margin=margin||0
-if(null!=range$$1.from.line){resolveScrollToPos(this)
-this.curOp.scrollToPos=range$$1}else{var sPos=calculateScrollPos(this,{left:Math.min(range$$1.from.left,range$$1.to.left),top:Math.min(range$$1.from.top,range$$1.to.top)-range$$1.margin,right:Math.max(range$$1.from.right,range$$1.to.right),bottom:Math.max(range$$1.from.bottom,range$$1.to.bottom)+range$$1.margin})
-this.scrollTo(sPos.scrollLeft,sPos.scrollTop)}}),setSize:methodOp(function(width,height){var this$1=this,interpret=function(val){return"number"==typeof val||/^\d+$/.test(String(val))?val+"px":val}
+null!=range$$1.from.line?scrollToRange(this,range$$1):scrollToCoordsRange(this,range$$1.from,range$$1.to,range$$1.margin)}),setSize:methodOp(function(width,height){var this$1=this,interpret=function(val){return"number"==typeof val||/^\d+$/.test(String(val))?val+"px":val}
 null!=width&&(this.display.wrapper.style.width=interpret(width))
 null!=height&&(this.display.wrapper.style.height=interpret(height))
 this.options.lineWrapping&&clearLineMeasurementCache(this)
@@ -2446,18 +2523,18 @@ var lineNo$$1=this.display.viewFrom
 this.doc.iter(lineNo$$1,this.display.viewTo,function(line){if(line.widgets)for(var i=0;i<line.widgets.length;i++)if(line.widgets[i].noHScroll){regLineChange(this$1,lineNo$$1,"widget")
 break}++lineNo$$1})
 this.curOp.forceUpdate=!0
-signal(this,"refresh",this)}),operation:function(f){return runInOp(this,f)},refresh:methodOp(function(){var oldHeight=this.display.cachedTextHeight
+signal(this,"refresh",this)}),operation:function(f){return runInOp(this,f)},startOperation:function(){return startOperation(this)},endOperation:function(){return endOperation(this)},refresh:methodOp(function(){var oldHeight=this.display.cachedTextHeight
 regChange(this)
 this.curOp.forceUpdate=!0
 clearCaches(this)
-this.scrollTo(this.doc.scrollLeft,this.doc.scrollTop)
+scrollToCoords(this,this.doc.scrollLeft,this.doc.scrollTop)
 updateGutterSpace(this);(null==oldHeight||Math.abs(oldHeight-textHeight(this.display))>.5)&&estimateLineHeights(this)
 signal(this,"refresh",this)}),swapDoc:methodOp(function(doc){var old=this.doc
 old.cm=null
 attachDoc(this,doc)
 clearCaches(this)
 this.display.input.reset()
-this.scrollTo(doc.scrollLeft,doc.scrollTop)
+scrollToCoords(this,doc.scrollLeft,doc.scrollTop)
 this.curOp.forceScroll=!0
 signalLater(this,"swapDoc",this,old)
 return old}),getInputField:function(){return this.display.input.getField()},getWrapperElement:function(){return this.display.wrapper},getScrollerElement:function(){return this.display.scroller},getGutterElement:function(){return this.display.gutters}}
@@ -2540,5 +2617,5 @@ CodeMirror.addClass=addClass
 CodeMirror.contains=contains
 CodeMirror.rmClass=rmClass
 CodeMirror.keyNames=keyNames}(CodeMirror$1)
-CodeMirror$1.version="5.25.0"
+CodeMirror$1.version="5.30.0"
 return CodeMirror$1})
