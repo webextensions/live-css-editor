@@ -44,51 +44,40 @@
     cursor: default;
 }
 
-.magicss-mode-switch {
-    width: 25px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 10px;
-    margin-top: 5px;
-}
-
-.magicss-mode-switch-selected {
-    width: 14px;
-    height: 10px;
-    float: right;
-    background-color: rgb(34, 186, 17);
-    border-radius: 10px;
-}
-.magicss-selected-mode-less .magicss-mode-switch-selected {
-    float: left;
-}
-
 .magicss-mode-button {
     float: left;
     cursor: pointer;
+    padding-right: 10px;
 }
 
-.magicss-mode-css {
-    padding-left: 5px;
-}
-
-.magicss-mode-less {
-    padding-right: 5px;
+.magicss-mode-button:last-child {
+    padding-right: 0;
 }
 
 .magicss-mode-css,
-.magicss-mode-less {
+.magicss-mode-less,
+.magicss-mode-sass {
     font-weight: bold;
-    color: #ffff00;
+    color: #ffffff;
     opacity: 0.5;
 }
 
 .magicss-mode-css:hover,
 .magicss-mode-less:hover,
+.magicss-mode-sass:hover,
 .magicss-selected-mode-less .magicss-mode-less,
+.magicss-selected-mode-sass .magicss-mode-sass,
 .magicss-selected-mode-css .magicss-mode-css {
     opacity: 1;
 }
+
+.magicss-selected-mode-less .magicss-mode-less,
+.magicss-selected-mode-sass .magicss-mode-sass,
+.magicss-selected-mode-css .magicss-mode-css {
+    opacity: 1;
+    color: #ffff00;
+}
+
 
 .magicss-gray-out {
     -webkit-filter: grayscale(1);
@@ -232,18 +221,19 @@ body .tooltipster-default .tooltipster-content {
     background-size: 16px !important;
 }
 
-.magicss-less-to-css {
+.magicss-less-or-sass-to-css {
     /* Source: https://upload.wikimedia.org/wikipedia/commons/8/81/LESS_Logo.svg */
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxklEQVQ4y53TMWpCQRCA4Q8JasAiRcQjWBixsUiRQPAwOYW9dmIpBMUTSCBtTpDOOoGQQBoru1RPmxUeq+CuA8OyMP8/sDPLcfQxQtMFcYcv7PCCm1zBPMBFOGdo5Ai6+AjwIZe4zpH0sI4kC9RyJH38RJIpqjmSe2wjyRBXOZKHSLDDc7mgckbwj03pXqCd2n2Av1LnAuNU+LG0UIecoJ4Cd/AZwfPUCbTwHcGrnFd/j+C33L/QwW+AXxOmdDKewv7fphTvATvpPMc4jdhXAAAAAElFTkSuQmCC");
     background-position: 7px 3px !important;
 }
 
-.tooltipster-base ul li a.magicss-less-to-css,
+.tooltipster-base ul li a.magicss-less-or-sass-to-css,
 .tooltipster-base ul li a.magicss-css-to-less {
     opacity: 0.35;
 }
 
-.tooltipster-selected-mode-less.tooltipster-base ul li a.magicss-less-to-css,
+.tooltipster-selected-mode-less.tooltipster-base ul li a.magicss-less-or-sass-to-css,
+.tooltipster-selected-mode-sass.tooltipster-base ul li a.magicss-less-or-sass-to-css,
 .tooltipster-selected-mode-css.tooltipster-base ul li a.magicss-css-to-less {
     opacity: 1;
 }
@@ -447,12 +437,12 @@ body .tooltipster-default .tooltipster-content {
     background-color: #bbb;
 }
 
-/* Highlight Less syntax error line in CodeMirror */
-.line-has-less-error-transition-effect {
+/* Highlight Less/Sass syntax error line in CodeMirror */
+.line-has-parsing-error-transition-effect {
     -webkit-transition: background-color 0.5s ease-in;
     transition: background-color 0.5s ease-in;
 }
-.line-has-less-error {
+.line-has-parsing-error {
     background-color: #f9edbe;    /* If that line is already in focus, this would not get applied and hence less disturbance to the user */
 }
 

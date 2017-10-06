@@ -1,4 +1,4 @@
-/*globals jQuery, less, csspretty */
+/*globals jQuery, less, Sass, csspretty */
 
 'use strict';
 
@@ -329,6 +329,17 @@ var utils = window.utils || {};
 
         // Alternatively, use Yahoo's CSS Min library:
         //     return YAHOO.compressor.cssmin(cssCode);
+    };
+
+    utils.sassToCSS = function (sassCode, cb) {
+        Sass.compile(sassCode, function (output) {
+            if (output.message) {
+                cb(output);
+            }  else {
+                var cssCode = output.text;
+                cb(null, cssCode);
+            }
+        });
     };
 
     utils.lessToCSS = function (lessCode, cb) {

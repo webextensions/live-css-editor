@@ -1,6 +1,6 @@
 {
   "name": "magicss",
-  "version": "6.2.12",
+  "version": "6.2.13",
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
     "postinstall": "copy-files-from-to copy-third-party-front-end-scripts.json",

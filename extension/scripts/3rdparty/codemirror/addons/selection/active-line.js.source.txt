@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/codemirror/CodeMirror/5.27.4/addon/selection/active-line.js
+https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/selection/active-line.js

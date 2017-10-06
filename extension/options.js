@@ -36,20 +36,26 @@ jQuery(function ($) {
         notifyUser();
     });
 
-    chromeStorage.get('use-less-by-default', function (values) {
-        if (values && values['use-less-by-default'] === 'yes') {
-            RadionButtonSelectedValueSet('language-mode', 'less');
+    chromeStorage.get('default-language-mode', function (values) {
+        if (values && values['default-language-mode'] === 'less') {
+            RadionButtonSelectedValueSet('default-language-mode', 'less');
+        } else if (values && values['default-language-mode'] === 'sass') {
+            RadionButtonSelectedValueSet('default-language-mode', 'sass');
         } else {
-            RadionButtonSelectedValueSet('language-mode', 'css');
+            RadionButtonSelectedValueSet('default-language-mode', 'css');
         }
     });
-    $('input[name=language-mode]').change(function () {
+    $('input[name=default-language-mode]').change(function () {
         var value = $(this).val(),
-            valueToSet = 'no';
+            valueToSet;
         if (value === 'less') {
-            valueToSet = 'yes';
+            valueToSet = 'less';
+        } else if (value === 'sass') {
+            valueToSet = 'sass';
+        } else {
+            valueToSet = 'css';
         }
-        chromeStorage.set({'use-less-by-default': valueToSet});
+        chromeStorage.set({'default-language-mode': valueToSet});
         notifyUser();
     });
 

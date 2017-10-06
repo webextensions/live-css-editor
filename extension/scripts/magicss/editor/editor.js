@@ -938,9 +938,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
     try {
         // TODO: Avoid this code structure full of callbacks
-        chromeStorage.get('use-less-by-default', function (values) {
-            if (values && values['use-less-by-default'] === 'yes') {
+        chromeStorage.get('default-language-mode', function (values) {
+            if (values && values['default-language-mode'] === 'less') {
                 Editor.defaultPreferences['language-mode'] = 'less';
+            } else if (values && values['default-language-mode'] === 'sass') {
+                Editor.defaultPreferences['language-mode'] = 'sass';
             }
 
             chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {

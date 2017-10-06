@@ -263,7 +263,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
     }
     var createGist = function (text, languageMode, cb) {
         var files = {};
-        files[languageMode === 'less' ? 'styles.less' : 'styles.css'] = {
+        files[
+            (function () {
+                if (languageMode === 'less') {
+                    return 'styles.less';
+                } else if (languageMode === 'sass') {
+                    return 'styles.scss';   // File extension for Sass is .scss (http://sass-lang.com/guide)
+                } else {
+                    return 'styles.css';
+                }
+            }())
+        ] = {
             "content": text + '\r\n\r\n/* ' + strCreatedVia + ' */\r\n'
         };
         $.ajax({
@@ -429,14 +439,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
     };
 
     var highlightErroneousLineTemporarily = function (editor, errorInLine) {
-        var lineHandle = editor.cm.addLineClass(errorInLine, 'background', 'line-has-less-error-transition-effect');
-        editor.cm.addLineClass(errorInLine, 'background', 'line-has-less-error');
+        var lineHandle = editor.cm.addLineClass(errorInLine, 'background', 'line-has-parsing-error-transition-effect');
+        editor.cm.addLineClass(errorInLine, 'background', 'line-has-parsing-error');
         var duration = 2000;
         setTimeout(function () {
-            editor.cm.removeLineClass(lineHandle, 'background', 'line-has-less-error');
+            editor.cm.removeLineClass(lineHandle, 'background', 'line-has-parsing-error');
             setTimeout(function () {
-                editor.cm.removeLineClass(lineHandle, 'background', 'line-has-less-error-transition-effect');
-            }, 500);   /* 500ms delay matches the transition duration specified for the CSS selector ".line-has-less-error-transition-effect" */
+                editor.cm.removeLineClass(lineHandle, 'background', 'line-has-parsing-error-transition-effect');
+            }, 500);   /* 500ms delay matches the transition duration specified for the CSS selector ".line-has-parsing-error-transition-effect" */
         }, duration);
     };
 
@@ -772,6 +782,84 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 }
                             }
                         });
+                    } else if (getLanguageMode() === 'sass') {
+                        var fn = function () {
+                            var Sass = window.Sass,
+                                sassCode = editor.getTextValue() || ' ';    // Sass compiler throws an error for empty code string
+
+                            Sass.compile(sassCode, function (result) {
+                                smc = null;     // Unset old SourceMapConsumer
+
+                                if (result.status === 0) {
+                                    var strCssCode = result.text || '';
+                                    newStyleTag.cssText = strCssCode;
+                                    newStyleTag.disabled = disabled;
+                                    newStyleTag.applyTag();
+                                    var rawSourceMap = result.map;
+                                    if (rawSourceMap) {
+                                        smc = new sourceMap.SourceMapConsumer(rawSourceMap);
+                                    }
+                                } else if (result.message) {
+                                    var err = result;
+                                    // FIXME: The following setTimeout is a temporary fix for alertNote getting hidden by 'delayedcursormove()'
+                                    setTimeout(function () {
+                                        utils.alertNote(
+                                            'Invalid SASS syntax.' +
+                                            '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                            '<br />Error message: ' + err.message,
+                                            10000
+                                        );
+                                        highlightErroneousLineTemporarily(editor, err.line - 1);
+                                    }, 0);
+                                } else {
+                                    // FIXME: The following setTimeout is a temporary fix for alertNote getting hidden by 'delayedcursormove()'
+                                    setTimeout(function () {
+                                        utils.alertNote(
+                                            'Unexpected error in parsing Sass.' +
+                                            '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                                            10000
+                                        );
+                                    }, 0);
+                                }
+                            });
+                        };
+                        if (window.Sass) {
+                            fn();
+                        } else {
+                            // Ensure that we don't send multiple load requests at once, by not sending request if previous one is still pending for succeess/failure
+                            if (!window.isActiveLoadSassRequest) {
+                                window.isActiveLoadSassRequest = true;
+                                var sassJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.6/sass.sync.min.js';
+                                utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
+
+                                chrome.runtime.sendMessage(
+                                    { loadRemoteJs: sassJsUrl },
+                                    function (error) {
+                                        window.isActiveLoadSassRequest = false;
+                                        if (chrome.runtime.lastError) {
+                                            console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                            utils.alertNote(
+                                                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage or Magic CSS and try again.',
+                                                10000
+                                            );
+                                        } else if (error) {
+                                            utils.alertNote(
+                                                'Error! Failed to load Sass parser from:<br />' + sassJsUrl + '<br />Please ensure that you are connected to internet and Magic CSS will try again to load it when you make any code changes.',
+                                                10000
+                                            );
+                                        } else {
+                                            utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                            setTimeout(function () {
+                                                // Ensure that getLanguageMode() is still 'sass'
+                                                if (getLanguageMode() === 'sass') {
+                                                    fn();
+                                                }
+                                            }, 300);
+                                        }
+                                    }
+                                );
+                            }
+                        }
                     } else {
                         var cssCode = editor.getTextValue();
                         newStyleTag.cssText = cssCode;
@@ -781,21 +869,40 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                 };
 
                 var setLanguageMode = function (languageMode, editor) {
+                    $(editor.container)
+                        .removeClass('magicss-selected-mode-sass')
+                        .removeClass('magicss-selected-mode-less')
+                        .removeClass('magicss-selected-mode-css');
                     if (languageMode === 'less') {
-                        $(editor.container).removeClass('magicss-selected-mode-css').addClass('magicss-selected-mode-less');
+                        $(editor.container).addClass('magicss-selected-mode-less');
                         editor.userPreference('language-mode', 'less');
+                        editor.cm.setOption('mode', 'text/x-less');
                         setCodeMirrorCSSLinting(editor, 'disable');
                         utils.alertNote('Now editing code in LESS mode', 5000);
+                    } else if (languageMode === 'sass') {
+                        $(editor.container).addClass('magicss-selected-mode-sass');
+                        editor.userPreference('language-mode', 'sass');
+                        editor.cm.setOption('mode', 'text/x-scss');
+                        setCodeMirrorCSSLinting(editor, 'disable');
+                        utils.alertNote('Now editing code in SASS mode', 5000);
                     } else {
-                        $(editor.container).removeClass('magicss-selected-mode-less').addClass('magicss-selected-mode-css');
+                        $(editor.container).addClass('magicss-selected-mode-css');
                         editor.userPreference('language-mode', 'css');
+                        editor.cm.setOption('mode', 'text/css');
                         utils.alertNote('Now editing code in CSS mode', 5000);
                     }
                     fnApplyTextAsCSS(editor);
                 };
 
                 var getLanguageMode = function () {
-                    return $('#' + id).hasClass('magicss-selected-mode-css') ? 'css' : 'less';
+                    var $el = $('#' + id),
+                        mode = 'css';
+                    if ($el.hasClass('magicss-selected-mode-less')) {
+                        mode = 'less';
+                    } else if ($el.hasClass('magicss-selected-mode-sass')) {
+                        mode = 'sass';
+                    }
+                    return mode;
                 };
 
                 var getMagicCSSForChrome = null,
@@ -879,9 +986,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             $titleItems = $('<div class="magicss-title"></div>');
                         $outer.append($titleItems);
                         $titleItems.append(
-                            '<div class="magicss-mode-button magicss-mode-less" title="LESS mode">less</div>' +
-                            '<div class="magicss-mode-button magicss-mode-switch" title="Switch mode"><div class="magicss-mode-switch-selected"></div></div>' +
-                            '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>'
+                            '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>' +
+                            '<div class="magicss-mode-button magicss-mode-less" title="Less mode">less</div>' +
+                            '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>'
                         );
 
                         $(document).on('click', '.magicss-mode-css', function () {
@@ -892,20 +999,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             setLanguageMode('less', editor);
                             editor.focus();
                         });
-                        $(document).on('click', '.magicss-mode-switch', function () {
-                            if ($('#' + id).hasClass('magicss-selected-mode-css')) {
-                                setLanguageMode('less', editor);
-                            } else {
-                                setLanguageMode('css', editor);
-                            }
+                        $(document).on('click', '.magicss-mode-sass', function () {
+                            setLanguageMode('sass', editor);
                             editor.focus();
                         });
 
                         return $outer;
                     },
-                    placeholder: 'Shortcut: Alt + Shift + C' + '\n\nWrite your LESS/CSS code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}',
+                    placeholder: 'Shortcut: Alt + Shift + C' + '\n\nWrite CSS/Less/Sass code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}',
                     codemirrorOptions: {
-                        mode: 'text/x-less',
                         colorpicker: {
                             mode: 'edit'
                         },
@@ -956,6 +1058,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 options.gutters = [];
                                 options.lint = false;
                             }
+                            options.mode = (function () {
+                                if (userPreference('language-mode') === 'sass') {
+                                    return 'text/x-scss';
+                                } else if (userPreference('language-mode') === 'less') {
+                                    return 'text/x-less';
+                                } else {
+                                    return 'text/css';
+                                }
+                            }());
                             return options;
                         }
                     },
@@ -1042,9 +1153,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     ],
                     headerOtherIcons: [
                         {
-                            name: 'less-to-css',
-                            title: 'Convert this code from LESS to CSS',
-                            uniqCls: 'magicss-less-to-css',
+                            name: 'less-or-sass-to-css',
+                            title: 'Convert this code from Less/Sass to CSS',
+                            uniqCls: 'magicss-less-or-sass-to-css',
                             onclick: function (evt, editor) {
                                 if (getLanguageMode() === 'less') {
                                     var lessCode = editor.getTextValue();
@@ -1071,20 +1182,57 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                                     utils.alertNote('Your code is already CSS compatible', 5000);
                                                 } else {
                                                     editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                    utils.alertNote('Your code has been converted from LESS to CSS :-)' + noteForUndo, 5000);
+                                                    utils.alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
+                                                }
+                                            }
+                                            editor.focus();
+                                        });
+                                    }
+                                } else if (getLanguageMode() === 'sass') {
+                                    var sassCode = editor.getTextValue();
+                                    if (!sassCode.trim()) {
+                                        editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Please type some SASS code to use this feature', 5000);
+                                        editor.focus();
+                                    } else {
+                                        utils.sassToCSS(sassCode, function (err, cssCode) {
+                                            if (err) {
+                                                utils.alertNote(
+                                                    'Invalid SASS syntax.' +
+                                                    '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                                    '<br />Error message: ' + err.message,
+                                                    10000
+                                                );
+                                                highlightErroneousLineTemporarily(editor, err.line - 1);
+                                                editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
+                                            } else {
+                                                var beautifiedSassCode = beautifyCSS(utils.minifyCSS(sassCode));
+                                                cssCode = beautifyCSS(utils.minifyCSS(cssCode));
+
+                                                if (cssCode === beautifiedSassCode) {
+                                                    utils.alertNote('Your code is already CSS compatible', 5000);
+                                                } else {
+                                                    editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                    utils.alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
                                                 }
                                             }
                                             editor.focus();
                                         });
                                     }
                                 } else {
-                                    utils.alertNote('Please switch to editing code in LESS mode to enable this feature', 5000);
+                                    utils.alertNote('Please switch to editing code in Less/Sass mode to enable this feature', 5000);
                                     editor.focus();
                                 }
                             },
                             beforeShow: function (origin, tooltip, editor) {
                                 tooltip
-                                    .addClass(getLanguageMode() === 'less' ? 'tooltipster-selected-mode-less' : 'tooltipster-selected-mode-css')
+                                    .addClass(
+                                        getLanguageMode() === 'less' ?
+                                            'tooltipster-selected-mode-less' :
+                                            getLanguageMode() === 'sass' ?
+                                                'tooltipster-selected-mode-sass' :
+                                                'tooltipster-selected-mode-css'
+                                    )
                                     .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
                                     .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
                                     .addClass(editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS) === 'no' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
@@ -1198,7 +1346,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=' + extensionUrl.chrome + '&text=' + extLib.TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=' + extensionUrl.chrome + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
                         /* */
                         getMagicCSSForChrome,
@@ -1219,7 +1367,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         }()),
                         {
                             name: 'share-on-facebook',
-                            title: 'Share us on Facebook',
+                            title: 'Share this extension with friends',
                             uniqCls: 'magicss-share-on-facebook',
                             href: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser)
                         },
@@ -1275,6 +1423,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             var languageMode = editor.userPreference('language-mode');
                             if (languageMode === 'less') {
                                 $(editor.container).addClass('magicss-selected-mode-less');
+                            } else if (languageMode === 'sass') {
+                                $(editor.container).addClass('magicss-selected-mode-sass');
                             } else {
                                 $(editor.container).addClass('magicss-selected-mode-css');
                             }
@@ -1442,7 +1592,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                 };
 
                 var processSplitText = function (splitText) {
-                    if (getLanguageMode() === 'less') {
+                    if (getLanguageMode() === 'sass' || getLanguageMode() === 'less') {
                         if (!smc) {
                             return '';
                         }
@@ -1451,7 +1601,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             rowNumber = (beforeCursor.match(/\n/g) || []).length,
                             columnNumber = beforeCursor.substr(beforeCursor.lastIndexOf('\n') + 1).length,
                             generatedPosition = smc.generatedPositionFor({
-                                source: 'input',
+                                source: getLanguageMode() === 'less' ? 'input' : 'root/stdin',  // less('input') OR sass('root/stdin')
                                 line: rowNumber + 1,  // Minimum value is 1 for line
                                 column: columnNumber  // Minimum value is 0 for column
                             });

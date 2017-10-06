@@ -1,9 +1,9 @@
 {
     "Extension_Description": {
-        "message": "Live preview of CSS/LESS code with an in-page editor. Autocomplete, convert LESS to CSS, beautify, minify, CSS reloader, linter, ..."
+        "message": "Live preview of CSS/Less/Sass code with an in-page editor. Autocomplete, Less/Sass to CSS, beautify, minify, CSS reloader, lint, ..."
     },
     "Extension_Name": {
-        "message": "Live editor for CSS and LESS - Magic CSS"
+        "message": "Live editor for CSS, Less & Sass - Magic CSS"
     },
     "Include_CanRunOnOtherPages": {
         "message": "You can run it on other web pages and websites."
@@ -18,7 +18,7 @@
         "message": "It requires your permission to execute on:"
     },
     "Include_ToExecuteMagicssEditor": {
-        "message": "To execute Live editor for CSS and LESS (Magic CSS) on:"
+        "message": "To execute Live editor for CSS, Less & Sass (Magic CSS) on:"
     },
     "Include_UnableToStart": {
         "message": "Unable to start"

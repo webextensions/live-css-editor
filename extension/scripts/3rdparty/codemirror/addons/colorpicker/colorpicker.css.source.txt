@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.8/addon/colorpicker/colorpicker.css
+https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.9/addon/colorpicker/colorpicker.css

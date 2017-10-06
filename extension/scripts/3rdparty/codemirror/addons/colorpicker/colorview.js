@@ -14,6 +14,9 @@
     var colorpicker_class = 'codemirror-colorview';
     var colorpicker_background_class = 'codemirror-colorview-background';
 
+    // Excluded tokens do not show color views..
+    var excluded_token = ['comment'];
+
     CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
 
         if (old && old != CodeMirror.Init) {
@@ -113,6 +116,9 @@
         this.opt = opt;
         this.cm = cm;
         this.markers = {};
+        
+        // set excluded token 
+        excluded_token = this.opt.excluded_token || excluded_token;
 
         if (this.cm.colorpicker) {
             this.colorpicker = this.cm.colorpicker();
@@ -295,7 +301,7 @@
         }
     }
 
-    codemirror_colorpicker.prototype.color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|(\w+))/gi;
+    codemirror_colorpicker.prototype.color_regexp = /(#(?:[\da-f]{3}){1,2}|rgb\((?:\s*\d{1,3},\s*){2}\d{1,3}\s*\)|rgba\((?:\s*\d{1,3},\s*){3}\d*\.?\d+\s*\)|hsl\(\s*\d{1,3}(?:,\s*\d{1,3}%){2}\s*\)|hsla\(\s*\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\s*\)|([\w_\-]+))/gi;
     
     codemirror_colorpicker.prototype.match_result = function (lineHandle) {
         return lineHandle.text.match(this.color_regexp);
@@ -389,8 +395,26 @@
 
     }
 
+    codemirror_colorpicker.prototype.is_excluded_token = function (line, ch) {
+        var token = this.cm.getTokenAt({line : line, ch : ch});
+        var count = 0; 
+        for(var i = 0, len = excluded_token.length; i < len; i++) {
+            if (token.type === excluded_token[i]) {
+                count++;
+                break; 
+            }
+        }
+
+        return count > 0;   // true is that it has a excluded token 
+    }
+
     codemirror_colorpicker.prototype.render = function (cursor, lineNo, lineHandle, color, nameColor) {
         var start = lineHandle.text.indexOf(color, cursor.next);
+
+        if (this.is_excluded_token(lineNo, start) === true) {
+            // excluded token do not show.
+            return;
+        }
 
         cursor.next = start + color.length;
 

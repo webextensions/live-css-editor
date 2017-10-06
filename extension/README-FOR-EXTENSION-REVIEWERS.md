@@ -18,12 +18,12 @@ Notes about usage of 3rdparty code
 - A list of most of those files and their origins can also be seen at:
     https://github.com/webextensions/live-css-editor/blob/master/copy-third-party-front-end-scripts.json
 
-3rdparty code which was used "as-is" from GitHub
-------------------------------------------------
+3rdparty code which is used "as-is" from GitHub
+-----------------------------------------------
 - You would find that `<3d-party-filename>.<ext>.source.txt` refers to the GitHub URL pointing to the source
 
-3rdparty code which was used "as-is" from npm
----------------------------------------------
+3rdparty code which is used "as-is" from npm
+--------------------------------------------
 You would be able to see that in some of the `<3rd-party-filename>.<ext>.source.txt`, the 3rdparty code has been copied from the `node_modules/<package>/<path>` after performing the following `npm install` operations as described in https://github.com/webextensions/live-css-editor/blob/master/package.json
 - `npm install codemirror@<version-mentioned-in-package.json>`
 - `npm install emmetio-codemirror-plugin-webextensions@<version-mentioned-in-package.json>`
@@ -33,12 +33,16 @@ Please note that:
 - https://www.npmjs.com/package/emmetio-codemirror-plugin-webextensions is published from https://github.com/webextensions/codemirror-plugin
 - https://github.com/webextensions/codemirror-plugin is a fork of https://github.com/emmetio/codemirror-plugin and differs from the original repository only with the commit https://github.com/webextensions/codemirror-plugin/commit/687c68a76804a8b20371ad54ddca803bfc66ed30 (the commit adds option to bundle a non-minified browser version of the library)
 
-3rdparty code which was compiled/minified with minor customization (after forking from the official GitHub repository)
-----------------------------------------------------------------------------------------------------------------------
+3rdparty code which is compiled/minified with minor customization (after forking from the official GitHub repository)
+---------------------------------------------------------------------------------------------------------------------
 The file, `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js`, has been fetched from https://github.com/webextensions/less.js which is a fork of a popular open-source library (https://github.com/less/less.js/). More details about those minor changes can be found in `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js.source.description.txt`
 
-3rdparty code which was customized
-----------------------------------
+3rdparty code which is used "as-is" from https://cdnjs.cloudflare.com/ajax/libs/
+--------------------------------------------------------------------------------
+- For parsing Sass, during runtime, we load https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.6/sass.sync.min.js
+
+3rdparty code which is customized
+---------------------------------
 Some of those 3rdparty files were customized and you would find the following files in such cases:
 - `<3rd-party-filename>.<ext>` (original source code file) (not loaded when executing the extension)
 - `<3rd-party-filename>.<ext>.source.txt` (source of the original file)

@@ -1,4 +1,4 @@
-/*globals chrome, alert, extLib */
+/*globals chrome, alert, extLib, jQuery */
 
 var main = function () {
     var pageType = (document.body.tagName === 'FRAMESET') ? 'FRAMESET' : 'BODY',
@@ -16,19 +16,47 @@ var main = function () {
     // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
     if (!window.openOptionsPageListenerAdded) {
-        chrome.runtime.onMessage.addListener(
-            function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
-                if (request.openOptionsPage) {
-                    // https://developer.chrome.com/extensions/optionsV2
-                    if (chrome.runtime.openOptionsPage) {
-                        chrome.runtime.openOptionsPage();
-                    } else {
-                        window.open(chrome.runtime.getURL('options.html'));
+        if (chrome.runtime.onMessage) {
+            chrome.runtime.onMessage.addListener(
+                function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
+                    if (request.openOptionsPage) {
+                        // https://developer.chrome.com/extensions/optionsV2
+                        if (chrome.runtime.openOptionsPage) {
+                            chrome.runtime.openOptionsPage();
+                        } else {
+                            window.open(chrome.runtime.getURL('options.html'));
+                        }
                     }
                 }
-            }
-        );
-        window.openOptionsPageListenerAdded = true;
+            );
+            window.openOptionsPageListenerAdded = true;
+        }
+    }
+
+    if (!window.loadRemoteJsListenerAdded) {
+        if (chrome.runtime.onMessage) {
+            chrome.runtime.onMessage.addListener(
+                function (request, sender, sendResponse) {
+                    if (request.loadRemoteJs) {
+                        // https://stackoverflow.com/questions/18169666/remote-script-as-content-script-in-chrome-extension
+                        jQuery.get(request.loadRemoteJs, null, null, 'text')
+                        .done(function(remoteCode){
+                            chrome.tabs.executeScript(sender.tab.id, { code: remoteCode }, function(){
+                                sendResponse();
+                            });
+                        })
+                        .fail(function() {
+                            sendResponse('error');
+                        });
+
+                        // https://developer.chrome.com/extensions/messaging
+                        // Need to return true from the event listener to indicate that we wish to send a response asynchronously
+                        return true;
+                    }
+                }
+            );
+            window.loadRemoteJsListenerAdded = true;
+        }
     }
 
     extLib.loadJSCSS([
@@ -147,7 +175,7 @@ var prerequisitesReady = function (main) {
                                 } else {
                                     if (url.indexOf('file:///') === 0) {
                                         alert(
-                                            TR('Include_ToExecuteMagicssEditor', 'To execute Live editor for CSS and LESS (Magic CSS) on:') +
+                                            TR('Include_ToExecuteMagicssEditor', 'To execute Live editor for CSS, Less & Sass (Magic CSS) on:') +
                                             '\n        ' + url +
                                             '\n\n' + TR('Include_YouNeedToGoTo', 'You need to go to:') +
                                             '\n        chrome://extensions' +
@@ -156,7 +184,7 @@ var prerequisitesReady = function (main) {
                                     } else {
                                         alert(
                                             TR('Include_UnableToStart', 'Unable to start') +
-                                            '\n        ' + TR('Extension_Name', 'Live editor for CSS and LESS - Magic CSS') + '\n\n' +
+                                            '\n        ' + TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS') + '\n\n' +
                                             TR('Include_RequiresYourPermission', 'It requires your permission to execute on:') +
                                             '\n        ' + url
                                         );
