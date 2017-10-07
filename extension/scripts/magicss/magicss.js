@@ -832,32 +832,46 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 var sassJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.6/sass.sync.min.js';
                                 utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
 
-                                chrome.runtime.sendMessage(
-                                    { loadRemoteJs: sassJsUrl },
-                                    function (error) {
-                                        window.isActiveLoadSassRequest = false;
-                                        if (chrome.runtime.lastError) {
-                                            console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                            utils.alertNote(
-                                                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage or Magic CSS and try again.',
-                                                10000
-                                            );
-                                        } else if (error) {
-                                            utils.alertNote(
-                                                'Error! Failed to load Sass parser from:<br />' + sassJsUrl + '<br />Please ensure that you are connected to internet and Magic CSS will try again to load it when you make any code changes.',
-                                                10000
-                                            );
-                                        } else {
-                                            utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
-                                            setTimeout(function () {
-                                                // Ensure that getLanguageMode() is still 'sass'
-                                                if (getLanguageMode() === 'sass') {
-                                                    fn();
-                                                }
-                                            }, 300);
+                                try {
+                                    chrome.runtime.sendMessage(
+                                        { loadRemoteJs: sassJsUrl },
+                                        function (error) {
+                                            window.isActiveLoadSassRequest = false;
+                                            if (chrome.runtime.lastError) {
+                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                utils.alertNote(
+                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                    10000
+                                                );
+                                            } else if (error) {
+                                                utils.alertNote(
+                                                    'Error! Failed to load Sass parser from:<br />' + sassJsUrl + '<br />Please ensure that you are connected to internet and Magic CSS will try again to load it when you make any code changes.',
+                                                    10000
+                                                );
+                                            } else {
+                                                utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                                setTimeout(function () {
+                                                    // Ensure that getLanguageMode() is still 'sass'
+                                                    if (getLanguageMode() === 'sass') {
+                                                        fn();
+                                                    }
+                                                }, 300);
+                                            }
                                         }
-                                    }
-                                );
+                                    );
+                                } catch (e) {
+                                    window.isActiveLoadSassRequest = false;
+                                    console.log('Error message reported by Magic CSS:', e);
+                                    // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
+                                    //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
+                                    //               always gets fired
+                                    setTimeout(function() {
+                                        utils.alertNote(
+                                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                            10000
+                                        );
+                                    }, 0);
+                                }
                             }
                         }
                     } else {
@@ -1376,7 +1390,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             title: 'More options',
                             uniqCls: 'magicss-options',
                             onclick: function (evt, editor) {
-                                chrome.runtime.sendMessage({openOptionsPage: true});
+                                try {
+                                    chrome.runtime.sendMessage({openOptionsPage: true});
+                                } catch (e) {
+                                    console.log('Error message reported by Magic CSS:', e);
+                                    utils.alertNote(
+                                        'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                        10000
+                                    );
+                                    try {
+                                        var href = chrome.runtime.getURL('options.html');
+                                        if (href) {
+                                            utils.alertNote(
+                                                'Configure more options for Magic CSS by going to the following address in a new tab:<br />' + href,
+                                                15000
+                                            );
+                                        }
+                                    } catch (e) {
+                                        // do nothing
+                                    }
+                                }
                                 editor.focus();
                             }
                         }

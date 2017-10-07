@@ -1,5 +1,56 @@
 /*globals chrome, alert, extLib, jQuery */
 
+// https://github.com/webextensions/live-css-editor/issues/5
+// Apparently, when a user plays around with Chrome devtools for a webpage, intermittently,
+// we notice that the listeners were going missing. Probably because, somehow, the extension
+// was getting reloaded and since previously, we were attaching the listeners only when the
+// user loaded the extension in a webpage, the events were not getting reattached on reload.
+// So, for fixing that, now we are attaching the events as soon as the extension loads.
+
+if (!window.openOptionsPageListenerAdded) {
+    if (chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener(
+            function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
+                if (request.openOptionsPage) {
+                    // https://developer.chrome.com/extensions/optionsV2
+                    if (chrome.runtime.openOptionsPage) {
+                        chrome.runtime.openOptionsPage();
+                    } else {
+                        window.open(chrome.runtime.getURL('options.html'));
+                    }
+                }
+            }
+        );
+        window.openOptionsPageListenerAdded = true;
+    }
+}
+
+if (!window.loadRemoteJsListenerAdded) {
+    if (chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener(
+            function (request, sender, sendResponse) {
+                if (request.loadRemoteJs) {
+                    // https://stackoverflow.com/questions/18169666/remote-script-as-content-script-in-chrome-extension
+                    jQuery.get(request.loadRemoteJs, null, null, 'text')
+                    .done(function(remoteCode){
+                        chrome.tabs.executeScript(sender.tab.id, { code: remoteCode }, function(){
+                            sendResponse();
+                        });
+                    })
+                    .fail(function() {
+                        sendResponse('error');
+                    });
+
+                    // https://developer.chrome.com/extensions/messaging
+                    // Need to return true from the event listener to indicate that we wish to send a response asynchronously
+                    return true;
+                }
+            }
+        );
+        window.loadRemoteJsListenerAdded = true;
+    }
+}
+
 var main = function () {
     var pageType = (document.body.tagName === 'FRAMESET') ? 'FRAMESET' : 'BODY',
         allFrames = (pageType === 'FRAMESET');
@@ -14,50 +65,6 @@ var main = function () {
     var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:" || document.location.protocol === "ms-browser-extension:") ? true : false;
     // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
     // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
-
-    if (!window.openOptionsPageListenerAdded) {
-        if (chrome.runtime.onMessage) {
-            chrome.runtime.onMessage.addListener(
-                function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
-                    if (request.openOptionsPage) {
-                        // https://developer.chrome.com/extensions/optionsV2
-                        if (chrome.runtime.openOptionsPage) {
-                            chrome.runtime.openOptionsPage();
-                        } else {
-                            window.open(chrome.runtime.getURL('options.html'));
-                        }
-                    }
-                }
-            );
-            window.openOptionsPageListenerAdded = true;
-        }
-    }
-
-    if (!window.loadRemoteJsListenerAdded) {
-        if (chrome.runtime.onMessage) {
-            chrome.runtime.onMessage.addListener(
-                function (request, sender, sendResponse) {
-                    if (request.loadRemoteJs) {
-                        // https://stackoverflow.com/questions/18169666/remote-script-as-content-script-in-chrome-extension
-                        jQuery.get(request.loadRemoteJs, null, null, 'text')
-                        .done(function(remoteCode){
-                            chrome.tabs.executeScript(sender.tab.id, { code: remoteCode }, function(){
-                                sendResponse();
-                            });
-                        })
-                        .fail(function() {
-                            sendResponse('error');
-                        });
-
-                        // https://developer.chrome.com/extensions/messaging
-                        // Need to return true from the event listener to indicate that we wish to send a response asynchronously
-                        return true;
-                    }
-                }
-            );
-            window.loadRemoteJsListenerAdded = true;
-        }
-    }
 
     extLib.loadJSCSS([
         {
