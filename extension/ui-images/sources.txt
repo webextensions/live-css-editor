@@ -26,10 +26,6 @@ logo-firefox_edited.png
     Slightly edited version of /usr/lib/firefox/browser/icons/mozicon128.png
     See: https://support.mozilla.org/en-US/questions/943506
 
-logo-firefox_grayscale_edited.png
-    Slightly edited version of /usr/lib/firefox/browser/icons/mozicon128.png
-    See: https://support.mozilla.org/en-US/questions/943506
-
 logo-github.png
     GitHub-Mark-32px.png from https://github.com/logos
 
@@ -53,6 +49,9 @@ logo-mozilla-add-ons.svg
 
 logo-mozilla-add-ons_edited.svg
     Slightly edited version of "logo-mozilla-add-ons.svg"
+
+logo-mozilla-addons_edited.png
+    Slightly edited version of https://addons.cdn.mozilla.net/static/img/favicon.ico?b=5ece819a-59d3df68
 
 logo-opera.svg
     https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg
