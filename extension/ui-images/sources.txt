@@ -26,6 +26,10 @@ logo-firefox_edited.png
     Slightly edited version of /usr/lib/firefox/browser/icons/mozicon128.png
     See: https://support.mozilla.org/en-US/questions/943506
 
+logo-firefox_grayscale_edited.png
+    Slightly edited version of /usr/lib/firefox/browser/icons/mozicon128.png
+    See: https://support.mozilla.org/en-US/questions/943506
+
 logo-github.png
     GitHub-Mark-32px.png from https://github.com/logos
 
