@@ -23,8 +23,14 @@ logo-facebook_edited.svg
     Slightly edited version of "logo-facebook.svg"
 
 logo-firefox_edited.png
-    Resized version of /usr/lib/firefox/browser/icons/mozicon128.png
+    Slightly edited version of /usr/lib/firefox/browser/icons/mozicon128.png
     See: https://support.mozilla.org/en-US/questions/943506
+
+logo-github.png
+    GitHub-Mark-32px.png from https://github.com/logos
+
+logo-github_edited.png
+    Slightly edited version of "logo-github.png"
 
 logo-google-chrome.svg
     https://upload.wikimedia.org/wikipedia/commons/e/e2/Google_Chrome_icon_%282011%29.svg

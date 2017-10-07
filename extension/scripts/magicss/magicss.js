@@ -1166,6 +1166,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         }())
                     ],
                     headerOtherIcons: [
+                        (function () {
+                            if (executionCounter < 50) {
+                                return null;
+                            } else {
+                                return iconForRateUs();
+                            }
+                        }()),
                         {
                             name: 'less-or-sass-to-css',
                             title: 'Convert this code from Less/Sass to CSS',
@@ -1372,13 +1379,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             uniqCls: 'magicss-github-repo',
                             href: 'https://github.com/webextensions/live-css-editor'
                         },
-                        (function () {
-                            if (executionCounter < 50) {
-                                return null;
-                            } else {
-                                return iconForRateUs();
-                            }
-                        }()),
                         {
                             name: 'share-on-facebook',
                             title: 'Share this extension with friends',
