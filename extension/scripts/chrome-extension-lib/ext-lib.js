@@ -32,7 +32,7 @@ var extLib = {
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
     insertCSS: function (file, allFrames, cb) {
         if (typeof chrome !== "undefined" && chrome && chrome.tabs) {
-            chrome.tabs.insertCSS(null, {file: file, allFrames: allFrames || true}, function () {
+            chrome.tabs.insertCSS(null, {file: file, allFrames: allFrames === false ? false : true}, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {

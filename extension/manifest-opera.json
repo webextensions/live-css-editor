@@ -1,5 +1,5 @@
 {
-    "version": "6.2.17",
+    "version": "6.2.18",
     "manifest_version": 2,
     "author": "Priyank Parashar",
     "default_locale": "en",
@@ -15,7 +15,6 @@
         "128": "icons/icon-128.png",
         "256": "icons/icon-256.png"
     },
-    "offline_enabled": true,
     "permissions": [
         "activeTab",
         "storage"
@@ -48,5 +47,6 @@
                 "default": "Alt+Shift+C"
             }
         }
-    }
+    },
+    "offline_enabled": true
 }

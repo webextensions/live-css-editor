@@ -8,7 +8,7 @@
 // So, for fixing that, now we are attaching the events as soon as the extension loads.
 
 if (!window.openOptionsPageListenerAdded) {
-    if (chrome.runtime.onMessage) {
+    if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
                 if (request.openOptionsPage) {
@@ -26,20 +26,30 @@ if (!window.openOptionsPageListenerAdded) {
 }
 
 if (!window.loadRemoteJsListenerAdded) {
-    if (chrome.runtime.onMessage) {
+    if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {
                 if (request.loadRemoteJs) {
                     // https://stackoverflow.com/questions/18169666/remote-script-as-content-script-in-chrome-extension
-                    jQuery.get(request.loadRemoteJs, null, null, 'text')
-                    .done(function(remoteCode){
-                        chrome.tabs.executeScript(sender.tab.id, { code: remoteCode }, function(){
-                            sendResponse();
+                    jQuery
+                        .get(request.loadRemoteJs, null, null, 'text')
+                        .done(function(remoteCode){
+                            if (request.preRunReplace) {
+                                for (var i = 0; i < request.preRunReplace.length; i++) {
+                                    remoteCode = remoteCode.replace(request.preRunReplace[i].oldText, request.preRunReplace[i].newText);
+                                }
+                            }
+                            chrome.tabs.executeScript(
+                                sender.tab.id,
+                                { code: remoteCode, allFrames: request.allFrames === false ? false : true },
+                                function(){
+                                    sendResponse();
+                                }
+                            );
+                        })
+                        .fail(function() {
+                            sendResponse('error');
                         });
-                    })
-                    .fail(function() {
-                        sendResponse('error');
-                    });
 
                     // https://developer.chrome.com/extensions/messaging
                     // Need to return true from the event listener to indicate that we wish to send a response asynchronously

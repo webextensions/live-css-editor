@@ -26,7 +26,6 @@ var generateManifest = function (whichBrowser) {
             "128": "icons/icon-128.png",
             "256": "icons/icon-256.png"
         },
-        "offline_enabled": true,
         "permissions": (function () {
             var permissions = [
                 "activeTab",
@@ -74,6 +73,11 @@ var generateManifest = function (whichBrowser) {
         ]
         /* */
     };
+
+    if (whichBrowser !== "firefox") {
+        manifest["offline_enabled"] = true;
+    }
+
     if (whichBrowser === "firefox") {
         manifest["applications"] = {
             "gecko": {
