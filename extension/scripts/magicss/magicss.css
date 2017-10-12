@@ -464,10 +464,20 @@ html .magicss-mouse-over-dom-element {
 }
 
 /*
-    Begin: Site-specific fixes
+    Begin: Site-specific / CSS-style-specific fixes
     (where sites over-ride some default styles in an unexpected manner)
     (these styles would be non-essential for most of the sites)
 */
+
+/* Show cursors if the CSS contains style like: div { overflow: hidden } */
+.CodeMirror-cursors {
+	overflow: initial !important;
+}
+
+/* Show selection if the CSS contains style like: div { overflow: hidden } */
+.CodeMirror-lines > div[role=presentation] > div[style]:not([class]) {
+	overflow: initial;
+}
 
 /* http://cssbeautify.com/ - Without this style, a scrollbar might appear when the size (height) of CodeMirror is increased */
 #MagiCSS-bookmarklet .CodeMirror-scroll {
