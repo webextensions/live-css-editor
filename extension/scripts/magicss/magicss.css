@@ -479,6 +479,11 @@ html .magicss-mouse-over-dom-element {
 	overflow: initial;
 }
 
+/* Show "alertNote" if the CSS contains style like: div { overflow: hidden } */
+#topCenterAlertNote > div {
+	overflow: initial !important;
+}
+
 /* http://cssbeautify.com/ - Without this style, a scrollbar might appear when the size (height) of CodeMirror is increased */
 #MagiCSS-bookmarklet .CodeMirror-scroll {
     height: 100%;
