@@ -1049,10 +1049,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                 var setLanguageMode = function (languageMode, editor) {
                     $(editor.container)
+                        .removeClass('magicss-selected-mode-js')
                         .removeClass('magicss-selected-mode-sass')
                         .removeClass('magicss-selected-mode-less')
                         .removeClass('magicss-selected-mode-css');
-                    if (languageMode === 'less') {
+                    if (languageMode === 'js') {
+                        $(editor.container).addClass('magicss-selected-mode-js');
+                        editor.userPreference('language-mode', 'js');
+                        editor.cm.setOption('mode', 'text/javascript');
+                        setCodeMirrorCSSLinting(editor, 'disable');
+                        utils.alertNote('Now editing code in JS mode', 5000);
+                    } else if (languageMode === 'less') {
                         $(editor.container).addClass('magicss-selected-mode-less');
                         editor.userPreference('language-mode', 'less');
                         editor.cm.setOption('mode', 'text/x-less');
@@ -1076,7 +1083,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 var getLanguageMode = function () {
                     var $el = $('#' + id),
                         mode = 'css';
-                    if ($el.hasClass('magicss-selected-mode-less')) {
+                    if ($el.hasClass('magicss-selected-mode-js')) {
+                        mode = 'js';
+                    } else if ($el.hasClass('magicss-selected-mode-less')) {
                         mode = 'less';
                     } else if ($el.hasClass('magicss-selected-mode-sass')) {
                         mode = 'sass';
@@ -1232,9 +1241,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         $titleItems.append(
                             '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>' +
                             '<div class="magicss-mode-button magicss-mode-less" title="Less mode">less</div>' +
-                            '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>'
+                            '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>' +
+                            // '<div class="magicss-mode-button magicss-mode-js" onclick="web.dev.allInOne();" title="JS mode">js</div>'
+                            '<div class="magicss-mode-button magicss-mode-js" title="JS mode">js</div>'
                         );
 
+                        $(document).on('click', '.magicss-mode-js', function () {
+                            setLanguageMode('js', editor);
+                            editor.focus();
+                        });
                         $(document).on('click', '.magicss-mode-css', function () {
                             setLanguageMode('css', editor);
                             editor.focus();
@@ -1696,6 +1711,24 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 '<div class="magicss-cache-image-to-prevent-CSP-problem-show-line-numbers"></div>' +
                             '</div>'
                         );
+
+                        // $footerItems.append('<select onchange="eval(this.value);"><option value="alert(123);">alert(123);</option><option value="alert(456);">alert(456);</option></select>');
+                        // $('body').append('<select style="position:fixed;top:0;right:0" onchange="eval(this.value);"><option value="alert(123);">alert(123);</option><option value="alert(456);">alert(456);</option></select>');
+                        $('body').append(
+                            '<div style="display:none!important">' +
+                                '<textarea id="magicss-value-textarea"></textarea>' +
+                            '</div>'
+                        );
+                        setTimeout(function () {
+                            // document.getElementById('myform').onsubmit = function () {
+                            //     alert(123456);
+                            // };
+
+                            // if (document.getElementById('myform').onsubmit()) {
+                                // document.getElementById('myform').submit();
+                            // }
+                        }, 100);
+
                         return $footerItems;
                     },
                     events: {
@@ -1819,9 +1852,22 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                             editor.styleHighlightingSelector.applyTag();
                         },
-                        keyup: function () {
-                            // Currently doing nothing
+                        /*
+                        keypress: function (editor, cmEvt) {
+                            if (cmEvt.ctrlKey && cmEvt.code === 'Enter') {
+                                var output;
+                                try {
+                                    output = eval(editor.cm.getValue());
+                                } catch (e) {
+                                    output = e;
+                                    console.log({error: e});
+                                }
+                                setTimeout(function () {
+                                    utils.alertNote('' + output);
+                                }, 10);
+                            }
                         },
+                        /* */
                         delayedtextchange: function (editor) {
                             fnApplyTextAsCSS(editor);
                         },
@@ -2017,6 +2063,32 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 window.MagiCSSEditor = new StylesEditor(options);
 
                 checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+
+                $('.CodeMirror textarea').attr(
+                    'onkeypress',
+                    'if (!window.alertNote) {' +
+                        'window.alertNoteDefinition = ' + utils.alertNoteDefinition.toString() + ';' +
+                        'window.alertNote = window.alertNoteDefinition();' +
+                    '}' +
+                    'if (event.ctrlKey && event.code === "Enter") {' +
+                        'var input = document.getElementById("magicss-value-textarea").value;' +
+
+                        'setTimeout(console.log.bind(console, "%c" + input, "color: #929292"));' +
+
+                        'setTimeout(function () {' +
+                            'var output;' +
+                            'try {' +
+                                'output = eval(input);' +
+                            '} catch (e) {' +
+                                'output = e;' +
+                            '}' +
+                            'setTimeout(function () {' +
+                                'window.alertNote("" + output);' +
+                                'setTimeout(console.log.bind(console, output));' +
+                            '});' +
+                        '})' +
+                    '}'
+                );
 
                 try {
                     chromeStorage.get('use-autocomplete-for-css-selectors', function (values) {

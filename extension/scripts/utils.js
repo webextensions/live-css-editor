@@ -325,7 +325,7 @@ if (!utils.defined) {
         }
     };
 
-    utils.alertNote = (function () {
+    utils.alertNoteDefinition = function () {
         var w = window,
             d = document,
             dE = d.documentElement,
@@ -405,7 +405,8 @@ if (!utils.defined) {
         };
 
         return alertNote;
-    }());
+    };
+    utils.alertNote = (utils.alertNoteDefinition());
 
     utils.beautifyCSS = function (cssCode, options) {
         var useTabs = options.useTabs,

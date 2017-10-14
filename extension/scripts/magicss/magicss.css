@@ -54,6 +54,7 @@
     padding-right: 0;
 }
 
+.magicss-mode-js,
 .magicss-mode-css,
 .magicss-mode-less,
 .magicss-mode-sass {
@@ -62,15 +63,18 @@
     opacity: 0.5;
 }
 
+.magicss-mode-js:hover,
 .magicss-mode-css:hover,
 .magicss-mode-less:hover,
 .magicss-mode-sass:hover,
+.magicss-selected-mode-js .magicss-mode-js,
 .magicss-selected-mode-less .magicss-mode-less,
 .magicss-selected-mode-sass .magicss-mode-sass,
 .magicss-selected-mode-css .magicss-mode-css {
     opacity: 1;
 }
 
+.magicss-selected-mode-js .magicss-mode-js,
 .magicss-selected-mode-less .magicss-mode-less,
 .magicss-selected-mode-sass .magicss-mode-sass,
 .magicss-selected-mode-css .magicss-mode-css {
