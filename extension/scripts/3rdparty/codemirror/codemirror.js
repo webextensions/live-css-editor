@@ -239,15 +239,18 @@ val instanceof Array&&(val=val.concat([]))
 nstate[n]=val}return nstate}function innerMode(mode,state){for(var info;mode.innerMode&&(info=mode.innerMode(state))&&info.mode!=mode;){state=info.state
 mode=info.mode}return info||{mode:mode,state:state}}function startState(mode,a1,a2){return!mode.startState||mode.startState(a1,a2)}function highlightLine(cm,line,context,forceToEnd){var st=[cm.state.modeGen],lineClasses={}
 runMode(cm,line.text,cm.doc.mode,context,function(end,style){return st.push(end,style)},lineClasses,forceToEnd)
-for(var state=context.state,o=0;o<cm.state.overlays.length;++o)!function(o){var overlay=cm.state.overlays[o],i=1,at=0
+for(var state=context.state,o=0;o<cm.state.overlays.length;++o)!function(o){context.baseTokens=st
+var overlay=cm.state.overlays[o],i=1,at=0
 context.state=!0
 runMode(cm,line.text,overlay.mode,context,function(end,style){for(var start=i;at<end;){var i_end=st[i]
 i_end>end&&st.splice(i,1,end,st[i+1],i_end)
 i+=2
 at=Math.min(end,i_end)}if(style)if(overlay.opaque){st.splice(start,i-start,end,"overlay "+style)
 i=start+2}else for(;start<i;start+=2){var cur=st[start+1]
-st[start+1]=(cur?cur+" ":"")+"overlay "+style}},lineClasses)}(o)
+st[start+1]=(cur?cur+" ":"")+"overlay "+style}},lineClasses)
 context.state=state
+context.baseTokens=null
+context.baseTokenPos=1}(o)
 return{styles:st,classes:lineClasses.bgClass||lineClasses.textClass?lineClasses:null}}function getLineStyles(cm,line,updateFrontier){if(!line.styles||line.styles[0]!=cm.state.modeGen){var context=getContextBefore(cm,lineNo(line)),resetState=line.text.length>cm.options.maxHighlightLength&&copyState(cm.doc.mode,context.state),result=highlightLine(cm,line,context)
 resetState&&(context.state=resetState)
 line.stateAfter=context.save(!resetState)
@@ -593,7 +596,8 @@ baseX=coords.left
 outside=y<coords.top||y>=coords.bottom}return PosWithInfo(lineNo$$1,ch=skipExtendingChars(lineObj.text,ch,1),sticky,outside,x-baseX)}function coordsBidiPart(cm,lineObj,lineNo$$1,preparedMeasure,order,x,y){var index=findFirst(function(i){var part=order[i],ltr=1!=part.level
 return boxIsAfter(cursorCoords(cm,Pos(lineNo$$1,ltr?part.to:part.from,ltr?"before":"after"),"line",lineObj,preparedMeasure),x,y,!0)},0,order.length-1),part=order[index]
 if(index>0){var ltr=1!=part.level,start=cursorCoords(cm,Pos(lineNo$$1,ltr?part.from:part.to,ltr?"after":"before"),"line",lineObj,preparedMeasure)
-boxIsAfter(start,x,y,!0)&&start.top>y&&(part=order[index-1])}return part}function coordsBidiPartWrapped(cm,lineObj,_lineNo,preparedMeasure,order,x,y){for(var ref=wrappedLineExtent(cm,lineObj,preparedMeasure,y),begin=ref.begin,end=ref.end,part=null,closestDist=null,i=0;i<order.length;i++){var p=order[i]
+boxIsAfter(start,x,y,!0)&&start.top>y&&(part=order[index-1])}return part}function coordsBidiPartWrapped(cm,lineObj,_lineNo,preparedMeasure,order,x,y){var ref=wrappedLineExtent(cm,lineObj,preparedMeasure,y),begin=ref.begin,end=ref.end;/\s/.test(lineObj.text.charAt(end-1))&&end--
+for(var part=null,closestDist=null,i=0;i<order.length;i++){var p=order[i]
 if(!(p.from>=end||p.to<=begin)){var endX=measureCharPrepared(cm,preparedMeasure,1!=p.level?Math.min(end,p.to)-1:Math.max(begin,p.from)).right,dist=endX<x?x-endX+1e9:endX-x
 if(!part||closestDist>dist){part=p
 closestDist=dist}}}part||(part=order[order.length-1])
@@ -640,23 +644,23 @@ otherCursor.style.top=pos.other.top+"px"
 otherCursor.style.height=.85*(pos.other.bottom-pos.other.top)+"px"}}function cmpCoords(a,b){return a.top-b.top||a.left-b.left}function drawSelectionRange(cm,range$$1,output){function add(left,top,width,bottom){top<0&&(top=0)
 top=Math.round(top)
 bottom=Math.round(bottom)
-fragment.appendChild(elt("div",null,"CodeMirror-selected","position: absolute; left: "+left+"px;\n                             top: "+top+"px; width: "+(null==width?rightSide-left:width)+"px;\n                             height: "+(bottom-top)+"px"))}function drawForLine(line,fromArg,toArg){function coords(ch,bias){return charCoords(cm,Pos(line,ch),"div",lineObj,bias)}var start,end,lineObj=getLine(doc,line),lineLen=lineObj.text.length,order=getOrder(lineObj,doc.direction)
-iterateBidiSections(order,fromArg||0,null==toArg?lineLen:toArg,function(from,to,dir,i){var fromPos=coords(from,"ltr"==dir?"left":"right"),toPos=coords(to-1,"ltr"==dir?"right":"left")
-if("ltr"==dir){var fromLeft=null==fromArg&&0==from?leftSide:fromPos.left,toRight=null==toArg&&to==lineLen?rightSide:toPos.right
-if(toPos.top-fromPos.top<=3)add(fromLeft,toPos.top,toRight-fromLeft,toPos.bottom)
-else{add(fromLeft,fromPos.top,null,fromPos.bottom)
+fragment.appendChild(elt("div",null,"CodeMirror-selected","position: absolute; left: "+left+"px;\n                             top: "+top+"px; width: "+(null==width?rightSide-left:width)+"px;\n                             height: "+(bottom-top)+"px"))}function drawForLine(line,fromArg,toArg){function coords(ch,bias){return charCoords(cm,Pos(line,ch),"div",lineObj,bias)}function wrapX(pos,dir,side){var extent=wrappedLineExtentChar(cm,lineObj,null,pos),prop="ltr"==dir==("after"==side)?"left":"right"
+return coords("after"==side?extent.begin:extent.end-(/\s/.test(lineObj.text.charAt(extent.end-1))?2:1),prop)[prop]}var start,end,lineObj=getLine(doc,line),lineLen=lineObj.text.length,order=getOrder(lineObj,doc.direction)
+iterateBidiSections(order,fromArg||0,null==toArg?lineLen:toArg,function(from,to,dir,i){var ltr="ltr"==dir,fromPos=coords(from,ltr?"left":"right"),toPos=coords(to-1,ltr?"right":"left"),openStart=null==fromArg&&0==from,openEnd=null==toArg&&to==lineLen,first=0==i,last=!order||i==order.length-1
+if(toPos.top-fromPos.top<=3){var openLeft=(docLTR?openStart:openEnd)&&first,openRight=(docLTR?openEnd:openStart)&&last,left=openLeft?leftSide:(ltr?fromPos:toPos).left,right=openRight?rightSide:(ltr?toPos:fromPos).right
+add(left,fromPos.top,right-left,fromPos.bottom)}else{var topLeft,topRight,botLeft,botRight
+if(ltr){topLeft=docLTR&&openStart&&first?leftSide:fromPos.left
+topRight=docLTR?rightSide:wrapX(from,dir,"before")
+botLeft=docLTR?leftSide:wrapX(to,dir,"after")
+botRight=docLTR&&openEnd&&last?rightSide:toPos.right}else{topLeft=docLTR?wrapX(from,dir,"before"):leftSide
+topRight=!docLTR&&openStart&&first?rightSide:fromPos.right
+botLeft=!docLTR&&openEnd&&last?leftSide:toPos.left
+botRight=docLTR?wrapX(to,dir,"after"):rightSide}add(topLeft,fromPos.top,topRight-topLeft,fromPos.bottom)
 fromPos.bottom<toPos.top&&add(leftSide,fromPos.bottom,null,toPos.top)
-add(leftSide,toPos.top,toPos.right,toPos.bottom)}}else if(from<to){var fromRight=null==fromArg&&0==from?rightSide:fromPos.right,toLeft=null==toArg&&to==lineLen?leftSide:toPos.left
-if(toPos.top-fromPos.top<=3)add(toLeft,toPos.top,fromRight-toLeft,toPos.bottom)
-else{var topLeft=leftSide
-if(i){var topEnd=wrappedLineExtentChar(cm,lineObj,null,from).end
-topLeft=coords(topEnd-(/\s/.test(lineObj.text.charAt(topEnd-1))?2:1),"left").left}add(topLeft,fromPos.top,fromRight-topLeft,fromPos.bottom)
-fromPos.bottom<toPos.top&&add(leftSide,fromPos.bottom,null,toPos.top)
-var botWidth=null;(order.length,0)||(botWidth=coords(wrappedLineExtentChar(cm,lineObj,null,to).begin,"right").right-toLeft)
-add(toLeft,toPos.top,botWidth,toPos.bottom)}}(!start||cmpCoords(fromPos,start)<0)&&(start=fromPos)
+add(botLeft,toPos.top,botRight-botLeft,toPos.bottom)}(!start||cmpCoords(fromPos,start)<0)&&(start=fromPos)
 cmpCoords(toPos,start)<0&&(start=toPos);(!end||cmpCoords(fromPos,end)<0)&&(end=fromPos)
 cmpCoords(toPos,end)<0&&(end=toPos)})
-return{start:start,end:end}}var display=cm.display,doc=cm.doc,fragment=document.createDocumentFragment(),padding=paddingH(cm.display),leftSide=padding.left,rightSide=Math.max(display.sizerWidth,displayWidth(cm)-display.sizer.offsetLeft)-padding.right,sFrom=range$$1.from(),sTo=range$$1.to()
+return{start:start,end:end}}var display=cm.display,doc=cm.doc,fragment=document.createDocumentFragment(),padding=paddingH(cm.display),leftSide=padding.left,rightSide=Math.max(display.sizerWidth,displayWidth(cm)-display.sizer.offsetLeft)-padding.right,docLTR="ltr"==doc.direction,sFrom=range$$1.from(),sTo=range$$1.to()
 if(sFrom.line==sTo.line)drawForLine(sFrom.line,sFrom.ch,sTo.ch)
 else{var fromLine=getLine(doc,sFrom.line),toLine=getLine(doc,sTo.line),singleVLine=visualLine(fromLine)==visualLine(toLine),leftEnd=drawForLine(sFrom.line,sFrom.ch,singleVLine?fromLine.text.length+1:null).end,rightStart=drawForLine(sTo.line,singleVLine?0:null,sTo.ch).start
 if(singleVLine)if(leftEnd.top<rightStart.top-2){add(leftEnd.right,leftEnd.top,null,leftEnd.bottom)
@@ -1308,7 +1312,7 @@ ensureCursorVisible(cm)})}function moveCharLogically(line,ch,dir){var target=ski
 return target<0||target>line.text.length?null:target}function moveLogically(line,start,dir){var ch=moveCharLogically(line,start.ch,dir)
 return null==ch?null:new Pos(start.line,ch,dir<0?"after":"before")}function endOfLine(visually,cm,lineObj,lineNo,dir){if(visually){var order=getOrder(lineObj,cm.doc.direction)
 if(order){var ch,part=dir<0?lst(order):order[0],sticky=dir<0==(1==part.level)?"after":"before"
-if(part.level>0){var prep=prepareMeasureForLine(cm,lineObj)
+if(part.level>0||"rtl"==cm.doc.direction){var prep=prepareMeasureForLine(cm,lineObj)
 ch=dir<0?lineObj.text.length-1:0
 var targetTop=measureCharPrepared(cm,prep,ch).top
 ch=findFirst(function(ch){return measureCharPrepared(cm,prep,ch).top==targetTop},dir<0==(1==part.level)?part.from:part.to-1,ch)
@@ -1714,9 +1718,9 @@ for(++i$7;i$7<len&&"L"!=types[i$7];++i$7);for(var j$2=pos;j$2<i$7;)if(countsAsNu
 var nstart=j$2
 for(++j$2;j$2<i$7&&countsAsNum.test(types[j$2]);++j$2);order.splice(at,0,new BidiSpan(2,nstart,j$2))
 pos=j$2}else++j$2
-pos<i$7&&order.splice(at,0,new BidiSpan(1,pos,i$7))}if(1==order[0].level&&(m=str.match(/^\s+/))){order[0].from=m[0].length
+pos<i$7&&order.splice(at,0,new BidiSpan(1,pos,i$7))}if("ltr"==direction){if(1==order[0].level&&(m=str.match(/^\s+/))){order[0].from=m[0].length
 order.unshift(new BidiSpan(0,0,m[0].length))}if(1==lst(order).level&&(m=str.match(/\s+$/))){lst(order).to-=m[0].length
-order.push(new BidiSpan(0,len-m[0].length,len))}return"rtl"==direction?order.reverse():order}}(),noHandlers=[],on=function(emitter,type,f){if(emitter.addEventListener)emitter.addEventListener(type,f,!1)
+order.push(new BidiSpan(0,len-m[0].length,len))}}return"rtl"==direction?order.reverse():order}}(),noHandlers=[],on=function(emitter,type,f){if(emitter.addEventListener)emitter.addEventListener(type,f,!1)
 else if(emitter.attachEvent)emitter.attachEvent("on"+type,f)
 else{var map$$1=emitter._handlers||(emitter._handlers={})
 map$$1[type]=(map$$1[type]||noHandlers).concat(f)}},dragAndDrop=function(){if(ie&&ie_version<9)return!1
@@ -1764,14 +1768,23 @@ StringStream.prototype.hideFirstChars=function(n,inner){this.lineStart+=n
 try{return inner()}finally{this.lineStart-=n}}
 StringStream.prototype.lookAhead=function(n){var oracle=this.lineOracle
 return oracle&&oracle.lookAhead(n)}
+StringStream.prototype.baseToken=function(){var oracle=this.lineOracle
+return oracle&&oracle.baseToken(this.pos)}
 var SavedContext=function(state,lookAhead){this.state=state
 this.lookAhead=lookAhead},Context=function(doc,state,line,lookAhead){this.state=state
 this.doc=doc
 this.line=line
-this.maxLookAhead=lookAhead||0}
+this.maxLookAhead=lookAhead||0
+this.baseTokens=null
+this.baseTokenPos=1}
 Context.prototype.lookAhead=function(n){var line=this.doc.getLine(this.line+n)
 null!=line&&n>this.maxLookAhead&&(this.maxLookAhead=n)
 return line}
+Context.prototype.baseToken=function(n){var this$1=this
+if(!this.baseTokens)return null
+for(;this.baseTokens[this.baseTokenPos]<=n;)this$1.baseTokenPos+=2
+var type=this.baseTokens[this.baseTokenPos+1]
+return{type:type&&type.replace(/( |^)overlay .*/,""),size:this.baseTokens[this.baseTokenPos]-n}}
 Context.prototype.nextLine=function(){this.line++
 this.maxLookAhead>0&&this.maxLookAhead--}
 Context.fromSaved=function(doc,saved,line){return saved instanceof SavedContext?new Context(doc,copyState(doc.mode,saved.state),line,saved.lookAhead):new Context(doc,copyState(doc.mode,saved),line)}
@@ -2617,5 +2630,5 @@ CodeMirror.addClass=addClass
 CodeMirror.contains=contains
 CodeMirror.rmClass=rmClass
 CodeMirror.keyNames=keyNames}(CodeMirror$1)
-CodeMirror$1.version="5.30.0"
+CodeMirror$1.version="5.31.0"
 return CodeMirror$1})
