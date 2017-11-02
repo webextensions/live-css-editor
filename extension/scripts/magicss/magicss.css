@@ -115,6 +115,7 @@
     opacity: 0.85;
 }
 
+.magicss-cache-image-to-prevent-CSP-problem-point-and-click-hover,
 .magicss-point-and-click:hover,
 .magicss-point-and-click-activated .magicss-point-and-click {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAdCAYAAABWk2cPAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QQYDBUsfZbIpAAAAQFJREFUSMftlr0NgzAQhd9FUTagZyl6bxKPEGWC1EzBEqSLAi0Z4qUBCQjGP9hCSLF0DVj+fPd8TwfsuUhkJK4kahKMFC8SdxIXE1RHhM3jZoLWJJiggiTRrP1MBZ2ce9rj/fyhSdc5NUAEcsxMSVQAGgAVgErE0IOh/WTY95i5TdN/UyTyVFBlsTzrJWQMNQk/g+YA3h75tIMUP3L42GCfja/pdySKYO9d0NUWJYlsk+E76GrObgM0D84u1Bz6x9Batj1F8InSMp666thQZSipdgb7jisLunaDhs5g22Dm0K+F5TztPYJadC0dE9Exhi41LqsDOAo0X23+KXg78HDrC43oi1116DqRAAAAAElFTkSuQmCC");
@@ -277,6 +278,7 @@ body .tooltipster-default .tooltipster-content {
     display: block;
 }
 
+.magicss-cache-image-to-prevent-CSP-problem-css-linting,
 .magicss-enable-css-linting {
     /* Source:
         chrome-extension://__MSG_@@extension_id__/ui-images/warning.svg
@@ -293,6 +295,7 @@ body .tooltipster-default .tooltipster-content {
     display: block;
 }
 
+.magicss-cache-image-to-prevent-CSP-problem-disable-css-linting,
 .magicss-disable-css-linting {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited.svg"),
@@ -320,6 +323,7 @@ body .tooltipster-default .tooltipster-content {
     opacity: 1;
 }
 
+.magicss-cache-image-to-prevent-CSP-problem-hide-line-numbers,
 .magicss-hide-line-numbers {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited.svg"),
@@ -337,6 +341,7 @@ body .tooltipster-default .tooltipster-content {
     display: block;
 }
 
+.magicss-cache-image-to-prevent-CSP-problem-show-line-numbers,
 .magicss-show-line-numbers {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/hash_edited.svg"); */

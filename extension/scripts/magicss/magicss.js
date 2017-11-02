@@ -1423,6 +1423,20 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         var $footerItems = $('<div></div>'),
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
+
+                        // The following DOM elements are added just to cache some Magic CSS icons/images which may otherwise fail to load on a
+                        // domain with CSP settings like:
+                        //     "Content-Security-Policy:default-src 'self'"
+                        // which may block the load of data URI based SVG images
+                        $footerItems.append(
+                            '<div style="width:0;height:0;opacity:0">' +    // Using display:none wouldn't help in caching the background-image style
+                                '<div class="magicss-cache-image-to-prevent-CSP-problem-point-and-click-hover"></div>' +
+                                '<div class="magicss-cache-image-to-prevent-CSP-problem-css-linting"></div>' +
+                                '<div class="magicss-cache-image-to-prevent-CSP-problem-disable-css-linting"></div>' +
+                                '<div class="magicss-cache-image-to-prevent-CSP-problem-hide-line-numbers"></div>' +
+                                '<div class="magicss-cache-image-to-prevent-CSP-problem-show-line-numbers"></div>' +
+                            '</div>'
+                        );
                         return $footerItems;
                     },
                     events: {
