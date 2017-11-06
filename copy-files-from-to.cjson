@@ -262,6 +262,32 @@
         {
             "from": {
                 "default": {
+                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.js",
+                    "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest-min.js"
+                },
+                "dev": {
+                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.js",
+                    "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest.js"
+                }
+            },
+            "to": "extension/scripts/3rdparty/magicsuggest/magicsuggest.js"
+        },
+        {
+            "from": {
+                "default": {
+                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.css",
+                    "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest-min.css"
+                },
+                "dev": {
+                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.css",
+                    "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest.css"
+                }
+            },
+            "to": "extension/scripts/3rdparty/magicsuggest/magicsuggest.css"
+        },
+        {
+            "from": {
+                "default": {
                     "src": "https://raw.githubusercontent.com/webextensions/less.js/ffd4f094cff8288e0fc5155b6e299e5699b890e9/dist/basic-less-with-sourcemap-support.browserified.uglified.js",
                     "latest": "https://raw.githubusercontent.com/webextensions/less.js/build-less-for-magic-css/dist/basic-less-with-sourcemap-support.browserified.uglified.js"
                 }
