@@ -4,6 +4,7 @@
   "scripts": {
     "lint": "eslint .",
     "manifest-generator": "node ./extension/manifest-generator.js",
+    "dev-mode-3rdparty": "copy-files-from-to copy-third-party-front-end-scripts.json dev",
     "postinstall": "copy-files-from-to copy-third-party-front-end-scripts.json",
     "zip-chrome-extension": "node ./zip-extension.js chrome",
     "zip-edge-extension": "node ./zip-extension.js edge",

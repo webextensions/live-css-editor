@@ -99,6 +99,22 @@
             "latestVersion": "https://raw.githubusercontent.com/prettydiff/prettydiff/master/lib/csspretty.js"
         },
         {
+            "to": "extension/scripts/3rdparty/magicsuggest/magicsuggest.js",
+            "from": {
+                "default": { "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.js" },
+                "dev": { "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.js" }
+            },
+            "latestVersion": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest-min.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/magicsuggest/magicsuggest.css",
+            "from": {
+                "default": { "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.css" },
+                "dev": { "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.css" }
+            },
+            "latestVersion": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest-min.css"
+        },
+        {
             "to": "extension/scripts/3rdparty/tooltipster/jquery.tooltipster.js",
             "from": {
                 "default": { "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.min.js" },

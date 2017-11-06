@@ -221,6 +221,9 @@ var main = function (tabId) {
             path3rdparty + 'tooltipster/tooltipster.css',
             path3rdparty + 'tooltipster/jquery.tooltipster.js',
 
+            path3rdparty + 'magicsuggest/magicsuggest.css',
+            path3rdparty + 'magicsuggest/magicsuggest.js',
+
             path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
             path3rdparty + 'csspretty/csspretty.js',
             // Alternatively, use cssbeautify & Yahoo's CSS Min libraries

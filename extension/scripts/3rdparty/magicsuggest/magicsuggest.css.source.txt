@@ -1,0 +1,1 @@
+https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.css
