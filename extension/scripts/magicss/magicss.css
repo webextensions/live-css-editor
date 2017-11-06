@@ -56,7 +56,8 @@
 
 .magicss-mode-css,
 .magicss-mode-less,
-.magicss-mode-sass {
+.magicss-mode-sass,
+.magicss-mode-file {
     font-weight: bold;
     color: #ffffff;
     opacity: 0.5;
@@ -65,15 +66,18 @@
 .magicss-mode-css:hover,
 .magicss-mode-less:hover,
 .magicss-mode-sass:hover,
+.magicss-mode-file:hover,
+.magicss-selected-mode-css .magicss-mode-css,
 .magicss-selected-mode-less .magicss-mode-less,
 .magicss-selected-mode-sass .magicss-mode-sass,
-.magicss-selected-mode-css .magicss-mode-css {
+.magicss-selected-mode-file .magifile-mode-file {
     opacity: 1;
 }
 
+.magicss-selected-mode-css .magicss-mode-css,
 .magicss-selected-mode-less .magicss-mode-less,
 .magicss-selected-mode-sass .magicss-mode-sass,
-.magicss-selected-mode-css .magicss-mode-css {
+.magicss-selected-mode-file .magicss-mode-file {
     opacity: 1;
     color: #ffff00;
 }
@@ -482,6 +486,16 @@ html .magicss-mouse-over-dom-element {
     color: #111 !important;
     opacity: 0.85 !important;
     fill: red !important;   /* Helps in highlighting SVG elements */
+}
+
+#MagiCSS-bookmarklet .link-tag-to-edit,
+#MagiCSS-bookmarklet .file-to-edit {
+	color: #fff;
+    display: inline-block;
+}
+
+#MagiCSS-bookmarklet .link-tag-to-edit {
+	float: right;
 }
 
 /*

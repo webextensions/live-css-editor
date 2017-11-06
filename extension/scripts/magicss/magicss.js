@@ -1049,10 +1049,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                 var setLanguageMode = function (languageMode, editor) {
                     $(editor.container)
-                        .removeClass('magicss-selected-mode-sass')
+                        .removeClass('magicss-selected-mode-css')
                         .removeClass('magicss-selected-mode-less')
-                        .removeClass('magicss-selected-mode-css');
-                    if (languageMode === 'less') {
+                        .removeClass('magicss-selected-mode-sass')
+                        .removeClass('magicss-selected-mode-file');
+                    if (languageMode === 'file') {
+                        $(editor.container).addClass('magicss-selected-mode-file');
+                        editor.userPreference('language-mode', 'less');
+                        editor.cm.setOption('mode', 'text/x-less');
+                        setCodeMirrorCSSLinting(editor, 'disable');
+                        utils.alertNote('Now editing code directly from file', 5000);
+                    } else if (languageMode === 'less') {
                         $(editor.container).addClass('magicss-selected-mode-less');
                         editor.userPreference('language-mode', 'less');
                         editor.cm.setOption('mode', 'text/x-less');
@@ -1232,7 +1239,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         $titleItems.append(
                             '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>' +
                             '<div class="magicss-mode-button magicss-mode-less" title="Less mode">less</div>' +
-                            '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>'
+                            '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>' +
+                            '<div class="magicss-mode-button magicss-mode-file" title="File mode">file</div>'
                         );
 
                         $(document).on('click', '.magicss-mode-css', function () {
@@ -1245,6 +1253,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         });
                         $(document).on('click', '.magicss-mode-sass', function () {
                             setLanguageMode('sass', editor);
+                            editor.focus();
+                        });
+                        $(document).on('click', '.magicss-mode-file', function () {
+                            setLanguageMode('file', editor);
+                            $.ajax({
+                                method: 'PUT',
+                                url: 'http://localhost:3000/magic-css/asdf.txt'
+                                // url: 'http://localhost:3000/magic-css/asdf.txt'
+                                // url: 'http://localhost:3000/asdf.txt'
+                                // url: 'http://localhost:3000/asdf.txt'
+                            });
                             editor.focus();
                         });
 
@@ -1682,6 +1701,87 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var $footerItems = $('<div></div>'),
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
+
+                        var $fileToEdit = $('<div class="file-to-edit">File to Edit</div>');
+                        var $linkTagToEdit = $('<div class="link-tag-to-edit">Link Tag To Edit</div>');
+                        var $selectLinkTag = $(
+                            // '<select>' +
+                            //     '<option>1</option>' +
+                            //     '<option>2</option>' +
+                            //     '<option>3</option>' +
+                            //     '<option>4</option>' +
+                            //     '<option>5</option>' +
+                            // '</select>'
+                            '<input id="magicss-file-to-edit" />'
+                        );
+                        $footerItems.append($linkTagToEdit);
+                        $footerItems.append($fileToEdit);
+                        $footerItems.append($selectLinkTag);
+
+                        // Magic Suggest uses old jQuery code. Minor changes to fix that
+                        jQuery.fn.extend({
+                            size: function() {
+                                return this.length;
+                            }
+                        });
+                        setTimeout(function () {
+                            // $.ajax({
+                            //     method: 'PUT',
+                            //     url: 'http://localhost:3000/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3000/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3000/asdf.txt'
+                            //     // url: 'http://localhost:3000/asdf.txt'
+                            // });
+                            $('#magicss-file-to-edit').magicSuggest({
+                                method: 'GET',
+                                data: 'http://localhost:3000/magic-css?query=asdf'
+                                // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
+                                // data: 'random.json',
+                                // renderer: function(data){
+                                //     // debugger;
+                                //     return '<div style="padding: 5px; overflow:hidden;">' +
+                                //     // '<div style="float: left;"><img src="' + data.picture + '" /></div>' +
+                                //     '<div style="float: left; margin-left: 5px">' +
+                                //     '<div style="font-weight: bold; color: #333; font-size: 10px; line-height: 11px">' + data.name + '</div>' +
+                                //     '<div style="color: #999; font-size: 9px">' + data.name + '</div>' +
+                                //     '</div>' +
+                                //     '</div><div style="clear:both;"></div>'; // make sure we have closed our dom stuff
+                                // }
+                            });
+                        }, 0);
+                        $selectLinkTag.on('mousedown', function (evt) {
+                            evt.stopPropagation();
+                        });
+                        // $selectLinkTag.on('click', function (evt) {
+                        //     $;
+                        //     $selectLinkTag;
+                        //     debugger;
+                        // });
+
+                        $linkTagToEdit.on('click', function () {
+                            // console.log($('link[rel=stylesheet]'));
+                            var links = [];
+                            $('link[rel~=stylesheet][href]').each(function (index, link) {
+                                links.push({
+                                    link: link,
+                                    href: $(link).attr('href')
+                                });
+                            });
+                            // console.log(links);
+                            // $footerItems.append(
+                            //     '<select>' +
+                            //         '<option>1</option>' +
+                            //         '<option>1</option>' +
+                            //         '<option>1</option>' +
+                            //         '<option>1</option>' +
+                            //         '<option>1</option>' +
+                            //     '</select>'
+                            // );
+                        });
+
+                        $fileToEdit.on('click', function () {
+                            alert(123);
+                        });
 
                         // The following DOM elements are added just to cache some Magic CSS icons/images which may otherwise fail to load on a
                         // domain with CSP settings like:
