@@ -474,6 +474,13 @@ html .magicss-mouse-over-dom-element {
     (these styles would be non-essential for most of the sites)
 */
 
+/* Use left-to-right direction for all sites */
+#topCenterAlertNote,
+#MagiCSS-bookmarklet .CodeMirror,
+.CodeMirror-hints {
+    direction: ltr;
+}
+
 /* Show cursors if the CSS contains style like: div { overflow: hidden } */
 .CodeMirror-cursors {
 	overflow: initial !important;
