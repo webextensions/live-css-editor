@@ -14,6 +14,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
     }
 
     if (window.MagiCSSEditor) {
+        utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
         window.MagiCSSEditor.reposition();      // 'Magic CSS window is already there. Repositioning it.'
         return;
     }
@@ -1705,6 +1706,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     }
                 }
 
+                utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
 
                 try {

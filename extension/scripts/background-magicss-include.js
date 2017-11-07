@@ -78,6 +78,17 @@ var main = function () {
 
     extLib.loadJSCSS([
         {
+            src: path3rdparty + 'jquery-3.2.1.js',
+            skip: typeof jQuery === "undefined" || runningInBrowserExtension ? false : true
+        },
+        {
+            src: pathScripts + 'chrome-extension-lib/ext-lib.js',
+            skip: typeof extLib === "undefined" || runningInBrowserExtension ? false : true
+        },
+
+        pathScripts + 'utils.js',
+
+        {
             src: path3rdparty + 'async.js',
             skip: typeof async === "undefined" || runningInBrowserExtension ? false : true
         },
@@ -111,10 +122,6 @@ var main = function () {
 
         pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
 
-        {
-            src: path3rdparty + 'jquery-3.2.1.js',
-            skip: typeof jQuery === "undefined" || runningInBrowserExtension ? false : true
-        },
         path3rdparty + 'jquery-ui_customized.css',
         path3rdparty + 'jquery-ui.js',
 
@@ -138,13 +145,6 @@ var main = function () {
         // http://www.miyconst.com/Blog/View/14/conver-css-to-less-with-css2less-js
         // path3rdparty + 'css2less/linq.js',
         // path3rdparty + 'css2less/css2less.js',
-
-        {
-            src: pathScripts + 'chrome-extension-lib/ext-lib.js',
-            skip: typeof extLib === "undefined" || runningInBrowserExtension ? false : true
-        },
-
-        pathScripts + 'utils.js',
 
         pathEditor + 'editor.css',
         pathEditor + 'editor.js',

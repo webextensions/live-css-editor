@@ -367,6 +367,8 @@ var utils = window.utils || {};
     };
 }(utils, jQuery));
 
+utils.alertNote('Loading Magic CSS ... Please wait :-)', 10000);
+
 (function($){
     utils.attachPublishSubscribe($);
 }(jQuery));
