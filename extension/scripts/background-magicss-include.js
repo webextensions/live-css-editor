@@ -87,6 +87,7 @@ var main = function () {
         },
 
         pathScripts + 'utils.js',
+        pathScripts + 'loading-magic-css.js',
 
         {
             src: path3rdparty + 'async.js',
