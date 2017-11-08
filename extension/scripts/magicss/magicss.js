@@ -429,6 +429,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
     var disablePointAndClickFunctionality = function (editor) {
         enablePointAndClick = false;
         $(editor.container).removeClass('magicss-point-and-click-activated');
+
+        // This is useful when the user disables point-and-click using keyboard shortcut
+        $('.magicss-mouse-over-dom-element').removeClass('magicss-mouse-over-dom-element');
     };
 
     var enableAutocompleteSelectors = function (editor) {
@@ -999,6 +1002,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     return icon;
                 };
 
+                var togglePointAndClick = function (editor) {
+                    if (enablePointAndClick) {
+                        disablePointAndClickFunctionality(editor);
+                    } else {
+                        // If currently, there is no text selection
+                        if (!editor.cm.getSelection()) {
+                            var cursorPosition = editor.cm.getCursor();
+                            // If there is any non-whitespace character before the cursor in the current line
+                            if (editor.cm.getLine(cursorPosition.line).substr(0, cursorPosition.ch).trim()) {
+                                // Move the cursor to the end of the current line
+                                // Which helps in avoiding the scenario that when the user does point-and-click,
+                                // the text insertion does not happen in the middle of the text
+                                editor.setCursor({line: cursorPosition.line}, {pleaseIgnoreCursorActivity: true});
+                            }
+                        }
+                        utils.alertNote('Select an element in the page to generate its CSS selector<br />(Shortcut: Alt + Shift + S)', 5000);
+                        enablePointAndClickFunctionality(editor);
+                    }
+                };
+
                 var options = {
                     id: id,
                     title: function ($, editor) {
@@ -1094,26 +1117,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     headerIcons: [
                         {
                             name: 'point-and-click',
-                            title: 'Select an element in the page to generate its CSS Selector',
+                            title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
                             cls: 'magicss-point-and-click',
                             onclick: function (evt, editor) {
-                                if (enablePointAndClick) {
-                                    disablePointAndClickFunctionality(editor);
-                                } else {
-                                    // If currently, there is no text selection
-                                    if (!editor.cm.getSelection()) {
-                                        var cursorPosition = editor.cm.getCursor();
-                                        // If there is any non-whitespace character before the cursor in the current line
-                                        if (editor.cm.getLine(cursorPosition.line).substr(0, cursorPosition.ch).trim()) {
-                                            // Move the cursor to the end of the current line
-                                            // Which helps in avoiding the scenario that when the user does point-and-click,
-                                            // the text insertion does not happen in the middle of the text
-                                            editor.setCursor({line: cursorPosition.line}, {pleaseIgnoreCursorActivity: true});
-                                        }
-                                    }
-                                    utils.alertNote('Select an element in the page to generate its CSS selector', 5000);
-                                    enablePointAndClickFunctionality(editor);
-                                }
+                                togglePointAndClick(editor);
                                 editor.focus();
                             }
                         },
@@ -1730,6 +1737,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         // do nothing
                     }
                 }
+
+                document.addEventListener('keyup', function (evt) {
+                    if (evt.altKey && evt.shiftKey && evt.keyCode === 83) {
+                        if (window.MagiCSSEditor.isVisible()) {
+                            togglePointAndClick(window.MagiCSSEditor);
+                        }
+                    }
+                }, false);
             }
         });
     };
