@@ -914,7 +914,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         disabled = true;
                     }
 
-                    if (getLanguageMode() === 'less') {
+                    if (getLanguageMode() === 'file') {
+                        var targetFileContents = editor.getTextValue();
+                        $.ajax({
+                            method: 'PUT',
+                            url: 'http://localhost:3000/magic-css/' + window.fileSuggestions.getValue()[0],
+                            data: {
+                                targetFileContents: targetFileContents
+                            }
+                        });
+                    } else if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
 
@@ -1055,7 +1064,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         .removeClass('magicss-selected-mode-file');
                     if (languageMode === 'file') {
                         $(editor.container).addClass('magicss-selected-mode-file');
-                        editor.userPreference('language-mode', 'less');
+                        editor.userPreference('language-mode', 'file');
                         editor.cm.setOption('mode', 'text/x-less');
                         setCodeMirrorCSSLinting(editor, 'disable');
                         utils.alertNote('Now editing code directly from file', 5000);
@@ -1082,11 +1091,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                 var getLanguageMode = function () {
                     var $el = $('#' + id),
-                        mode = 'css';
-                    if ($el.hasClass('magicss-selected-mode-less')) {
+                        mode;
+                    if ($el.hasClass('magicss-selected-mode-file')) {
+                        mode = 'file';
+                    } else if ($el.hasClass('magicss-selected-mode-less')) {
                         mode = 'less';
                     } else if ($el.hasClass('magicss-selected-mode-sass')) {
                         mode = 'sass';
+                    } else {
+                        mode = 'css';
                     }
                     return mode;
                 };
@@ -1697,7 +1710,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         }
                     ],
-                    footer: function ($) {
+                    footer: function ($, editor) {
                         var $footerItems = $('<div></div>'),
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
@@ -1732,7 +1745,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             //     // url: 'http://localhost:3000/asdf.txt'
                             //     // url: 'http://localhost:3000/asdf.txt'
                             // });
-                            $('#magicss-file-to-edit').magicSuggest({
+                            var fileSuggestions = $('#magicss-file-to-edit').magicSuggest({
                                 method: 'GET',
                                 data: 'http://localhost:3000/magic-css?query=asdf'
                                 // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
@@ -1747,6 +1760,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 //     '</div>' +
                                 //     '</div><div style="clear:both;"></div>'; // make sure we have closed our dom stuff
                                 // }
+                            });
+                            window.fileSuggestions = fileSuggestions;
+                            fileSuggestions.expand();
+                            $(fileSuggestions).on('selectionchange', function(e, m){
+                                $.ajax({
+                                    url: 'http://localhost:3000/' + this.getValue()[0],
+                                    success: function (data, textStatus) {
+                                        if (textStatus === 'success') {
+                                            editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        }
+                                    }
+                                });
                             });
                         }, 0);
                         $selectLinkTag.on('mousedown', function (evt) {
@@ -1832,7 +1857,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             });
 
                             var languageMode = editor.userPreference('language-mode');
-                            if (languageMode === 'less') {
+                            if (languageMode === 'file') {
+                                $(editor.container).addClass('magicss-selected-mode-file');
+                            } else if (languageMode === 'less') {
                                 $(editor.container).addClass('magicss-selected-mode-less');
                             } else if (languageMode === 'sass') {
                                 $(editor.container).addClass('magicss-selected-mode-sass');

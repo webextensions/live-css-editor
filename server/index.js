@@ -1,10 +1,13 @@
 var express = require('express');
-var app = express();
+var serveIndex = require('serve-index');
+var bodyParser = require('body-parser');
+
 var path = require('path');
 var fs = require('fs');
-var serveIndex = require('serve-index');
 var glob = require('glob-all');
 
+var app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // app.use(express.static('temp'));
 // app.use('/temp', express.static('temp'));
@@ -18,12 +21,11 @@ app.put('/magic-css', function (req, res, next) {
 
 app.put('/magic-css/*', function (req, res, next) {
     var relativeFilePath = req.originalUrl.substr('/magic-css/'.length);
-    console.log('in put handler');
     fs.writeFileSync(
         __dirname + '/' + relativeFilePath,
-        'hello world'
+        req.body.targetFileContents
     );
-    debugger;
+    res.send({ status: 'File updated successfully' });
 }); /* */
 
 app.get('/magic-css', function (req, res, next) {
