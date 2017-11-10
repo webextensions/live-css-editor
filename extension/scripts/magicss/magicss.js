@@ -1998,6 +1998,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
 
+                        var $footerForFileMode = $('<div class="footer-for-file-mode"></div>');
+                        $footerItems.append($footerForFileMode);
+
                         var $fileToEdit = $('<div class="file-to-edit">File to Edit</div>');
                         var $linkTagToEdit = $('<div class="link-tag-to-edit">Link Tag To Edit</div>');
                         var $selectLinkTag = $(
@@ -2010,9 +2013,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             // '</select>'
                             '<input id="magicss-file-to-edit" />'
                         );
-                        $footerItems.append($linkTagToEdit);
-                        $footerItems.append($fileToEdit);
-                        $footerItems.append($selectLinkTag);
+                        $footerForFileMode.append($linkTagToEdit);
+                        $footerForFileMode.append($fileToEdit);
+                        $footerForFileMode.append($selectLinkTag);
 
                         // Magic Suggest uses old jQuery code. Minor changes to fix that
                         jQuery.fn.extend({
@@ -2045,7 +2048,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 // }
                             });
                             window.fileSuggestions = fileSuggestions;
-                            fileSuggestions.expand();
+                            // fileSuggestions.expand();
                             $(fileSuggestions).on('selectionchange', function(e, m){
                                 $.ajax({
                                     url: 'http://localhost:3000/' + this.getValue()[0],
@@ -2075,16 +2078,21 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     href: $(link).attr('href')
                                 });
                             });
-                            // console.log(links);
-                            // $footerItems.append(
-                            //     '<select>' +
-                            //         '<option>1</option>' +
-                            //         '<option>1</option>' +
-                            //         '<option>1</option>' +
-                            //         '<option>1</option>' +
-                            //         '<option>1</option>' +
-                            //     '</select>'
-                            // );
+                            console.log(links);
+                            $footerItems.append(
+                                '<select>' +
+                                    (function () {
+                                        var str = '';
+                                        for (var i = 0; i < links.length; i++) {
+                                            str += '<option>' + links[i].href + '</option>';
+                                        }
+                                        return str;
+                                    }()) +
+                                '</select>'
+                            );
+                        });
+                        $footerItems.on('mousedown', function (evt) {
+                            evt.stopPropagation();
                         });
 
                         $fileToEdit.on('click', function () {

@@ -584,6 +584,19 @@ html .magicss-mouse-over-dom-element {
 	float: right;
 }
 
+
+.ms-res-ctn.dropdown-menu {
+    height: 58px;
+    position: absolute;
+    border: 1px solid #777;
+	width: calc(100% - 2px);
+	z-index: 10000;
+    background-color: #fff;
+    left: 0px;
+    bottom: 30px;
+}
+
+
 /*
     Begin: Site-specific / CSS-style-specific fixes
     (where sites over-ride some default styles in an unexpected manner)
