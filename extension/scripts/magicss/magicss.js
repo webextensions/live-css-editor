@@ -1864,26 +1864,30 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         editor.userPreference('language-mode', 'file');
                         editor.cm.setOption('mode', 'text/x-less');
                         setCodeMirrorCSSLinting(editor, 'disable');
-                        utils.alertNote('Now editing code directly from file', 5000);
-                    } else if (languageMode === 'less') {
-                        $(editor.container).addClass('magicss-selected-mode-less');
-                        editor.userPreference('language-mode', 'less');
-                        editor.cm.setOption('mode', 'text/x-less');
-                        setCodeMirrorCSSLinting(editor, 'disable');
-                        utils.alertNote('Now editing code in LESS mode', 5000);
-                    } else if (languageMode === 'sass') {
-                        $(editor.container).addClass('magicss-selected-mode-sass');
-                        editor.userPreference('language-mode', 'sass');
-                        editor.cm.setOption('mode', 'text/x-scss');
-                        setCodeMirrorCSSLinting(editor, 'disable');
-                        utils.alertNote('Now editing code in SASS mode', 5000);
+                        $('.footer-for-file-mode').show();
+                        utils.alertNote('In this mode you can edit code directly from file', 5000);
                     } else {
-                        $(editor.container).addClass('magicss-selected-mode-css');
-                        editor.userPreference('language-mode', 'css');
-                        editor.cm.setOption('mode', 'text/css');
-                        utils.alertNote('Now editing code in CSS mode', 5000);
+                        $('.footer-for-file-mode').hide();
+                        if (languageMode === 'less') {
+                            $(editor.container).addClass('magicss-selected-mode-less');
+                            editor.userPreference('language-mode', 'less');
+                            editor.cm.setOption('mode', 'text/x-less');
+                            setCodeMirrorCSSLinting(editor, 'disable');
+                            utils.alertNote('Now editing code in LESS mode', 5000);
+                        } else if (languageMode === 'sass') {
+                            $(editor.container).addClass('magicss-selected-mode-sass');
+                            editor.userPreference('language-mode', 'sass');
+                            editor.cm.setOption('mode', 'text/x-scss');
+                            setCodeMirrorCSSLinting(editor, 'disable');
+                            utils.alertNote('Now editing code in SASS mode', 5000);
+                        } else {
+                            $(editor.container).addClass('magicss-selected-mode-css');
+                            editor.userPreference('language-mode', 'css');
+                            editor.cm.setOption('mode', 'text/css');
+                            utils.alertNote('Now editing code in CSS mode', 5000);
+                        }
+                        fnApplyTextAsCSS(editor);
                     }
-                    fnApplyTextAsCSS(editor);
                 };
 
                 var getLanguageMode = function () {
@@ -2609,7 +2613,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
 
-                        var $footerForFileMode = $('<div class="footer-for-file-mode"></div>');
+                        var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none"></div>');
                         $footerItems.append($footerForFileMode);
 
                         var $fileToEdit = $('<div class="file-to-edit">File to Edit</div>');
@@ -2617,10 +2621,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var $selectLinkTag = $(
                             // '<select>' +
                             //     '<option>1</option>' +
-                            //     '<option>2</option>' +
-                            //     '<option>3</option>' +
-                            //     '<option>4</option>' +
-                            //     '<option>5</option>' +
                             // '</select>'
                             '<input id="magicss-file-to-edit" />'
                         );
