@@ -1069,6 +1069,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                     if (getLanguageMode() === 'file') {
                         var targetFileContents = editor.getTextValue();
+
+                        /*
                         $.ajax({
                             method: 'PUT',
                             url: 'http://localhost:3000/magic-css/' + window.fileSuggestions.getValue()[0],
@@ -1076,6 +1078,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 targetFileContents: targetFileContents
                             }
                         });
+                        /* */
                     } else if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
@@ -2007,16 +2010,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                         var $fileToEdit = $('<div class="file-to-edit">File to Edit</div>');
                         var $linkTagToEdit = $('<div class="link-tag-to-edit">Link Tag To Edit</div>');
-                        var $selectLinkTag = $(
-                            // '<select>' +
-                            //     '<option>1</option>' +
-                            // '</select>'
-                            '<input id="magicss-file-to-edit" />'
-                        );
+                        // var $selectLinkTag = $(
+                        //     // '<select>' +
+                        //     //     '<option>1</option>' +
+                        //     // '</select>'
+                        //     '<input id="magicss-file-to-edit" />'
+                        // );
                         $footerForFileMode.append($linkTagToEdit);
                         $footerForFileMode.append($fileToEdit);
-                        $footerForFileMode.append($selectLinkTag);
+                        // $footerForFileMode.append($selectLinkTag);
 
+                        /*
                         // Magic Suggest uses old jQuery code. Minor changes to fix that
                         jQuery.fn.extend({
                             size: function() {
@@ -2068,35 +2072,84 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         //     $selectLinkTag;
                         //     debugger;
                         // });
+                        /* */
 
-                        $linkTagToEdit.on('click', function () {
-                            // console.log($('link[rel=stylesheet]'));
-                            var links = [];
-                            $('link[rel~=stylesheet][href]').each(function (index, link) {
-                                links.push({
-                                    link: link,
-                                    href: $(link).attr('href')
-                                });
-                            });
-                            console.log(links);
-                            $footerItems.append(
-                                '<select>' +
-                                    (function () {
-                                        var str = '';
-                                        for (var i = 0; i < links.length; i++) {
-                                            str += '<option>' + links[i].href + '</option>';
-                                        }
-                                        return str;
-                                    }()) +
-                                '</select>'
-                            );
-                        });
+                        // $linkTagToEdit.on('click', function () {
+                        //     // console.log($('link[rel=stylesheet]'));
+                        //     var links = [];
+                        //     $('link[rel~=stylesheet][href]').each(function (index, link) {
+                        //         links.push({
+                        //             link: link,
+                        //             href: $(link).attr('href')
+                        //         });
+                        //     });
+                        //     console.log(links);
+                        //     $footerItems.append(
+                        //         '<select>' +
+                        //             (function () {
+                        //                 var str = '';
+                        //                 for (var i = 0; i < links.length; i++) {
+                        //                     str += '<option>' + links[i].href + '</option>';
+                        //                 }
+                        //                 return str;
+                        //             }()) +
+                        //         '</select>'
+                        //     );
+                        // });
                         $footerItems.on('mousedown', function (evt) {
                             evt.stopPropagation();
                         });
 
                         $fileToEdit.on('click', function () {
-                            alert(123);
+
+                            var generateLinkTagsList = function () {
+                                var links = [];
+                                $('link[rel~=stylesheet]:not([disabled])').each(function (index, link) {
+                                    if ($(link).attr('href')) {     // The href attribute might have been blank, hence this condition wasn't added to the main jQuery selector itself
+                                        links.push({
+                                            link: link,
+                                            href: $(link).attr('href')
+                                        });
+                                    }
+                                });
+
+                                // TODO: If links.length is 0, then show a warning/error message
+
+                                return $(
+                                    '<select>' +
+                                        (function () {
+                                            var str = '';
+                                            for (var i = 0; i < links.length; i++) {
+                                                str += '<option>' + links[i].href + '</option>';
+                                            }
+                                            return str;
+                                        }()) +
+                                    '</select>'
+                                );
+                            };
+                            /* eslint-disable indent */
+                            var $fileEditOptions = $(
+                                [
+                                    '<div>',
+                                        '<div class="magic-css-full-page-overlay">',
+                                        '</div>',
+                                        '<div class="magic-css-edit-file-options">',
+                                            '<div>File to edit:</div>',
+                                            '<div>Link tag to refresh:</div>',
+                                            '<div class="link-tag-to-refresh"></div>',
+                                            '<div>Refresh link tag after delay (in milliseconds):</div>',
+                                            '<div><input type="button" value="Start Editing" /></div>',
+                                        '</div>',
+                                    '</div>',
+                                ].join('')
+                            );
+                            /* eslint-enable indent */
+                            $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
+
+                            $fileEditOptions.find('.magic-css-full-page-overlay').on('click', function () {
+                                $fileEditOptions.remove();
+                            });
+                            $('body').append($fileEditOptions);
                         });
 
                         // The following DOM elements are added just to cache some Magic CSS icons/images which may otherwise fail to load on a

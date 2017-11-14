@@ -576,21 +576,48 @@ html .magicss-mouse-over-dom-element {
 
 #MagiCSS-bookmarklet .link-tag-to-edit,
 #MagiCSS-bookmarklet .file-to-edit {
-	color: #fff;
+    color: #fff;
     display: inline-block;
 }
 
 #MagiCSS-bookmarklet .link-tag-to-edit {
-	float: right;
+    float: right;
 }
 
+.magic-css-full-page-overlay {
+    background-color: rgba(0,0,0,0.5);
+    -pointer-events: none;
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -z-index: 2147483646;
+    z-index: 2147483647;
+}
+
+.magic-css-edit-file-options {
+    width: 500px;
+    height: 200px;
+    position: fixed;
+    left: calc(50% - 250px);
+    top: calc(50% - 100px);
+    -z-index: 2147483646;
+    z-index: 2147483647;
+    box-sizing: border-box;
+    background-color: #eee;
+    padding: 10px;
+    border-radius: 10px;
+}
 
 .ms-res-ctn.dropdown-menu {
     height: 58px;
     position: absolute;
     border: 1px solid #777;
-	width: calc(100% - 2px);
-	z-index: 10000;
+    width: calc(100% - 2px);
+    z-index: 10000;
     background-color: #fff;
     left: 0px;
     bottom: 30px;
@@ -612,17 +639,17 @@ html .magicss-mouse-over-dom-element {
 
 /* Show cursors if the CSS contains style like: div { overflow: hidden } */
 .CodeMirror-cursors {
-	overflow: initial !important;
+    overflow: initial !important;
 }
 
 /* Show selection if the CSS contains style like: div { overflow: hidden } */
 .CodeMirror-lines > div[role=presentation] > div[style]:not([class]) {
-	overflow: initial;
+    overflow: initial;
 }
 
 /* Show "alertNote" if the CSS contains style like: div { overflow: hidden } */
 #topCenterAlertNote > div {
-	overflow: initial !important;
+    overflow: initial !important;
 }
 
 /* http://cssbeautify.com/ - Without this style, a scrollbar might appear when the size (height) of CodeMirror is increased */
