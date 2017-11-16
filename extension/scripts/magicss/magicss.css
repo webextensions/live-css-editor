@@ -526,6 +526,27 @@ html .magicss-mouse-over-dom-element {
     border-radius: 10px;
 }
 
+.magic-css-row {
+	clear: both;
+	margin-top: 7px;
+}
+
+.magic-css-row-first-item {
+	float: left;
+	width: 125px;
+	text-align: right;
+	margin-right: 10px;
+}
+
+.magic-css-row input {
+	padding-left: 3px;
+}
+
+.magic-css-row input:invalid {
+	border-color: #e81a1a;
+	border-style: solid;
+}
+
 .ms-res-ctn.dropdown-menu {
     height: 58px;
     position: absolute;
