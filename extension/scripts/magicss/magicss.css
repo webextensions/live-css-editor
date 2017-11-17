@@ -633,6 +633,11 @@ html .magicss-mouse-over-dom-element {
 	border-style: solid;
 }
 
+.magic-css-row .link-tag-to-refresh select {
+    width: 300px;
+}
+
+
 .ms-res-ctn.dropdown-menu {
     height: 58px;
     position: absolute;

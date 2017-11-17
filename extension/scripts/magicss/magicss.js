@@ -1070,14 +1070,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     if (getLanguageMode() === 'file') {
                         var targetFileContents = editor.getTextValue();
 
-                        /*
-                        $.ajax({
-                            method: 'PUT',
-                            url: 'http://localhost:3000/magic-css/' + window.fileSuggestions.getValue()[0],
-                            data: {
-                                targetFileContents: targetFileContents
-                            }
-                        });
+                        if (window.fileSuggestions) {
+                            $.ajax({
+                                method: 'PUT',
+                                url: 'http://localhost:3777/magic-css/' + window.fileSuggestions.getValue()[0],
+                                data: {
+                                    targetFileContents: targetFileContents
+                                }
+                            });
+                        }
                         /* */
                     } else if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
@@ -1437,10 +1438,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             setLanguageMode('file', editor);
                             $.ajax({
                                 method: 'PUT',
-                                url: 'http://localhost:3000/magic-css/asdf.txt'
-                                // url: 'http://localhost:3000/magic-css/asdf.txt'
-                                // url: 'http://localhost:3000/asdf.txt'
-                                // url: 'http://localhost:3000/asdf.txt'
+                                url: 'http://localhost:3777/magic-css/asdf.txt'
+                                // url: 'http://localhost:3777/magic-css/asdf.txt'
+                                // url: 'http://localhost:3777/asdf.txt'
+                                // url: 'http://localhost:3777/asdf.txt'
                             });
                             editor.focus();
                         });
@@ -2030,14 +2031,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         setTimeout(function () {
                             // $.ajax({
                             //     method: 'PUT',
-                            //     url: 'http://localhost:3000/magic-css/asdf.txt'
-                            //     // url: 'http://localhost:3000/magic-css/asdf.txt'
-                            //     // url: 'http://localhost:3000/asdf.txt'
-                            //     // url: 'http://localhost:3000/asdf.txt'
+                            //     url: 'http://localhost:3777/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3777/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3777/asdf.txt'
+                            //     // url: 'http://localhost:3777/asdf.txt'
                             // });
                             var fileSuggestions = $('#magicss-file-to-edit').magicSuggest({
                                 method: 'GET',
-                                data: 'http://localhost:3000/magic-css?query=asdf'
+                                data: 'http://localhost:3777/magic-css?query=asdf'
                                 // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                                 // data: 'random.json',
                                 // renderer: function(data){
@@ -2055,7 +2056,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             // fileSuggestions.expand();
                             $(fileSuggestions).on('selectionchange', function(e, m){
                                 $.ajax({
-                                    url: 'http://localhost:3000/' + this.getValue()[0],
+                                    url: 'http://localhost:3777/' + this.getValue()[0],
                                     success: function (data, textStatus) {
                                         if (textStatus === 'success') {
                                             editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
@@ -2100,6 +2101,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             evt.stopPropagation();
                         });
 
+                        // Magic Suggest uses old jQuery code. Minor changes to fix that
+                        jQuery.fn.extend({
+                            size: function() {
+                                return this.length;
+                            }
+                        });
+
+
                         $fileToEdit.on('click', function () {
 
                             var generateLinkTagsList = function () {
@@ -2114,18 +2123,21 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 });
 
                                 // TODO: If links.length is 0, then show a warning/error message
-
-                                return $(
-                                    '<select>' +
+                                if (links.length) {
+                                    return $(
+                                        '<select>' +
                                         (function () {
-                                            var str = '';
+                                            var str = '<option>Refresh all &lt;link&gt; tags</option>';
                                             for (var i = 0; i < links.length; i++) {
                                                 str += '<option>' + links[i].href + '</option>';
                                             }
                                             return str;
                                         }()) +
-                                    '</select>'
-                                );
+                                        '</select>'
+                                    );
+                                } else {
+                                    return $('<span>No &lt;link&gt; tags in the page</span>');
+                                }
                             };
                             /* eslint-disable indent */
                             var $fileEditOptions = $(
@@ -2136,7 +2148,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         '<div class="magic-css-edit-file-options">',
                                             '<div class="magic-css-row">',
                                                 '<div class="magic-css-row-first-item">Server path:</div>',
-                                                '<div><input /> <span style="color:#888;font-size:12px">(eg: http://localhost:3777)</span></div>',
+                                                '<div>',
+                                                    '<input value="http://localhost:3777/" />',
+                                                    '<span style="color:#888;font-size:12px">(eg: http://localhost:3777)</span>',
+                                                '</div>',
                                             '</div>',
                                             '<div class="magic-css-row">',
                                                 '<div class="magic-css-row-first-item">&nbsp;</div>',
@@ -2144,7 +2159,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             '</div>',
                                             '<div class="magic-css-row">',
                                                 '<div class="magic-css-row-first-item">File to edit:</div>',
-                                                '<div><input /></div>',
+                                                '<div><input class="magicss-file-to-edit" /></div>',
                                             '</div>',
                                             '<div class="magic-css-row">',
                                                 '<div class="magic-css-row-first-item">Link tag to refresh:</div>',
@@ -2162,6 +2177,38 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 ].join('')
                             );
                             /* eslint-enable indent */
+
+                            var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
+                                method: 'GET',
+                                data: 'http://localhost:3777/magic-css?query=asdf'
+                                // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
+                                // data: 'random.json',
+                                // renderer: function(data){
+                                //     // debugger;
+                                //     return '<div style="padding: 5px; overflow:hidden;">' +
+                                //     // '<div style="float: left;"><img src="' + data.picture + '" /></div>' +
+                                //     '<div style="float: left; margin-left: 5px">' +
+                                //     '<div style="font-weight: bold; color: #333; font-size: 10px; line-height: 11px">' + data.name + '</div>' +
+                                //     '<div style="color: #999; font-size: 9px">' + data.name + '</div>' +
+                                //     '</div>' +
+                                //     '</div><div style="clear:both;"></div>'; // make sure we have closed our dom stuff
+                                // }
+                            });
+
+                            window.fileSuggestions = fileSuggestions;
+
+                            var $fileSuggestions = $(fileSuggestions);
+                            $fileSuggestions.on('selectionchange', function(e, m){
+                                $.ajax({
+                                    url: 'http://localhost:3777/' + this.getValue()[0],
+                                    success: function (data, textStatus) {
+                                        if (textStatus === 'success') {
+                                            editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        }
+                                    }
+                                });
+                            });
+
                             $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
 
                             $fileEditOptions.find('.magic-css-full-page-overlay').on('click', function () {
