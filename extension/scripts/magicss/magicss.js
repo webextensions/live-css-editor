@@ -1990,89 +1990,134 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
                     $fileEditOptions.find('.magic-css-edit-file-options').draggable();
 
-                    $fileEditOptions.find('.magic-css-full-page-overlay').on('click', function () {
+                    $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
                         $fileEditOptions.remove();
                     });
                     $fileEditOptions.find('.magicss-start-file-editing').on('click', function () {
+                        var filePath = fileSuggestions.getValue()[0];
                         $fileEditOptions.remove();
-                        cb();
+                        cb(filePath);
                     });
                     $('body').append($fileEditOptions);
                 };
 
-                var showFileToEditPrompt = function (editor, cb) {
-                    showFileEditOptions(editor, function () {
-                        var fileSuggestions = window.fileSuggestions;
-                        var filePath = fileSuggestions.getValue()[0];
-                        $.ajax({
-                            url: editor.userPreference('magic-css-server-path') + '/' + filePath,
-                            success: function (data, textStatus) {
-                                if (textStatus === 'success') {
-                                    editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                    var fileToEdit = filePath;
-                                    cb(fileToEdit);
-                                } else {
-                                    console.log('TODO');
-                                }
-                            },
-                            failure: function () {
+                var loadFile = function (editor, options, cb) {
+                    var filePath = options.filePath;
+                    $.ajax({
+                        url: editor.userPreference('magic-css-server-path') + '/' + filePath,
+                        success: function (data, textStatus) {
+                            if (textStatus === 'success') {
+                                cb({
+                                    path: filePath,
+                                    contents: data
+                                });
+                            } else {
                                 console.log('TODO');
                             }
-                        });
+                        },
+                        failure: function () {
+                            console.log('TODO');
+                        }
                     });
                 };
 
-                var removeLanguageModeClass = function (editor) {
+                var getDataForFileToEdit = function (editor, cb) {
+                    var needInputThroughUi = true;
+                    console.log('TODO: Set needInputThroughUi to true/false');
+
+                    if (needInputThroughUi) {
+                        showFileEditOptions(editor, function (filePath) {
+                            // var fileSuggestions = window.fileSuggestions;
+                            // var filePath = fileSuggestions.getValue()[0];
+                            loadFile(
+                                editor,
+                                {
+                                    filePath: filePath
+                                },
+                                function (file) {
+                                    cb(file);
+                                }
+                            );
+                            /*
+                            $.ajax({
+                                url: editor.userPreference('magic-css-server-path') + '/' + filePath,
+                                success: function (data, textStatus) {
+                                    if (textStatus === 'success') {
+                                        editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        var fileToEdit = filePath;
+                                        cb(fileToEdit);
+                                    } else {
+                                        console.log('TODO');
+                                    }
+                                },
+                                failure: function () {
+                                    console.log('TODO');
+                                }
+                            });
+                            /* */
+                        });
+                    } else {
+                        console.log('TODO');
+                    }
+                };
+
+                var setLanguageModeClass = function (editor, cls) {
                     $(editor.container)
                         .removeClass('magicss-selected-mode-css')
                         .removeClass('magicss-selected-mode-less')
                         .removeClass('magicss-selected-mode-sass')
-                        .removeClass('magicss-selected-mode-file');
+                        .removeClass('magicss-selected-mode-file')
+                        .addClass(cls);
                 };
 
                 var setLanguageMode = function (languageMode, editor) {
                     if (languageMode === 'file') {
-                        editor.options.rememberText = false;
-                        showFileToEditPrompt(editor, function (fileToEdit) {
-                            removeLanguageModeClass(editor);
-                            $(editor.container).addClass('magicss-selected-mode-file');
+                        getDataForFileToEdit(editor, function (file) {
+                            editor.options.rememberText = false;
+
+                            setLanguageModeClass(editor, 'magicss-selected-mode-file');
                             editor.userPreference('language-mode', 'file');
                             editor.cm.setOption('mode', 'text/x-less');
                             setCodeMirrorCSSLinting(editor, 'disable');
                             $('.footer-for-file-mode').show();
-                            $('.footer-for-file-mode .name-of-file-being-edited').html(htmlEscape(fileToEdit));
-                            utils.alertNote('Now editing file: ' + htmlEscape(fileToEdit), 5000);
-                            editor.focus();
+                            $('.footer-for-file-mode .name-of-file-being-edited').html(htmlEscape(getFileNameFromPath(file.path)));
+                            utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
+                            editor
+                                .setTextValue(file.contents)
+                                .reInitTextComponent({pleaseIgnoreCursorActivity: true})
+                                .focus();
                         });
                     } else {
                         editor.options.rememberText = true;
+
+                        // If previous mode was 'file', then we restore the saved code
                         if (getLanguageMode() === 'file') {
                             editor
                                 .setTextValue(editor.userPreference('textarea-value'))
                                 .reInitTextComponent({pleaseIgnoreCursorActivity: true});
                         }
 
-                        removeLanguageModeClass(editor);
                         $('.footer-for-file-mode').hide();
                         if (languageMode === 'less') {
-                            $(editor.container).addClass('magicss-selected-mode-less');
+                            setLanguageModeClass(editor, 'magicss-selected-mode-less');
                             editor.userPreference('language-mode', 'less');
                             editor.cm.setOption('mode', 'text/x-less');
                             setCodeMirrorCSSLinting(editor, 'disable');
                             utils.alertNote('Now editing code in LESS mode', 5000);
                         } else if (languageMode === 'sass') {
-                            $(editor.container).addClass('magicss-selected-mode-sass');
+                            setLanguageModeClass(editor, 'magicss-selected-mode-sass');
                             editor.userPreference('language-mode', 'sass');
                             editor.cm.setOption('mode', 'text/x-scss');
                             setCodeMirrorCSSLinting(editor, 'disable');
                             utils.alertNote('Now editing code in SASS mode', 5000);
                         } else {
-                            $(editor.container).addClass('magicss-selected-mode-css');
+                            setLanguageModeClass(editor, 'magicss-selected-mode-css');
                             editor.userPreference('language-mode', 'css');
                             editor.cm.setOption('mode', 'text/css');
                             utils.alertNote('Now editing code in CSS mode', 5000);
                         }
                         fnApplyTextAsCSS(editor);
+                        console.log('TODO: Check if the editor is being focused back');
                     }
                 };
 
