@@ -1224,6 +1224,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                 var setLanguageMode = function (languageMode, editor) {
                     if (languageMode === 'file') {
+                        editor.options.rememberText = false;
                         showFileToEditPrompt(editor, function (fileToEdit) {
                             removeLanguageModeClass(editor);
                             $(editor.container).addClass('magicss-selected-mode-file');
@@ -1232,8 +1233,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             setCodeMirrorCSSLinting(editor, 'disable');
                             $('.footer-for-file-mode').show();
                             utils.alertNote('Now editing file: ' + htmlEscape(fileToEdit), 5000);
+                            editor.focus();
                         });
                     } else {
+                        editor.options.rememberText = true;
+                        if (getLanguageMode() === 'file') {
+                            editor
+                                .setTextValue(editor.userPreference('textarea-value'))
+                                .reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                        }
+
                         removeLanguageModeClass(editor);
                         $('.footer-for-file-mode').hide();
                         if (languageMode === 'less') {
