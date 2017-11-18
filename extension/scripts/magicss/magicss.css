@@ -544,6 +544,11 @@ body .tooltipster-default .tooltipster-content {
 .indicate-disabled#MagiCSS-bookmarklet .CodeMirror-scrollbar-filler {
     background-color: #bbb;
 }
+.indicate-disabled#MagiCSS-bookmarklet .magicss-mode-css,
+.indicate-disabled#MagiCSS-bookmarklet .magicss-mode-less,
+.indicate-disabled#MagiCSS-bookmarklet .magicss-mode-sass {
+    text-decoration: line-through;
+}
 
 /* Highlight Less/Sass syntax error line in CodeMirror */
 .line-has-parsing-error-transition-effect {
@@ -663,7 +668,7 @@ html .magicss-mouse-over-dom-element {
     outline: -webkit-focus-ring-color auto 5px
 }
 .magic-css-edit-file-options .ms-ctn .ms-helper {
-    display: none;
+    display: none !important;
 }
 
 
