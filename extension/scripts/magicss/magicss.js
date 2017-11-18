@@ -1862,6 +1862,124 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
+                var generateLinkTagsList = function () {
+                    var links = [];
+                    $('link[rel~=stylesheet]:not([disabled])').each(function (index, link) {
+                        if ($(link).attr('href')) {     // The href attribute might have been blank, hence this condition wasn't added to the main jQuery selector itself
+                            links.push({
+                                link: link,
+                                href: $(link).attr('href')
+                            });
+                        }
+                    });
+
+                    // TODO: If links.length is 0, then show a warning/error message
+                    if (links.length) {
+                        return $(
+                            '<select>' +
+                            (function () {
+                                var str = '<option>Refresh all &lt;link&gt; tags</option>';
+                                for (var i = 0; i < links.length; i++) {
+                                    str += '<option>' + links[i].href + '</option>';
+                                }
+                                return str;
+                            }()) +
+                            '</select>'
+                        );
+                    } else {
+                        return $('<span>No &lt;link&gt; tags in the page</span>');
+                    }
+                };
+
+                var showFileEditOptions = function (editor) {
+                    /* eslint-disable indent */
+                    var $fileEditOptions = $(
+                        [
+                            '<div>',
+                                '<div class="magic-css-full-page-overlay">',
+                                '</div>',
+                                '<div class="magic-css-edit-file-options">',
+                                    '<div class="magic-css-row">',
+                                        '<div class="magic-css-row-first-item">Server path:</div>',
+                                        '<div>',
+                                            '<input value="http://localhost:3777/" />',
+                                            '<span style="color:#888;font-size:12px">(eg: http://localhost:3777)</span>',
+                                        '</div>',
+                                    '</div>',
+                                    '<div class="magic-css-row">',
+                                        '<div class="magic-css-row-first-item">&nbsp;</div>',
+                                        '<div><input type="button" value="Check connectivity" /></div>',
+                                    '</div>',
+                                    '<div class="magic-css-row">',
+                                        '<div class="magic-css-row-first-item">File to edit:</div>',
+                                        '<div><input class="magicss-file-to-edit" /></div>',
+                                    '</div>',
+                                    '<div class="magic-css-row">',
+                                        '<div class="magic-css-row-first-item">Link tag to refresh:</div>',
+                                        '<div class="link-tag-to-refresh"></div>',
+                                    '</div>',
+                                    '<div class="magic-css-row">',
+                                        '<div class="magic-css-row-first-item">Refresh delay:</div>',
+                                        '<div><input type="number" value="750" min="50" max="60000" step="50" /> milliseconds</div>',
+                                    '</div>',
+                                    '<div class="magic-css-row">',
+                                        '<input type="button" value="Start Editing" />',
+                                    '</div>',
+                                '</div>',
+                            '</div>',
+                        ].join('')
+                    );
+                    /* eslint-enable indent */
+
+                    var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
+                        method: 'GET',
+                        data: 'http://localhost:3777/magic-css?query=asdf'
+                        // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
+                        // data: 'random.json',
+                        // renderer: function(data){
+                        //     // debugger;
+                        //     return '<div style="padding: 5px; overflow:hidden;">' +
+                        //     // '<div style="float: left;"><img src="' + data.picture + '" /></div>' +
+                        //     '<div style="float: left; margin-left: 5px">' +
+                        //     '<div style="font-weight: bold; color: #333; font-size: 10px; line-height: 11px">' + data.name + '</div>' +
+                        //     '<div style="color: #999; font-size: 9px">' + data.name + '</div>' +
+                        //     '</div>' +
+                        //     '</div><div style="clear:both;"></div>'; // make sure we have closed our dom stuff
+                        // }
+                    });
+
+                    window.fileSuggestions = fileSuggestions;
+
+                    var $fileSuggestions = $(fileSuggestions);
+                    $fileSuggestions.on('selectionchange', function(e, m){
+                        $.ajax({
+                            url: 'http://localhost:3777/' + this.getValue()[0],
+                            success: function (data, textStatus) {
+                                if (textStatus === 'success') {
+                                    editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                }
+                            }
+                        });
+                    });
+
+                    $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
+
+                    $fileEditOptions.find('.magic-css-full-page-overlay').on('click', function () {
+                        $fileEditOptions.remove();
+                    });
+                    $('body').append($fileEditOptions);
+                };
+
+                var showFileToEditPrompt = function (editor, cb) {
+                    console.log('TODO: Show file-to-edit prompt');
+                    console.log('TODO: Update <file-to-edit>');
+
+                    showFileEditOptions(editor);
+
+                    var fileToEdit = '<file-to-edit>';
+                    cb(fileToEdit);
+                };
+
                 var removeLanguageModeClass = function (editor) {
                     $(editor.container)
                         .removeClass('magicss-selected-mode-css')
@@ -1870,16 +1988,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         .removeClass('magicss-selected-mode-file');
                 };
 
-                var showFileToEditPrompt = function (cb) {
-                    console.log('TODO: Show file-to-edit prompt');
-                    console.log('TODO: Update <file-to-edit>');
-                    var fileToEdit = '<file-to-edit>';
-                    cb(fileToEdit);
-                };
-
                 var setLanguageMode = function (languageMode, editor) {
                     if (languageMode === 'file') {
-                        showFileToEditPrompt(function (fileToEdit) {
+                        showFileToEditPrompt(editor, function (fileToEdit) {
                             removeLanguageModeClass(editor);
                             $(editor.container).addClass('magicss-selected-mode-file');
                             editor.userPreference('language-mode', 'file');
@@ -2743,111 +2854,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
 
                         $fileToEdit.on('click', function () {
-
-                            var generateLinkTagsList = function () {
-                                var links = [];
-                                $('link[rel~=stylesheet]:not([disabled])').each(function (index, link) {
-                                    if ($(link).attr('href')) {     // The href attribute might have been blank, hence this condition wasn't added to the main jQuery selector itself
-                                        links.push({
-                                            link: link,
-                                            href: $(link).attr('href')
-                                        });
-                                    }
-                                });
-
-                                // TODO: If links.length is 0, then show a warning/error message
-                                if (links.length) {
-                                    return $(
-                                        '<select>' +
-                                        (function () {
-                                            var str = '<option>Refresh all &lt;link&gt; tags</option>';
-                                            for (var i = 0; i < links.length; i++) {
-                                                str += '<option>' + links[i].href + '</option>';
-                                            }
-                                            return str;
-                                        }()) +
-                                        '</select>'
-                                    );
-                                } else {
-                                    return $('<span>No &lt;link&gt; tags in the page</span>');
-                                }
-                            };
-                            /* eslint-disable indent */
-                            var $fileEditOptions = $(
-                                [
-                                    '<div>',
-                                        '<div class="magic-css-full-page-overlay">',
-                                        '</div>',
-                                        '<div class="magic-css-edit-file-options">',
-                                            '<div class="magic-css-row">',
-                                                '<div class="magic-css-row-first-item">Server path:</div>',
-                                                '<div>',
-                                                    '<input value="http://localhost:3777/" />',
-                                                    '<span style="color:#888;font-size:12px">(eg: http://localhost:3777)</span>',
-                                                '</div>',
-                                            '</div>',
-                                            '<div class="magic-css-row">',
-                                                '<div class="magic-css-row-first-item">&nbsp;</div>',
-                                                '<div><input type="button" value="Check connectivity" /></div>',
-                                            '</div>',
-                                            '<div class="magic-css-row">',
-                                                '<div class="magic-css-row-first-item">File to edit:</div>',
-                                                '<div><input class="magicss-file-to-edit" /></div>',
-                                            '</div>',
-                                            '<div class="magic-css-row">',
-                                                '<div class="magic-css-row-first-item">Link tag to refresh:</div>',
-                                                '<div class="link-tag-to-refresh"></div>',
-                                            '</div>',
-                                            '<div class="magic-css-row">',
-                                                '<div class="magic-css-row-first-item">Refresh delay:</div>',
-                                                '<div><input type="number" value="750" min="50" max="60000" step="50" /> milliseconds</div>',
-                                            '</div>',
-                                            '<div class="magic-css-row">',
-                                                '<input type="button" value="Start Editing" />',
-                                            '</div>',
-                                        '</div>',
-                                    '</div>',
-                                ].join('')
-                            );
-                            /* eslint-enable indent */
-
-                            var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
-                                method: 'GET',
-                                data: 'http://localhost:3777/magic-css?query=asdf'
-                                // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
-                                // data: 'random.json',
-                                // renderer: function(data){
-                                //     // debugger;
-                                //     return '<div style="padding: 5px; overflow:hidden;">' +
-                                //     // '<div style="float: left;"><img src="' + data.picture + '" /></div>' +
-                                //     '<div style="float: left; margin-left: 5px">' +
-                                //     '<div style="font-weight: bold; color: #333; font-size: 10px; line-height: 11px">' + data.name + '</div>' +
-                                //     '<div style="color: #999; font-size: 9px">' + data.name + '</div>' +
-                                //     '</div>' +
-                                //     '</div><div style="clear:both;"></div>'; // make sure we have closed our dom stuff
-                                // }
-                            });
-
-                            window.fileSuggestions = fileSuggestions;
-
-                            var $fileSuggestions = $(fileSuggestions);
-                            $fileSuggestions.on('selectionchange', function(e, m){
-                                $.ajax({
-                                    url: 'http://localhost:3777/' + this.getValue()[0],
-                                    success: function (data, textStatus) {
-                                        if (textStatus === 'success') {
-                                            editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        }
-                                    }
-                                });
-                            });
-
-                            $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
-
-                            $fileEditOptions.find('.magic-css-full-page-overlay').on('click', function () {
-                                $fileEditOptions.remove();
-                            });
-                            $('body').append($fileEditOptions);
+                            console.log('TODO');
                         });
 
                         // The following DOM elements are added just to cache some Magic CSS icons/images which may otherwise fail to load on a
