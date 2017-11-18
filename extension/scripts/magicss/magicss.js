@@ -1123,7 +1123,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     '</div>',
                                     '<div class="magic-css-row">',
                                         '<div class="magic-css-row-first-item">Refresh delay:</div>',
-                                        '<div><input type="number" value="750" min="50" max="60000" step="50" /> milliseconds</div>',
+                                        '<div><input type="number" class="magic-css-link-refresh-delay" value="750" min="50" max="60000" step="50" /> milliseconds</div>',
                                     '</div>',
                                     '<div class="magic-css-row">',
                                         '<input type="button" class="magicss-start-file-editing" value="Start Editing" />',
@@ -1165,7 +1165,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         });
                     });
 
+                    var linkRefreshDelayValue = editor.userPreference('link-refresh-delay-on-file-update') || 750;
+                    var $linkRefreshDelay = $fileEditOptions.find('.magic-css-link-refresh-delay');
+                    $linkRefreshDelay.val(linkRefreshDelayValue);
+                    $linkRefreshDelay.on('change', function () {
+                        editor.userPreference('link-refresh-delay-on-file-update', $linkRefreshDelay.val());
+                    });
+
                     $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
+                    $fileEditOptions.find('.magic-css-edit-file-options').draggable();
 
                     $fileEditOptions.find('.magic-css-full-page-overlay').on('click', function () {
                         $fileEditOptions.remove();
