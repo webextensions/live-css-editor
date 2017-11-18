@@ -923,6 +923,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 url: 'http://localhost:3777/magic-css/' + window.fileSuggestions.getValue()[0],
                                 data: {
                                     targetFileContents: targetFileContents
+                                },
+                                success: function () {
+                                    reloadCSSInPage();
+                                    // debugger;
                                 }
                             });
                         }
@@ -1278,13 +1282,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         });
                         $(document).on('click', '.magicss-mode-file', function () {
                             setLanguageMode('file', editor);
-                            $.ajax({
-                                method: 'PUT',
-                                url: 'http://localhost:3777/magic-css/asdf.txt'
-                                // url: 'http://localhost:3777/magic-css/asdf.txt'
-                                // url: 'http://localhost:3777/asdf.txt'
-                                // url: 'http://localhost:3777/asdf.txt'
-                            });
+                            // $.ajax({
+                            //     method: 'PUT',
+                            //     url: 'http://localhost:3777/magic-css/asdf.txt',
+                            //     // url: 'http://localhost:3777/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3777/asdf.txt'
+                            //     // url: 'http://localhost:3777/asdf.txt'
+                            //     success: function () {
+                            //         debugger;
+                            //     }
+                            // });
                             editor.focus();
                         });
 
