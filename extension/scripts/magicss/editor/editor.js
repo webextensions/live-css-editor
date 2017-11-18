@@ -949,6 +949,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
             var $that = $(thisOb.container);
             $that.addClass('mode-codeMirror');
+            return this;
         }
 
         setCursor(cursorPosition, options) {
@@ -963,6 +964,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = true; }
             this.reInitCodeMirror();
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
+            return this;
         }
     }
     Editor.defaultPreferences = {
