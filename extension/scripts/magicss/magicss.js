@@ -925,12 +925,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     targetFileContents: targetFileContents
                                 },
                                 success: function () {
-                                    reloadCSSInPage();
-                                    // debugger;
+                                    console.log('TODO: Make this delay of 750ms customizable');
+                                    setTimeout(function () {
+                                        reloadCSSInPage();
+                                    }, 750);
                                 }
                             });
                         }
-                        /* */
                     } else if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
@@ -1064,20 +1065,34 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
-                var setLanguageMode = function (languageMode, editor) {
+                var removeLanguageModeClass = function (editor) {
                     $(editor.container)
                         .removeClass('magicss-selected-mode-css')
                         .removeClass('magicss-selected-mode-less')
                         .removeClass('magicss-selected-mode-sass')
                         .removeClass('magicss-selected-mode-file');
+                };
+
+                var showFileToEditPrompt = function (cb) {
+                    console.log('TODO: Show file-to-edit prompt');
+                    console.log('TODO: Update <file-to-edit>');
+                    var fileToEdit = '<file-to-edit>';
+                    cb(fileToEdit);
+                };
+
+                var setLanguageMode = function (languageMode, editor) {
                     if (languageMode === 'file') {
-                        $(editor.container).addClass('magicss-selected-mode-file');
-                        editor.userPreference('language-mode', 'file');
-                        editor.cm.setOption('mode', 'text/x-less');
-                        setCodeMirrorCSSLinting(editor, 'disable');
-                        $('.footer-for-file-mode').show();
-                        utils.alertNote('In this mode you can edit code directly from file', 5000);
+                        showFileToEditPrompt(function (fileToEdit) {
+                            removeLanguageModeClass(editor);
+                            $(editor.container).addClass('magicss-selected-mode-file');
+                            editor.userPreference('language-mode', 'file');
+                            editor.cm.setOption('mode', 'text/x-less');
+                            setCodeMirrorCSSLinting(editor, 'disable');
+                            $('.footer-for-file-mode').show();
+                            utils.alertNote('Now editing file: ' + htmlEscape(fileToEdit), 5000);
+                        });
                     } else {
+                        removeLanguageModeClass(editor);
                         $('.footer-for-file-mode').hide();
                         if (languageMode === 'less') {
                             $(editor.container).addClass('magicss-selected-mode-less');
