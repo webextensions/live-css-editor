@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var express = require('express');
 var serveIndex = require('serve-index');
 var bodyParser = require('body-parser');
@@ -22,7 +24,8 @@ app.put('/magic-css', function (req, res, next) {
 app.put('/magic-css/*', function (req, res, next) {
     var relativeFilePath = req.originalUrl.substr('/magic-css/'.length);
     fs.writeFileSync(
-        __dirname + '/' + relativeFilePath,
+        // __dirname + '/' + relativeFilePath,
+        relativeFilePath,
         req.body.targetFileContents
     );
     res.send({ status: 'File updated successfully' });
