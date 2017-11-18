@@ -1725,13 +1725,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             },
                             beforeShow: function (origin, tooltip, editor) {
                                 tooltip
-                                    .addClass(
-                                        getLanguageMode() === 'less' ?
-                                            'tooltipster-selected-mode-less' :
-                                            getLanguageMode() === 'sass' ?
-                                                'tooltipster-selected-mode-sass' :
-                                                'tooltipster-selected-mode-css'
-                                    )
+                                    .addClass(function () {
+                                        switch(getLanguageMode()) {
+                                            case 'file':    return 'tooltipster-selected-mode-file';
+                                            case 'less':    return 'tooltipster-selected-mode-less';
+                                            case 'sass':    return 'tooltipster-selected-mode-sass';
+                                            default:        return 'tooltipster-selected-mode-css';
+                                        }
+                                    }())
                                     .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
                                     .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
                                     .addClass(editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS) === 'no' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
