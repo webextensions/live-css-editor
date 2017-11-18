@@ -1097,7 +1097,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
-                var showFileEditOptionsIfRequired = function (editor, cb) {
+                var showFileEditOptions = function (editor, cb) {
                     /* eslint-disable indent */
                     var $fileEditOptions = $(
                         [
@@ -1203,8 +1203,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $('body').append($fileEditOptions);
                 };
 
-                var showFileToEditPromptIfRequired = function (editor, cb) {
-                    showFileEditOptionsIfRequired(editor, function () {
+                var showFileToEditPrompt = function (editor, cb) {
+                    showFileEditOptions(editor, function () {
                         var fileSuggestions = window.fileSuggestions;
                         var filePath = fileSuggestions.getValue()[0];
                         $.ajax({
@@ -1236,7 +1236,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 var setLanguageMode = function (languageMode, editor) {
                     if (languageMode === 'file') {
                         editor.options.rememberText = false;
-                        showFileToEditPromptIfRequired(editor, function (fileToEdit) {
+                        showFileToEditPrompt(editor, function (fileToEdit) {
                             removeLanguageModeClass(editor);
                             $(editor.container).addClass('magicss-selected-mode-file');
                             editor.userPreference('language-mode', 'file');
