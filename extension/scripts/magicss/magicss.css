@@ -621,10 +621,9 @@ html .magicss-mouse-over-dom-element {
 	float: left;
 	width: 125px;
 	text-align: right;
-	margin-right: 10px;
 }
 .magic-css-row-item-2 {
-    margin-left: 125px;
+    margin-left: 135px;
 }
 
 .magic-css-row input {
@@ -641,7 +640,7 @@ html .magicss-mouse-over-dom-element {
 }
 
 
-.ms-res-ctn.dropdown-menu {
+.magic-css-edit-file-options .ms-res-ctn.dropdown-menu {
     height: 58px;
     position: absolute;
     border: 1px solid #777;
@@ -650,6 +649,21 @@ html .magicss-mouse-over-dom-element {
     background-color: #fff;
     left: 0px;
     bottom: 30px;
+}
+.magic-css-edit-file-options .ms-ctn {
+    padding-left: 7px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.magic-css-edit-file-options .ms-ctn .ms-trigger .ms-trigger-ico {
+    margin-top: 9px;
+}
+.magic-css-edit-file-options .ms-ctn-focus {
+    box-shadow: none;
+    outline: -webkit-focus-ring-color auto 5px
+}
+.magic-css-edit-file-options .ms-ctn .ms-helper {
+    display: none;
 }
 
 
