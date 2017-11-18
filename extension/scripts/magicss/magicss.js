@@ -1625,7 +1625,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         if (window.fileSuggestions) {
                             $.ajax({
                                 method: 'PUT',
-                                url: 'http://localhost:3777/magic-css/' + window.fileSuggestions.getValue()[0],
+                                url: editor.userPreference('magic-css-server-path') + '/magic-css/' + window.fileSuggestions.getValue()[0],
                                 data: {
                                     targetFileContents: targetFileContents
                                 },
@@ -1845,7 +1845,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                     var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
                         method: 'GET',
-                        data: 'http://localhost:3777/magic-css?query=asdf'
+                        data: editor.userPreference('magic-css-server-path') + '/magic-css?query=asdf'
                         // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                         // data: 'random.json',
                         // renderer: function(data){
@@ -1868,10 +1868,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     // });
 
                     var $serverPath = $fileEditOptions.find('.magic-css-server-path'),
-                        serverPathValue = editor.userPreference('magic-css-server-path') || 'http://localhost:3777/';
+                        serverPathValue = editor.userPreference('magic-css-server-path');
                     $serverPath.val(serverPathValue);
                     $serverPath.on('change', function () {
-                        editor.userPreference('magic-css-server-path', $(this).val());
+                        var serverPathValue = $(this).val().trim().replace(/\/$/, '');
+                        editor.userPreference('magic-css-server-path', serverPathValue);
                     });
 
                     var $linkRefreshDelay = $fileEditOptions.find('.magic-css-link-refresh-delay'),
@@ -1900,12 +1901,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                     showFileEditOptions(editor, function () {
                         var fileSuggestions = window.fileSuggestions;
+                        var filePath = fileSuggestions.getValue()[0];
                         $.ajax({
-                            url: 'http://localhost:3777/' + fileSuggestions.getValue()[0],
+                            url: editor.userPreference('magic-css-server-path') + '/' + filePath,
                             success: function (data, textStatus) {
                                 if (textStatus === 'success') {
                                     editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                    var fileToEdit = '<file-to-edit>';
+                                    var fileToEdit = filePath;
                                     cb(fileToEdit);
                                 } else {
                                     console.log('TODO');
