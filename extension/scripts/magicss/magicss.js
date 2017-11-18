@@ -926,7 +926,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 },
                                 success: function () {
                                     var delay = editor.userPreference('link-refresh-delay-on-file-update') || 750;
-                                    utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
+                                    if (delay >= 500) {
+                                        utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
+                                    }
                                     setTimeout(function () {
                                         reloadCSSInPage();
                                     }, delay);
@@ -1124,7 +1126,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     '</div>',
                                     '<div class="magic-css-row">',
                                         '<div class="magic-css-row-first-item">Refresh delay:</div>',
-                                        '<div><input type="number" class="magic-css-link-refresh-delay" value="750" min="50" max="60000" step="50" /> milliseconds</div>',
+                                        '<div><input type="number" class="magic-css-link-refresh-delay" value="750" min="0" max="60000" step="50" /> milliseconds</div>',
                                     '</div>',
                                     '<div class="magic-css-row">',
                                         '<input type="button" class="magicss-start-file-editing" value="Start Editing" />',
