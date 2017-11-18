@@ -1309,17 +1309,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                     window.fileSuggestions = fileSuggestions;
 
-                    var $fileSuggestions = $(fileSuggestions);
-                    $fileSuggestions.on('selectionchange', function(e, m){
-                        $.ajax({
-                            url: 'http://localhost:3777/' + this.getValue()[0],
-                            success: function (data, textStatus) {
-                                if (textStatus === 'success') {
-                                    editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                }
-                            }
-                        });
-                    });
+                    // var $fileSuggestions = $(fileSuggestions);
+                    // $fileSuggestions.on('selectionchange', function(e, m){
+                    //     debugger
+                    // });
 
                     var $serverPath = $fileEditOptions.find('.magic-css-server-path'),
                         serverPathValue = editor.userPreference('magic-css-server-path') || 'http://localhost:3777/';
@@ -1353,8 +1346,22 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     console.log('TODO: Update <file-to-edit>');
 
                     showFileEditOptions(editor, function () {
-                        var fileToEdit = '<file-to-edit>';
-                        cb(fileToEdit);
+                        var fileSuggestions = window.fileSuggestions;
+                        $.ajax({
+                            url: 'http://localhost:3777/' + fileSuggestions.getValue()[0],
+                            success: function (data, textStatus) {
+                                if (textStatus === 'success') {
+                                    editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                    var fileToEdit = '<file-to-edit>';
+                                    cb(fileToEdit);
+                                } else {
+                                    console.log('TODO');
+                                }
+                            },
+                            failure: function () {
+                                console.log('TODO');
+                            }
+                        });
                     });
                 };
 
