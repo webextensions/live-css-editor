@@ -1,8 +1,11 @@
 {
-  "name": "magic-css-server",
+  "name": "magic-css",
   "version": "0.0.1",
   "description": "Server for handling simple GET/PUT requests for Magic CSS",
   "main": "index.js",
+  "bin": {
+    "magic-css": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
