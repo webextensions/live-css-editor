@@ -531,11 +531,14 @@ html .magicss-mouse-over-dom-element {
 	margin-top: 7px;
 }
 
-.magic-css-row-first-item {
+.magic-css-row-item-1 {
 	float: left;
 	width: 125px;
 	text-align: right;
 	margin-right: 10px;
+}
+.magic-css-row-item-2 {
+    margin-left: 125px;
 }
 
 .magic-css-row input {
