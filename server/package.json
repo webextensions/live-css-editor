@@ -1,7 +1,7 @@
 {
   "name": "magic-css",
   "version": "0.0.1",
-  "description": "Server for handling simple GET/PUT requests for Magic CSS",
+  "description": "Server for handling simple GET/PUT requests for Magic CSS browser extension",
   "main": "index.js",
   "bin": {
     "magic-css": "./index.js"
