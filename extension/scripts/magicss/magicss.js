@@ -931,8 +931,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     targetFileContents: targetFileContents
                                 },
                                 success: function () {
-                                    var delay = editor.userPreference('link-refresh-delay-on-file-update') || 750;
-                                    if (delay >= 500) {
+                                    var delay = editor.userPreference('link-refresh-delay-on-file-update');
+                                    if (delay > 500) {
                                         utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
                                     }
                                     setTimeout(function () {
@@ -1190,7 +1190,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     });
 
                     var $linkRefreshDelay = $fileEditOptions.find('.magic-css-link-refresh-delay'),
-                        linkRefreshDelayValue = editor.userPreference('link-refresh-delay-on-file-update') || 750;
+                        linkRefreshDelayValue = editor.userPreference('link-refresh-delay-on-file-update');
                     $linkRefreshDelay.val(linkRefreshDelayValue);
                     $linkRefreshDelay.on('change', function () {
                         editor.userPreference('link-refresh-delay-on-file-update', $(this).val());
@@ -1302,7 +1302,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             editor.cm.setOption('mode', 'text/x-less');
                             setCodeMirrorCSSLinting(editor, 'disable');
                             $('.footer-for-file-mode').show();
-                            $('.footer-for-file-mode .name-of-file-being-edited').html(htmlEscape(getFileNameFromPath(file.path)));
+
+                            // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user clicks on the footer in file mode
+                            $('.footer-for-file-mode .name-of-file-being-edited')
+                                .html(htmlEscape(getFileNameFromPath(file.path)))
+                                .css({marginLeft: 75, color: 'yellow', fontWeight: 'bold'})
+                                .animate({marginLeft: 0}, 1000)
+                                .fadeOut(100)
+                                .fadeIn(750);
                             utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
                             editor
                                 .setTextValue(file.contents)
@@ -2044,9 +2051,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         //     evt.stopPropagation();
                         // });
 
-                        $footerForFileMode.on('click', function () {
+                        $fileToEdit.on('click', function () {
                             getDataForFileToEdit(editor, {showUi: true} ,function (file) {
-                                $('.footer-for-file-mode .name-of-file-being-edited').html(htmlEscape(getFileNameFromPath(file.path)));
+                                // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user switches the editing mode
+                                $('.footer-for-file-mode .name-of-file-being-edited')
+                                    .html(htmlEscape(getFileNameFromPath(file.path)))
+                                    .css({marginLeft: 75, color: 'yellow', fontWeight: 'bold'})
+                                    .animate({marginLeft: 0}, 1000)
+                                    .fadeOut(100)
+                                    .fadeIn(750);
                                 utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
                                 editor
                                     .setTextValue(file.contents)
