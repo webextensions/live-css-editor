@@ -1097,7 +1097,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
-                var showFileEditOptions = function (editor, cb) {
+                var showFileEditOptionsIfRequired = function (editor, cb) {
                     /* eslint-disable indent */
                     var $fileEditOptions = $(
                         [
@@ -1142,10 +1142,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                     var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
                         method: 'GET',
-                        value: {
-                            id: fileSuggestionValue,
-                            name: fileSuggestionValue
-                        },
+                        value: (function () {
+                            var ob = undefined;
+                            if (fileSuggestionValue) {
+                                ob = {
+                                    id: fileSuggestionValue,
+                                    name: fileSuggestionValue
+                                };
+                            }
+                            return ob;
+                        }()),
+                        maxSelection: 1,
                         data: editor.userPreference('magic-css-server-path') + '/magic-css?query=asdf'
                         // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                         // data: 'random.json',
@@ -1164,7 +1171,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                     var $fileSuggestions = $(fileSuggestions);
                     $fileSuggestions.on('selectionchange', function(e, m){
-                        var fileToEdit = this.getValue()[0];
+                        var fileToEdit = this.getValue()[0] || '';
                         editor.userPreference('file-to-edit', fileToEdit);
                     });
 
@@ -1196,11 +1203,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $('body').append($fileEditOptions);
                 };
 
-                var showFileToEditPrompt = function (editor, cb) {
-                    console.log('TODO: Show file-to-edit prompt');
-                    console.log('TODO: Update <file-to-edit>');
-
-                    showFileEditOptions(editor, function () {
+                var showFileToEditPromptIfRequired = function (editor, cb) {
+                    showFileEditOptionsIfRequired(editor, function () {
                         var fileSuggestions = window.fileSuggestions;
                         var filePath = fileSuggestions.getValue()[0];
                         $.ajax({
@@ -1232,7 +1236,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 var setLanguageMode = function (languageMode, editor) {
                     if (languageMode === 'file') {
                         editor.options.rememberText = false;
-                        showFileToEditPrompt(editor, function (fileToEdit) {
+                        showFileToEditPromptIfRequired(editor, function (fileToEdit) {
                             removeLanguageModeClass(editor);
                             $(editor.container).addClass('magicss-selected-mode-file');
                             editor.userPreference('language-mode', 'file');
