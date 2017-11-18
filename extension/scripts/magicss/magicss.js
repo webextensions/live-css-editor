@@ -2686,7 +2686,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
 
-                        var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none"></div>');
+                        var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none;margin-top:3px;margin-bottom:-4px;"></div>');
                         $footerItems.append($footerForFileMode);
 
                         var $fileToEdit = $('<div class="file-to-edit">Editing file: <span class="name-of-file-being-edited"></span></div>');
