@@ -1800,7 +1800,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
-                var showFileEditOptions = function (editor) {
+                var showFileEditOptions = function (editor, cb) {
                     /* eslint-disable indent */
                     var $fileEditOptions = $(
                         [
@@ -1832,7 +1832,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         '<div><input type="number" value="750" min="50" max="60000" step="50" /> milliseconds</div>',
                                     '</div>',
                                     '<div class="magic-css-row">',
-                                        '<input type="button" value="Start Editing" />',
+                                        '<input type="button" class="magicss-start-file-editing" value="Start Editing" />',
                                     '</div>',
                                 '</div>',
                             '</div>',
@@ -1876,6 +1876,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $fileEditOptions.find('.magic-css-full-page-overlay').on('click', function () {
                         $fileEditOptions.remove();
                     });
+                    $fileEditOptions.find('.magicss-start-file-editing').on('click', function () {
+                        $fileEditOptions.remove();
+                        cb();
+                    });
                     $('body').append($fileEditOptions);
                 };
 
@@ -1883,10 +1887,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     console.log('TODO: Show file-to-edit prompt');
                     console.log('TODO: Update <file-to-edit>');
 
-                    showFileEditOptions(editor);
-
-                    var fileToEdit = '<file-to-edit>';
-                    cb(fileToEdit);
+                    showFileEditOptions(editor, function () {
+                        var fileToEdit = '<file-to-edit>';
+                        cb(fileToEdit);
+                    });
                 };
 
                 var removeLanguageModeClass = function (editor) {
