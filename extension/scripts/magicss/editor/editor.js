@@ -670,13 +670,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             cm.setSize(dimWH.width, dimWH.height);
 
             var t_timer;
-            cm.on('change', function() {
-                var delay = 500;
-                clearTimeout(t_timer);
-                t_timer = setTimeout(function () {
+            cm.on('change', function(cm, changeObj) {
+                if (changeObj.origin === 'setValue') {
                     thisOb.setTextValue(cm.getValue());
-                    thisOb.triggerEvent('delayedtextchange');
-                }, delay);
+                } else {
+                    var delay = 500;
+                    clearTimeout(t_timer);
+                    t_timer = setTimeout(function () {
+                        thisOb.setTextValue(cm.getValue());
+                        thisOb.triggerEvent('delayedtextchange');
+                    }, delay);
+                }
             });
 
             // http://stackoverflow.com/questions/4179708/how-to-detect-if-the-pressed-key-will-produce-a-character-inside-an-input-text/4180715#4180715

@@ -1712,24 +1712,23 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     if (getLanguageMode() === 'file') {
                         var targetFileContents = editor.getTextValue();
 
-                        if (window.fileSuggestions) {
-                            $.ajax({
-                                method: 'PUT',
-                                url: editor.userPreference('magic-css-server-path') + '/magic-css/' + window.fileSuggestions.getValue()[0],
-                                data: {
-                                    targetFileContents: targetFileContents
-                                },
-                                success: function () {
-                                    var delay = editor.userPreference('link-refresh-delay-on-file-update');
-                                    if (delay > 500) {
-                                        utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
-                                    }
-                                    setTimeout(function () {
-                                        reloadCSSInPage();
-                                    }, delay);
+                        var filePath = editor.userPreference('file-to-edit');
+                        $.ajax({
+                            method: 'PUT',
+                            url: editor.userPreference('magic-css-server-path') + '/magic-css/' + filePath,
+                            data: {
+                                targetFileContents: targetFileContents
+                            },
+                            success: function () {
+                                var delay = editor.userPreference('link-refresh-delay-on-file-update');
+                                if (delay > 500) {
+                                    utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
                                 }
-                            });
-                        }
+                                setTimeout(function () {
+                                    reloadCSSInPage();
+                                }, delay);
+                            }
+                        });
                     } else if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
@@ -2083,7 +2082,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         .addClass(cls);
                 };
 
-                var setLanguageMode = function (languageMode, editor) {
+                var setLanguageMode = function (languageMode, editor, options) {
+                    options = options || {};
                     if (languageMode === 'file') {
                         getDataForFileToEdit(editor, {}, function (file) {
                             editor.options.rememberText = false;
@@ -2097,11 +2097,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user clicks on the footer in file mode
                             $('.footer-for-file-mode .name-of-file-being-edited')
                                 .html(htmlEscape(getFileNameFromPath(file.path)))
+                                .attr('title', file.path)
                                 .css({marginLeft: 75, color: 'yellow', fontWeight: 'bold'})
                                 .animate({marginLeft: 0}, 1000)
                                 .fadeOut(100)
                                 .fadeIn(750);
-                            utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
+                            if (!options.skipNotifications) {
+                                utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
+                            }
                             editor
                                 .setTextValue(file.contents)
                                 .reInitTextComponent({pleaseIgnoreCursorActivity: true})
@@ -2123,21 +2126,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             editor.userPreference('language-mode', 'less');
                             editor.cm.setOption('mode', 'text/x-less');
                             setCodeMirrorCSSLinting(editor, 'disable');
-                            utils.alertNote('Now editing code in LESS mode', 5000);
+                            if (!options.skipNotifications) {
+                                utils.alertNote('Now editing code in LESS mode', 5000);
+                            }
                         } else if (languageMode === 'sass') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-sass');
                             editor.userPreference('language-mode', 'sass');
                             editor.cm.setOption('mode', 'text/x-scss');
                             setCodeMirrorCSSLinting(editor, 'disable');
-                            utils.alertNote('Now editing code in SASS mode', 5000);
+                            if (!options.skipNotifications) {
+                                utils.alertNote('Now editing code in SASS mode', 5000);
+                            }
                         } else {
                             setLanguageModeClass(editor, 'magicss-selected-mode-css');
                             editor.userPreference('language-mode', 'css');
                             editor.cm.setOption('mode', 'text/css');
-                            utils.alertNote('Now editing code in CSS mode', 5000);
+                            if (!options.skipNotifications) {
+                                utils.alertNote('Now editing code in CSS mode', 5000);
+                            }
                         }
                         fnApplyTextAsCSS(editor);
-                        console.log('TODO: Check if the editor is being focused back');
                     }
                 };
 
@@ -2871,7 +2879,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none;margin-top:3px;margin-bottom:-4px;"></div>');
                         $footerItems.append($footerForFileMode);
 
-                        var $fileToEdit = $('<div class="file-to-edit">Editing file: <span class="name-of-file-being-edited"></span></div>');
+                        var $fileToEdit = $('<div class="file-to-edit"><span class="name-of-file-being-edited"></span></div>');
                         // var $selectLinkTag = $(
                         //     // '<select>' +
                         //     //     '<option>1</option>' +
@@ -2944,6 +2952,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user switches the editing mode
                                 $('.footer-for-file-mode .name-of-file-being-edited')
                                     .html(htmlEscape(getFileNameFromPath(file.path)))
+                                    .attr('title', file.path)
                                     .css({marginLeft: 75, color: 'yellow', fontWeight: 'bold'})
                                     .animate({marginLeft: 0}, 1000)
                                     .fadeOut(100)
@@ -3073,14 +3082,22 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             });
 
                             var languageMode = editor.userPreference('language-mode');
-                            if (languageMode === 'file') {
-                                $(editor.container).addClass('magicss-selected-mode-file');
-                            } else if (languageMode === 'less') {
+
+                            // Editing mode 'file' is handled outside this if...else block
+                            if (languageMode === 'less') {
                                 $(editor.container).addClass('magicss-selected-mode-less');
                             } else if (languageMode === 'sass') {
                                 $(editor.container).addClass('magicss-selected-mode-sass');
                             } else {
                                 $(editor.container).addClass('magicss-selected-mode-css');
+                            }
+
+                            if (languageMode === 'file') {
+                                setLanguageMode('file', editor, {skipNotifications: true});
+                            } else {
+                                window.setTimeout(function () {
+                                    fnApplyTextAsCSS(editor);
+                                }, 100);
                             }
 
                             var disableStyles = editor.userPreference('disable-styles') === 'yes';
