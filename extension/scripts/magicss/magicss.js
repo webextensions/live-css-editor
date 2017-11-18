@@ -2142,15 +2142,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none"></div>');
                         $footerItems.append($footerForFileMode);
 
-                        var $fileToEdit = $('<div class="file-to-edit">File to Edit</div>');
-                        var $linkTagToEdit = $('<div class="link-tag-to-edit">Link Tag To Edit</div>');
+                        var $fileToEdit = $('<div class="file-to-edit">Editing file: &lt;TODO&gt;</div>');
                         // var $selectLinkTag = $(
                         //     // '<select>' +
                         //     //     '<option>1</option>' +
                         //     // '</select>'
                         //     '<input id="magicss-file-to-edit" />'
                         // );
-                        $footerForFileMode.append($linkTagToEdit);
                         $footerForFileMode.append($fileToEdit);
                         // $footerForFileMode.append($selectLinkTag);
 
@@ -2208,28 +2206,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         // });
                         /* */
 
-                        // $linkTagToEdit.on('click', function () {
-                        //     // console.log($('link[rel=stylesheet]'));
-                        //     var links = [];
-                        //     $('link[rel~=stylesheet][href]').each(function (index, link) {
-                        //         links.push({
-                        //             link: link,
-                        //             href: $(link).attr('href')
-                        //         });
-                        //     });
-                        //     console.log(links);
-                        //     $footerItems.append(
-                        //         '<select>' +
-                        //             (function () {
-                        //                 var str = '';
-                        //                 for (var i = 0; i < links.length; i++) {
-                        //                     str += '<option>' + links[i].href + '</option>';
-                        //                 }
-                        //                 return str;
-                        //             }()) +
-                        //         '</select>'
-                        //     );
-                        // });
                         $footerItems.on('mousedown', function (evt) {
                             evt.stopPropagation();
                         });
