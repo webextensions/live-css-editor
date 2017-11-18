@@ -1938,6 +1938,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             editor.cm.setOption('mode', 'text/x-less');
                             setCodeMirrorCSSLinting(editor, 'disable');
                             $('.footer-for-file-mode').show();
+                            $('.footer-for-file-mode .name-of-file-being-edited').html(htmlEscape(fileToEdit));
                             utils.alertNote('Now editing file: ' + htmlEscape(fileToEdit), 5000);
                             editor.focus();
                         });
@@ -2681,7 +2682,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none"></div>');
                         $footerItems.append($footerForFileMode);
 
-                        var $fileToEdit = $('<div class="file-to-edit">Editing file: &lt;TODO&gt;</div>');
+                        var $fileToEdit = $('<div class="file-to-edit">Editing file: <span class="name-of-file-being-edited"></span></div>');
                         // var $selectLinkTag = $(
                         //     // '<select>' +
                         //     //     '<option>1</option>' +
