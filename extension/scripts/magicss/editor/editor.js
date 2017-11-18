@@ -1042,7 +1042,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     // TODO:
     // Move out the default preferences of Magic CSS into magicss.js
     Editor.defaultPreferences = {
-        'magic-css-server-path': 'http://localhost:3777',  // TODO: Move this into Magic CSS code
+        'magic-css-server-path': 'http://localhost:3777',   // TODO: Move this into Magic CSS code
+        'file-to-edit': '',                                 // TODO: Move this into Magic CSS code
 
         'language-mode': 'css',
         'use-css-linting': 'no',
