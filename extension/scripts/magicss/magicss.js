@@ -1078,10 +1078,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     targetFileContents: targetFileContents
                                 },
                                 success: function () {
-                                    console.log('TODO: Make this delay of 750ms customizable');
+                                    var delay = editor.userPreference('link-refresh-delay-on-file-update') || 750;
+                                    utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
                                     setTimeout(function () {
                                         reloadCSSInPage();
-                                    }, 750);
+                                    }, delay);
                                 }
                             });
                         }
@@ -1258,7 +1259,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     '<div class="magic-css-row">',
                                         '<div class="magic-css-row-first-item">Server path:</div>',
                                         '<div>',
-                                            '<input value="http://localhost:3777/" />',
+                                            '<input class="magic-css-server-path" />',
                                             '<span style="color:#888;font-size:12px">(eg: http://localhost:3777)</span>',
                                         '</div>',
                                     '</div>',
@@ -1318,11 +1319,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         });
                     });
 
-                    var linkRefreshDelayValue = editor.userPreference('link-refresh-delay-on-file-update') || 750;
-                    var $linkRefreshDelay = $fileEditOptions.find('.magic-css-link-refresh-delay');
+                    var $serverPath = $fileEditOptions.find('.magic-css-server-path'),
+                        serverPathValue = editor.userPreference('magic-css-server-path') || 'http://localhost:3777/';
+                    $serverPath.val(serverPathValue);
+                    $serverPath.on('change', function () {
+                        editor.userPreference('magic-css-server-path', $(this).val());
+                    });
+
+                    var $linkRefreshDelay = $fileEditOptions.find('.magic-css-link-refresh-delay'),
+                        linkRefreshDelayValue = editor.userPreference('link-refresh-delay-on-file-update') || 750;
                     $linkRefreshDelay.val(linkRefreshDelayValue);
                     $linkRefreshDelay.on('change', function () {
-                        editor.userPreference('link-refresh-delay-on-file-update', $linkRefreshDelay.val());
+                        editor.userPreference('link-refresh-delay-on-file-update', $(this).val());
                     });
 
                     $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
