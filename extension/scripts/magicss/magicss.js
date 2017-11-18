@@ -1290,8 +1290,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     );
                     /* eslint-enable indent */
 
+                    var fileSuggestionValue = editor.userPreference('file-to-edit');
+
                     var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
                         method: 'GET',
+                        value: {
+                            id: fileSuggestionValue,
+                            name: fileSuggestionValue
+                        },
                         data: editor.userPreference('magic-css-server-path') + '/magic-css?query=asdf'
                         // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                         // data: 'random.json',
@@ -1306,13 +1312,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         //     '</div><div style="clear:both;"></div>'; // make sure we have closed our dom stuff
                         // }
                     });
-
                     window.fileSuggestions = fileSuggestions;
 
-                    // var $fileSuggestions = $(fileSuggestions);
-                    // $fileSuggestions.on('selectionchange', function(e, m){
-                    //     debugger
-                    // });
+                    var $fileSuggestions = $(fileSuggestions);
+                    $fileSuggestions.on('selectionchange', function(e, m){
+                        var fileToEdit = this.getValue()[0];
+                        editor.userPreference('file-to-edit', fileToEdit);
+                    });
 
                     var $serverPath = $fileEditOptions.find('.magic-css-server-path'),
                         serverPathValue = editor.userPreference('magic-css-server-path');
