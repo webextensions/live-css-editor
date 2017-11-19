@@ -1351,7 +1351,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     });
 
                     $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
-                    $fileEditOptions.find('.magic-css-edit-file-options').draggable();
+                    $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
                     $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
                         $fileEditOptions.remove();
