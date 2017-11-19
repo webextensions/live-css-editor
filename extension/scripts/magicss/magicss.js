@@ -1462,8 +1462,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             $('.footer-for-file-mode .name-of-file-being-edited')
                                 .html(htmlEscape(getFileNameFromPath(file.path)))
                                 .attr('title', file.path)
-                                .css({marginLeft: 75, color: 'yellow', fontWeight: 'bold'})
-                                .animate({marginLeft: 0}, 1000)
+                                .css({marginRight: 75, fontWeight: 'bold'})
+                                .animate({marginRight: 0}, 1000)
                                 .fadeOut(100)
                                 .fadeIn(750);
                             if (!options.skipNotifications) {
@@ -2273,10 +2273,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
 
-                        var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none;margin-top:3px;margin-bottom:-4px;"></div>');
+                        var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none;margin-top:3px;margin-bottom:-4px;overflow:auto"></div>');
                         $footerItems.append($footerForFileMode);
 
-                        var $fileToEdit = $('<div class="file-to-edit"><span class="name-of-file-being-edited"></span></div>');
+                        var $fileToEdit = $('<div class="file-to-edit"><span class="name-of-file-being-edited" style="color:yellow"></span></div>');
                         // var $selectLinkTag = $(
                         //     // '<select>' +
                         //     //     '<option>1</option>' +
@@ -2350,8 +2350,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 $('.footer-for-file-mode .name-of-file-being-edited')
                                     .html(htmlEscape(getFileNameFromPath(file.path)))
                                     .attr('title', file.path)
-                                    .css({marginLeft: 75, color: 'yellow', fontWeight: 'bold'})
-                                    .animate({marginLeft: 0}, 1000)
+                                    .css({marginRight: 75, fontWeight: 'bold'})
+                                    .animate({marginRight: 0}, 1000)
                                     .fadeOut(100)
                                     .fadeIn(750);
                                 utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
