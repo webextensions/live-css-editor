@@ -499,6 +499,10 @@ html .magicss-mouse-over-dom-element {
     display: inline-block;
 }
 
+#MagiCSS-bookmarklet .file-to-edit {
+    float: right;
+}
+
 #MagiCSS-bookmarklet .link-tag-to-edit {
     float: right;
 }
