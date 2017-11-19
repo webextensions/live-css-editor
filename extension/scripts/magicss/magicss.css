@@ -870,7 +870,7 @@ html .magicss-mouse-over-dom-element {
 .magic-css-edit-file-options {
     width: 500px;
     height: 200px;
-    position: fixed;
+    position: fixed !important; /* Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;" */
     left: calc(50% - 250px);
     top: calc(50% - 100px);
     -z-index: 2147483646;
