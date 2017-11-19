@@ -1448,7 +1448,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 var setLanguageMode = function (languageMode, editor, options) {
                     options = options || {};
                     if (languageMode === 'file') {
-                        getDataForFileToEdit(editor, {}, function (file) {
+                        var fileEditingOptions = {};
+                        // If previous mode was also 'file' (meaning the user clicked again), then we prompt the user for selecting file (or related options)
+                        if (getLanguageMode() === 'file') {
+                            fileEditingOptions.showUi = true;
+                        }
+                        getDataForFileToEdit(editor, fileEditingOptions, function (file) {
                             editor.options.rememberText = false;
 
                             setLanguageModeClass(editor, 'magicss-selected-mode-file');
