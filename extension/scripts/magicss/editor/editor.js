@@ -20,6 +20,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         fn.timer = setTimeout(fn, delay);
     };
 
+    var nodeExistsInDom = function (el) {
+        while (el) {
+            if (el.nodeName === 'HTML') {
+                return true;
+            }
+            el = el.parentNode;
+        }
+        return false;
+    };
+
     class Editor {
         /**
          * Constructor
@@ -247,7 +257,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                 distance: 5,
                 cancel: '.cancelDragHandle, textarea',
                 opacity: 0.35,
-                start: function () {
+                start: function (evt, ui) {
+                    // When a matching/non-matching bracket was highlighted, and the user tried to select some other piece
+                    // of text, dragging was starting. This happened because the node was being removed from DOM, but jQuery UI's
+                    // draggable logic wasn't handling that correctly. So, we do that here manually.
+                    if (!nodeExistsInDom(evt.originalEvent.target)) {
+                        // Need to fix opacity manually because jQuery UI doesn't set it back when we return "false" inside "start()"
+                        ui.helper.css('opacity', 1);
+
+                        // Do not start dragging
+                        return false;
+                    }
+
                     $(thisOb.container).addClass('noclick');
                     // This code will be used for functionality of providing free style draggability
                     // Clear corner positioning and allow free-style (jQuery uses top and left for draggable)
