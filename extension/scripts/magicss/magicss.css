@@ -61,6 +61,7 @@
     font-weight: bold;
     color: #ffffff;
     opacity: 0.5;
+    -webkit-transform: translateZ(0);   /* https://stackoverflow.com/questions/7582567/css-opacity-change-on-hover-flickering/7623025#7623025 */
 }
 
 .magicss-mode-css:hover,
