@@ -54,8 +54,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     };
 
     var getFileNameFromPath = function (filePath) {
-        var fileName = filePath;
-        console.log('TODO');
+        var fileName = filePath.replace(/\\/g,'/').replace(/.*\//, '');
         return fileName;
     };
 
