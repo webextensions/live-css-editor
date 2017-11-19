@@ -32,8 +32,6 @@
     float: left;
     background-color: #4458ae;
     border-radius: 5px 5px 0 0;
-    padding-left: 5px;
-    padding-right: 5px;
     font-weight: bold;
     color: #fff;
     letter-spacing: 1px;
@@ -47,11 +45,8 @@
 .magicss-mode-button {
     float: left;
     cursor: pointer;
-    padding-right: 10px;
-}
-
-.magicss-mode-button:last-child {
-    padding-right: 0;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .magicss-mode-css,
