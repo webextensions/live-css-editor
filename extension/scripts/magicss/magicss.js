@@ -1068,6 +1068,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         overwriteExistingStyleTagWithSameId: true
                     });
 
+                var anySavePending = false;
                 var fnApplyTextAsCSS = function (editor) {
                     var disabled = false;
                     if (editor.userPreference('disable-styles') === 'yes') {
@@ -1077,6 +1078,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     if (getLanguageMode() === 'file') {
                         var targetFileContents = editor.getTextValue();
 
+                        var $fileEditStatus = $('.footer-for-file-mode .file-edit-status');
+                        var saveInProgress = true;
+                        anySavePending = true;
+                        setTimeout(function () {
+                            if (saveInProgress) {
+                                $fileEditStatus.html('◔ Saving');
+                            }
+                        }, 300);
+
                         var filePath = editor.userPreference('file-to-edit');
                         $.ajax({
                             method: 'PUT',
@@ -1084,7 +1094,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             data: {
                                 targetFileContents: targetFileContents
                             },
-                            success: function () {
+                            success: function (data, textStatus, jqXHR) {   // eslint-disable-line no-unused-vars
+                                saveInProgress = false;
+                                anySavePending = false;
+
+                                $fileEditStatus.html('✔ Saved');
+                                setTimeout(function () {
+                                    if (!anySavePending) {
+                                        $fileEditStatus.html('');
+                                    }
+                                }, 2500);
                                 var delay = editor.userPreference('link-refresh-delay-on-file-update');
                                 if (delay > 500) {
                                     utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
@@ -1092,6 +1111,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 setTimeout(function () {
                                     reloadCSSInPage();
                                 }, delay);
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {  // eslint-disable-line no-unused-vars
+                                saveInProgress = false;
+
+                                $fileEditStatus.html('✘ Save failed');
+                                utils.alertNote(
+                                    '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
+                                    '<br/>Probable cause: <span style="font-weight:bold">magic-css server</span> is not running',
+                                    7500
+                                );
                             }
                         });
                     } else if (getLanguageMode() === 'less') {
@@ -2280,15 +2309,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none;margin-top:3px;margin-bottom:-4px;overflow:auto"></div>');
                         $footerItems.append($footerForFileMode);
 
-                        var $fileToEdit = $('<div class="file-to-edit"><span class="name-of-file-being-edited" style="color:yellow"></span></div>');
-                        // var $selectLinkTag = $(
-                        //     // '<select>' +
-                        //     //     '<option>1</option>' +
-                        //     // '</select>'
-                        //     '<input id="magicss-file-to-edit" />'
-                        // );
+                        var $fileToEdit = $(
+                            '<div class="file-to-edit">' +
+                                '<span class="name-of-file-being-edited" style="color:yellow"></span>' +
+                            '</div>'
+                        );
+                        var $fileEditStatus = $('<div class="file-edit-status" style="color:#fff"></div>');
                         $footerForFileMode.append($fileToEdit);
-                        // $footerForFileMode.append($selectLinkTag);
+                        $footerForFileMode.append($fileEditStatus);
 
                         /*
                         // Magic Suggest uses old jQuery code. Minor changes to fix that
