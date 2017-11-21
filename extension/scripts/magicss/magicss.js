@@ -2043,7 +2043,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 console.log('TODO');
                             }
                         },
-                        failure: function () {
+                        error: function () {
                             console.log('TODO');
                         }
                     });
@@ -2083,7 +2083,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         console.log('TODO');
                                     }
                                 },
-                                failure: function () {
+                                error: function () {
                                     console.log('TODO');
                                 }
                             });
