@@ -2,14 +2,10 @@
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
+var USER_PREFERENCE_ALL_FRAMES = 'all-frames';
 
 jQuery(function ($) {
-    var chromeStorage;
-    try {
-        chromeStorage = chrome.storage.sync || chrome.storage.local;
-    } catch (e) {
-        // do nothing
-    }
+    var chromeStorage = chrome.storage.sync || chrome.storage.local;
 
     var RadionButtonSelectedValueSet = function (name, SelectedValue) {
         $('input[name="' + name+ '"]').val([SelectedValue]);
@@ -33,6 +29,23 @@ jQuery(function ($) {
             valueToSet = 'yes';
         }
         chromeStorage.set({[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: valueToSet});
+        notifyUser();
+    });
+
+    chromeStorage.get(USER_PREFERENCE_ALL_FRAMES, function (values) {
+        var $allFrames = $('#all-frames'),
+            markChecked = false;
+        if (values && values[USER_PREFERENCE_ALL_FRAMES] === 'yes') {
+            markChecked = true;
+        }
+        $allFrames.prop('checked', markChecked);
+    });
+    $('#all-frames').on('click', function () {
+        var valueToSet = 'no';
+        if($(this).is(':checked')) {
+            valueToSet = 'yes';
+        }
+        chromeStorage.set({[USER_PREFERENCE_ALL_FRAMES]: valueToSet});
         notifyUser();
     });
 

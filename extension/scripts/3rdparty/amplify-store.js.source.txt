@@ -1,0 +1,1 @@
+https://raw.githubusercontent.com/mikehostetler/amplify/1.1.2/src/store.js

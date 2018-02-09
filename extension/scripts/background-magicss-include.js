@@ -1,5 +1,7 @@
 /*globals chrome, alert, extLib, jQuery */
 
+console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
+
 // https://github.com/webextensions/live-css-editor/issues/5
 // Apparently, when a user plays around with Chrome devtools for a webpage, intermittently,
 // we notice that the listeners were going missing. Probably because, somehow, the extension
@@ -39,17 +41,40 @@ if (!window.loadRemoteJsListenerAdded) {
                                     remoteCode = remoteCode.replace(request.preRunReplace[i].oldText, request.preRunReplace[i].newText);
                                 }
                             }
-                            chrome.tabs.executeScript(
-                                sender.tab.id,
-                                { code: remoteCode, allFrames: request.allFrames === false ? false : true },
-                                function(){
-                                    sendResponse();
-                                }
-                            );
+                            getAllFrames(function (allFrames) {
+                                chrome.tabs.executeScript(
+                                    sender.tab.id,
+                                    { code: remoteCode, allFrames: allFrames},
+                                    function(){
+                                        sendResponse();
+                                    }
+                                );
+                            });
                         })
                         .fail(function() {
                             sendResponse('error');
                         });
+
+                    // https://developer.chrome.com/extensions/messaging
+                    // Need to return true from the event listener to indicate that we wish to send a response asynchronously
+                    return true;
+                } else if (request.requestPermissions) {
+                    var url = request.url;
+                    chrome.permissions.request(
+                        {
+                            permissions: ['webNavigation'],
+                            origins: [url]
+                        },
+                        function (granted) {
+                            if (granted) {
+                                sendResponse('request-granted');
+
+                                onDOMContentLoadedHandler();
+                            } else {
+                                sendResponse('request-not-granted');
+                            }
+                        }
+                    );
 
                     // https://developer.chrome.com/extensions/messaging
                     // Need to return true from the event listener to indicate that we wish to send a response asynchronously
@@ -61,99 +86,134 @@ if (!window.loadRemoteJsListenerAdded) {
     }
 }
 
-var main = function () {
-    var pageType = (document.body.tagName === 'FRAMESET') ? 'FRAMESET' : 'BODY',
-        allFrames = (pageType === 'FRAMESET');
 
-    var pathScripts = 'scripts/',
-        path3rdparty = pathScripts + '3rdparty/',
-        path3rdpartyCustomFixes = pathScripts + '3rdparty-custom-fixes/',
-        pathMagicss = pathScripts + 'magicss/',
-        pathEditor = pathMagicss + 'editor/',
-        pathCodeMirror = path3rdparty + 'codemirror/';
+var getFromChromeStorage = function (property, cb) {
+    var chromeStorage = chrome.storage.sync || chrome.storage.local;
 
-    var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:" || document.location.protocol === "ms-browser-extension:") ? true : false;
-    // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
-    // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
+    chromeStorage.get(property, function (values) {
+        if (values) {
+            cb(values[property]);
+        } else {
+            cb(undefined);
+        }
+    });
+};
 
-    extLib.loadJSCSS([
-        {
-            src: path3rdparty + 'jquery-3.2.1.js',
-            skip: typeof jQuery === "undefined" || runningInBrowserExtension ? false : true
-        },
-        {
-            src: pathScripts + 'chrome-extension-lib/ext-lib.js',
-            skip: typeof extLib === "undefined" || runningInBrowserExtension ? false : true
-        },
+var getAllFrames = function (cb) {
+    getFromChromeStorage('all-frames', function (value) {
+        if (value === 'yes') {
+            cb(true);
+        } else {
+            cb(false);
+        }
+    });
+};
 
-        pathScripts + 'utils.js',
-        pathScripts + 'loading-magic-css.js',
+var reapplyCss = function (tabId) {
+    getAllFrames(function (allFrames) {
+        var pathScripts = 'scripts/',
+            path3rdparty = pathScripts + '3rdparty/';
 
-        {
-            src: path3rdparty + 'async.js',
-            skip: typeof async === "undefined" || runningInBrowserExtension ? false : true
-        },
+        extLib.loadJSCSS([
+            path3rdparty + 'amplify-store.js',
+            pathScripts + 'utils.js',
+            pathScripts + 'reapply-css.js'
+        ], allFrames, tabId);
+    });
+};
 
-        path3rdparty + 'css.escape.js',
+var main = function (tabId) {
+    getAllFrames(function (allFrames) {
+        var pathScripts = 'scripts/',
+            path3rdparty = pathScripts + '3rdparty/',
+            path3rdpartyCustomFixes = pathScripts + '3rdparty-custom-fixes/',
+            pathMagicss = pathScripts + 'magicss/',
+            pathEditor = pathMagicss + 'editor/',
+            pathCodeMirror = path3rdparty + 'codemirror/';
 
-        pathCodeMirror + 'codemirror.css',
-        path3rdpartyCustomFixes + 'codemirror/magicss-codemirror.css',
-        pathCodeMirror + 'codemirror.js',
-        pathCodeMirror + 'mode/css.js',
-        pathCodeMirror + 'addons/display/placeholder.js',
-        pathCodeMirror + 'addons/selection/active-line.js',
-        pathCodeMirror + 'addons/edit/closebrackets.js',
-        pathCodeMirror + 'addons/edit/matchbrackets.js',
+        var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:" || document.location.protocol === "ms-browser-extension:") ? true : false;
+        // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
+        // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
-        path3rdparty + 'csslint/csslint.js',
-        path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
-        pathCodeMirror + 'addons/lint/lint.css',
-        path3rdpartyCustomFixes + 'codemirror/addons/lint/tooltip.css',
-        pathCodeMirror + 'addons/lint/lint.js',
-        pathCodeMirror + 'addons/lint/css-lint_customized.js',
+        extLib.loadJSCSS([
+            {
+                src: path3rdparty + 'jquery-3.2.1.js',
+                skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
+            },
+            {
+                src: pathScripts + 'chrome-extension-lib/ext-lib.js',
+                skip: typeof extLib !== "undefined" || runningInBrowserExtension ? false : true
+            },
 
-        pathCodeMirror + 'addons/hint/show-hint.css',
-        pathCodeMirror + 'addons/hint/show-hint_customized.js',
-        pathCodeMirror + 'addons/hint/css-hint_customized.js',
+            pathScripts + 'utils.js',
+            pathScripts + 'loading-magic-css.js',
 
-        // https://github.com/easylogic/codemirror-colorpicker
-        pathCodeMirror + 'addons/colorpicker/colorpicker.css',
-        pathCodeMirror + 'addons/colorpicker/colorview.js',
-        pathCodeMirror + 'addons/colorpicker/colorpicker.js',
+            {
+                src: path3rdparty + 'async.js',
+                skip: typeof async === "undefined" || runningInBrowserExtension ? false : true
+            },
 
-        pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
+            path3rdparty + 'css.escape.js',
 
-        path3rdparty + 'jquery-ui_customized.css',
-        path3rdparty + 'jquery-ui.js',
+            pathCodeMirror + 'codemirror.css',
+            path3rdpartyCustomFixes + 'codemirror/magicss-codemirror.css',
+            pathCodeMirror + 'codemirror.js',
+            pathCodeMirror + 'mode/css.js',
+            pathCodeMirror + 'addons/display/placeholder.js',
+            pathCodeMirror + 'addons/selection/active-line.js',
+            pathCodeMirror + 'addons/edit/closebrackets.js',
+            pathCodeMirror + 'addons/edit/matchbrackets.js',
 
-        path3rdparty + 'amplify.js',
+            path3rdparty + 'csslint/csslint.js',
+            path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
+            pathCodeMirror + 'addons/lint/lint.css',
+            path3rdpartyCustomFixes + 'codemirror/addons/lint/tooltip.css',
+            pathCodeMirror + 'addons/lint/lint.js',
+            pathCodeMirror + 'addons/lint/css-lint_customized.js',
 
-        path3rdparty + 'tooltipster/tooltipster.css',
-        path3rdparty + 'tooltipster/jquery.tooltipster.js',
+            pathCodeMirror + 'addons/hint/show-hint.css',
+            pathCodeMirror + 'addons/hint/show-hint_customized.js',
+            pathCodeMirror + 'addons/hint/css-hint_customized.js',
 
-        path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
-        path3rdparty + 'csspretty/csspretty.js',
-        // Alternatively, use cssbeautify & Yahoo's CSS Min libraries
-        // path3rdparty + 'cssbeautify/cssbeautify.js',
-        // path3rdparty + 'yui-cssmin/cssmin.js',
+            // https://github.com/easylogic/codemirror-colorpicker
+            pathCodeMirror + 'addons/colorpicker/colorpicker.css',
+            pathCodeMirror + 'addons/colorpicker/colorview.js',
+            pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
-        // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
-        // path3rdparty + 'less.js',
-        path3rdparty + 'basic-less-with-sourcemap-support.browserified.uglified.js',
+            pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
 
-        path3rdparty + 'source-map.js',
+            path3rdparty + 'jquery-ui_customized.css',
+            path3rdparty + 'jquery-ui.js',
 
-        // http://www.miyconst.com/Blog/View/14/conver-css-to-less-with-css2less-js
-        // path3rdparty + 'css2less/linq.js',
-        // path3rdparty + 'css2less/css2less.js',
+            path3rdparty + 'amplify-store.js',
 
-        pathEditor + 'editor.css',
-        pathEditor + 'editor.js',
+            path3rdparty + 'tooltipster/tooltipster.css',
+            path3rdparty + 'tooltipster/jquery.tooltipster.js',
 
-        pathMagicss + 'magicss.css',
-        pathMagicss + 'generate-selector.js',
-        pathMagicss + 'magicss.js'
-    ], allFrames);
+            path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
+            path3rdparty + 'csspretty/csspretty.js',
+            // Alternatively, use cssbeautify & Yahoo's CSS Min libraries
+            // path3rdparty + 'cssbeautify/cssbeautify.js',
+            // path3rdparty + 'yui-cssmin/cssmin.js',
+
+            // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
+            // path3rdparty + 'less.js',
+            path3rdparty + 'basic-less-with-sourcemap-support.browserified.uglified.js',
+
+            path3rdparty + 'source-map.js',
+
+            // http://www.miyconst.com/Blog/View/14/conver-css-to-less-with-css2less-js
+            // path3rdparty + 'css2less/linq.js',
+            // path3rdparty + 'css2less/css2less.js',
+
+            pathEditor + 'editor.css',
+            pathEditor + 'editor.js',
+
+            pathMagicss + 'magicss.css',
+            pathMagicss + 'generate-selector.js',
+            pathMagicss + 'magicss.js'
+        ], allFrames, tabId);
+    });
 };
 
 var prerequisitesReady = function (main) {
@@ -232,3 +292,62 @@ var prerequisitesReady = function (main) {
 prerequisitesReady(function () {
     main();
 });
+
+var parseUrl = function(href) {
+    var l = document.createElement("a");
+    l.href = href;
+    return l;
+};
+
+var generatePermissionPattern = function (url) {
+    var parsedUrl = parseUrl(url),
+        pattern = '';
+
+    if (parsedUrl.protocol === 'file:') {
+        pattern = 'file:///*';
+    } else if (['http:', 'https:', 'ftp:'].indexOf(parsedUrl.protocol) >= 0) {
+        pattern = parsedUrl.protocol + '//' + parsedUrl.hostname + '/*';
+    } else {
+        pattern = url;
+    }
+    return pattern;
+};
+
+var onDOMContentLoadedHandler = function () {
+    if (!window.onDOMContentLoadedListenerAdded) {
+        if (chrome.webNavigation) {
+            chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
+                var tabId = details.tabId,
+                    url = details.url;
+
+                var permissionsPattern = generatePermissionPattern(url);
+                chrome.tabs.get(tabId, function (tab) {
+                    // This check (accessing chrome.runtime.lastError) is required to avoid an unnecessary error log in Chrome when the tab doesn't exist
+                    // Reference: https://stackoverflow.com/questions/16571393/the-best-way-to-check-if-tab-with-exact-id-exists-in-chrome/27532535#27532535
+                    if (chrome.runtime.lastError) {
+                        // do nothing
+                    } else {
+                        // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
+                        if (tab && tab.url) {
+                            // details.frameId === 0 means the top most frame (the webpage)
+                            if (permissionsPattern && details.frameId === 0) {
+                                chrome.permissions.contains({
+                                    origins: [permissionsPattern]
+                                }, function (result) {
+                                    if (result) {
+                                        reapplyCss(tabId);
+                                    } else {
+                                        // do nothing because we don't have enough permissions
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+            window.onDOMContentLoadedListenerAdded = true;
+        }
+    }
+};
+
+onDOMContentLoadedHandler();

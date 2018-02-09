@@ -25,6 +25,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         return;
     }
 
+    var rememberLastAppliedCss = function (css) {
+        var editor = window.MagiCSSEditor;
+        editor.userPreference('last-applied-css', css);
+    };
+
     var ellipsis = function (str, limit) {
         limit = limit || 12;
         return (str.length <= limit) ? str : (str.substring(0, limit - 3) + '...');
@@ -356,7 +361,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
         if (!editor.styleHighlightingSelector) {
             editor.styleHighlightingSelector = new utils.StyleTag({
-                id: 'magicss-higlight-by-selector',
+                id: 'magicss-highlight-by-selector',
                 parentTag: 'body',
                 attributes: [{
                     name: 'data-style-created-by',
@@ -419,6 +424,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         }
         cm.setOption('gutters', gutters);
         cm.setOption('lint', lint);
+    };
+
+    var markAsPinnedOrNotPinned = function (editor, pinnedOrNotPinned) {
+        if (pinnedOrNotPinned === 'pinned') {
+            editor.applyStylesAutomatically(true);
+            editor.userPreference('apply-styles-automatically', 'yes');
+        } else {
+            editor.applyStylesAutomatically(false);
+            editor.userPreference('apply-styles-automatically', 'no');
+        }
     };
 
     var enablePointAndClick = false;
@@ -779,7 +794,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 var strCssCode = output.css;
                                 newStyleTag.cssText = strCssCode;
                                 newStyleTag.disabled = disabled;
-                                newStyleTag.applyTag();
+                                newStyleTag.applyTag(rememberLastAppliedCss);
                                 var rawSourceMap = output.map;
                                 if (rawSourceMap) {
                                     smc = new sourceMap.SourceMapConsumer(rawSourceMap);
@@ -798,7 +813,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                     var strCssCode = result.text || '';
                                     newStyleTag.cssText = strCssCode;
                                     newStyleTag.disabled = disabled;
-                                    newStyleTag.applyTag();
+                                    newStyleTag.applyTag(rememberLastAppliedCss);
                                     var rawSourceMap = result.map;
                                     if (rawSourceMap) {
                                         smc = new sourceMap.SourceMapConsumer(rawSourceMap);
@@ -841,8 +856,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                     chrome.runtime.sendMessage(
                                         {
                                             loadRemoteJs: sassJsUrl,
-                                            preRunReplace: preRunReplace,
-                                            allFrames: true
+                                            preRunReplace: preRunReplace
                                         },
                                         function (error) {
                                             window.isActiveLoadSassRequest = false;
@@ -887,7 +901,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         var cssCode = editor.getTextValue();
                         newStyleTag.cssText = cssCode;
                         newStyleTag.disabled = disabled;
-                        newStyleTag.applyTag();
+                        newStyleTag.applyTag(rememberLastAppliedCss);
                     }
                 };
 
@@ -1168,6 +1182,46 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                         divIcon.title = 'Deactivate code';
                                     }
                                 };
+                            }
+                        },
+                        {
+                            name: 'reapply',
+                            title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
+                            cls: 'magicss-reapply-styles magicss-gray-out',
+                            onclick: function (evt, editor, divIcon) {
+                                if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
+                                    markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                    utils.alertNote(
+                                        '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                        5000
+                                    );
+                                } else {
+                                    chrome.runtime.sendMessage(
+                                        {
+                                            requestPermissions: true,
+                                            url: window.location.href
+                                        },
+                                        function (status) {
+                                            if (chrome.runtime.lastError) {
+                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                utils.alertNote(
+                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                    10000
+                                                );
+                                            }
+                                            if (status === 'request-granted') {
+                                                markAsPinnedOrNotPinned(editor, 'pinned');
+                                                utils.alertNote(
+                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                    10000
+                                                );
+                                            } else if (status === 'request-not-granted') {
+                                                utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                            }
+                                        }
+                                    );
+                                }
+                                editor.focus();
                             }
                         },
                         (function () {
@@ -1495,6 +1549,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             } else {
                                 editor.indicateEnabledDisabled('enabled');
                             }
+
+                            var applyStylesAutomatically = editor.userPreference('apply-styles-automatically') === 'yes';
+                            if (applyStylesAutomatically) {
+                                editor.applyStylesAutomatically(true);
+                            } else {
+                                editor.applyStylesAutomatically(false);
+                            }
+
                             window.setTimeout(function () {
                                 fnApplyTextAsCSS(editor);
                             }, 100);
@@ -1542,7 +1604,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
                             if (!editor.styleHighlightingSelector) {
                                 editor.styleHighlightingSelector = new utils.StyleTag({
-                                    id: 'magicss-higlight-by-selector',
+                                    id: 'magicss-highlight-by-selector',
                                     parentTag: 'body',
                                     attributes: [{
                                         name: 'data-style-created-by',
@@ -1694,6 +1756,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             $(this.container).removeClass('indicate-disabled').addClass('indicate-enabled');
                         } else {
                             $(this.container).removeClass('indicate-enabled').addClass('indicate-disabled');
+                        }
+                    }
+
+                    applyStylesAutomatically(doApply) {
+                        if (doApply) {
+                            $(this.container).addClass('magic-css-apply-styles-automatically');
+                        } else {
+                            $(this.container).removeClass('magic-css-apply-styles-automatically');
                         }
                     }
 

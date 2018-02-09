@@ -37,6 +37,7 @@ var generateManifest = function (whichBrowser) {
             return permissions;
         }()),
         "optional_permissions": [
+            "webNavigation",
             "<all_urls>"
         ],
         "browser_action": {

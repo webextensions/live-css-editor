@@ -1,5 +1,5 @@
 {
-    "version": "6.2.23.0",
+    "version": "6.2.24.0",
     "manifest_version": 2,
     "author": "Priyank Parashar",
     "default_locale": "en",
@@ -21,6 +21,7 @@
         "<all_urls>"
     ],
     "optional_permissions": [
+        "webNavigation",
         "<all_urls>"
     ],
     "browser_action": {

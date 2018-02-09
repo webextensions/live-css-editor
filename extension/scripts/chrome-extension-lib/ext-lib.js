@@ -1,4 +1,34 @@
-/*globals chrome, async */
+/*globals chrome */
+
+// https://github.com/coderaiser/itchy/blob/master/lib/itchy.js
+var asyncEachSeries = (array, iterator, done) => {
+    check(array, iterator, done);
+
+    var i = -1,
+        n = array.length;
+
+    var loop = function (e) {
+        i++;
+
+        if (e || i === n)
+            return done && done(e);
+
+        iterator(array[i], loop);
+    };
+
+    loop();
+};
+
+function check(array, iterator, done) {
+    if (!Array.isArray(array))
+        throw Error('array should be an array!');
+
+    if (typeof iterator !== 'function')
+        throw Error('iterator should be a function!');
+
+    if (done && typeof done !== 'function')
+        throw Error('done should be a function (when available)!');
+}
 
 var extLib = {
     TR: function (key, defaultValue) {
@@ -30,9 +60,13 @@ var extLib = {
 
     // allFrames: true
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
-    insertCSS: function (file, allFrames, cb) {
+    insertCSS: function (options, cb) {
+        var file = options.file,
+            allFrames = options.allFrames === false ? false : true,
+            tabId = options.tabId || null;
+
         if (typeof chrome !== "undefined" && chrome && chrome.tabs) {
-            chrome.tabs.insertCSS(null, {file: file, allFrames: allFrames === false ? false : true}, function () {
+            chrome.tabs.insertCSS(tabId, {file: file, allFrames: allFrames}, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {
@@ -64,9 +98,12 @@ var extLib = {
 
     // allFrames: true
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
-    executeScript: function (file, allFrames, cb) {
+    executeScript: function (options, cb) {
+        var file = options.file,
+            allFrames = options.allFrames === false ? false : true,
+            tabId = options.tabId || null;
         if (typeof chrome !== "undefined" && chrome && chrome.tabs) {
-            chrome.tabs.executeScript(null, {file: file, allFrames: allFrames || true}, function () {
+            chrome.tabs.executeScript(tabId, {file: file, allFrames: allFrames}, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {
@@ -80,8 +117,8 @@ var extLib = {
         }
     },
 
-    loadJSCSS: function (arrSources, allFrames) {
-        async.eachSeries(
+    loadJSCSS: function (arrSources, allFrames, tabId) {
+        asyncEachSeries(
             arrSources,
             function (source, cb) {
                 // source can also be an object and can have "src" and "skip" parameters
@@ -94,9 +131,9 @@ var extLib = {
                 }
                 if (source) {
                     if (source.match('.js$')) {
-                        extLib.executeScript(source, allFrames, cb);
+                        extLib.executeScript({file: source, allFrames: allFrames, tabId: tabId}, cb);
                     } else if (source.match('.css$')) {
-                        extLib.insertCSS(source, allFrames, cb);
+                        extLib.insertCSS({file: source, allFrames: allFrames, tabId: tabId}, cb);
                     } else {
                         console.log('Error - Loading files like ' + source + ' is not supported by loadJSCSS(). Please check the file extension.');
                         cb();

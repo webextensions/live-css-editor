@@ -943,6 +943,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         'language-mode': 'css',
         'use-css-linting': 'no',
         'disable-styles': 'no',
+        'apply-styles-automatically': 'no',
         'use-tab-for-indentation': 'no',
         'indentation-spaces-count': '4',
         [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',

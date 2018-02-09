@@ -112,12 +112,11 @@
             "latestVersion": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/css/tooltipster.main.css"
         },
         {
-            "to": "extension/scripts/3rdparty/amplify.js",
+            "to": "extension/scripts/3rdparty/amplify-store.js",
             "from": {
-                "default": { "src": "https://raw.githubusercontent.com/mikehostetler/amplify/1.1.2/lib/amplify.min.js" },
-                "dev": { "src": "https://raw.githubusercontent.com/mikehostetler/amplify/1.1.2/lib/amplify.js"}
+                "default": { "src": "https://raw.githubusercontent.com/mikehostetler/amplify/1.1.2/src/store.js" }
             },
-            "latestVersion": "https://raw.githubusercontent.com/mikehostetler/amplify/master/lib/amplify.min.js"
+            "latestVersion": "https://raw.githubusercontent.com/mikehostetler/amplify/master/src/store.js"
         },
         {
             "to": "extension/scripts/3rdparty/async.js",
