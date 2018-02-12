@@ -132,7 +132,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
         }
 
-        reposition() {
+        reposition(cb) {
+            cb = cb || function () {};
             var thisOb = this,
                 containerEl = thisOb.container;
 
@@ -140,6 +141,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                 isContainerTrulyHidden = isContainerHidden && $(thisOb.container).parent().is(':visible');
             if (isContainerTrulyHidden) {
                 thisOb.options.editorOb.show();
+                cb();
             } else {
                 var defaultLeft = thisOb.defaultPreference('ui-position-left'),
                     defaultTop = thisOb.defaultPreference('ui-position-top'),
@@ -167,6 +169,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         targetWidth: defaultWidth,
                         targetHeight: defaultHeight
                     });
+
+                    cb();
                 } else {
                     var maxDuration = 750;
 
@@ -193,6 +197,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     }, duration, function () {
                         thisOb.savePosition({ top: defaultTop, left: defaultLeft });
                         thisOb.focus();
+                        cb();
                     });
 
                     // TODO: Implement 'resizable' option

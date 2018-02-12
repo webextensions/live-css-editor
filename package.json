@@ -1,6 +1,6 @@
 {
   "name": "magic-css",
-  "version": "6.2.24",
+  "version": "6.2.25",
   "scripts": {
     "lint": "eslint .",
     "postinstall": "copy-files-from-to copy-third-party-front-end-scripts.json",

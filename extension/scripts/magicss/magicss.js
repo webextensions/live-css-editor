@@ -13,9 +13,24 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         // do nothing
     }
 
+    var checkIfMagicCssLoadedFine = function (MagiCSSEditor) {
+        if (!MagiCSSEditor.container.clientHeight) {
+            // One of the cases where this condition would be true is when the <body> element itself is implemented as shadow-dom
+            // eg: http://www.firstpost.com
+            utils.alertNote(
+                'Error: Unable to load Magic CSS properly' +
+                '<br/>Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>',
+                10000
+            );
+        }
+    };
+
     if (window.MagiCSSEditor) {
         utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
-        window.MagiCSSEditor.reposition();      // 'Magic CSS window is already there. Repositioning it.'
+        // 'Magic CSS window is already there. Repositioning it.'
+        window.MagiCSSEditor.reposition(function () {
+            checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+        });
         return;
     }
 
@@ -1785,6 +1800,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
                 utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
+
+                checkIfMagicCssLoadedFine(window.MagiCSSEditor);
 
                 try {
                     chromeStorage.get('use-autocomplete-for-css-selectors', function (values) {
