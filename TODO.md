@@ -9,7 +9,7 @@
 * Use black-and-white/grayscale + transparent/translucent for all icons under "+"
 * "Reload CSS resources" feature should try to detect and reload @import instructions through <style> and <link> tags
 * CodeMirror autocomplete suggestions should have fixed position OR they should not let scroll event pass through to parent-elements/body OR both
-* Review if the fix for https://github.com/webextensions/live-css-editor/issues/2 (Changes aren't applied after reload until extension is opened) works well in Firefox/Edge/Opera browsers (or has graceful degradation)
+* Review if the fix for https://github.com/webextensions/live-css-editor/issues/2 (Changes aren't applied after reload until extension is opened) works well in Edge/Opera browsers (or has graceful degradation). Note: The fix doesn't work well in Firefox due to the pending bug https://bugzilla.mozilla.org/show_bug.cgi?id=1392624 (Also see: https://bugzilla.mozilla.org/show_bug.cgi?id=1397658)
 * Autocompleting a CSS property adds ": " (colon and space) characters, while autocompleting using Emmet expansion adds ": ;" (colon, space and semicolon) characters and puts the cursor before the semicolon character (for example, typing "p", "d" and "<Tab>" expands to "padding: ;" ). We may make this behavior consistent.
 
 #### Environments
