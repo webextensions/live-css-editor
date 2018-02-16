@@ -314,15 +314,15 @@
         {
             "from": {
                 "default": {
-                    "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                    "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js",
                     "latest": "https://unpkg.com/jquery/dist/jquery.min.js"
                 },
                 "dev": {
-                    "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js",
+                    "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.js",
                     "latest": "https://unpkg.com/jquery/dist/jquery.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/jquery-3.2.1.js"
+            "to": "extension/scripts/3rdparty/jquery.js"
         },
         {
             "from": {
