@@ -599,8 +599,8 @@ html .magicss-mouse-over-dom-element {
     left: 0;
     width: 100%;
     height: 100%;
-    -z-index: 2147483646;
-    z-index: 2147483647;
+    z-index: 2147483646;
+    -z-index: 2147483647;
 }
 
 .magic-css-edit-file-options {
