@@ -153,10 +153,10 @@
             "latestVersion": "https://raw.githubusercontent.com/mathiasbynens/CSS.escape/master/css.escape.js"
         },
         {
-            "to": "extension/scripts/3rdparty/jquery-3.2.1.js",
+            "to": "extension/scripts/3rdparty/jquery.js",
             "from": {
-                "default": { "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" },
-                "dev": { "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js" }
+                "default": { "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" },
+                "dev": { "src": "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.js" }
             }
         },
         {

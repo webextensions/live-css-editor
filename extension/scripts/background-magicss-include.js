@@ -137,7 +137,7 @@ var main = function (tabId) {
 
         extLib.loadJSCSS([
             {
-                src: path3rdparty + 'jquery-3.2.1.js',
+                src: path3rdparty + 'jquery.js',
                 skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
             },
             {
