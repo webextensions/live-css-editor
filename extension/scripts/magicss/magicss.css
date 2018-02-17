@@ -518,8 +518,7 @@ html .magicss-mouse-over-dom-element {
 }
 
 .magic-css-edit-file-options {
-    width: 500px;
-    height: 200px;
+    width: 300px;
     position: fixed !important; /* Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;" */
     left: calc(50% - 250px);
     top: calc(50% - 100px);
@@ -527,10 +526,25 @@ html .magicss-mouse-over-dom-element {
     z-index: 2147483647;
     box-sizing: border-box;
     background-color: #eee;
-    padding: 10px;
     border-radius: 10px;
+    font-family: Helvetica, "Trebuchet MS", sans-serif;
+    font-size: 12px;
 }
 
+.magic-css-edit-file-options {
+    box-sizing: border-box;
+}
+
+.magic-css-edit-file-options * {
+    box-sizing: inherit;
+}
+
+.magic-css-file-field-header {
+    color: #777;
+    margin-bottom: 2px;
+}
+
+/*
 .magic-css-row {
 	clear: both;
 	margin-top: 7px;
@@ -557,7 +571,41 @@ html .magicss-mouse-over-dom-element {
 .magic-css-row .link-tag-to-refresh select {
     width: 300px;
 }
+/* */
+.magic-css-file-config-item {
+    background-color: #ddd;
+    border-bottom: 1px solid #999;
+    margin-bottom: 0;
+    padding: 10px;
 
+    border: 1px solid #999;
+    border-bottom-width: 0;
+}
+
+.magic-css-file-config-item:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.magic-css-file-config-item:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.magic-css-file-config-item:last-child {
+    border-bottom: 1px solid #999;
+}
+
+.magic-css-file-config-item input[type="number"],
+.magic-css-file-config-item input[type="text"],
+.magic-css-file-config-item select {
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 100%;
+    height: 21px;
+}
+
+.magic-css-file-config-item select {
+    background-color: #fff;
+}
 
 .magic-css-edit-file-options .ms-res-ctn.dropdown-menu {
     height: 58px;
