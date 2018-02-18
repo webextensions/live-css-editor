@@ -1907,7 +1907,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     window.fileSuggestions = fileSuggestions;
 
                     var $fileSuggestions = $(fileSuggestions);
-                    $fileSuggestions.on('selectionchange', function(e, m){
+                    $fileSuggestions.on('selectionchange', function(e, m){   // eslint-disable-line no-unused-vars
                         var fileToEdit = this.getValue()[0] || '';
                         editor.userPreference('file-to-edit', fileToEdit);
                     });
