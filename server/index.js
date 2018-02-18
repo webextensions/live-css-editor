@@ -6,7 +6,10 @@ var bodyParser = require('body-parser');
 
 var path = require('path');
 var fs = require('fs');
+var os = require('os');
 var glob = require('glob-all');
+
+var localIpAddresses = require('local-ip-addresses');
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -32,7 +35,7 @@ app.put('/magic-css/*', function (req, res, next) {
 }); /* */
 
 app.get('/magic-css', function (req, res, next) {
-    debugger;
+    // debugger;
     var arrFiles = [];
     glob([
         '**/*.css',
@@ -66,5 +69,20 @@ app.use('/', express.static('.'), serveIndex('.', {'icons': true}));
 //     res.send('Hello World');
 // });
 
+var portNumber = 3777;
+app.listen(portNumber);
 
-app.listen(3777);
+console.log(
+    'Live CSS Editor (Magic CSS) is available at any of the following addresses:\n' +
+    (function (ipAddresses) {
+        var host = os.hostname(),
+            addresses = [];
+        addresses = addresses.concat('localhost');
+        addresses = addresses.concat(host);
+        addresses = addresses.concat(ipAddresses);
+        addresses = addresses.map(function (item) {
+            return  '    http://' + item + ':3777/';
+        });
+        return addresses.join('\n');
+    }(localIpAddresses))
+);
