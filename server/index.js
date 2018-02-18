@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 
-var express = require('express');
-var serveIndex = require('serve-index');
-var bodyParser = require('body-parser');
+/* eslint-env node */
 
-var path = require('path');
-var fs = require('fs');
-var os = require('os');
-var glob = require('glob-all');
+// var path = require('path'),
+var fs = require('fs'),
+    os = require('os');
 
-var localIpAddresses = require('local-ip-addresses');
+var express = require('express'),
+    serveIndex = require('serve-index'),
+    bodyParser = require('body-parser'),
+    glob = require('glob-all');
+
+var logger = require('note-down'),
+    localIpAddresses = require('local-ip-addresses');
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -24,7 +27,7 @@ app.put('/magic-css', function (req, res, next) {
 });
 /* */
 
-app.put('/magic-css/*', function (req, res, next) {
+app.put('/magic-css/*', function (req, res, next) { // eslint-disable-line no-unused-vars
     var relativeFilePath = req.originalUrl.substr('/magic-css/'.length);
     fs.writeFileSync(
         // __dirname + '/' + relativeFilePath,
@@ -34,15 +37,14 @@ app.put('/magic-css/*', function (req, res, next) {
     res.send({ status: 'File updated successfully' });
 }); /* */
 
-app.get('/magic-css', function (req, res, next) {
-    // debugger;
+app.get('/magic-css', function (req, res, next) { // eslint-disable-line no-unused-vars
     var arrFiles = [];
     glob([
         '**/*.css',
         '**/*.scss',
         '**/*.less'
     ], function (err, files) {
-        console.log(files);
+        logger.verbose(files);
         for (var i = 0; i < files.length; i++) {
             var file = files[i];
             arrFiles.push({
@@ -53,7 +55,7 @@ app.get('/magic-css', function (req, res, next) {
         res.send(arrFiles);
 
         // next();
-    })
+    });
 });
 
 // https://expressjs.com/en/starter/static-files.html
@@ -72,8 +74,8 @@ app.use('/', express.static('.'), serveIndex('.', {'icons': true}));
 var portNumber = 3777;
 app.listen(portNumber);
 
-console.log(
-    'Live CSS Editor (Magic CSS) is available at any of the following addresses:\n' +
+logger.info(
+    '\nLive CSS Editor (Magic CSS) is available at any of the following addresses:\n' +
     (function (ipAddresses) {
         var host = os.hostname(),
             addresses = [];
