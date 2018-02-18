@@ -81,7 +81,7 @@ console.log(
         addresses = addresses.concat(host);
         addresses = addresses.concat(ipAddresses);
         addresses = addresses.map(function (item) {
-            return  '    http://' + item + ':3777/';
+            return  '    http://' + item + ':' + portNumber + '/';
         });
         return addresses.join('\n');
     }(localIpAddresses))
