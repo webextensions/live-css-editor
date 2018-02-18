@@ -1,10 +1,10 @@
 {
-  "name": "magic-css",
+  "name": "live-css-editor",
   "version": "0.0.1",
   "description": "Server for handling simple GET/PUT requests for Magic CSS browser extension",
   "main": "index.js",
   "bin": {
-    "magic-css": "./index.js"
+    "live-css-editor": "./index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,9 +12,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.16.2",
-    "body-parser": "^1.18.2",
-    "glob-all": "^3.1.0",
-    "serve-index": "^1.9.1"
+    "express": "4.16.2",
+    "body-parser": "1.18.2",
+    "glob-all": "3.1.0",
+    "local-ip-addresses": "0.0.1",
+    "serve-index": "1.9.1"
   }
 }
