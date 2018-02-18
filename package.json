@@ -23,7 +23,7 @@
     "copy-files-from-to": "0.2.1",
     "cp-file": "5.0.0",
     "del": "3.0.0",
-    "eslint": "4.17.0",
+    "eslint": "4.18.0",
     "jsonfile": "4.0.0"
   }
 }
