@@ -7,6 +7,7 @@
     "live-css-editor": "./index.js"
   },
   "scripts": {
+    "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -16,6 +17,7 @@
     "body-parser": "1.18.2",
     "glob-all": "3.1.0",
     "local-ip-addresses": "0.0.1",
+    "note-down": "0.1.0",
     "serve-index": "1.9.1"
   }
 }
