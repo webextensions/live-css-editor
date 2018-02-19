@@ -20,17 +20,17 @@
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/display/placeholder.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/display/placeholder.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/display/placeholder.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/display/placeholder.js"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/edit/closebrackets.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/edit/closebrackets.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/edit/closebrackets.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/closebrackets.js"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/edit/matchbrackets.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/edit/matchbrackets.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/edit/matchbrackets.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/matchbrackets.js"
         },
         {
@@ -42,42 +42,42 @@
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/hint/css-hint.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/hint/css-hint.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/hint/css-hint.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/css-hint.js"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/hint/show-hint.css",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/hint/show-hint.css" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/hint/show-hint.css" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.css"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/hint/show-hint.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/hint/show-hint.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/hint/show-hint.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.js"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/lint/css-lint.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/lint/css-lint.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/lint/css-lint.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/css-lint.js"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/lint/lint.css",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/lint/lint.css" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/lint/lint.css" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.css"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/lint/lint.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/lint/lint.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/lint/lint.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.js"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/addons/selection/active-line.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/selection/active-line.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/selection/active-line.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/selection/active-line.js"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/mode/css.js",
-            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/mode/css/css.js" } },
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/mode/css/css.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/mode/css/css.js"
         },
         {
