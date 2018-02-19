@@ -42,7 +42,8 @@ app.get('/magic-css', function (req, res, next) { // eslint-disable-line no-unus
     glob([
         '**/*.css',
         '**/*.scss',
-        '**/*.less'
+        '**/*.less',
+        '!**/node_modules/**/*'
     ], function (err, files) {
         logger.verbose(files);
         for (var i = 0; i < files.length; i++) {
@@ -53,7 +54,6 @@ app.get('/magic-css', function (req, res, next) { // eslint-disable-line no-unus
             });
         }
         res.send(arrFiles);
-
         // next();
     });
 });
