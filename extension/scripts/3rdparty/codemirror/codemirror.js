@@ -688,7 +688,8 @@ height=box.bottom-box.top}var diff=cur.line.height-height
 height<2&&(height=textHeight(display))
 if(diff>.005||diff<-.005){updateLineHeight(cur.line,height)
 updateWidgetHeight(cur.line)
-if(cur.rest)for(var j=0;j<cur.rest.length;j++)updateWidgetHeight(cur.rest[j])}}}}function updateWidgetHeight(line){if(line.widgets)for(var i=0;i<line.widgets.length;++i)line.widgets[i].height=line.widgets[i].node.parentNode.offsetHeight}function visibleLines(display,doc,viewport){var top=viewport&&null!=viewport.top?Math.max(0,viewport.top):display.scroller.scrollTop
+if(cur.rest)for(var j=0;j<cur.rest.length;j++)updateWidgetHeight(cur.rest[j])}}}}function updateWidgetHeight(line){if(line.widgets)for(var i=0;i<line.widgets.length;++i){var w=line.widgets[i],parent=w.node.parentNode
+parent&&(w.height=parent.offsetHeight)}}function visibleLines(display,doc,viewport){var top=viewport&&null!=viewport.top?Math.max(0,viewport.top):display.scroller.scrollTop
 top=Math.floor(top-paddingTop(display))
 var bottom=viewport&&null!=viewport.bottom?viewport.bottom:top+display.wrapper.clientHeight,from=lineAtHeight(doc,top),to=lineAtHeight(doc,bottom)
 if(viewport&&viewport.ensure){var ensureFrom=viewport.ensure.from.line,ensureTo=viewport.ensure.to.line
@@ -1305,7 +1306,9 @@ event.altKey&&"Alt"!=base&&(name="Alt-"+name);(flipCtrlCmd?event.metaKey:event.c
 !noShift&&event.shiftKey&&"Shift"!=base&&(name="Shift-"+name)
 return name}function keyName(event,noShift){if(presto&&34==event.keyCode&&event.char)return!1
 var name=keyNames[event.keyCode]
-return null!=name&&!event.altGraphKey&&addModifierNames(name,event,noShift)}function getKeyMap(val){return"string"==typeof val?keyMap[val]:val}function deleteNearSelection(cm,compute){for(var ranges=cm.doc.sel.ranges,kill=[],i=0;i<ranges.length;i++){for(var toKill=compute(ranges[i]);kill.length&&cmp(toKill.from,lst(kill).to)<=0;){var replaced=kill.pop()
+if(null==name||event.altGraphKey)return!1
+3==event.keyCode&&event.code&&(name=event.code)
+return addModifierNames(name,event,noShift)}function getKeyMap(val){return"string"==typeof val?keyMap[val]:val}function deleteNearSelection(cm,compute){for(var ranges=cm.doc.sel.ranges,kill=[],i=0;i<ranges.length;i++){for(var toKill=compute(ranges[i]);kill.length&&cmp(toKill.from,lst(kill).to)<=0;){var replaced=kill.pop()
 if(cmp(replaced.from,toKill.from)<0){toKill.from=replaced.from
 break}}kill.push(toKill)}runInOp(cm,function(){for(var i=kill.length-1;i>=0;i--)replaceRange(cm.doc,"",kill[i].from,kill[i].to,"+delete")
 ensureCursorVisible(cm)})}function moveCharLogically(line,ch,dir){var target=skipExtendingChars(line.text,ch+dir,dir)
@@ -1348,15 +1351,13 @@ dropShift&&(cm.display.shift=!1)
 done=bound(cm)!=Pass}finally{cm.display.shift=prevShift
 cm.state.suppressEdits=!1}return done}function lookupKeyForEditor(cm,name,handle){for(var i=0;i<cm.state.keyMaps.length;i++){var result=lookupKey(name,cm.state.keyMaps[i],handle,cm)
 if(result)return result}return cm.options.extraKeys&&lookupKey(name,cm.options.extraKeys,handle,cm)||lookupKey(name,cm.options.keyMap,handle,cm)}function dispatchKey(cm,name,e,handle){var seq=cm.state.keySeq
-if(seq){if(isModifierKey(name))return"handled"
-stopSeq.set(50,function(){if(cm.state.keySeq==seq){cm.state.keySeq=null
+if(seq){if(isModifierKey(name))return"handled";/\'$/.test(name)?cm.state.keySeq=null:stopSeq.set(50,function(){if(cm.state.keySeq==seq){cm.state.keySeq=null
 cm.display.input.reset()}})
-name=seq+" "+name}var result=lookupKeyForEditor(cm,name,handle)
+if(dispatchKeyInner(cm,seq+" "+name,e,handle))return!0}return dispatchKeyInner(cm,name,e,handle)}function dispatchKeyInner(cm,name,e,handle){var result=lookupKeyForEditor(cm,name,handle)
 "multi"==result&&(cm.state.keySeq=name)
 "handled"==result&&signalLater(cm,"keyHandled",cm,name,e)
 if("handled"==result||"multi"==result){e_preventDefault(e)
-restartBlink(cm)}if(seq&&!result&&/\'$/.test(name)){e_preventDefault(e)
-return!0}return!!result}function handleKeyBinding(cm,e){var name=keyName(e,!0)
+restartBlink(cm)}return!!result}function handleKeyBinding(cm,e){var name=keyName(e,!0)
 return!!name&&(e.shiftKey&&!cm.state.keySeq?dispatchKey(cm,"Shift-"+name,e,function(b){return doHandleBinding(cm,b,!0)})||dispatchKey(cm,name,e,function(b){if("string"==typeof b?/^go[A-Z]/.test(b):b.motion)return doHandleBinding(cm,b)}):dispatchKey(cm,name,e,function(b){return doHandleBinding(cm,b)}))}function handleCharBinding(cm,e,ch){return dispatchKey(cm,"'"+ch+"'",e,function(b){return doHandleBinding(cm,b,!0)})}function onKeyDown(e){var cm=this
 cm.curOp.focus=activeElt()
 if(!signalDOMEvent(cm,e)){ie&&ie_version<11&&27==e.keyCode&&(e.returnValue=!1)
@@ -2095,7 +2096,7 @@ if(dir!=this.direction){this.direction=dir
 this.iter(function(line){return line.order=null})
 this.cm&&directionChanged(this.cm)}})})
 Doc.prototype.eachLine=Doc.prototype.iter
-for(var lastDrop=0,globalsRegistered=!1,keyNames={3:"Enter",8:"Backspace",9:"Tab",13:"Enter",16:"Shift",17:"Ctrl",18:"Alt",19:"Pause",20:"CapsLock",27:"Esc",32:"Space",33:"PageUp",34:"PageDown",35:"End",36:"Home",37:"Left",38:"Up",39:"Right",40:"Down",44:"PrintScrn",45:"Insert",46:"Delete",59:";",61:"=",91:"Mod",92:"Mod",93:"Mod",106:"*",107:"=",109:"-",110:".",111:"/",127:"Delete",173:"-",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'",63232:"Up",63233:"Down",63234:"Left",63235:"Right",63272:"Delete",63273:"Home",63275:"End",63276:"PageUp",63277:"PageDown",63302:"Insert"},i=0;i<10;i++)keyNames[i+48]=keyNames[i+96]=String(i)
+for(var lastDrop=0,globalsRegistered=!1,keyNames={3:"Pause",8:"Backspace",9:"Tab",13:"Enter",16:"Shift",17:"Ctrl",18:"Alt",19:"Pause",20:"CapsLock",27:"Esc",32:"Space",33:"PageUp",34:"PageDown",35:"End",36:"Home",37:"Left",38:"Up",39:"Right",40:"Down",44:"PrintScrn",45:"Insert",46:"Delete",59:";",61:"=",91:"Mod",92:"Mod",93:"Mod",106:"*",107:"=",109:"-",110:".",111:"/",127:"Delete",145:"ScrollLock",173:"-",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'",63232:"Up",63233:"Down",63234:"Left",63235:"Right",63272:"Delete",63273:"Home",63275:"End",63276:"PageUp",63277:"PageDown",63302:"Insert"},i=0;i<10;i++)keyNames[i+48]=keyNames[i+96]=String(i)
 for(var i$1=65;i$1<=90;i$1++)keyNames[i$1]=String.fromCharCode(i$1)
 for(var i$2=1;i$2<=12;i$2++)keyNames[i$2+111]=keyNames[i$2+63235]="F"+i$2
 var keyMap={}
@@ -2630,5 +2631,5 @@ CodeMirror.addClass=addClass
 CodeMirror.contains=contains
 CodeMirror.rmClass=rmClass
 CodeMirror.keyNames=keyNames}(CodeMirror$1)
-CodeMirror$1.version="5.31.0"
+CodeMirror$1.version="5.34.0"
 return CodeMirror$1})

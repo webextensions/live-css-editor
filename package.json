@@ -14,7 +14,7 @@
     "all-is-well": "./scripts/all-is-well.sh"
   },
   "dependencies": {
-    "codemirror": "5.31.0",
+    "codemirror": "5.34.0",
     "emmetio-codemirror-plugin-webextensions": "0.3.7",
     "jquery": "~3.3.1",
     "socket.io": "~2.1.1",
