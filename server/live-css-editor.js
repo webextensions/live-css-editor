@@ -72,6 +72,7 @@ app.use('/', express.static('.'), serveIndex('.', {'icons': true}));
 // });
 
 var portNumber = 3777;
+
 app.listen(portNumber);
 
 logger.info(
@@ -88,3 +89,6 @@ logger.info(
         return addresses.join('\n');
     }(localIpAddresses))
 );
+
+logger.success('Use it along with the Chrome extension:');
+logger.success('    https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol');
