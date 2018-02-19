@@ -1039,7 +1039,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         'ui-position-left': 20,
         'ui-position-top': 20,
         'ui-size-height': 250,
-        'ui-size-width': 300
+        'ui-size-width': 350
     };
 
     window.Editor = Editor;
