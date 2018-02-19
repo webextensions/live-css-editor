@@ -13,7 +13,7 @@
     "zip-extension": "npm run zip-chrome-extension && npm run zip-edge-extension && npm run zip-firefox-extension && npm run zip-opera-extension"
   },
   "dependencies": {
-    "codemirror": "5.31.0",
+    "codemirror": "5.34.0",
     "emmetio-codemirror-plugin-webextensions": "0.3.7",
     "jquery": "3.3.1"
   },
