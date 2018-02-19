@@ -639,6 +639,9 @@ html .magicss-mouse-over-dom-element {
 .magic-css-edit-file-options .ms-ctn .ms-helper {
     display: none !important;
 }
+.magic-css-edit-file-options .ms-ctn.form-control {
+    border: 1px solid #aaa;
+}
 
 
 /*

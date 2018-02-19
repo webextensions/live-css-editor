@@ -1119,7 +1119,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             (function () {
                                 var str = '<option>Refresh all &lt;link&gt; tags</option>';
                                 for (var i = 0; i < links.length; i++) {
-                                    str += '<option>' + links[i].href + '</option>';
+                                    str +=
+                                        '<option>' +
+                                            // links[i].href
+                                            links[i].href.split('?reloadedAt=')[0].split('&reloadedAt=')[0] +
+                                        '</option>';
                                 }
                                 return str;
                             }()) +
