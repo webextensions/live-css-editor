@@ -34,7 +34,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/comment/comment.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/comment/comment.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/comment/comment.js"
                 }
             },
@@ -43,7 +43,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/display/placeholder.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/display/placeholder.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/display/placeholder.js"
                 }
             },
@@ -52,7 +52,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/edit/closebrackets.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/edit/closebrackets.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/closebrackets.js"
                 }
             },
@@ -61,7 +61,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/edit/matchbrackets.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/edit/matchbrackets.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/edit/matchbrackets.js"
                 }
             },
@@ -81,7 +81,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/hint/css-hint.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/hint/css-hint.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/css-hint.js"
                 }
             },
@@ -90,7 +90,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/hint/show-hint.css",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/hint/show-hint.css",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.css"
                 }
             },
@@ -99,7 +99,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/hint/show-hint.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/hint/show-hint.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/hint/show-hint.js"
                 }
             },
@@ -108,7 +108,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/lint/css-lint.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/lint/css-lint.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/css-lint.js"
                 }
             },
@@ -117,7 +117,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/lint/lint.css",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/lint/lint.css",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.css"
                 }
             },
@@ -126,7 +126,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/lint/lint.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/lint/lint.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.js"
                 }
             },
@@ -135,7 +135,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/search/searchcursor.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/search/searchcursor.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/search/searchcursor.js"
                 }
             },
@@ -144,7 +144,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/selection/active-line.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/selection/active-line.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/selection/active-line.js"
                 }
             },
@@ -153,7 +153,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/keymap/sublime.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/keymap/sublime.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/keymap/sublime.js"
                 }
             },
@@ -162,7 +162,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/mode/css/css.js",
+                    "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/mode/css/css.js",
                     "latest": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/mode/css/css.js"
                 }
             },
