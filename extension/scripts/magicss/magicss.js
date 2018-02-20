@@ -1112,15 +1112,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     });
 
+                    var $dom;
                     // TODO: If links.length is 0, then show a warning/error message
                     if (links.length) {
-                        return $(
+                        $dom = $(
                             '<select>' +
                             (function () {
-                                var str = '<option>Refresh all &lt;link&gt; tags</option>';
+                                var str = '<option value="0">Refresh all &lt;link&gt; tags</option>';
                                 for (var i = 0; i < links.length; i++) {
                                     str +=
-                                        '<option>' +
+                                        '<option value="' + (i + 1) + '">' +
                                             // links[i].href
                                             links[i].href.split('?reloadedAt=')[0].split('&reloadedAt=')[0] +
                                         '</option>';
@@ -1130,8 +1131,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             '</select>'
                         );
                     } else {
-                        return $('<span>No &lt;link&gt; tags in the page</span>');
+                        $dom = $('<span>No &lt;link&gt; tags in the page</span>');
                     }
+                    return $dom;
                 };
 
                 var showFileEditOptions = function (editor, cb) {
@@ -1230,7 +1232,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         editor.userPreference('link-refresh-delay-on-file-update', $(this).val());
                     });
 
-                    $fileEditOptions.find('.link-tag-to-refresh').append(generateLinkTagsList());
+                    var $linkTagToRefresh = $fileEditOptions.find('.link-tag-to-refresh');
+                    var generatedLinkTagsList = generateLinkTagsList();
+                    $linkTagToRefresh.append(generatedLinkTagsList);
+                    var $selectLinkTagToRefresh = $linkTagToRefresh.find('select');
+                    $selectLinkTagToRefresh.on('change', function (a, b, c) {
+                    // $linkTagToRefresh.on('change', function (a, b, c) {
+                        console.log(123);
+                        $selectLinkTagToRefresh;
+                        generatedLinkTagsList;
+                        debugger;
+                    });
+
                     $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
                     $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
