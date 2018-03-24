@@ -184,6 +184,7 @@ var main = function (tabId) {
 
             path3rdparty + 'jquery-ui_customized.css',
             path3rdparty + 'jquery-ui.js',
+            path3rdparty + 'jquery.ui.touch-punch.js',
 
             path3rdparty + 'amplify-store.js',
 

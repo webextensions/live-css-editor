@@ -1,0 +1,1 @@
+https://raw.githubusercontent.com/furf/jquery-ui-touch-punch/8f7559b6e65cdc3ee3648d5fe76d38c653f87ff5/jquery.ui.touch-punch.min.js

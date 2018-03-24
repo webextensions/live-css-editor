@@ -144,6 +144,14 @@
             }
         },
         {
+            "to": "extension/scripts/3rdparty/jquery.ui.touch-punch.js",
+            "from": {
+                "default": { "src": "https://raw.githubusercontent.com/furf/jquery-ui-touch-punch/8f7559b6e65cdc3ee3648d5fe76d38c653f87ff5/jquery.ui.touch-punch.min.js" },
+                "dev": { "src": "https://raw.githubusercontent.com/furf/jquery-ui-touch-punch/8f7559b6e65cdc3ee3648d5fe76d38c653f87ff5/jquery.ui.touch-punch.js" }
+            },
+            "latestVersion": "https://raw.githubusercontent.com/furf/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js"
+        },
+        {
             "to": "extension/scripts/3rdparty/source-map.js",
             "from": {
                 "default": { "src": "https://raw.githubusercontent.com/mozilla/source-map/0.6.1/dist/source-map.min.js" },
