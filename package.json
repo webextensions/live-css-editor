@@ -1,8 +1,9 @@
 {
   "name": "magic-css",
-  "version": "6.2.25",
+  "version": "6.2.26",
   "scripts": {
     "lint": "eslint .",
+    "manifest-generator": "node ./extension/manifest-generator.js",
     "postinstall": "copy-files-from-to copy-third-party-front-end-scripts.json",
     "zip-chrome-extension": "node ./zip-extension.js chrome",
     "zip-edge-extension": "node ./zip-extension.js edge",
