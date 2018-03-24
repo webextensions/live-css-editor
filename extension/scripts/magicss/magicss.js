@@ -27,6 +27,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
     if (window.MagiCSSEditor) {
         utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
+
         // 'Magic CSS window is already there. Repositioning it.'
         window.MagiCSSEditor.reposition(function () {
             checkIfMagicCssLoadedFine(window.MagiCSSEditor);
@@ -1186,16 +1187,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 editor.focus();
                             },
                             afterrender: function (editor, divIcon) {
-                                /* HACK: Remove this hack which is being used to handle "divIcon.title" change
-                                         for the case of "editor.disableEnableCSS('disable')" under "reInitialized()" */
-                                editor.originalDisableEnableCSS = editor.disableEnableCSS;
-                                editor.disableEnableCSS = function (doWhat) {
-                                    editor.originalDisableEnableCSS(doWhat);
-                                    if (doWhat === 'disable') {
+                                // TODO: Make the code independent of this setTimeout logic.
+                                setTimeout(function () {
+                                    if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
                                         divIcon.title = 'Activate code';
                                     } else {
                                         divIcon.title = 'Deactivate code';
                                     }
+                                }, 0);
+
+                                /* HACK: Remove this hack which is being used to handle "divIcon.title" change
+                                         for the case of "editor.disableEnableCSS('disable')" under "reInitialized()" */
+                                editor.originalDisableEnableCSS = editor.disableEnableCSS;
+                                editor.disableEnableCSS = function (doWhat) {
+                                    var state = editor.originalDisableEnableCSS(doWhat);
+                                    if (state === 'disabled') {
+                                        divIcon.title = 'Activate code';
+                                    } else {
+                                        divIcon.title = 'Deactivate code';
+                                    }
+                                    return state;
                                 };
                             }
                         },
@@ -1584,7 +1595,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                             }
                         },
                         reInitialized: function (editor, cfg) {
-                            editor.disableEnableCSS('disable');
+                            editor.disableEnableCSS('toggle');
 
                             cfg = cfg || {};
                             var duration = cfg.animDuration,
@@ -1783,7 +1794,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     }
 
                     disableEnableCSS(doWhat) {
-                        var disabled = doWhat === 'disable';
+                        var disabled;
+                        if (doWhat === 'disable') {
+                            disabled = true;
+                        } else if (doWhat === 'toggle') {
+                            if (newStyleTag.disabled) {
+                                disabled = false;
+                            } else {
+                                disabled = true;
+                            }
+                        } else {
+                            disabled = false;
+                        }
                         newStyleTag.disabled = disabled;
                         newStyleTag.applyTag();
                         this.userPreference('disable-styles', disabled ? 'yes' : 'no');
@@ -1791,9 +1813,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         if (disabled) {
                             this.indicateEnabledDisabled('disabled');
                             utils.alertNote('Deactivated the code', 5000);
+                            return 'disabled';
                         } else {
                             this.indicateEnabledDisabled('enabled');
                             utils.alertNote('Activated the code', 5000);
+                            return 'enabled';
                         }
                     }
                 }
