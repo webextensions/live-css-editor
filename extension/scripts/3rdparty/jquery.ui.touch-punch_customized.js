@@ -13,10 +13,13 @@
   // Detect touch support
   $.support.touch = 'ontouchend' in document;
 
+  // Commenting out the following code since touch support may get added dynamically when the user is using debugging tools
+  /*
   // Ignore browsers without touch support
   if (!$.support.touch) {
     return;
   }
+  */
 
   var mouseProto = $.ui.mouse.prototype,
       _mouseInit = mouseProto._mouseInit,
