@@ -138,7 +138,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                 containerEl = thisOb.container;
 
             var isContainerHidden = $(thisOb.container).is(':visible') ? false : true,
-                isContainerTrulyHidden = isContainerHidden && $(thisOb.container).parent().is(':visible');
+                isContainerTrulyHidden = isContainerHidden
+                    && thisOb.container.style.display === 'none'
+                    && $(thisOb.container).parent().is(':visible');
             if (isContainerTrulyHidden) {
                 thisOb.options.editorOb.show();
                 cb();

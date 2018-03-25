@@ -15,8 +15,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
     var checkIfMagicCssLoadedFine = function (MagiCSSEditor) {
         if (!MagiCSSEditor.container.clientHeight) {
-            // One of the cases where this condition would be true is when the <body> element itself is implemented as shadow-dom
-            // eg: http://www.firstpost.com
+            // Cases where this condition would be true:
+            //     - When the <body> element itself is implemented as shadow-dom. eg: http://www.firstpost.com (when this change was initially added)
+            //     - If the user tries to use following CSS via this extension: #MagiCSS-bookmarklet {display: none !important;}
             utils.alertNote(
                 'Error: Unable to load Magic CSS properly' +
                 '<br/>Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>',
