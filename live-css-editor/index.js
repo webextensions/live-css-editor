@@ -2,43 +2,36 @@
 
 /* eslint-env node */
 
-var chokidar = require('chokidar');
-var express = require('express');
-var Emitter = require('tiny-emitter');
-// var chalk = require('chalk');
-
-var emitter = new Emitter();
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-
 var os = require('os');
+
+var chokidar = require('chokidar'),
+    findFreePort = require('find-free-port');
+
+var Emitter = require('tiny-emitter'),
+    emitter = new Emitter();
+
+var argv = require('yargs').argv;
+
+var express = require('express'),
+    app = express(),
+    http = require('http').Server(app),
+    io = require('socket.io')(http);
+
 var logger = require('note-down'),
     localIpAddresses = require('local-ip-addresses');
 
-// var getPort = require('get-port');
-var findFreePort = require('find-free-port');
-
-var argv = require('yargs').argv;
+var log = console.log.bind(console);
 
 var verboseLogging = false;
 if (argv.v || argv.verbose) {
     verboseLogging = true;
 }
 
-// var verboseLogging = false;
-// var verboseLogging = true;
-
 var connectedSessions = 0;
 
-// app.get('/', function(req, res){
-//     res.send('<h1>Hello world</h1>');
-// });
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
-
-var log = console.log.bind(console);
 
 var watcher = chokidar.watch(
     [
@@ -128,7 +121,7 @@ emitter.on('disconnected-socket', function () {
 
 watcher
     .on('add', function (path) {
-        // log(`File ${path} has been added`);
+        logger.verbose(`File ${path} is being watched`);
         emitter.emit('file-added', { fileName: path });
     })
     .on('change', function (path) {
@@ -152,7 +145,7 @@ io.on('connection', function(socket) {
     });
 });
 
-findFreePort(4000, function(err, freePort) {
+findFreePort(3456, function(err, freePort) {
     logger.info(
         '\nLive CSS Editor (Magic CSS) is available at any of the following addresses:\n' +
         (function (ipAddresses) {

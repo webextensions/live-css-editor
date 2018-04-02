@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Server application meant to be used along with browser extension \"Live editor for CSS, Less & Sass - Magic CSS\" for Chrome/Edge/Firefox/Opera",
   "main": "index.js",
+  "bin": {
+    "live-css-editor": "./index.js"
+  },
   "scripts": {
     "nodemon": "nodemon ./index.js",
     "nodemon-verbose": "nodemon ./index.js -- --verbose",
@@ -15,8 +18,8 @@
     "chokidar": "^2.0.3",
     "express": "^4.16.3",
     "find-free-port": "^1.2.0",
-    "local-ip-addresses": "0.0.1",
-    "note-down": "0.1.0",
+    "local-ip-addresses": "^0.0.1",
+    "note-down": "^0.1.1",
     "tiny-emitter": "^2.0.2",
     "socket.io": "^2.0.4",
     "yargs": "^11.0.0"
