@@ -1,6 +1,6 @@
 {
   "name": "magic-css",
-  "version": "6.2.27",
+  "version": "6.2.28",
   "scripts": {
     "lint": "eslint .",
     "manifest-generator": "node ./extension/manifest-generator.js",
