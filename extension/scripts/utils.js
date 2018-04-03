@@ -260,7 +260,8 @@ if (!utils.defined) {
             options = options || {};
             var alignment = options.alignment || 'center',
                 margin = options.margin || '0 10px',
-                opacity = options.opacity || '1';
+                opacity = options.opacity || '1',
+                unobtrusive = options.unobtrusive || false;
             // TODO:
             // - Apply !important for various inline styles (otherwise, it might get over-ridden by some previously present !important CSS styles)
             // - "OK" button functionality
@@ -285,6 +286,22 @@ if (!utils.defined) {
                 '</div>'
             ].join('');
             /*eslint-enable indent */
+
+            if (unobtrusive) {
+                var firstChild = div.firstChild;
+                firstChild.addEventListener('mouseenter', function () {
+                    // Note:
+                    //      If we wish to directly apply the opacity changes to the parent "div",
+                    //      which is currently a direct child of <html> tag, then, on some sites (eg:
+                    //      gmail.com) somehow, as soon as we reduce its opacity to a value less than
+                    //      1 (eg: 0.99), it gets hidden immediately. The fact that it is appended to
+                    //      <html> tag and not to <body> is somehow causing this behavior. Since we
+                    //      are using that parent div's firstChild, the opacity transition works fine.
+                    firstChild.style.transition = 'opacity 0.3s ease-out';
+                    firstChild.style.opacity = '0';
+                    firstChild.style.pointerEvents = 'none';
+                }, false);
+            }
 
             div.style.display = '';     // Required when the same div element is being reused
 

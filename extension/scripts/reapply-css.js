@@ -23,6 +23,7 @@
 
     if (cssText && applyStylesAutomatically && !disableStyles) {
         utils.alertNote('Activating styles provided in Magic CSS.<br/><span style="font-weight:normal;">Run Magic CSS extension to make any changes.</span>', 500, {
+            unobtrusive: true,
             alignment: 'right',
             margin: '0'
         });
@@ -45,6 +46,7 @@
             newStyleTag.applyTag();
 
             utils.alertNote('Activated styles provided in Magic CSS.<br/><span style="font-weight:normal;">Run Magic CSS extension to make any changes.</span>', 5000, {
+                unobtrusive: true,
                 alignment: 'right',
                 margin: '0'
             });
