@@ -14,10 +14,10 @@
   "dependencies": {
     "codemirror": "5.31.0",
     "emmetio-codemirror-plugin-webextensions": "0.3.7",
-    "jquery": "3.2.1"
+    "jquery": "3.3.1"
   },
   "devDependencies": {
-    "archiver": "2.1.0",
+    "archiver": "2.1.1",
     "chalk": "2.3.2",
     "copy-files-from-to": "0.2.1",
     "cp-file": "5.0.0",
