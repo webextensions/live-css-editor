@@ -83,3 +83,10 @@ unordered-list_edited.svg
 warning.svg
     https://www.iconfinder.com/icons/293711/warning_icon#size=128
     https://www.iconfinder.com/icons/293711/download/svg/128
+
+watch.svg
+    https://www.iconfinder.com/icons/2561502/watch_icon#size=128
+    https://www.iconfinder.com/icons/2561502/download/svg/128
+
+watch_edited.svg
+    Slightly edited version of "watch.svg"

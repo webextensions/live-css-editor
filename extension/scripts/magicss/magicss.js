@@ -1326,6 +1326,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         {
+                            name: 'watch-css-files',
+                            title: 'Watch CSS file changes and reload them',
+                            cls: 'magicss-watch-resources magicss-gray-out',
+                            onclick: function (evt, editor) {
+                                console.log('Watch CSS file changes and reload them');
+                                editor.focus();
+                            }
+                        },
+                        {
                             name: 'beautify',
                             title: 'Beautify code',
                             cls: 'magicss-beautify magicss-gray-out',
