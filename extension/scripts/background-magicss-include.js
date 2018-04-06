@@ -186,6 +186,8 @@ var main = function (tabId) {
             path3rdparty + 'jquery-ui.js',
             path3rdparty + 'jquery.ui.touch-punch_customized.js',
 
+            path3rdparty + 'socket.io/socket.io.slim.js',
+
             path3rdparty + 'amplify-store.js',
 
             path3rdparty + 'tooltipster/tooltipster.css',
