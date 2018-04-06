@@ -7,18 +7,19 @@ var os = require('os');
 var chokidar = require('chokidar'),
     findFreePort = require('find-free-port');
 
+var logger = require('note-down');
+
 var Emitter = require('tiny-emitter'),
     emitter = new Emitter();
-
-var argv = require('yargs').argv;
 
 var express = require('express'),
     app = express(),
     http = require('http').Server(app),
     io = require('socket.io')(http);
 
-var logger = require('note-down'),
-    localIpAddresses = require('local-ip-addresses');
+var argv = require('yargs').argv;
+
+var localIpAddressesAndHostnames = require('local-ip-addresses-and-hostnames').getLocalIpAddressesAndHostnames();
 
 var log = console.log.bind(console);
 
@@ -148,17 +149,13 @@ io.on('connection', function(socket) {
 findFreePort(3456, function(err, freePort) {
     logger.info(
         '\nLive CSS Editor (Magic CSS) is available at any of the following addresses:\n' +
-        (function (ipAddresses) {
-            var host = os.hostname(),
-                addresses = [];
-            addresses = addresses.concat('localhost');
-            addresses = addresses.concat(host);
-            addresses = addresses.concat(ipAddresses);
+        (function (localIpAddressesAndHostnames) {
+            var addresses = [].concat(localIpAddressesAndHostnames);
             addresses = addresses.map(function (item) {
                 return  '    http://' + item + ':' + freePort + '/';
             });
             return addresses.join('\n');
-        }(localIpAddresses))
+        }(localIpAddressesAndHostnames))
     );
 
     http.listen(freePort, function() {
