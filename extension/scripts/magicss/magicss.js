@@ -53,12 +53,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return (str.length <= limit) ? str : (str.substring(0, limit - 3) + '...');
     };
 
-    var reloadCSSInPage = function () {
+    var getLocalISOTime = function () {
         // http://stackoverflow.com/questions/10830357/javascript-toisostring-ignores-timezone-offset/28149561#28149561
         var tzoffset = (new Date()).getTimezoneOffset() * 60000, //offset in milliseconds
             localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0,-1);
         localISOTime = localISOTime.slice(0, -4).replace('T', '_');
+        return localISOTime;
+    };
 
+    var get$activeStylesheetLinks = function () {
         // The disabled <link> tags are not loaded when href is changed, so don't include them
         // Don't include the elements which don't have a value set for href
         var $links = $('link[rel~="stylesheet"]:not([disabled])').filter(function () {
@@ -70,6 +73,96 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
             return true;
         });
+        return $links;
+    };
+
+    var findBestMatchElementIndex = function (arr, itemToMatch) {
+        console.log('TODO: Do proper calculations');
+        return 7;
+    };
+
+    var reloadCSSResourceInPage = function (relativeFilePath) {
+        var localISOTime = getLocalISOTime();
+        var $links = get$activeStylesheetLinks();
+
+        var arrLinks = [];
+        $links.each(function () {
+            arrLinks.push($(this).attr('href'));
+        });
+
+        var index = findBestMatchElementIndex(arrLinks, relativeFilePath);
+
+        reloadLinkTag($links[index]);
+    };
+
+    var reloadLinkTag = function (linkTag) {
+        var localISOTime = getLocalISOTime();
+
+        var successCount = 0,
+            errorCount = 0;
+
+        var checkCompletion = function () {
+            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + 1);
+            // utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + $links.length);
+            if (1 === successCount + errorCount) {
+            // if ($links.length === successCount + errorCount) {
+                setTimeout(function () {
+                    if (errorCount) {
+                        if (errorCount === 1) {
+                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tag failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                        } else {
+                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                        }
+                    } else {
+                        utils.alertNote(htmlEscape('All active CSS <link> tags got reloaded successfully :-)'));
+                    }
+                }, 750);
+
+                var tagsToExclude = jQuery.makeArray(jQuery('[data-style-created-by="magicss"]'));
+                updateExistingCSSSelectorsAndAutocomplete(tagsToExclude);
+            }
+        };
+
+        var link = linkTag,
+            $link = $(link),
+            href = $link.attr('href');
+        if (href.indexOf('reloadedAt=') >= 0) {
+            href = href.replace(/[?&]reloadedAt=[\d-_:]+/, '');
+        }
+        var newHref;
+        if (href.indexOf('?') >= 0) {
+            newHref = href + '&reloadedAt=' + localISOTime;
+        } else {
+            newHref = href + '?reloadedAt=' + localISOTime;
+        }
+
+        var $newLink = $link.clone(),
+            newLink = $newLink.get(0);
+        newLink.onload = function () {
+            delete newLink.reloadingActiveWithMagicCSS;
+            delete link.reloadingActiveWithMagicCSS;
+            $link.remove();
+            successCount++;
+            checkCompletion();
+        };
+        newLink.onerror = function () {
+            delete newLink.reloadingActiveWithMagicCSS;
+            delete link.reloadingActiveWithMagicCSS;
+            $newLink.remove();
+            errorCount++;
+            checkCompletion();
+        };
+
+        newLink.reloadingActiveWithMagicCSS = true;
+        link.reloadingActiveWithMagicCSS = true;
+
+        $newLink.attr('href', newHref);
+        $link.after($newLink);
+    };
+
+    var reloadAllCSSResourcesInPage = function () {
+        var localISOTime = getLocalISOTime();
+        var $links = get$activeStylesheetLinks();
 
         var successCount = 0,
             errorCount = 0;
@@ -1223,6 +1316,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
+                var cssResourceWatchingInitiated = false,
+                    currentlyWatchingCssResources = false,
+                    socket = null;
+
                 var options = {
                     id: id,
                     title: function ($, editor) {
@@ -1330,7 +1427,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             title: 'Watch CSS file changes and reload them',
                             cls: 'magicss-watch-resources magicss-gray-out',
                             onclick: function (evt, editor) {
-                                console.log('Watch CSS file changes and reload them');
+                                if (socket) {
+                                    socket.close();
+                                    socket = null;
+                                } else {
+                                    socket = io('127.0.0.1:3456');
+                                    socket.on('file-modified', function(changeDetails) {
+                                        // $('#messages').append($('<li>').text(msg));
+                                        // console.log(changeDetails);
+
+                                        reloadCSSResourceInPage(changeDetails.fileName);
+                                    });
+                                }
                                 editor.focus();
                             }
                         },
@@ -1555,7 +1663,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             title: 'Reload CSS resources',
                             uniqCls: 'magicss-reload-css-resources',
                             onclick: function (evt, editor) {
-                                reloadCSSInPage();
+                                reloadAllCSSResourcesInPage();
                                 editor.focus();
                             }
                         },
