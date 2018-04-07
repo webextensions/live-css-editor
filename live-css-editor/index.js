@@ -53,6 +53,7 @@ var watcher = chokidar.watch(
         'node_modules/async-limiter/coverage/lcov-report/base.css',
     ],
     {
+        cwd: process.env.INIT_CWD,
         ignored: [
             /(^|[/\\])\../,     // A general rule to ignore the "." files/directories
             'node_modules',

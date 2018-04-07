@@ -76,9 +76,22 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return $links;
     };
 
-    var findBestMatchElementIndex = function (arr, itemToMatch) {
-        console.log('TODO: Do proper calculations');
-        return 7;
+    var getFilenameFromPath = function (path) {
+        path = path.split('?')[0];
+        path = path.split('#')[0];
+        path = path.split('/').pop();
+        return path;
+    };
+
+    var findProbableMatchElementIndexes = function (arr, itemToMatch) {
+        var fileNameOfItemToMatch = getFilenameFromPath(itemToMatch);
+        var matchedIndexes = [];
+        arr.forEach(function (item, index) {
+            if (getFilenameFromPath(item) === fileNameOfItemToMatch) {
+                matchedIndexes.push(index);
+            }
+        });
+        return matchedIndexes;
     };
 
     var reloadCSSResourceInPage = function (relativeFilePath) {
@@ -90,11 +103,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             arrLinks.push($(this).attr('href'));
         });
 
-        var index = findBestMatchElementIndex(arrLinks, relativeFilePath);
+        var indexes = findProbableMatchElementIndexes(arrLinks, relativeFilePath);
 
-        reloadLinkTag($links[index]);
+        // TODO: Make reloading single or multiple CSS link tag(s) work properly
+        indexes.forEach(function (index) {
+            reloadLinkTag($links[index]);
+        });
     };
 
+    // TODO: Make reloading single or multiple CSS link tag(s) work properly
     var reloadLinkTag = function (linkTag) {
         var localISOTime = getLocalISOTime();
 
