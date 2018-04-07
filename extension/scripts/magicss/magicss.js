@@ -1,4 +1,4 @@
-/*globals jQuery, less, utils, sourceMap, chrome, CodeMirror */
+/*globals jQuery, less, utils, sourceMap, chrome, CodeMirror, io */
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
@@ -61,10 +61,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return localISOTime;
     };
 
-    var get$activeStylesheetLinks = function () {
+    var getActiveStylesheetLinkTags = function () {
         // The disabled <link> tags are not loaded when href is changed, so don't include them
         // Don't include the elements which don't have a value set for href
-        var $links = $('link[rel~="stylesheet"]:not([disabled])').filter(function () {
+        var linkTags = $('link[rel~="stylesheet"]:not([disabled])').filter(function () {
             if (this.reloadingActiveWithMagicCSS) {
                 return false;
             }
@@ -72,8 +72,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 return false;
             }
             return true;
-        });
-        return $links;
+        }).toArray();
+
+        return linkTags;
     };
 
     var getFilenameFromPath = function (path) {
@@ -95,34 +96,30 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     };
 
     var reloadCSSResourceInPage = function (relativeFilePath) {
-        var localISOTime = getLocalISOTime();
-        var $links = get$activeStylesheetLinks();
+        var activeLinkTags = getActiveStylesheetLinkTags();
 
-        var arrLinks = [];
-        $links.each(function () {
-            arrLinks.push($(this).attr('href'));
+        var arrLinkTags = [];
+        activeLinkTags.forEach(function (linkTag) {
+            arrLinkTags.push($(linkTag).attr('href'));
         });
 
-        var indexes = findProbableMatchElementIndexes(arrLinks, relativeFilePath);
+        var indexes = findProbableMatchElementIndexes(arrLinkTags, relativeFilePath);
 
-        // TODO: Make reloading single or multiple CSS link tag(s) work properly
+        var linkTagsToReload = [];
         indexes.forEach(function (index) {
-            reloadLinkTag($links[index]);
+            linkTagsToReload.push(activeLinkTags[index]);
         });
+        reloadPassedLinkTags(linkTagsToReload);
     };
 
-    // TODO: Make reloading single or multiple CSS link tag(s) work properly
-    var reloadLinkTag = function (linkTag) {
+    var reloadPassedLinkTags = function (linkTags) {
         var localISOTime = getLocalISOTime();
 
         var successCount = 0,
             errorCount = 0;
-
         var checkCompletion = function () {
-            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + 1);
-            // utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + $links.length);
-            if (1 === successCount + errorCount) {
-            // if ($links.length === successCount + errorCount) {
+            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + linkTags.length);
+            if (linkTags.length === successCount + errorCount) {
                 setTimeout(function () {
                     if (errorCount) {
                         if (errorCount === 1) {
@@ -131,70 +128,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
                         }
                     } else {
-                        utils.alertNote(htmlEscape('All active CSS <link> tags got reloaded successfully :-)'));
-                    }
-                }, 750);
-
-                var tagsToExclude = jQuery.makeArray(jQuery('[data-style-created-by="magicss"]'));
-                updateExistingCSSSelectorsAndAutocomplete(tagsToExclude);
-            }
-        };
-
-        var link = linkTag,
-            $link = $(link),
-            href = $link.attr('href');
-        if (href.indexOf('reloadedAt=') >= 0) {
-            href = href.replace(/[?&]reloadedAt=[\d-_:]+/, '');
-        }
-        var newHref;
-        if (href.indexOf('?') >= 0) {
-            newHref = href + '&reloadedAt=' + localISOTime;
-        } else {
-            newHref = href + '?reloadedAt=' + localISOTime;
-        }
-
-        var $newLink = $link.clone(),
-            newLink = $newLink.get(0);
-        newLink.onload = function () {
-            delete newLink.reloadingActiveWithMagicCSS;
-            delete link.reloadingActiveWithMagicCSS;
-            $link.remove();
-            successCount++;
-            checkCompletion();
-        };
-        newLink.onerror = function () {
-            delete newLink.reloadingActiveWithMagicCSS;
-            delete link.reloadingActiveWithMagicCSS;
-            $newLink.remove();
-            errorCount++;
-            checkCompletion();
-        };
-
-        newLink.reloadingActiveWithMagicCSS = true;
-        link.reloadingActiveWithMagicCSS = true;
-
-        $newLink.attr('href', newHref);
-        $link.after($newLink);
-    };
-
-    var reloadAllCSSResourcesInPage = function () {
-        var localISOTime = getLocalISOTime();
-        var $links = get$activeStylesheetLinks();
-
-        var successCount = 0,
-            errorCount = 0;
-        var checkCompletion = function () {
-            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + $links.length);
-            if ($links.length === successCount + errorCount) {
-                setTimeout(function () {
-                    if (errorCount) {
-                        if (errorCount === 1) {
-                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tag failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                        if (successCount === 1) {
+                            utils.alertNote(htmlEscape(successCount + ' active CSS <link> tag got reloaded successfully :-)'));
                         } else {
-                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                            utils.alertNote(htmlEscape(successCount + ' active CSS <link> tags got reloaded successfully :-)'));
                         }
-                    } else {
-                        utils.alertNote(htmlEscape('All active CSS <link> tags got reloaded successfully :-)'));
                     }
                 }, 750);
 
@@ -202,10 +140,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 updateExistingCSSSelectorsAndAutocomplete(tagsToExclude);
             }
         };
-        if ($links.length) {
+        if (linkTags.length) {
             checkCompletion();
-            $links.each(function () {
-                var link = this,
+            linkTags.forEach(function (linkTag) {
+                var link = linkTag,
                     $link = $(link),
                     href = $link.attr('href');
                 if (href.indexOf('reloadedAt=') >= 0) {
@@ -242,8 +180,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 $link.after($newLink);
             });
         } else {
-            utils.alertNote(htmlEscape('There are no active CSS <link> tags to be reloaded.'));
+            utils.alertNote(htmlEscape('There are no active CSS <link> tags that need to be reloaded.'));
         }
+    };
+
+    var reloadAllCSSResourcesInPage = function () {
+        var linkTags = getActiveStylesheetLinkTags();
+        reloadPassedLinkTags(linkTags);
     };
 
     var getExistingCSSSelectors = function (tagsToExclude) {

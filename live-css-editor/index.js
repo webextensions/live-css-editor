@@ -2,8 +2,6 @@
 
 /* eslint-env node */
 
-var os = require('os');
-
 var chokidar = require('chokidar'),
     findFreePort = require('find-free-port');
 
