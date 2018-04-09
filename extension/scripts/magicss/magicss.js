@@ -1374,6 +1374,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     bgColor: '68,88,174,0.85',
                     headerIcons: [
                         {
+                            name: 'point-and-click',
+                            title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
+                            cls: 'magicss-point-and-click',
+                            onclick: function (evt, editor) {
+                                togglePointAndClick(editor);
+                                editor.focus();
+                            }
+                        },
+                        {
                             name: 'css-reloader-and-file-changes-watcher',
                             title: 'CSS reloader and watch file changes',
                             cls: 'magicss-reload-css-resources magicss-gray-out',
@@ -1407,15 +1416,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     }
                                 }
                             ]
-                        },
-                        {
-                            name: 'point-and-click',
-                            title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
-                            cls: 'magicss-point-and-click',
-                            onclick: function (evt, editor) {
-                                togglePointAndClick(editor);
-                                editor.focus();
-                            }
                         },
                         /*
                         {
