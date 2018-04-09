@@ -682,58 +682,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         var matchingSelectors = selectorsOb.matchingAndSuggestedSelectors,
                             suggestedSelectors = selectorsOb.suggestedSelectors;
 
-                        /*
-                        var selector = window.generateFullSelector(targetElement);
-                        var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
-
-                        var matchAll = function (fullSelector, smallSelector) {
-                            var tokens = smallSelector.split('.').join(' ').split('#').join(' ').split(' ');
-                            var tokenNotAvailable = tokens.some(function tokenNotInFullSelector(token) {
-                                return fullSelector.indexOf(token) === -1;
-                            });
-                            if (tokenNotAvailable === false) {
-                                return true;
-                            }
-                        };
-
-                        var matchingSelectors = [];
-
-                        var suggestedSelectors = [];
-                        try {
-                            suggestedSelectors = [
-                                window.generateSelector(targetElement),
-                                window.generateSelector(targetElement, {reverseClasses: true}),
-                                window.generateSelector(targetElement, {sortClasses: true}),
-                                window.generateSelector(targetElement, {sortClasses: true, reverseClasses: true})
-                            ];
-                        } catch (e) {
-                            var errorMessage = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
-                            // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
-                            //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
-                            //               always gets fired
-                            setTimeout(function() { utils.alertNote(errorMessage, 10000); }, 0);
-                            console.log(errorMessage);
-                            console.log(e);     // The user might wish to add these detais for the report/issue in GitHub about this error.
-                        }
-                        suggestedSelectors = suggestedSelectors.filter(function(item, pos, self) {
-                            return self.indexOf(item) == pos;
-                        });
-
-                        matchingSelectors = matchingSelectors.concat(suggestedSelectors);
-
-                        Object.keys(workingSetOfSelectors).forEach(function (key) {
-                            var existingSelector = key;
-                            var matchesAll = matchAll(selector, existingSelector);
-                            if (matchesAll) {
-                                if ($(targetElement).is(existingSelector)) {
-                                    if (matchingSelectors.indexOf(existingSelector) === -1) {
-                                        matchingSelectors.push(existingSelector);
-                                    }
-                                }
-                            }
-                        });
-                        /* */
-
                         var cm = window.MagiCSSEditor.cm;
 
                         var currentLine = cm.getLine(cm.getCursor().line);
