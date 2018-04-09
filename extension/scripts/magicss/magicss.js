@@ -1374,6 +1374,41 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     bgColor: '68,88,174,0.85',
                     headerIcons: [
                         {
+                            name: 'css-reloader-and-file-changes-watcher',
+                            title: 'CSS reloader and watch file changes',
+                            cls: 'magicss-reload-css-resources magicss-gray-out',
+                            icons: [
+                                {
+                                    name: 'reload-css-resources',
+                                    title: 'Reload all CSS resources',
+                                    cls: 'magicss-reload-all-css-resources',
+                                    uniqCls: 'magicss-reload-all-css-resources',
+                                    onclick: function (evt, editor) {
+                                        reloadAllCSSResourcesInPage();
+                                        editor.focus();
+                                    }
+                                },
+                                {
+                                    name: 'watch-css-files',
+                                    title: 'Watch CSS files & apply changes automatically',
+                                    cls: 'magicss-watch-resources',
+                                    uniqCls: 'magicss-watch-and-reload-link-tags',
+                                    onclick: function (evt, editor) {
+                                        if (socket) {
+                                            socket.close();
+                                            socket = null;
+                                        } else {
+                                            socket = io('127.0.0.1:3456');
+                                            socket.on('file-modified', function(changeDetails) {
+                                                reloadCSSResourceInPage(changeDetails.fileName);
+                                            });
+                                        }
+                                        editor.focus();
+                                    }
+                                }
+                            ]
+                        },
+                        {
                             name: 'point-and-click',
                             title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
                             cls: 'magicss-point-and-click',
@@ -1382,6 +1417,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.focus();
                             }
                         },
+                        /*
                         {
                             name: 'watch-css-files',
                             title: 'Watch CSS file changes and reload them',
@@ -1402,6 +1438,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.focus();
                             }
                         },
+                        /* */
                         {
                             name: 'beautify',
                             title: 'Beautify code',
@@ -1618,6 +1655,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         /* */
+
+                        /*
                         {
                             name: 'reload-css-resources',
                             title: 'Reload CSS resources',
@@ -1627,6 +1666,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.focus();
                             }
                         },
+                        /* */
                         {
                             name: 'showLineNumbers',
                             title: 'Show line numbers',

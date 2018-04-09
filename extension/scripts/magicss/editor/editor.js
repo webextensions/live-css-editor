@@ -533,6 +533,48 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             options.headerIcons = (options.headerIcons || []).filter(function (item) { return !!item; });
             if (options.headerIcons.length) {
                 options.headerIcons.forEach(function (iconOptions) {
+                    if (iconOptions.icons) {
+                        iconOptions.afterrender = function (editor, divIcon) {
+                            var $divIcon = $(divIcon),
+                                tooltipContent = ['<ul>'];
+
+                            iconOptions.icons.forEach(function (iconOptions) {
+                                tooltipContent.push(
+                                    '<li class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '">' +
+                                        '<a' +
+                                        ' class="more-icons ' + (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + '"' +
+                                        ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
+                                        ' target="_blank">' +
+                                            iconOptions.title +
+                                        '</a>' +
+                                    '</li>'
+                                );
+                                if (iconOptions.uniqCls && iconOptions.onclick) {
+                                    $(document).on('click', '.' + iconOptions.uniqCls, function(evt){
+                                        evt.preventDefault();   // Useful in preventing the opening of a new tab in Firefox if the anchor-tag icon has target="_blank"
+                                        iconOptions.onclick(evt, editor, $divIcon);
+                                        $divIcon.tooltipster('hide');
+                                    });
+                                }
+                            });
+                            tooltipContent.push('</ul>');
+                            $divIcon.tooltipster({
+                                content: tooltipContent.join(''),
+                                contentAsHTML: true,
+                                position: 'bottom',
+                                interactive: true,
+                                interactiveTolerance: 350,
+                                functionReady: function (origin, tooltip) {
+                                    iconOptions.icons.forEach(function (iconOptions) {
+                                        if (iconOptions && iconOptions.beforeShow) {
+                                            iconOptions.beforeShow(origin, tooltip, editor);
+                                        }
+                                    });
+                                }
+                            });
+                        };
+                    }
+
                     var divIcon = document.createElement('div');
                     if (divIcon.style.cssFloat !== undefined) {
                         divIcon.style.cssFloat = 'right';
