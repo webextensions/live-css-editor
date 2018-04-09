@@ -453,6 +453,28 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         }
     };
 
+    var elementHadClassAttributeBeforePointAndSelect,
+        elementHadTitleAttributeBeforePointAndSelect,
+        titleValueOfElementBeforePointAndSelect;
+
+    var removeMouseOverDomElementEffect = function () {
+        var $el = $('.magicss-mouse-over-dom-element');
+
+        if (!elementHadTitleAttributeBeforePointAndSelect) {
+            $el.removeAttr('title');
+        } else {
+            if (titleValueOfElementBeforePointAndSelect) {
+                $el.attr('title', titleValueOfElementBeforePointAndSelect);
+            }
+        }
+
+        if (!elementHadClassAttributeBeforePointAndSelect) {
+            $el.removeAttr('class');
+        } else {
+            $el.removeClass('magicss-mouse-over-dom-element');
+        }
+    };
+
     var enablePointAndClick = false;
     var enablePointAndClickFunctionality = function (editor) {
         enablePointAndClick = true;
@@ -463,7 +485,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         $(editor.container).removeClass('magicss-point-and-click-activated');
 
         // This is useful when the user disables point-and-click using keyboard shortcut
-        $('.magicss-mouse-over-dom-element').removeClass('magicss-mouse-over-dom-element');
+        removeMouseOverDomElementEffect();
     };
 
     var enableAutocompleteSelectors = function (editor) {
@@ -522,6 +544,63 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     return utils.beautifyCSS(cssCode, options);
                 };
 
+                var getMatchingAndSuggestedSelectors = function (targetElement) {
+                    var selector = window.generateFullSelector(targetElement);
+                    var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
+
+                    var matchAll = function (fullSelector, smallSelector) {
+                        var tokens = smallSelector.split('.').join(' ').split('#').join(' ').split(' ');
+                        var tokenNotAvailable = tokens.some(function tokenNotInFullSelector(token) {
+                            return fullSelector.indexOf(token) === -1;
+                        });
+                        if (tokenNotAvailable === false) {
+                            return true;
+                        }
+                    };
+
+                    var matchingSelectors = [];
+
+                    var suggestedSelectors = [];
+                    try {
+                        suggestedSelectors = [
+                            window.generateSelector(targetElement),
+                            window.generateSelector(targetElement, {reverseClasses: true}),
+                            window.generateSelector(targetElement, {sortClasses: true}),
+                            window.generateSelector(targetElement, {sortClasses: true, reverseClasses: true})
+                        ];
+                    } catch (e) {
+                        var errorMessage = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
+                        // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
+                        //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
+                        //               always gets fired
+                        setTimeout(function() { utils.alertNote(errorMessage, 10000); }, 0);
+                        console.log(errorMessage);
+                        console.log(e);     // The user might wish to add these detais for the report/issue in GitHub about this error.
+                    }
+                    suggestedSelectors = suggestedSelectors.filter(function(item, pos, self) {
+                        return self.indexOf(item) == pos;
+                    });
+
+                    matchingSelectors = matchingSelectors.concat(suggestedSelectors);
+
+                    Object.keys(workingSetOfSelectors).forEach(function (key) {
+                        var existingSelector = key;
+                        var matchesAll = matchAll(selector, existingSelector);
+                        if (matchesAll) {
+                            if ($(targetElement).is(existingSelector)) {
+                                if (matchingSelectors.indexOf(existingSelector) === -1) {
+                                    matchingSelectors.push(existingSelector);
+                                }
+                            }
+                        }
+                    });
+
+                    return {
+                        matchingAndSuggestedSelectors: matchingSelectors,   // TODO: Fix variable naming
+                        suggestedSelectors: suggestedSelectors
+                    };
+                };
+
                 var currentNode = null;
                 $(document).on('mousemove', function(event) {
                     if (!enablePointAndClick) {
@@ -534,8 +613,27 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         if ($(currentNode).hasClass('magicss-mouse-over-dom-element')) {
                             // do nothing
                         } else {
-                            $('.magicss-mouse-over-dom-element').removeClass('magicss-mouse-over-dom-element');
+                            removeMouseOverDomElementEffect();
                             if (currentNode.get(0) !== $('#MagiCSS-bookmarklet').get(0) && !$(currentNode).parents('#MagiCSS-bookmarklet').length) {
+                                var matchingAndSuggestedSelectors = getMatchingAndSuggestedSelectors(currentNode.get(0)).matchingAndSuggestedSelectors;
+
+                                elementHadClassAttributeBeforePointAndSelect = currentNode.get(0).hasAttribute('class');
+
+                                elementHadTitleAttributeBeforePointAndSelect = currentNode.get(0).hasAttribute('title');
+                                if (elementHadTitleAttributeBeforePointAndSelect) {
+                                    titleValueOfElementBeforePointAndSelect = currentNode.attr('title');
+                                } else {
+                                    titleValueOfElementBeforePointAndSelect = undefined;
+                                }
+
+                                var title = '';
+                                if (matchingAndSuggestedSelectors.length === 1) {
+                                    title = 'Suggested CSS selector:';
+                                } else if (matchingAndSuggestedSelectors.length > 1) {
+                                    title = 'Suggested CSS selectors:';
+                                }
+                                title += '\n    ' + matchingAndSuggestedSelectors.join('\n    ');
+                                $(currentNode).attr('title', title);
                                 $(currentNode).addClass('magicss-mouse-over-dom-element');
                             }
                         }
@@ -572,13 +670,19 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     $div.css('left', '0px');
                     $div.css('top', '0px');
 
-                    $('.magicss-mouse-over-dom-element').removeClass('magicss-mouse-over-dom-element');
+                    removeMouseOverDomElementEffect();
                     $div.on('mouseup', function () {
                         $div.remove();
                     });
 
                     var targetElement = evt.target;
                     setTimeout(function () {
+                        var selectorsOb = getMatchingAndSuggestedSelectors(targetElement);
+                        // TODO: Fix variable naming
+                        var matchingSelectors = selectorsOb.matchingAndSuggestedSelectors,
+                            suggestedSelectors = selectorsOb.suggestedSelectors;
+
+                        /*
                         var selector = window.generateFullSelector(targetElement);
                         var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
 
@@ -628,6 +732,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                                 }
                             }
                         });
+                        /* */
 
                         var cm = window.MagiCSSEditor.cm;
 
