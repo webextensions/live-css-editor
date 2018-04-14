@@ -457,27 +457,49 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         elementHadTitleAttributeBeforePointAndSelect,
         titleValueOfElementBeforePointAndSelect;
 
-    var removeMouseOverDomElementEffect = function () {
+    var removeMouseOverDomElementEffect = function (cb) {
         var $el = $('.magicss-mouse-over-dom-element');
+        if ($el.length) {
+            if (!elementHadTitleAttributeBeforePointAndSelect) {
+                var title = $el.attr('title');
+                // If the title attribute is set by Magic CSS, it would start like:
+                //     "Suggested CSS selector:" OR "Suggested CSS selectors:"
+                if (title && title.indexOf('Suggested CSS selector') === 0) {
+                    $el.removeAttr('title');
+                }
+            } else {
+                if (titleValueOfElementBeforePointAndSelect) {
+                    $el.attr('title', titleValueOfElementBeforePointAndSelect);
+                } else {
+                    $el.attr('title', '');
+                }
+            }
 
-        if (!elementHadTitleAttributeBeforePointAndSelect) {
-            $el.removeAttr('title');
-        } else {
-            if (titleValueOfElementBeforePointAndSelect) {
-                $el.attr('title', titleValueOfElementBeforePointAndSelect);
+            $el.removeClass('magicss-mouse-over-dom-element');
+            if (!elementHadClassAttributeBeforePointAndSelect && !$el.attr('class')) {
+                $el.removeAttr('class');
             }
         }
-
-        if (!elementHadClassAttributeBeforePointAndSelect) {
-            $el.removeAttr('class');
-        } else {
-            $el.removeClass('magicss-mouse-over-dom-element');
+        if (cb) {
+            cb();
         }
     };
+
+    // Set testingDataIntegrityOfPointAndClickFunctionality as true for testing data integrity of point and click functionality
+    var testingDataIntegrityOfPointAndClickFunctionality = false,
+        forTestingOnly_InitialInnerHtml = '',
+        forTestingOnly_FinalInnerHtml = '',
+        forTestingOnly_getInnerHtml = function () {
+            // Change the selctor depending on the webpage being tested
+            return $('div').html();     // Return the innerHTML of the first available <div> element
+        };
 
     var enablePointAndClick = false;
     var enablePointAndClickFunctionality = function (editor) {
         enablePointAndClick = true;
+        if (testingDataIntegrityOfPointAndClickFunctionality) {
+            forTestingOnly_InitialInnerHtml = forTestingOnly_getInnerHtml();
+        }
         $(editor.container).addClass('magicss-point-and-click-activated');
     };
     var disablePointAndClickFunctionality = function (editor) {
@@ -486,6 +508,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
         // This is useful when the user disables point-and-click using keyboard shortcut
         removeMouseOverDomElementEffect();
+        if (testingDataIntegrityOfPointAndClickFunctionality) {
+            forTestingOnly_FinalInnerHtml = forTestingOnly_getInnerHtml();
+            if (forTestingOnly_FinalInnerHtml !== forTestingOnly_InitialInnerHtml) {
+                console.log('Note: The data integrity of point and click functionality may have some minor issues.');
+                console.log(forTestingOnly_InitialInnerHtml);
+                console.log(forTestingOnly_FinalInnerHtml);
+            } else {
+                console.log('Note: The data integrity of point and click functionality is working fine.');
+            }
+        }
     };
 
     var enableAutocompleteSelectors = function (editor) {
