@@ -364,16 +364,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
             var cm = thisOb.cm = CodeMirror(newDiv.get(0), codemirrorOptions);
 
-            cm.on('focus', function (cm, evt) {
+            cm.on('focus', function (cm, evt) { // eslint-disable-line no-unused-vars
                 // https://github.com/webextensions/live-css-editor/issues/4
-                // In case of focus stealing by jQuery UI, setTimeout is not required, but using it
-                // anyways to detect some more similar cases which have not been encountered yet
-                setTimeout(function () {
-                    if (!thisOb.cmInputFieldHasFocus()) {
-                        // There is a chance that something is problematic in focus behavior
-                        thisOb.triggerEvent('problematicFocusDetected');
-                    }
-                }, 10);
+                if (!thisOb.cmInputFieldHasFocus()) {
+                    // Most probably there is something problematic in focus behavior
+                    thisOb.triggerEvent('problematicFocusDetected');
+                }
             });
 
             var dimWH = thisOb.getDimensions();
