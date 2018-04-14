@@ -364,6 +364,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
             var cm = thisOb.cm = CodeMirror(newDiv.get(0), codemirrorOptions);
 
+            cm.on('focus', function (cm, evt) {
+                // https://github.com/webextensions/live-css-editor/issues/4
+                // In case of focus stealing by jQuery UI, setTimeout is not required, but using it
+                // anyways to detect some more similar cases which have not been encountered yet
+                setTimeout(function () {
+                    if (!thisOb.cmInputFieldHasFocus()) {
+                        // There is a chance that something is problematic in focus behavior
+                        thisOb.triggerEvent('problematicFocusDetected');
+                    }
+                }, 10);
+            });
+
             var dimWH = thisOb.getDimensions();
             cm.setSize(dimWH.width, dimWH.height);
 
@@ -790,6 +802,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     thisOb.triggerEvent('delayedtestfortextchange');
                     thisOb.triggerEvent('_delayedcursorprobablymoved');
                     break;
+                // There is a chance that something is problematic in focus behavior
+                case 'problematicFocusDetected':
+                    if (events.problematicFocusDetected) {
+                        events.problematicFocusDetected(thisOb);
+                    }
+                    break;
                 default:
                     console.warn('An unexpected event was attempted to be triggered: ' + eventName);
             }
@@ -797,6 +815,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
 
         getCursorPosition() {
             return this.cm.getCursor('start');
+        }
+
+        cmInputFieldHasFocus () {
+            return this.cm.getInputField() === document.activeElement;
         }
 
         recordCursorPosition() {

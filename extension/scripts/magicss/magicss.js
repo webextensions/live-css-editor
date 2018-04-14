@@ -1106,6 +1106,51 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                     }
                 };
 
+                var focusChangeInformationLoggedInConsoleJustNow = false;
+                var informUserAboutProblematicFocus = function () {
+                    utils.alertNote(
+                        'Typing in the Magic CSS editor may not work well.' +
+                        '<br />It appears that some JavaScript code running on the page steals focus.' +
+                        '<br />Check the "Console" in "Developer tools" for more information.',
+                        20000,
+                        {
+                            backgroundColor: '#f5bcae',
+                            borderColor: '#e87457'
+                        }
+                    );
+
+                    if (!focusChangeInformationLoggedInConsoleJustNow) {
+                        // References:
+                        //    https://github.com/webextensions/live-css-editor/issues/4
+                        //    https://github.com/zenorocha/clipboard.js/wiki/Known-Issues
+                        console.log(
+                            '************************* Note *************************' +
+                            '\nTyping in the Magic CSS editor may not work well.' +
+                            '\nIt appears that some JavaScript code running on the page steals focus.' +
+                            '\nYou may need to workaround the problematic JavaScript code to avoid this problem.' +
+                            '\n' +
+                            '\nHow to workaround this problem?' +
+                            '\n* If you are using jQuery UI, try executing:' +
+                            // eg: https://jqueryui.com/resources/demos/dialog/modal-message.html
+                            '\n    jQuery.ui.dialog.prototype._focusTabbable = jQuery.noop;' +
+                            // eg: Open modal at https://www.w3schools.com/bootstrap/bootstrap_modal.asp
+                            '\n* If you are using Bootstrap 3, try executing:' +
+                            '\n    jQuery.fn.modal.Constructor.prototype.enforceFocus = function() {};      // You may need to close and reopen the modal dialog' +
+                            // eg: Open modal at https://getbootstrap.com/docs/4.1/components/modal/
+                            '\n* If you are using Bootstrap 4 or later, try executing:' +
+                            '\n    jQuery.fn.modal.Constructor.prototype._enforceFocus = function() {};     // You may need to close and reopen the modal dialog' +
+                            '\n' +
+                            '\nFor more details, kindly refer to:' +
+                            '\n    https://github.com/webextensions/live-css-editor/issues/4' +
+                            '\n\n'
+                        );
+                        focusChangeInformationLoggedInConsoleJustNow = true;
+                        setTimeout(function () {
+                            focusChangeInformationLoggedInConsoleJustNow = false;
+                        }, 100);
+                    }
+                };
+
                 var options = {
                     id: id,
                     title: function ($, editor) {
@@ -1707,6 +1752,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         },
                         delayedtextchange: function (editor) {
                             fnApplyTextAsCSS(editor);
+                        },
+                        problematicFocusDetected: function (editor) {
+                            // There is a chance that something is problematic in focus behavior
+                            // Waiting for extra 1500ms for 2 reasons:
+                            //     1. Confirming that the focus which was stolen hasn't been returned back
+                            //     2. When the user clicks at another cursor position (or moves the cursor around),
+                            //        we show the "alertNote" which mentions the current CSS selector (where user
+                            //        has placed the cursor) and the number of DOM elements matching that CSS
+                            //        selector. We also do "alertNote.hide()" if there is no CSS selector around.
+                            //        This is currently done after a delay of 500ms from when the user took that
+                            //        action. Waiting for 1500ms helps in letting the user see the "alertNote"
+                            //        showing the number of matches and also in avoiding hiding of the "alertNote"
+                            //        displayed by this function ("problematicFocusDetected")
+                            setTimeout(function () {
+                                // Confirming the focus problem
+                                if (!editor.cmInputFieldHasFocus()) {
+                                    // Informing the user about the focus problem
+                                    informUserAboutProblematicFocus();
+                                }
+                            }, 1500);
                         },
                         clear: function (editor) {
                             fnApplyTextAsCSS(editor);

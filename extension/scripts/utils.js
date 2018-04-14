@@ -259,6 +259,8 @@ if (!utils.defined) {
         var alertNote = function (msg, hideDelay, options) {
             options = options || {};
             var alignment = options.alignment || 'center',
+                backgroundColor = options.backgroundColor || '#f9edbe',
+                borderColor = options.borderColor || '#eb7',
                 margin = options.margin || '0 10px',
                 opacity = options.opacity || '1',
                 unobtrusive = options.unobtrusive || false;
@@ -272,7 +274,7 @@ if (!utils.defined) {
                                                                                          // margin:0 is useful for some sites (eg: https://developer.chrome.com/home)
                     '<table style="display:inline-table;border-collapse:collapse;width:auto;margin:0"><tr><td style="padding:0px;border:0">',
                                                         // background-color:#feb;
-                        '<div style="border:1px solid #eb7;background-color:#f9edbe;margin:' + margin + ';padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font:bold 13px Arial">',
+                        '<div style="border:1px solid ' + borderColor + ';background-color:' + backgroundColor + ';margin:' + margin + ';padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font:bold 13px Arial">',
                             '<div style="clear:both">',
                                 '<div style="float:left;color:#000;text-align:' + alignment + ';">',
                                     msg,
