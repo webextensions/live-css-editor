@@ -473,6 +473,7 @@ body .tooltipster-default .tooltipster-content {
     top: 1px;
 }
 
+html.magicss-mouse-over-dom-element,
 html .magicss-mouse-over-dom-element {
     outline: 1px solid red !important;
     border-color: orange !important;
