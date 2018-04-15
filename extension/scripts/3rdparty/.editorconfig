@@ -1,0 +1,13 @@
+# References:
+#     http://editorconfig.org/ (Official Site)
+#     http://editorconfig.org/#download (Plugins)
+#     http://davidensinger.com/2013/07/why-i-use-editorconfig/ (Reference)
+#     https://github.com/eslint/eslint/blob/master/.editorconfig (Sample file)
+
+[*]
+charset = utf-8
+end_of_line = disabled
+indent_size = disabled
+indent_style = disabled
+insert_final_newline = disabled
+trim_trailing_whitespace = disabled

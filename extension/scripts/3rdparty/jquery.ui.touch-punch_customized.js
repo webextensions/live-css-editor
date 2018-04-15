@@ -21,6 +21,15 @@
   }
   */
 
+  // Custom change (don't handle touch events if the element has cancel drag)
+  // eventOccurredOnElementWithCancelDrag helps in detecting that the original event's srcElement has the cancelDragHandle class
+  var eventOccurredOnElementWithCancelDrag = function (evt) {
+    if ($(evt.originalEvent.srcElement).hasClass('cancelDragHandle')) {
+        return true;
+    }
+    return false;
+  };
+
   var mouseProto = $.ui.mouse.prototype,
       _mouseInit = mouseProto._mouseInit,
       _mouseDestroy = mouseProto._mouseDestroy,
@@ -71,7 +80,7 @@
    * @param {Object} event The widget element's touchstart event
    */
   mouseProto._touchStart = function (event) {
-
+    if (eventOccurredOnElementWithCancelDrag(event)) { return; }    // Custom change (don't handle touch events if the element has cancel drag)
     var self = this;
 
     // Ignore the event if another widget is already being handled
@@ -100,7 +109,7 @@
    * @param {Object} event The document's touchmove event
    */
   mouseProto._touchMove = function (event) {
-
+    if (eventOccurredOnElementWithCancelDrag(event)) { return; }    // Custom change (don't handle touch events if the element has cancel drag)
     // Ignore event if not handled
     if (!touchHandled) {
       return;
@@ -118,7 +127,7 @@
    * @param {Object} event The document's touchend event
    */
   mouseProto._touchEnd = function (event) {
-
+    if (eventOccurredOnElementWithCancelDrag(event)) { return; }    // Custom change (don't handle touch events if the element has cancel drag)
     // Ignore event if not handled
     if (!touchHandled) {
       return;
