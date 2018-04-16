@@ -361,9 +361,9 @@ if (!utils.defined) {
                                                                                          // margin:0 is useful for some sites (eg: https://developer.chrome.com/home)
                     '<table style="display:inline-table;border-collapse:collapse;width:auto;margin:0"><tr><td style="padding:0px;border:0">',
                                                         // background-color:#feb;
-                        '<div style="border:1px solid ' + borderColor + ';background-color:' + backgroundColor + ';margin:' + margin + ';padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font:bold 13px Arial">',
+                        '<div style="border:1px solid ' + borderColor + ';background-color:' + backgroundColor + ';margin:' + margin + ';padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font-family:Arial,sans-serif;font-weight:bold;font-size:12px">',
                             '<div style="clear:both">',
-                                '<div style="float:left;color:#000;text-align:' + textAlignment + ';">',
+                                '<div class="alert-note-text" style="float:left;color:#000;text-align:' + textAlignment + ';">',
                                     msg,
                                 '</div>',
                                 // '<div style="float:right;margin-left:10px;font-weight:normal;text-decoration:underline;cursor:pointer">',

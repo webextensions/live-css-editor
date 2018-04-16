@@ -447,18 +447,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 rememberDimensions = options.rememberDimensions;
 
             var divHeader = document.createElement('div');
+            divHeader.className = 'magic-css-header';
             thisOb.container.appendChild(divHeader);
 
             var parentDivRightAligned = divHeader;
 
             var divHeaderLeft = document.createElement('div');
+            divHeaderLeft.className = 'magic-css-header-left-section';
             divHeader.appendChild(divHeaderLeft);
-            if (divHeaderLeft.style.cssFloat !== undefined) {
-                divHeaderLeft.style.cssFloat = 'left';
-            }
-            if (divHeaderLeft.style.styleFloat !== undefined) {
-                divHeaderLeft.style.styleFloat = 'left';
-            }
 
             var title = options.title || 'Editor';
 
@@ -472,7 +468,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             options.headerOtherIcons = (options.headerOtherIcons || []).filter(function (item) { return !!item; });
             if (options.headerOtherIcons.length) {
                 options.headerIcons = options.headerIcons || [];
-                options.headerIcons.push({
+                options.headerIcons.unshift({
                     name: 'more',
                     cls: 'editor-more-icons editor-translucent-out cancelDragHandle',
                     afterrender: function (editor, moreIcon) {
@@ -517,10 +513,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             }
 
+            options.headerIcons = (options.headerIcons || []).filter(function (item) { return !!item; });
+
             var disableCloseIcon = !!options.disableCloseIcon;
             if (!disableCloseIcon) {
                 options.headerIcons = options.headerIcons || [];
-                options.headerIcons.unshift({
+                options.headerIcons.push({
                     name: 'close',
                     title: 'Close',
                     cls: 'editor-close',
@@ -530,7 +528,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             }
 
-            options.headerIcons = (options.headerIcons || []).filter(function (item) { return !!item; });
             if (options.headerIcons.length) {
                 options.headerIcons.forEach(function (iconOptions) {
                     if (iconOptions.icons) {
@@ -576,12 +573,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
 
                     var divIcon = document.createElement('div');
-                    if (divIcon.style.cssFloat !== undefined) {
-                        divIcon.style.cssFloat = 'right';
-                    }
-                    if (divIcon.style.styleFloat !== undefined) {
-                        divIcon.style.styleFloat = 'right';
-                    }
                     divIcon.className = (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + ' editor-icon';
                     if (iconOptions.title) {
                         divIcon.title = iconOptions.title;
@@ -651,7 +642,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             }
 
-            thisOb.container.style.padding = '7px';
+            thisOb.container.style.padding = '0 7px 7px 7px';
 
             var disableResize = !!options.disableResize;
             if (!disableResize) {

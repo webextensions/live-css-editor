@@ -1373,88 +1373,49 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     },
                     bgColor: '68,88,174,0.85',
                     headerIcons: [
-                        {
-                            name: 'point-and-click',
-                            title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
-                            cls: 'magicss-point-and-click',
-                            onclick: function (evt, editor) {
-                                togglePointAndClick(editor);
-                                editor.focus();
+                        (function () {
+                            if (executionCounter < 25 || 50 <= executionCounter) {
+                                return null;
+                            } else {
+                                return iconForRateUs({addOpaqueOnHoverClass: true});
                             }
-                        },
+                        }()),
                         {
-                            name: 'css-reloader-and-file-changes-watcher',
-                            title: 'CSS reloader and watch file changes',
-                            cls: 'magicss-reload-css-resources magicss-gray-out',
-                            icons: [
-                                {
-                                    name: 'reload-css-resources',
-                                    title: 'Reload all CSS resources',
-                                    cls: 'magicss-reload-all-css-resources',
-                                    uniqCls: 'magicss-reload-all-css-resources',
-                                    onclick: function (evt, editor) {
-                                        reloadAllCSSResourcesInPage();
-                                        editor.focus();
-                                    }
-                                },
-                                {
-                                    name: 'watch-css-files',
-                                    title: 'Watch CSS files & apply changes automatically',
-                                    cls: 'magicss-watch-resources',
-                                    uniqCls: 'magicss-watch-and-reload-link-tags',
-                                    onclick: function (evt, editor) {
-                                        if (socket) {
-                                            socket.close();
-                                            socket = null;
-                                        } else {
-                                            socket = io('127.0.0.1:3456');
-                                            socket.on('file-modified', function(changeDetails) {
-                                                reloadCSSResourceInPage(changeDetails.fileName);
-                                            });
+                            name: 'reapply',
+                            title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
+                            cls: 'magicss-reapply-styles magicss-gray-out',
+                            onclick: function (evt, editor, divIcon) {
+                                if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
+                                    markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                    utils.alertNote(
+                                        '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                        5000
+                                    );
+                                } else {
+                                    chrome.runtime.sendMessage(
+                                        {
+                                            requestPermissions: true,
+                                            url: window.location.href
+                                        },
+                                        function (status) {
+                                            if (chrome.runtime.lastError) {
+                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                utils.alertNote(
+                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                    10000
+                                                );
+                                            }
+                                            if (status === 'request-granted') {
+                                                markAsPinnedOrNotPinned(editor, 'pinned');
+                                                utils.alertNote(
+                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                    10000
+                                                );
+                                            } else if (status === 'request-not-granted') {
+                                                utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                            }
                                         }
-                                        editor.focus();
-                                    }
-                                }
-                            ]
-                        },
-                        /*
-                        {
-                            name: 'watch-css-files',
-                            title: 'Watch CSS file changes and reload them',
-                            cls: 'magicss-watch-resources magicss-gray-out',
-                            onclick: function (evt, editor) {
-                                if (socket) {
-                                    socket.close();
-                                    socket = null;
-                                } else {
-                                    socket = io('127.0.0.1:3456');
-                                    socket.on('file-modified', function(changeDetails) {
-                                        // $('#messages').append($('<li>').text(msg));
-                                        // console.log(changeDetails);
-
-                                        reloadCSSResourceInPage(changeDetails.fileName);
-                                    });
-                                }
-                                editor.focus();
-                            }
-                        },
-                        /* */
-                        {
-                            name: 'beautify',
-                            title: 'Beautify code',
-                            cls: 'magicss-beautify magicss-gray-out',
-                            onclick: function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    utils.alertNote('Please type some code to be beautified', 5000);
-                                } else {
-                                    var beautifiedCSS = beautifyCSS(textValue);
-                                    if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Your code has been beautified :-)', 5000);
-                                    } else {
-                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
-                                    }
+                                    );
                                 }
                                 editor.focus();
                             }
@@ -1496,52 +1457,91 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         {
-                            name: 'reapply',
-                            title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
-                            cls: 'magicss-reapply-styles magicss-gray-out',
-                            onclick: function (evt, editor, divIcon) {
-                                if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
-                                    markAsPinnedOrNotPinned(editor, 'not-pinned');
-                                    utils.alertNote(
-                                        '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
-                                        5000
-                                    );
+                            name: 'beautify',
+                            title: 'Beautify code',
+                            cls: 'magicss-beautify magicss-gray-out',
+                            onclick: function (evt, editor) {
+                                var textValue = editor.getTextValue();
+                                if (!textValue.trim()) {
+                                    utils.alertNote('Please type some code to be beautified', 5000);
                                 } else {
-                                    chrome.runtime.sendMessage(
-                                        {
-                                            requestPermissions: true,
-                                            url: window.location.href
-                                        },
-                                        function (status) {
-                                            if (chrome.runtime.lastError) {
-                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                utils.alertNote(
-                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                    10000
-                                                );
-                                            }
-                                            if (status === 'request-granted') {
-                                                markAsPinnedOrNotPinned(editor, 'pinned');
-                                                utils.alertNote(
-                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
-                                                    10000
-                                                );
-                                            } else if (status === 'request-not-granted') {
-                                                utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
-                                            }
-                                        }
-                                    );
+                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    if (textValue.trim() !== beautifiedCSS.trim()) {
+                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been beautified :-)', 5000);
+                                    } else {
+                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
+                                    }
                                 }
                                 editor.focus();
                             }
                         },
-                        (function () {
-                            if (executionCounter < 25 || 50 <= executionCounter) {
-                                return null;
-                            } else {
-                                return iconForRateUs({addOpaqueOnHoverClass: true});
+                        /*
+                        {
+                            name: 'watch-css-files',
+                            title: 'Watch CSS file changes and reload them',
+                            cls: 'magicss-watch-resources magicss-gray-out',
+                            onclick: function (evt, editor) {
+                                if (socket) {
+                                    socket.close();
+                                    socket = null;
+                                } else {
+                                    socket = io('127.0.0.1:3456');
+                                    socket.on('file-modified', function(changeDetails) {
+                                        // $('#messages').append($('<li>').text(msg));
+                                        // console.log(changeDetails);
+
+                                        reloadCSSResourceInPage(changeDetails.fileName);
+                                    });
+                                }
+                                editor.focus();
                             }
-                        }())
+                        },
+                        /* */
+                        {
+                            name: 'css-reloader-and-file-changes-watcher',
+                            title: 'CSS reloader and watch file changes',
+                            cls: 'magicss-reload-css-resources magicss-gray-out cancelDragHandle',
+                            icons: [
+                                {
+                                    name: 'reload-css-resources',
+                                    title: 'Reload all CSS resources',
+                                    cls: 'magicss-reload-all-css-resources',
+                                    uniqCls: 'magicss-reload-all-css-resources',
+                                    onclick: function (evt, editor) {
+                                        reloadAllCSSResourcesInPage();
+                                        editor.focus();
+                                    }
+                                },
+                                {
+                                    name: 'watch-css-files',
+                                    title: 'Watch CSS files & apply changes automatically',
+                                    cls: 'magicss-watch-resources',
+                                    uniqCls: 'magicss-watch-and-reload-link-tags',
+                                    onclick: function (evt, editor) {
+                                        if (socket) {
+                                            socket.close();
+                                            socket = null;
+                                        } else {
+                                            socket = io('127.0.0.1:3456');
+                                            socket.on('file-modified', function(changeDetails) {
+                                                reloadCSSResourceInPage(changeDetails.fileName);
+                                            });
+                                        }
+                                        editor.focus();
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            name: 'point-and-click',
+                            title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
+                            cls: 'magicss-point-and-click',
+                            onclick: function (evt, editor) {
+                                togglePointAndClick(editor);
+                                editor.focus();
+                            }
+                        }
                     ],
                     headerOtherIcons: [
                         (function () {
