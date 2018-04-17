@@ -451,7 +451,8 @@ body .tooltipster-default .tooltipster-content {
     color: #aaa;
 }
 
-.indicate-disabled#MagiCSS-bookmarklet .CodeMirror {
+.indicate-disabled#MagiCSS-bookmarklet .CodeMirror,
+.indicate-disabled#MagiCSS-bookmarklet .CodeMirror-scrollbar-filler {
     background-color: #bbb;
 }
 
