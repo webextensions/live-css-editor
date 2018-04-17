@@ -3,7 +3,8 @@
 // TODO: If remember text option is on, detect text change in another instance of this extension in some different tab
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
-var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
+var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function ($) {
     'use strict';
@@ -972,6 +973,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
         'use-tab-for-indentation': 'no',
         'indentation-spaces-count': '4',
         [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',
+        [USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: 'no',
         'syntax-highlighting': 'yes',
         'show-line-numbers': 'no',
         'textarea-value': '',
@@ -984,40 +986,64 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
     window.Editor = Editor;
 
     try {
-        // TODO: Avoid this code structure full of callbacks
-        chromeStorage.get('default-language-mode', function (values) {
-            if (values && values['default-language-mode'] === 'less') {
-                Editor.defaultPreferences['language-mode'] = 'less';
-            } else if (values && values['default-language-mode'] === 'sass') {
-                Editor.defaultPreferences['language-mode'] = 'sass';
-            }
-
-            chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
-                if (values && values[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] === 'no') {
-                    Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] = 'no';
-                }
-
+        var waterfall = utils.waterfall;
+        waterfall([
+            // If there is an error, it would get caught in the first function itself
+            // With the waterfall() function being used currently, errors in any of
+            // the upcoming functions are not caught or reported in the final callback
+            function (callback) {
+                chromeStorage.get('default-language-mode', function (values) {
+                    if (values && values['default-language-mode'] === 'less') {
+                        Editor.defaultPreferences['language-mode'] = 'less';
+                    } else if (values && values['default-language-mode'] === 'sass') {
+                        Editor.defaultPreferences['language-mode'] = 'sass';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
+                    if (values && values[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] === 'no') {
+                        Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] = 'no';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorage.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
+                    if (values && values[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT] === 'yes') {
+                        Editor.defaultPreferences[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT] = 'yes';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
                 chromeStorage.get('use-tab-for-indentation', function (values) {
                     if (values && values['use-tab-for-indentation'] === 'yes') {
                         Editor.defaultPreferences['use-tab-for-indentation'] = 'yes';
                     }
-
-                    chromeStorage.get('indentation-spaces-count', function (values) {
-                        var value = parseInt(values && values['indentation-spaces-count'], 10);
-                        if (!isNaN(value)) {
-                            Editor.defaultPreferences['indentation-spaces-count'] = '' + value;
-                        }
-
-                        chromeStorage.get('use-css-linting', function (values) {
-                            if (values && values['use-css-linting'] === 'yes') {
-                                Editor.defaultPreferences['use-css-linting'] = 'yes';
-                            }
-
-                            Editor.usable = true;
-                        });
-                    });
+                    callback(null);
                 });
-            });
+            },
+            function (callback) {
+                chromeStorage.get('indentation-spaces-count', function (values) {
+                    var value = parseInt(values && values['indentation-spaces-count'], 10);
+                    if (!isNaN(value)) {
+                        Editor.defaultPreferences['indentation-spaces-count'] = '' + value;
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorage.get('use-css-linting', function (values) {
+                    if (values && values['use-css-linting'] === 'yes') {
+                        Editor.defaultPreferences['use-css-linting'] = 'yes';
+                    }
+                    callback(null);
+                });
+            }
+        ], function () {
+            Editor.usable = true;
         });
     } catch (e) {
         Editor.usable = true;

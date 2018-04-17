@@ -8,10 +8,32 @@
 
     <style>
         html {
-            width: 350px;
+            width: 410px;
         }
         body {
             font-size: 13px;
+        }
+        .option-heading {
+            font-size: 14px;
+        }
+        .option-value,
+        label {
+            display: flex;
+        }
+        .option-value {
+            align-items: center;
+        }
+        label {
+            margin-top: 1px;
+            margin-bottom: 1px;
+        }
+        label input,
+        label input[type="button"],
+        label input[type="checkbox"],
+        label input[type="radio"],
+        label input[type="submit"],
+        label select {
+            margin-right: 4px;
         }
         .option-heading {
             font-weight: bold;
@@ -47,7 +69,7 @@
                     <label><input type="radio" name="indentation" value="tab" /> Tab character</label>
                 </div>
                 <div class="option-value">
-                    <label><input type="radio" name="indentation" value="spaces" /> Space characters: </label>
+                    <label><input type="radio" name="indentation" value="spaces" /> Space characters:&nbsp;</label>
                     <select class="indentation-spaces-count">
                         <option value="1">1</option>
                         <option value="2">2</option>
@@ -73,6 +95,20 @@
             <div style="margin-left:20px">
                 <div class="option-value">
                     <label><input type="checkbox" id="all-frames" /> Load separate instances for each frame/iframe</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option" style="margin-top:20px">
+            <div class="option-heading">
+                Experimental options:
+                <div style="font-size:11px; font-weight:normal">These options may not work perfectly in all the scenarios.</div>
+            </div>
+            <div style="margin-left:20px">
+                <div class="option-value">
+                    <label title="This may not work well when you are working in &quot;no mouse support&quot; mode.&#013;&#010;&#013;&#010;It should work well in &quot;Responsive&quot; mode of browser's &quot;Developer tools&quot; when having support for touch and mouse, both.">
+                        <input type="checkbox" id="hide-on-page-mouseout" /> <div>Hide editor when mouse pointer is outside the webpage</div>
+                    </label>
                 </div>
             </div>
         </div>

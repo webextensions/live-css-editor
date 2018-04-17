@@ -1,8 +1,9 @@
 /*globals jQuery, utils, chrome */
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
-var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
-var USER_PREFERENCE_ALL_FRAMES = 'all-frames';
+var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_ALL_FRAMES = 'all-frames',
+    USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 jQuery(function ($) {
     var chromeStorage = chrome.storage.sync || chrome.storage.local;
@@ -46,6 +47,23 @@ jQuery(function ($) {
             valueToSet = 'yes';
         }
         chromeStorage.set({[USER_PREFERENCE_ALL_FRAMES]: valueToSet});
+        notifyUser();
+    });
+
+    chromeStorage.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
+        var $hideOnPageMouseOut = $('#hide-on-page-mouseout'),
+            markChecked = false;
+        if (values && values[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT] === 'yes') {
+            markChecked = true;
+        }
+        $hideOnPageMouseOut.prop('checked', markChecked);
+    });
+    $('#hide-on-page-mouseout').on('click', function () {
+        var valueToSet = 'no';
+        if($(this).is(':checked')) {
+            valueToSet = 'yes';
+        }
+        chromeStorage.set({[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: valueToSet});
         notifyUser();
     });
 

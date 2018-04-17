@@ -3,7 +3,8 @@
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
-var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
+var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function($){
     var chromeStorage;
@@ -2007,6 +2008,43 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         }
                     }
                 }, false);
+
+                if (window.MagiCSSEditor.userPreference(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT) === 'yes') {
+                    var opacityCssAdded = false,
+                        opacityStyleTagId = id + '-opacity-id';
+
+                    var mousemoveListener = function () {
+                        // This check is not necessary as such since we are removing the mousemoveListener
+                        // once the code has been executed. This check is there just to prevent some possible
+                        // bugs that might come up later if we change the approach/code and miss out some cases
+                        if (opacityCssAdded) {
+                            return;
+                        }
+
+                        utils.addStyleTag({
+                            id: opacityStyleTagId,
+                            attributes: [{
+                                name: 'data-style-created-by',
+                                value: 'magicss'
+                            }],
+                            cssText: [
+                                'html #' + id + ' {',
+                                '    opacity: 0 !important;',
+                                '    pointer-events: none !important;',
+                                '    transition: opacity 0.5s ease-in-out;',
+                                '}',
+                                'html:hover #' + id + ' {',
+                                '    pointer-events: initial !important;',
+                                '    opacity: 1 !important;',
+                                '}'
+                            ].join('\n'),
+                            parentTag: 'body'
+                        });
+                        opacityCssAdded = true;
+                        document.removeEventListener('mousemove', mousemoveListener, false);
+                    };
+                    document.addEventListener('mousemove', mousemoveListener, false);
+                }
             }
         });
     };
