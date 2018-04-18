@@ -4,6 +4,8 @@
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
+    USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function ($) {
@@ -1007,6 +1009,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         'indentation-spaces-count': '4',
         [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',
         [USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: 'no',
+        [USER_PREFERENCE_USE_CUSTOM_FONT_SIZE]: 'no',
+        [USER_PREFERENCE_FONT_SIZE_IN_PX]: '12',
         'syntax-highlighting': 'yes',
         'show-line-numbers': 'no',
         'textarea-value': '',
@@ -1063,6 +1067,23 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     var value = parseInt(values && values['indentation-spaces-count'], 10);
                     if (!isNaN(value)) {
                         Editor.defaultPreferences['indentation-spaces-count'] = '' + value;
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorage.get(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE, function (values) {
+                    if (values && values[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] === 'yes') {
+                        Editor.defaultPreferences[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] = 'yes';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorage.get(USER_PREFERENCE_FONT_SIZE_IN_PX, function (values) {
+                    var value = parseInt(values && values[USER_PREFERENCE_FONT_SIZE_IN_PX], 10);
+                    if (!isNaN(value)) {
+                        Editor.defaultPreferences[USER_PREFERENCE_FONT_SIZE_IN_PX] = '' + value;
                     }
                     callback(null);
                 });

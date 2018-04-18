@@ -4,6 +4,8 @@
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
+    USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function($){
@@ -2164,6 +2166,27 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     }
                 }, false);
+
+                if (window.MagiCSSEditor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
+                    var userPrefFontSizeInPx = window.MagiCSSEditor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX);
+                    if (userPrefFontSizeInPx !== '12') {
+                        utils.addStyleTag({
+                            attributes: [{
+                                name: 'data-style-created-by',
+                                value: 'magicss'
+                            }],
+                            cssText: [
+                                '#' + id + ' *,',
+                                '.alert-note-text,',
+                                '.tooltipster-base ul li a,',
+                                '.CodeMirror-hints * {',
+                                '    font-size: ' + userPrefFontSizeInPx + 'px !important;',
+                                '}'
+                            ].join('\n'),
+                            parentTag: 'body'
+                        });
+                    }
+                }
 
                 if (window.MagiCSSEditor.userPreference(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT) === 'yes') {
                     var opacityCssAdded = false,
