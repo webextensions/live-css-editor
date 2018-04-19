@@ -1,5 +1,4 @@
 body > div span {
     font-size: 20px;
-    -text-decoration: underline;
+    text-decoration: underline;
 }
-

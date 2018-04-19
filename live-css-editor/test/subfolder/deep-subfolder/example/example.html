@@ -2,17 +2,24 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="example.css" />
-    <link rel="stylesheet" href="example.css?zyx" />
-    <link rel="stylesheet" href="example.css?xyz" />
-    <link rel="stylesheet" href="example.css?abcd" />
-    <link rel="stylesheet" href="example.css?abcd=123" />
-    <link rel="stylesheet" href="example.css?abcd=123&xyz=456" />
+    <link rel="stylesheet" href="example1.css" />
+    <link rel="stylesheet" href="example1.css?xyz" />
+    <link rel="stylesheet" href="example1.css?123" />
+    <link rel="stylesheet" href="example1.css?abcd" />
+    <link rel="stylesheet" href="example1.css?abcd=123" />
+    <link rel="stylesheet" href="example1.css?abcd=123&" />
+    <link rel="stylesheet" href="example1.css?abcd=123&xyz=456" />
     <link rel="stylesheet" href="example2.css" />
-    <link rel="stylesheet" href="example3.css" />
-    <link rel="stylesheet" href="../example4.css" />
-    <link rel="stylesheet" href="../../example5.css" />
-    <link rel="stylesheet" href="../../../example.css" />
+    <link rel="stylesheet" href="./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css" />
+    <link rel="stylesheet" href="../file-placed-one-level-up-than-html-file-accessed-with-relative-path.css" />
+    <link rel="stylesheet" href="../../file-placed-two-levels-up-than-html-file-accessed-with-relative-path.css" />
+
+    <link rel="stylesheet" href=".file-starting-with-dot.css" />
+    <link rel="stylesheet" href="file-which-does-not-exist.css" />
+    <link rel="stylesheet" href="file-which-gets-linked-twice.css" />
+    <link rel="stylesheet" href="file-which-gets-linked-twice.css" />
+    <link rel="stylesheet" href="css-file-without-any-extension" />
+    <link rel="stylesheet" href="css-file-with-wrong-extension.mystyles" />
 </head>
 
 <body>
