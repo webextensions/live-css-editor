@@ -22,6 +22,7 @@
     "note-down": "0.1.1",
     "tiny-emitter": "2.0.2",
     "socket.io": "2.1.0",
+    "update-notifier": "2.5.0",
     "yargs": "11.0.0"
   }
 }

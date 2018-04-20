@@ -2,6 +2,28 @@
 
 /* eslint-env node */
 
+var updateNotifier = require('update-notifier'),
+    pkg = require('./package.json'),
+    notifier = updateNotifier({
+        // updateCheckInterval: 0,     // Useful when testing
+        pkg: pkg
+    });
+
+if (notifier.update) {
+    // Notify about update immediately when the script executes
+    notifier.notify({
+        defer: false,
+        shouldNotifyInNpmScript: true
+    });
+
+    // Notify about update when the script ends after running for at least 15 seconds
+    setTimeout(function () {
+        notifier.notify({
+            shouldNotifyInNpmScript: true
+        });
+    }, 15000);
+}
+
 var chokidar = require('chokidar'),
     findFreePort = require('find-free-port');
 
