@@ -2,41 +2,44 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="example1.css" />
-    <link rel="stylesheet" href="example1.css?xyz" />
-    <link rel="stylesheet" href="example1.css?123" />
-    <link rel="stylesheet" href="example1.css?abcd" />
-    <link rel="stylesheet" href="example1.css?abcd=123" />
-    <link rel="stylesheet" href="example1.css?abcd=123&" />
-    <link rel="stylesheet" href="example1.css?abcd=123&xyz=456" />
-    <link rel="stylesheet" href="example2.css" />
-    <link rel="stylesheet" href="./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css" />
-    <link rel="stylesheet" href="../file-placed-one-level-up-than-html-file-accessed-with-relative-path.css" />
-    <link rel="stylesheet" href="../../file-placed-two-levels-up-than-html-file-accessed-with-relative-path.css" />
-
-    <link rel="stylesheet" href=".file-starting-with-dot.css" />
-    <link rel="stylesheet" href="file-which-does-not-exist.css" />
-    <link rel="stylesheet" href="file-which-gets-linked-twice.css" />
-    <link rel="stylesheet" href="file-which-gets-linked-twice.css" />
-    <link rel="stylesheet" href="css-file-without-any-extension" />
-    <link rel="stylesheet" href="css-file-with-wrong-extension.mystyles" />
 </head>
 
 <body>
     <div>
-        <span>hello</span>
-
-        <div class="test123">
-            .test123
+        <link rel="stylesheet" href="example1.css" />
+        <div class="example1-style1">
+            .example1-style1 - Style defined in example1.css
         </div>
 
-        <div class="example3">
-            .example3 - Style defined in example3.css
+        <link rel="stylesheet" href="example2.css" />
+        <link rel="stylesheet" href="example2.css?xyz" />
+        <link rel="stylesheet" href="example2.css?123" />
+        <link rel="stylesheet" href="example2.css?abcd" />
+        <link rel="stylesheet" href="example2.css?abcd=123" />
+        <link rel="stylesheet" href="example2.css?abcd=123&" />
+        <link rel="stylesheet" href="example2.css?abcd=123&xyz=456" />
+        <div class="example2-style1">
+            .example2-style1 - Style defined in example2.css
         </div>
 
-        <div class="example-inside-test-folder">
-            .example-inside-test-folder - Style defined in example.css inside test folder
+        <link rel="stylesheet" href="./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css" />
+        <div class="file-placed-at-same-level-as-html-file-accessed-with-relative-path-style1">
+            .file-placed-at-same-level-as-html-file-accessed-with-relative-path-style1 - Style defined in ./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css
         </div>
+
+        <link rel="stylesheet" href="node_modules/file-placed-in-a-folder-disabled-from-watch-by-default.css" />
+        <link rel="stylesheet" href="../file-placed-one-level-up-than-html-file-accessed-with-relative-path.css" />
+        <link rel="stylesheet" href="../../file-placed-two-levels-up-than-html-file-accessed-with-relative-path.css" />
+
+        <link rel="stylesheet" href=".css" />
+        <link rel="stylesheet" href="file-with-unicode-character-ë.css" />
+        <link rel="stylesheet" href="file-with-unicode-character-á.css" />
+        <link rel="stylesheet" href=".file-starting-with-dot.css" />
+        <link rel="stylesheet" href="file-which-does-not-exist.css" />
+        <link rel="stylesheet" href="file-which-gets-linked-twice.css" />
+        <link rel="stylesheet" href="file-which-gets-linked-twice.css" />
+        <link rel="stylesheet" href="css-file-without-any-extension" />
+        <link rel="stylesheet" href="css-file-with-wrong-extension.mystyles" />
     </div>
 </body>
 
