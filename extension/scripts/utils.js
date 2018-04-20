@@ -7,6 +7,7 @@ var utils = window.utils || {};
 if (!utils.defined) {
     utils.defined = true;
 
+    /* eslint-disable no-undef */
     // https://github.com/hydiak/a-sync-waterfall/blob/master/index.js
     // MIT license (by Elan Shanker).
     (function(globals) {
@@ -91,6 +92,7 @@ if (!utils.defined) {
             globals.waterfall = waterfall; // <script>
         }
     })(this);
+    /* eslint-enable no-undef */
     utils.waterfall = this.waterfall;
 
     utils.attachPublishSubscribe = function (attachToObject) {
