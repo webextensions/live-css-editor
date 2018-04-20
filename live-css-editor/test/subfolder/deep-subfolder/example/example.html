@@ -6,9 +6,16 @@
 
 <body>
     <div>
+        <style>
+            div.block {
+                margin-bottom: 20px;
+            }
+        </style>
+
         <link rel="stylesheet" href="example1.css" />
-        <div class="example1-style1">
-            .example1-style1 - Style defined in example1.css
+        <div class="block example1-style1">
+            .example1-style1
+            <br />Style defined in example1.css
         </div>
 
         <link rel="stylesheet" href="example2.css" />
@@ -18,24 +25,51 @@
         <link rel="stylesheet" href="example2.css?abcd=123" />
         <link rel="stylesheet" href="example2.css?abcd=123&" />
         <link rel="stylesheet" href="example2.css?abcd=123&xyz=456" />
-        <div class="example2-style1">
-            .example2-style1 - Style defined in example2.css
+        <div class="block example2-style1">
+            .example2-style1
+            <br />Style defined in example2.css
+            <br />Style defined in example2.css?xyz
+            <br />Style defined in example2.css?123
+            <br />Style defined in example2.css?abcd
+            <br />Style defined in example2.css?abcd=123
+            <br />Style defined in example2.css?abcd=123&
+            <br />Style defined in example2.css?abcd=123&xyz=456
         </div>
 
         <link rel="stylesheet" href="./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css" />
-        <div class="file-placed-at-same-level-as-html-file-accessed-with-relative-path-style1">
-            .file-placed-at-same-level-as-html-file-accessed-with-relative-path-style1 - Style defined in ./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css
+        <div class="block file-placed-at-same-level-as-html-file-accessed-with-relative-path-style1">
+            .file-placed-at-same-level-as-html-file-accessed-with-relative-path-style1
+            <br />Style defined in ./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css
         </div>
 
         <link rel="stylesheet" href="node_modules/file-placed-in-a-folder-disabled-from-watch-by-default.css" />
+        <div class="block file-placed-in-a-folder-disabled-from-watch-by-default-style1">
+            .file-placed-in-a-folder-disabled-from-watch-by-default-style1
+            <br />Style defined in node_modules/file-placed-in-a-folder-disabled-from-watch-by-default.css
+        </div>
+
         <link rel="stylesheet" href="../file-placed-one-level-up-than-html-file-accessed-with-relative-path.css" />
+        <div class="block file-placed-one-level-up-than-html-file-accessed-with-relative-path-style1">
+            .file-placed-one-level-up-than-html-file-accessed-with-relative-path-style1
+            <br />Style defined in ../file-placed-one-level-up-than-html-file-accessed-with-relative-path.css
+        </div>
+
         <link rel="stylesheet" href="../../file-placed-two-levels-up-than-html-file-accessed-with-relative-path.css" />
+        <div class="block file-placed-two-levels-up-than-html-file-accessed-with-relative-path-style1">
+            .file-placed-two-levels-up-than-html-file-accessed-with-relative-path-style1
+            <br />Style defined in ../../file-placed-two-levels-up-than-html-file-accessed-with-relative-path.css
+        </div>
 
         <link rel="stylesheet" href=".css" />
+        <div class="block file-name-is-dot-css-style1">
+            .file-name-is-dot-css-style1
+            <br />Style defined in .css
+        </div>
 
         <link rel="stylesheet" href="node_modules.css" />
-        <div>
-            .node-modules-style-1 - Style defined in node_modules.css (to test that that default folders being ignored from watch are handled appropriately and don't affect files partly-matching with the ignored)
+        <div class="block node_modules-style1">
+            .node_modules-style1
+            <br />Style defined in node_modules.css (to test that that default folders being ignored from watch are handled appropriately and don't affect files partly-matching with the ignored)
         </div>
 
         <link rel="stylesheet" href="file-with-unicode-character-ë.css" />
