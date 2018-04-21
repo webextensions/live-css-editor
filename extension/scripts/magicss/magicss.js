@@ -1493,7 +1493,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         // $('#messages').append($('<li>').text(msg));
                                         // console.log(changeDetails);
 
-                                        reloadCSSResourceInPage(changeDetails.fileName);
+                                        reloadCSSResourceInPage(changeDetails.relativePath);
                                     });
                                 }
                                 editor.focus();
@@ -1527,7 +1527,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         } else {
                                             socket = io('127.0.0.1:3456');
                                             socket.on('file-modified', function(changeDetails) {
-                                                reloadCSSResourceInPage(changeDetails.fileName);
+                                                reloadCSSResourceInPage(changeDetails.relativePath);
                                             });
                                         }
                                         editor.focus();

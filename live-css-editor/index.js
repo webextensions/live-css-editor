@@ -24,7 +24,10 @@ if (notifier.update) {
     }, 15000);
 }
 
+var nPath = require('path');
+
 var chokidar = require('chokidar'),
+    _uniq = require('lodash/uniq.js'),
     findFreePort = require('find-free-port');
 
 var logger = require('note-down');
@@ -55,6 +58,7 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
+var watcherCwd = process.cwd();
 var watcher = chokidar.watch(
     [
         '**/*.css',
@@ -74,7 +78,7 @@ var watcher = chokidar.watch(
         'node_modules/async-limiter/coverage/lcov-report/base.css',
     ],
     {
-        cwd: process.env.INIT_CWD,
+        cwd: watcherCwd,
         ignored: [
             /(^|[/\\])\../,     // A general rule to ignore the "." files/directories
             'node_modules',
@@ -89,24 +93,25 @@ var watcher = chokidar.watch(
     }
 );
 
-var filesBeingWatched = 0;
+var filesBeingWatched = [];
 var fileModifiedHandler = function (changeObj) {
-    // console.log(changeObj.fileName);
     io.emit('file-modified', changeObj);
 };
 var fileAddedHandler = function (changeObj) {
-    filesBeingWatched++;
     if (verboseLogging) {
-        if (filesBeingWatched === 1) {
+        if (filesBeingWatched.length === 0) {
             logger.success('Live CSS Editor (Magic CSS) is watching the following file(s):');
         }
-        logger.log('    ' + changeObj.fileName);
+        logger.log('    ' + changeObj.relativePath);
     }
+    filesBeingWatched.push(changeObj);
     io.emit('file-added', changeObj);
 };
 var fileDeletedHandler = function (changeObj) {
-    // console.log(changeObj.fileName);
-    filesBeingWatched--;
+    filesBeingWatched = filesBeingWatched.filter(function(item){
+        return item.relativePath !== changeObj.relativePath
+    });
+
     io.emit('file-deleted', changeObj);
 };
 
@@ -114,8 +119,23 @@ emitter.on('file-modified', fileModifiedHandler);
 emitter.on('file-added', fileAddedHandler);
 emitter.on('file-deleted', fileDeletedHandler);
 
+var anyFileNameIsRepeated = function (arrPaths) {
+    var arrWithFileNames = arrPaths.map(function (item) {
+        return item.fileName;
+    });
+    var uniqArrWithRelativePaths = _uniq(arrWithFileNames);
+    if (uniqArrWithRelativePaths.length === arrWithFileNames.length) {
+        return false;
+    } else {
+        return true;
+    }
+};
+
 emitter.on('file-watch-ready', function () {
-    logger.success('Live CSS Editor (Magic CSS) is watching ' + filesBeingWatched + ' files.');
+    if (!argv.projectRoot && anyFileNameIsRepeated(filesBeingWatched)) {
+        logger.warn('It is recommended to start the process with an appropriate projectRoot parameter');
+    }
+    logger.success('Live CSS Editor (Magic CSS) is watching ' + filesBeingWatched.length + ' files.');
 });
 
 watcher.on('ready', function () {
@@ -142,18 +162,26 @@ emitter.on('disconnected-socket', function () {
     printSessionCount(connectedSessions);
 });
 
+var getPathValues = function (path) {
+    return {
+        relativePath: path,
+        fullPath: nPath.join(watcherCwd, path),
+        fileName: nPath.basename(path)
+    };
+}
+
 watcher
-    .on('add', function (path) {
+    .on('add', function (path, asdf, xyz) {
         logger.verbose(`File ${path} is being watched`);
-        emitter.emit('file-added', { fileName: path });
+        emitter.emit('file-added', getPathValues(path));
     })
     .on('change', function (path) {
         log(`File ${path} has been changed`);
-        emitter.emit('file-modified', { fileName: path });
+        emitter.emit('file-modified', getPathValues(path));
     })
     .on('unlink', function (path) {
         log(`File ${path} has been removed`);
-        emitter.emit('file-deleted', { fileName: path });
+        emitter.emit('file-deleted', getPathValues(path));
     });
 
 io.on('connection', function(socket) {
