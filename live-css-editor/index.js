@@ -59,7 +59,7 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-var watcherCwd = process.cwd();
+var watcherCwd = (argv.root && nPath.resolve(argv.root)) || process.cwd();
 var watcher = chokidar.watch(
     [
         '**/*.css',
@@ -133,7 +133,11 @@ var anyFileNameIsRepeated = function (arrPaths) {
 };
 
 emitter.on('file-watch-ready', function () {
-    logger.success('Live CSS Editor (Magic CSS) is watching ' + filesBeingWatched.length + ' files.');
+    logger.success(
+        '\nLive CSS Editor (Magic CSS) is watching ' + filesBeingWatched.length + ' files from:' +
+        '\n    ' + nPath.relative(process.cwd(), watcherCwd) +
+        '\n'
+    );
     if (!argv.root && anyFileNameIsRepeated(filesBeingWatched)) {
         logger.warn(
             boxen(
