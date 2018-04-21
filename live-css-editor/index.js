@@ -28,6 +28,7 @@ var chokidar = require('chokidar'),
     findFreePort = require('find-free-port');
 
 var logger = require('note-down');
+logger.removeOption('showLogLine');
 
 var Emitter = require('tiny-emitter'),
     emitter = new Emitter();
