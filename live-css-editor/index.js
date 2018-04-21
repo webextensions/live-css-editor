@@ -27,6 +27,7 @@ if (notifier.update) {
 var nPath = require('path');
 
 var chokidar = require('chokidar'),
+    boxen = require('boxen'),
     _uniq = require('lodash/uniq.js'),
     findFreePort = require('find-free-port');
 
@@ -132,10 +133,20 @@ var anyFileNameIsRepeated = function (arrPaths) {
 };
 
 emitter.on('file-watch-ready', function () {
-    if (!argv.projectRoot && anyFileNameIsRepeated(filesBeingWatched)) {
-        logger.warn('It is recommended to start the process with an appropriate projectRoot parameter');
-    }
     logger.success('Live CSS Editor (Magic CSS) is watching ' + filesBeingWatched.length + ' files.');
+    if (!argv.root && anyFileNameIsRepeated(filesBeingWatched)) {
+        logger.warn(
+            boxen(
+                'We recommend you to start live-css-editor' +
+                '\nwith an appropriate ' + logger.chalk.bold('--root') + ' parameter',
+                {
+                    padding: 1,
+                    margin: 1,
+                    borderStyle: 'double'
+                }
+            )
+        );
+    }
 });
 
 watcher.on('ready', function () {
@@ -172,15 +183,15 @@ var getPathValues = function (path) {
 
 watcher
     .on('add', function (path, asdf, xyz) {
-        logger.verbose(`File ${path} is being watched`);
+        logger.verbose('File being watched: ' + path);
         emitter.emit('file-added', getPathValues(path));
     })
     .on('change', function (path) {
-        log(`File ${path} has been changed`);
+        log('File modified: ' + path);
         emitter.emit('file-modified', getPathValues(path));
     })
     .on('unlink', function (path) {
-        log(`File ${path} has been removed`);
+        log('File removed: ' + path);
         emitter.emit('file-deleted', getPathValues(path));
     });
 
@@ -205,7 +216,8 @@ findFreePort(3456, function(err, freePort) {
                 return  '    http://' + item + ':' + freePort + '/';
             });
             return addresses.join('\n');
-        }(localIpAddressesAndHostnames))
+        }(localIpAddressesAndHostnames)) +
+        '\n'
     );
 
     http.listen(freePort, function() {
