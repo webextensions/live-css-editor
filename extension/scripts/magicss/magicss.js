@@ -39,6 +39,56 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return;
     }
 
+    // TODO: Move this functionality into utils.js
+    // https://github.com/lydell/resolve-url/blob/master/resolve-url.js
+    // Copyright 2014 Simon Lydell
+    // X11 (“MIT”) Licensed. (See LICENSE.)
+
+    void (function(root, factory) {
+      if (typeof define === "function" && define.amd) {
+        define(factory)
+      } else if (typeof exports === "object") {
+        module.exports = factory()
+      } else {
+        root.resolveUrl = factory()
+      }
+    }(this, function() {
+
+      function resolveUrl(/* ...urls */) {
+        var numUrls = arguments.length
+
+        if (numUrls === 0) {
+          throw new Error("resolveUrl requires at least one argument; got none.")
+        }
+
+        var base = document.createElement("base")
+        base.href = arguments[0]
+
+        if (numUrls === 1) {
+          return base.href
+        }
+
+        var head = document.getElementsByTagName("head")[0]
+        head.insertBefore(base, head.firstChild)
+
+        var a = document.createElement("a")
+        var resolved
+
+        for (var index = 1; index < numUrls; index++) {
+          a.href = arguments[index]
+          resolved = a.href
+          base.href = resolved
+        }
+
+        head.removeChild(base)
+
+        return resolved
+      }
+
+      return resolveUrl
+
+    }));
+
     // for HTML frameset pages, this value would be 'FRAMESET'
     // chrome.tabs.executeScript uses allFrames: true, to run inside all frames
     if (document.body.tagName !== 'BODY') {
@@ -97,7 +147,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return matchedIndexes;
     };
 
-    var reloadCSSResourceInPage = function (relativeFilePath) {
+    // var reloadCSSResourceInPage = function (relativeFilePath) {
+    var reloadCSSResourceInPage = function (config) {
+        var fileNameOrFullUrl = config.fileName || config.url;
         var activeLinkTags = getActiveStylesheetLinkTags();
 
         var arrLinkTags = [];
@@ -105,7 +157,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             arrLinkTags.push($(linkTag).attr('href'));
         });
 
-        var indexes = findProbableMatchElementIndexes(arrLinkTags, relativeFilePath);
+        // TODO: findProbableMatchElementIndexes() currently handles only the fileName and not fullUrl
+        var indexes = findProbableMatchElementIndexes(arrLinkTags, fileNameOrFullUrl);
+        // var indexes = findProbableMatchElementIndexes(arrLinkTags, relativeFilePath);
 
         var linkTagsToReload = [];
         indexes.forEach(function (index) {
@@ -1527,7 +1581,25 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         } else {
                                             socket = io('127.0.0.1:3456');
                                             socket.on('file-modified', function(changeDetails) {
-                                                reloadCSSResourceInPage(changeDetails.relativePath);
+                                                if (changeDetails.useOnlyFileNamesForMatch) {
+                                                    reloadCSSResourceInPage({
+                                                        useOnlyFileNamesForMatch: true,
+                                                        fileName: changeDetails.fileName
+                                                        // changeDetails.relativePath
+                                                    });
+                                                } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                                                    var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                                                    reloadCSSResourceInPage({
+                                                        url: resolveUrl(pathWrtRoot)
+                                                    });
+                                                } else {
+                                                    // The code should never reach here
+                                                    utils.alertNote(
+                                                        'Unexpected scenario occurred in reloading some CSS resources.' +
+                                                        '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                                                        10000
+                                                    );
+                                                }
                                             });
                                         }
                                         editor.focus();

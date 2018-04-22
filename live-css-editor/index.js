@@ -134,9 +134,8 @@ var anyFileNameIsRepeated = function (arrPaths) {
 
 emitter.on('file-watch-ready', function () {
     logger.success(
-        '\nLive CSS Editor (Magic CSS) is watching ' + filesBeingWatched.length + ' files from:' +
-        '\n    ' + nPath.relative(process.cwd(), watcherCwd) +
-        '\n'
+        '\nLive CSS Editor (Magic CSS) server is watching ' + filesBeingWatched.length + ' files from:' +
+        '\n    ' + nPath.relative(process.cwd(), watcherCwd)
     );
     if (!argv.root && anyFileNameIsRepeated(filesBeingWatched)) {
         logger.warn(
@@ -151,6 +150,8 @@ emitter.on('file-watch-ready', function () {
             )
         );
     }
+
+    logger.info('Press CTRL-C to stop the server\n');
 });
 
 watcher.on('ready', function () {
@@ -178,11 +179,23 @@ emitter.on('disconnected-socket', function () {
 });
 
 var getPathValues = function (path) {
-    return {
+    var ob = {
         relativePath: path,
         fullPath: nPath.join(watcherCwd, path),
-        fileName: nPath.basename(path)
+        fileName: nPath.basename(path),
+        useOnlyFileNamesForMatch: (function () {
+
+        }()),
+        root: watcherCwd
     };
+    if (argv.root) {
+        ob.root = watcherCwd;
+        ob.useOnlyFileNamesForMatch = false;
+    } else {
+        ob.root = null;
+        ob.useOnlyFileNamesForMatch = true;
+    }
+    return ob;
 }
 
 watcher
@@ -213,7 +226,7 @@ io.on('connection', function(socket) {
 
 findFreePort(3456, function(err, freePort) {
     logger.info(
-        '\nLive CSS Editor (Magic CSS) is available at any of the following addresses:\n' +
+        '\nLive CSS Editor (Magic CSS) server is available at any of the following addresses:\n' +
         (function (localIpAddressesAndHostnames) {
             var addresses = [].concat(localIpAddressesAndHostnames);
             addresses = addresses.map(function (item) {
