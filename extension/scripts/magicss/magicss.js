@@ -136,20 +136,30 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return path;
     };
 
-    var findProbableMatchElementIndexes = function (arr, itemToMatch) {
+    var findProbableMatchElementIndexes = function (arr, useOnlyFileNamesForMatch, itemToMatch) {
         var fileNameOfItemToMatch = getFilenameFromPath(itemToMatch);
         var matchedIndexes = [];
         arr.forEach(function (item, index) {
-            if (getFilenameFromPath(item) === fileNameOfItemToMatch) {
-                matchedIndexes.push(index);
+            item = item.replace(/[?&]reloadedAt=[\d-_:]+/, '');
+            if (useOnlyFileNamesForMatch) {
+                if (getFilenameFromPath(item) === fileNameOfItemToMatch) {
+                    matchedIndexes.push(index);
+                }
+            } else {
+                if (resolveUrl(item) === itemToMatch) {
+                    matchedIndexes.push(index);
+                }
             }
         });
         return matchedIndexes;
     };
 
-    // var reloadCSSResourceInPage = function (relativeFilePath) {
     var reloadCSSResourceInPage = function (config) {
-        var fileNameOrFullUrl = config.fileName || config.url;
+        var useOnlyFileNamesForMatch = config.useOnlyFileNamesForMatch,
+            fileName = config.fileName,
+            fullUrl = config.url,
+            fullPath = config.fullPath;
+
         var activeLinkTags = getActiveStylesheetLinkTags();
 
         var arrLinkTags = [];
@@ -157,18 +167,29 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             arrLinkTags.push($(linkTag).attr('href'));
         });
 
-        // TODO: findProbableMatchElementIndexes() currently handles only the fileName and not fullUrl
-        var indexes = findProbableMatchElementIndexes(arrLinkTags, fileNameOrFullUrl);
-        // var indexes = findProbableMatchElementIndexes(arrLinkTags, relativeFilePath);
+        var indexes = findProbableMatchElementIndexes(
+            arrLinkTags,
+            useOnlyFileNamesForMatch,
+            useOnlyFileNamesForMatch ? fileName : fullUrl
+        );
 
         var linkTagsToReload = [];
         indexes.forEach(function (index) {
             linkTagsToReload.push(activeLinkTags[index]);
         });
-        reloadPassedLinkTags(linkTagsToReload);
+        reloadPassedLinkTags(linkTagsToReload, {
+            noMatchesPrepend: 'Modified: <span style="font-weight:normal">' + (function (str) {
+                if (str.length >= 53) {
+                    return '...' + str.substr(-50);
+                } else {
+                    return str;
+                }
+            }(fullPath)) +
+            '</span>'
+        });
     };
 
-    var reloadPassedLinkTags = function (linkTags) {
+    var reloadPassedLinkTags = function (linkTags, extraInfo) {
         var localISOTime = getLocalISOTime();
 
         var successCount = 0,
@@ -236,7 +257,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 $link.after($newLink);
             });
         } else {
-            utils.alertNote(htmlEscape('There are no active CSS <link> tags that need to be reloaded.'));
+            utils.alertNote(
+                ((extraInfo && extraInfo.noMatchesPrepend) ? (extraInfo.noMatchesPrepend + '<br />') : '') +
+                htmlEscape('There are no active CSS <link> tags that need to be reloaded.')
+            );
         }
     };
 
@@ -1583,13 +1607,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             socket.on('file-modified', function(changeDetails) {
                                                 if (changeDetails.useOnlyFileNamesForMatch) {
                                                     reloadCSSResourceInPage({
+                                                        fullPath: changeDetails.fullPath,
                                                         useOnlyFileNamesForMatch: true,
                                                         fileName: changeDetails.fileName
-                                                        // changeDetails.relativePath
                                                     });
                                                 } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
                                                     var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
                                                     reloadCSSResourceInPage({
+                                                        fullPath: changeDetails.fullPath,
                                                         url: resolveUrl(pathWrtRoot)
                                                     });
                                                 } else {

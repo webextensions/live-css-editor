@@ -73,6 +73,12 @@ if (!module.parent) {
 
     if (argv.h || argv.help) {
         showHelp();
+        process.exit(0);
+    } else {
+        logger.verbose([
+            '',
+            'Run ' + logger.chalk.underline('live-css-editor --help') + ' to see all the options'
+        ].join('\n'));
     }
 
     var connectedSessions = 0;
