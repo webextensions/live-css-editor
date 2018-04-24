@@ -65,8 +65,9 @@ if (!module.parent) {
             '          live-css-editor --help',
             '          live-css-editor --root=project/css',
             'Options:  -h --help',
+            '          -p --port=<port-number>',
             '          -v --verbose',
-            '             --root=<project-root-folder>',
+            '          -r --root=<project-root-folder>',
             ''
         ].join('\n'));
     };
@@ -263,31 +264,41 @@ if (!module.parent) {
         });
     });
 
-    findFreePort(3456, function(err, freePort) {
-        logger.info(
-            '\nLive CSS Editor (Magic CSS) server is available at any of the following addresses:\n' +
-            (function (localIpAddressesAndHostnames) {
-                var addresses = [].concat(localIpAddressesAndHostnames);
-                addresses = addresses.map(function (item) {
-                    return  '    http://' + item + ':' + freePort + '/';
-                });
-                return addresses.join('\n');
-            }(localIpAddressesAndHostnames)) +
-            '\n'
-        );
+    var startServer = function (portNumber) {
+        http.listen(portNumber, function() {
+            logger.info(
+                '\nLive CSS Editor (Magic CSS) server is available at any of the following addresses:\n' +
+                (function (localIpAddressesAndHostnames) {
+                    var addresses = [].concat(localIpAddressesAndHostnames);
+                    addresses = addresses.map(function (item) {
+                        return  '    http://' + item + ':' + portNumber + '/';
+                    });
+                    return addresses.join('\n');
+                }(localIpAddressesAndHostnames)) +
+                '\n'
+            );
 
-        logger.info('Press CTRL-C to stop the server\n');
-
-        http.listen(freePort, function() {
-            // console.log('listening on *:' + freePort);
+            logger.info('Press CTRL-C to stop the server\n');
         });
-    });
-
-    // getPort({port: 4000}).then(port => {
-    //     http.listen(port, function(){
-    //         console.log('listening on *:' + port);
-    //     });
-    //
-    //     // Will use 3000 if available, otherwise fall back to a random port
-    // });
+    };
+    var portNumber = argv.port || argv.p;
+    if (portNumber && typeof portNumber === 'number' && portNumber >= 0 && portNumber < 65536) {
+        startServer(parseInt(portNumber, 10));
+    } else {
+        findFreePort(3456, function(err, freePort) {
+            startServer(freePort);
+        });
+    }
 }
+
+process.on('uncaughtException', function(err) {
+    if(err.errno === 'EADDRINUSE') {
+        logger.error(
+            '\nError: The requested port number is in use.' +
+            '\nPlease pass a different port number or skip passing the port number and let Live CSS Editor (Magic CSS) choose an available port for you.'
+        );
+    } else {
+        console.log(err);
+    }
+    process.exit(1);
+});
