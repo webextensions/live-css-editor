@@ -1918,8 +1918,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         beforeInstantiatingCodeMirror: function (editor) {
                             // Need to add font-styling before CodeMirror is instantiated
                             if (editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
-                                var userPrefFontSizeInPx = editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX);
-                                if (userPrefFontSizeInPx !== '12') {
+                                var userPrefFontSizeInPx = parseInt(editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                                if (userPrefFontSizeInPx !== 12) {
+                                    var cssLintErrorWarningMarkerSize = 16;
+                                    if (userPrefFontSizeInPx < 12) {
+                                        cssLintErrorWarningMarkerSize = Math.round(userPrefFontSizeInPx * 1.2);
+                                    }
                                     utils.addStyleTag({
                                         attributes: [{
                                             name: 'data-style-created-by',
@@ -1929,12 +1933,41 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             '#' + id + ' *,',
                                             '.alert-note-text,',
                                             '.tooltipster-base ul li a,',
-                                            '.CodeMirror-hints * {',
+                                            '.CodeMirror-hints *,',
+                                            '.CodeMirror-lint-message-error,',
+                                            '.CodeMirror-lint-message-warning {',
                                             '    font-size: ' + userPrefFontSizeInPx + 'px !important;',
                                             '}',
                                             '.CodeMirror-overwrite .CodeMirror-cursor {',
-                                            '    width: ' + Math.ceil(userPrefFontSizeInPx * 62 / 100) + 'px;',
-                                            '}'
+                                            '    width: ' + Math.round(userPrefFontSizeInPx * 62 / 100) + 'px;',
+                                            '}',
+                                            '.CodeMirror-lint-tooltip {',
+                                            '    max-width: ' + Math.round(600 * userPrefFontSizeInPx / 12) + 'px;',
+                                            '}',
+                                            '.CodeMirror-lint-marker-error,',
+                                            '.CodeMirror-lint-marker-warning {',
+                                            '    padding: ' +
+                                                        Math.round(((userPrefFontSizeInPx * 1.2) - cssLintErrorWarningMarkerSize) / 2) +
+                                                        // Math.round((userPrefFontSizeInPx - 12) * 70 / 100) +
+                                                        'px 0;',
+                                                (function () {
+                                                    if (cssLintErrorWarningMarkerSize <= 16) {
+                                                        var size = cssLintErrorWarningMarkerSize;
+                                                        return 'width: ' + size + 'px; height: ' + size + 'px;';
+                                                    }
+                                                    return '';
+                                                }()),
+                                            '}',
+                                            (function () {
+                                                if (userPrefFontSizeInPx < 12) {
+                                                    return (
+                                                        '.CodeMirror-lint-message-error, .CodeMirror-lint-message-warning {' +
+                                                        '    background-size: contain;' +
+                                                        '}'
+                                                    );
+                                                }
+                                                return '';
+                                            }())
                                         ].join('\n'),
                                         parentTag: 'body'
                                     });

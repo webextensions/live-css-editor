@@ -7,14 +7,27 @@
     box-sizing: content-box !important;
 }
 
+/* Begin: CSS changes related to font-size */
 .alert-note-text,
 .tooltipster-base ul li a,
 #MagiCSS-bookmarklet *,
-.CodeMirror-hints * {
+.CodeMirror-hints *,
+.CodeMirror-lint-message-error,
+.CodeMirror-lint-message-warning {
     /* Set this value flexibly, to fix https://github.com/webextensions/live-css-editor/issues/12 */
     font-size: 12px !important;
 }
-/* TODO: Pixel perfect positioning of tooltipster related and other background images */
+
+.CodeMirror-lint-message-error,
+.CodeMirror-lint-message-warning {
+    background-position-y: center;
+}
+.CodeMirror-lint-marker-error,
+.CodeMirror-lint-marker-warning {
+    background-size: contain;
+}
+/* End: CSS changes related to font-size */
+
 /* TODO: Vertical middle aligning of background color shown inside CodeMirror (increase the text font size to see the current effect) */
 
 /* Don't highlight Magic CSS components when the user types a selector which matches them,
