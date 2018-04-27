@@ -527,7 +527,8 @@ body .tooltipster-default .tooltipster-content {
 }
 
 #MagiCSS-bookmarklet .codemirror-colorview {
-    top: 1px;
+    top: -1px;  /* It looks better with top: -1px; */
+    vertical-align: middle;
 }
 
 html.magicss-mouse-over-dom-element,
