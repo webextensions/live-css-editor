@@ -365,6 +365,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             delete passedOptionsCombined.optionsBasedOnUserPreference;  // Just cleaning up the object (not a compulsory thing to do)
             codemirrorOptions = $.extend(true, {}, codemirrorOptions, passedOptionsCombined);
 
+            thisOb.triggerEvent('beforeInstantiatingCodeMirror');
             var cm = thisOb.cm = CodeMirror(newDiv.get(0), codemirrorOptions);
 
             cm.on('focus', function (cm, evt) { // eslint-disable-line no-unused-vars
@@ -833,6 +834,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                     thisOb.triggerEvent('delayedtestfortextchange');
                     thisOb.triggerEvent('_delayedcursorprobablymoved');
+                    break;
+                case 'beforeInstantiatingCodeMirror':
+                    if (events.beforeInstantiatingCodeMirror) {
+                        events.beforeInstantiatingCodeMirror(thisOb);
+                    }
                     break;
                 // There is a chance that something is problematic in focus behavior
                 case 'problematicFocusDetected':
