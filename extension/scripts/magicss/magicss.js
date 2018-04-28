@@ -1536,6 +1536,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 };
                             }
                         },
+                        /*
                         {
                             name: 'beautify',
                             title: 'Beautify code',
@@ -1556,6 +1557,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.focus();
                             }
                         },
+                        /* */
                         /*
                         {
                             name: 'watch-css-files',
@@ -1808,6 +1810,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     setCodeMirrorCSSLinting(editor, 'disable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                                }
+                                editor.focus();
+                            }
+                        },
+                        {
+                            name: 'beautify',
+                            title: 'Beautify code',
+                            uniqCls: 'magicss-beautify',
+                            onclick: function (evt, editor) {
+                                var textValue = editor.getTextValue();
+                                if (!textValue.trim()) {
+                                    utils.alertNote('Please type some code to be beautified', 5000);
+                                } else {
+                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    if (textValue.trim() !== beautifiedCSS.trim()) {
+                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been beautified :-)', 5000);
+                                    } else {
+                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
+                                    }
                                 }
                                 editor.focus();
                             }

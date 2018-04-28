@@ -72,6 +72,10 @@ reload.svg
 reload_edited.svg
     Slightly edited version of "reload.svg"
 
+smiley.svg
+    https://www.iconfinder.com/icons/1608409/o_smile_icon#size=128
+    https://www.iconfinder.com/icons/1608409/download/svg/128
+
 settings.svg
     https://www.iconfinder.com/icons/326699/settings_icon#size=128
     https://www.iconfinder.com/icons/326699/download/svg/128
