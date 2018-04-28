@@ -263,6 +263,7 @@
 
     var generateFullSelector = function (el, options) {
         options = options || {};
+        var skipClass = options.skipClass || null;
         var useDescendentSyntax = (options.useDescendentSyntax === undefined) ? true : options.useDescendentSyntax;
         var useDescendentForLastSelector = options.useDescendentForLastSelector;
         var sortClasses = options.sortClasses;
@@ -280,6 +281,9 @@
                 selectorForThisNode += '#' + CSS.escape(id);
             }
             var className = ((typeof currentNode.className === 'string') ? currentNode.className : ((currentNode.className || {}).baseVal)).trim();
+            if (skipClass) {
+                className = className.replace(skipClass, '').trim();
+            }
             if (className) {
                 var classes = className.replace(/\s+/g, ' ').split(' ');
                 var classesWhichNeedEscaping = [],
@@ -331,6 +335,7 @@
         options = options || {};
 
         var fullSelector = generateFullSelector(el, {
+            skipClass: options.skipClass,
             useDescendentSyntax: true,
             useDescendentForLastSelector: true,
             sortClasses: options.sortClasses,

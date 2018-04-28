@@ -454,27 +454,27 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         }
     };
 
-    var elementHadClassAttributeBeforePointAndSelect,
-        elementHadTitleAttributeBeforePointAndSelect,
-        titleValueOfElementBeforePointAndSelect;
+    var elementHadClassAttributeBeforePointAndSelect;
+        // elementHadTitleAttributeBeforePointAndSelect,
+        // titleValueOfElementBeforePointAndSelect;
 
     var removeMouseOverDomElementEffect = function (cb) {
         var $el = $('.magicss-mouse-over-dom-element');
         if ($el.length) {
-            if (!elementHadTitleAttributeBeforePointAndSelect) {
-                var title = $el.attr('title');
-                // If the title attribute is set by Magic CSS, it would start like:
-                //     "Suggested CSS selector:" OR "Suggested CSS selectors:"
-                if (title && title.indexOf('Suggested CSS selector') === 0) {
-                    $el.removeAttr('title');
-                }
-            } else {
-                if (titleValueOfElementBeforePointAndSelect) {
-                    $el.attr('title', titleValueOfElementBeforePointAndSelect);
-                } else {
-                    $el.attr('title', '');
-                }
-            }
+            // if (!elementHadTitleAttributeBeforePointAndSelect) {
+            //     var title = $el.attr('title');
+            //     // If the title attribute is set by Magic CSS, it would start like:
+            //     //     "Suggested CSS selector:" OR "Suggested CSS selectors:"
+            //     if (title && title.indexOf('Suggested CSS selector') === 0) {
+            //         $el.removeAttr('title');
+            //     }
+            // } else {
+            //     if (titleValueOfElementBeforePointAndSelect) {
+            //         $el.attr('title', titleValueOfElementBeforePointAndSelect);
+            //     } else {
+            //         $el.attr('title', '');
+            //     }
+            // }
 
             $el.removeClass('magicss-mouse-over-dom-element');
             if (!elementHadClassAttributeBeforePointAndSelect && !$el.attr('class')) {
@@ -596,10 +596,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     var suggestedSelectors = [];
                     try {
                         suggestedSelectors = [
-                            window.generateSelector(targetElement),
-                            window.generateSelector(targetElement, {reverseClasses: true}),
-                            window.generateSelector(targetElement, {sortClasses: true}),
-                            window.generateSelector(targetElement, {sortClasses: true, reverseClasses: true})
+                            window.generateSelector(targetElement, {skipClass: 'magicss-mouse-over-dom-element'}),
+                            window.generateSelector(targetElement, {skipClass: 'magicss-mouse-over-dom-element', reverseClasses: true}),
+                            window.generateSelector(targetElement, {skipClass: 'magicss-mouse-over-dom-element', sortClasses: true}),
+                            window.generateSelector(targetElement, {skipClass: 'magicss-mouse-over-dom-element', sortClasses: true, reverseClasses: true})
                         ];
                     } catch (e) {
                         var errorMessage = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
@@ -635,6 +635,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 };
 
                 var currentNode = null;
+                var timerActiveSelectorCalculation = null;
                 $(document).on('mousemove', function(event) {
                     if (!enablePointAndClick) {
                         return;
@@ -647,26 +648,43 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             // do nothing
                         } else {
                             removeMouseOverDomElementEffect();
+                            utils.alertNote.hide();     // Hide the suggestions shown previously (for other elements)
                             if (currentNode.get(0) !== $('#MagiCSS-bookmarklet').get(0) && !$(currentNode).parents('#MagiCSS-bookmarklet').length) {
-                                var matchingAndSuggestedSelectors = getMatchingAndSuggestedSelectors(currentNode.get(0)).matchingAndSuggestedSelectors;
+                                window.clearTimeout(timerActiveSelectorCalculation);
+                                timerActiveSelectorCalculation = window.setTimeout(function () {
+                                    if (currentNode.get(0) !== event.target) {
+                                        return;
+                                    }
+                                    var matchingAndSuggestedSelectors = getMatchingAndSuggestedSelectors(currentNode.get(0)).matchingAndSuggestedSelectors;
 
-                                elementHadClassAttributeBeforePointAndSelect = currentNode.get(0).hasAttribute('class');
+                                    elementHadClassAttributeBeforePointAndSelect = currentNode.get(0).hasAttribute('class');
 
-                                elementHadTitleAttributeBeforePointAndSelect = currentNode.get(0).hasAttribute('title');
-                                if (elementHadTitleAttributeBeforePointAndSelect) {
-                                    titleValueOfElementBeforePointAndSelect = currentNode.attr('title');
-                                } else {
-                                    titleValueOfElementBeforePointAndSelect = undefined;
-                                }
+                                    // elementHadTitleAttributeBeforePointAndSelect = currentNode.get(0).hasAttribute('title');
+                                    // if (elementHadTitleAttributeBeforePointAndSelect) {
+                                    //     titleValueOfElementBeforePointAndSelect = currentNode.attr('title');
+                                    // } else {
+                                    //     titleValueOfElementBeforePointAndSelect = undefined;
+                                    // }
 
-                                var title = '';
-                                if (matchingAndSuggestedSelectors.length === 1) {
-                                    title = 'Suggested CSS selector:';
-                                } else if (matchingAndSuggestedSelectors.length > 1) {
-                                    title = 'Suggested CSS selectors:';
-                                }
-                                title += '\n    ' + matchingAndSuggestedSelectors.join('\n    ');
-                                $(currentNode).attr('title', title);
+                                    var title = '';
+                                    if (matchingAndSuggestedSelectors.length === 1) {
+                                        title = 'Suggested CSS selector:';
+                                    } else if (matchingAndSuggestedSelectors.length > 1) {
+                                        title = 'Suggested CSS selectors:';
+                                    }
+                                    // title += '\n    ' + matchingAndSuggestedSelectors.join('\n    ');
+                                    // $(currentNode).attr('title', title);
+                                    title += '<span style="font-weight:normal;">' + '<br />' + matchingAndSuggestedSelectors.join('<br />') + '</span>';
+
+                                    utils.alertNote(
+                                        title,
+                                        5000,
+                                        {
+                                            textAlignment: 'left',
+                                            unobtrusive: true
+                                        }
+                                    );
+                                }, 500);
                                 $(currentNode).addClass('magicss-mouse-over-dom-element');
                             }
                         }

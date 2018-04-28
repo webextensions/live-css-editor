@@ -345,6 +345,7 @@ if (!utils.defined) {
         var alertNote = function (msg, hideDelay, options) {
             options = options || {};
             var alignment = options.alignment || 'center',
+                textAlignment = options.textAlignment || alignment,
                 backgroundColor = options.backgroundColor || '#f9edbe',
                 borderColor = options.borderColor || '#eb7',
                 margin = options.margin || '0 10px',
@@ -362,7 +363,7 @@ if (!utils.defined) {
                                                         // background-color:#feb;
                         '<div style="border:1px solid ' + borderColor + ';background-color:' + backgroundColor + ';margin:' + margin + ';padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font:bold 13px Arial">',
                             '<div style="clear:both">',
-                                '<div style="float:left;color:#000;text-align:' + alignment + ';">',
+                                '<div style="float:left;color:#000;text-align:' + textAlignment + ';">',
                                     msg,
                                 '</div>',
                                 // '<div style="float:right;margin-left:10px;font-weight:normal;text-decoration:underline;cursor:pointer">',
