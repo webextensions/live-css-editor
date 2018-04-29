@@ -1769,6 +1769,47 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         },
                         /* */
                         {
+                            name: 'beautify',
+                            title: 'Beautify code',
+                            uniqCls: 'magicss-beautify',
+                            onclick: function (evt, editor) {
+                                var textValue = editor.getTextValue();
+                                if (!textValue.trim()) {
+                                    utils.alertNote('Please type some code to be beautified', 5000);
+                                } else {
+                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    if (textValue.trim() !== beautifiedCSS.trim()) {
+                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been beautified :-)', 5000);
+                                    } else {
+                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
+                                    }
+                                }
+                                editor.focus();
+                            }
+                        },
+                        {
+                            name: 'minify',
+                            title: 'Minify code',
+                            uniqCls: 'magicss-minify',
+                            onclick: function (evt, editor) {
+                                var textValue = editor.getTextValue();
+                                if (!textValue.trim()) {
+                                    editor.setTextValue('').reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                    utils.alertNote('Please type some code to be minified', 5000);
+                                } else {
+                                    var minifiedCSS = utils.minifyCSS(textValue);
+                                    if (textValue !== minifiedCSS) {
+                                        editor.setTextValue(minifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been minified' + noteForUndo, 5000);
+                                    } else {
+                                        utils.alertNote('Your code is already minified', 5000);
+                                    }
+                                }
+                                editor.focus();
+                            }
+                        },
+                        {
                             name: 'showLineNumbers',
                             title: 'Show line numbers',
                             uniqCls: 'magicss-show-line-numbers',
@@ -1810,47 +1851,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     setCodeMirrorCSSLinting(editor, 'disable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
-                                }
-                                editor.focus();
-                            }
-                        },
-                        {
-                            name: 'beautify',
-                            title: 'Beautify code',
-                            uniqCls: 'magicss-beautify',
-                            onclick: function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    utils.alertNote('Please type some code to be beautified', 5000);
-                                } else {
-                                    var beautifiedCSS = beautifyCSS(textValue);
-                                    if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Your code has been beautified :-)', 5000);
-                                    } else {
-                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
-                                    }
-                                }
-                                editor.focus();
-                            }
-                        },
-                        {
-                            name: 'minify',
-                            title: 'Minify',
-                            uniqCls: 'magicss-minify',
-                            onclick: function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    editor.setTextValue('').reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                    utils.alertNote('Please type some code to be minified', 5000);
-                                } else {
-                                    var minifiedCSS = utils.minifyCSS(textValue);
-                                    if (textValue !== minifiedCSS) {
-                                        editor.setTextValue(minifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Your code has been minified' + noteForUndo, 5000);
-                                    } else {
-                                        utils.alertNote('Your code is already minified', 5000);
-                                    }
                                 }
                                 editor.focus();
                             }
