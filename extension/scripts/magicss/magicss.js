@@ -127,11 +127,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (!options.skipIntegrityCheck) {
                 // Don't include the elements which have a value set for "integrity"
                 if ($(this).attr('integrity')) {
-                    // TODO: We should show an "alertNote" or console.log() message like the following at an
-                    //       appropriate place when reloading all CSS resources (the case where we reload
-                    //       files via watch mode has been handled).
-                    // This place may not be the best since this is a general purpose function.
-                    // console.log('Magic CSS will not attempt to reload the following link tag since it uses "integrity" attribute: ', this);
                     return false;
                 }
             }
@@ -286,6 +281,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
     var reloadAllCSSResourcesInPage = function () {
         var linkTags = getActiveStylesheetLinkTags();
+        var activeLinkTagsSkipIntegrityCheck = getActiveStylesheetLinkTags({skipIntegrityCheck: true});
+        if (linkTags.length !== activeLinkTagsSkipIntegrityCheck.length) {
+            console.log('Note: Magic CSS will not attempt to reload the link tags which use "integrity" attribute.');
+        }
         reloadPassedLinkTags(linkTags);
     };
 
