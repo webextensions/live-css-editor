@@ -113,7 +113,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return localISOTime;
     };
 
-    var getActiveStylesheetLinkTags = function () {
+    var getActiveStylesheetLinkTags = function (options) {
+        options = options || {};
         // The disabled <link> tags are not loaded when "href" is changed, so don't include them
         var linkTags = $('link[rel~="stylesheet"]:not([disabled])').filter(function () {
             if (this.reloadingActiveWithMagicCSS) {
@@ -123,12 +124,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (!$(this).attr('href')) {
                 return false;
             }
-            // Don't include the elements which have a value set for "integrity"
-            if ($(this).attr('integrity')) {
-                // TODO: We should show an "alertNote" message like the following at an appropriate place.
-                // This place may not be the best since this is a general purpose function.
-                // console.log('Magic CSS will not attempt to reload the following link tag since it uses "integrity" attribute: ', this);
-                return false;
+            if (!options.skipIntegrityCheck) {
+                // Don't include the elements which have a value set for "integrity"
+                if ($(this).attr('integrity')) {
+                    // TODO: We should show an "alertNote" or console.log() message like the following at an
+                    //       appropriate place when reloading all CSS resources (the case where we reload
+                    //       files via watch mode has been handled).
+                    // This place may not be the best since this is a general purpose function.
+                    // console.log('Magic CSS will not attempt to reload the following link tag since it uses "integrity" attribute: ', this);
+                    return false;
+                }
             }
             return true;
         }).toArray();
@@ -167,10 +172,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             fullUrl = config.url,
             fullPath = config.fullPath;
 
-        var activeLinkTags = getActiveStylesheetLinkTags();
+        var activeLinkTagsSkipIntegrityCheck = getActiveStylesheetLinkTags({skipIntegrityCheck: true});
 
         var arrLinkTags = [];
-        activeLinkTags.forEach(function (linkTag) {
+        activeLinkTagsSkipIntegrityCheck.forEach(function (linkTag) {
             arrLinkTags.push($(linkTag).attr('href'));
         });
 
@@ -181,9 +186,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         );
 
         var linkTagsToReload = [];
+        var linkTagsNotToReloadBecauseOfIntegrityAttribute = 0;
         indexes.forEach(function (index) {
-            linkTagsToReload.push(activeLinkTags[index]);
+            if (activeLinkTagsSkipIntegrityCheck[index].getAttribute('integrity')) {
+                linkTagsNotToReloadBecauseOfIntegrityAttribute += 1;
+            } else {
+                linkTagsToReload.push(activeLinkTagsSkipIntegrityCheck[index]);
+            }
         });
+        if (linkTagsNotToReloadBecauseOfIntegrityAttribute) {
+            console.log('Note: Magic CSS will not attempt to reload the link tags which use "integrity" attribute.');
+        }
         reloadPassedLinkTags(linkTagsToReload, {
             noMatchesPrepend: 'Modified: <span style="font-weight:normal">' + (function (str) {
                 if (str.length >= 53) {
