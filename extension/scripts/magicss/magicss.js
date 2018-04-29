@@ -114,13 +114,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     };
 
     var getActiveStylesheetLinkTags = function () {
-        // The disabled <link> tags are not loaded when href is changed, so don't include them
-        // Don't include the elements which don't have a value set for href
+        // The disabled <link> tags are not loaded when "href" is changed, so don't include them
         var linkTags = $('link[rel~="stylesheet"]:not([disabled])').filter(function () {
             if (this.reloadingActiveWithMagicCSS) {
                 return false;
             }
+            // Don't include the elements which don't have a value set for "href"
             if (!$(this).attr('href')) {
+                return false;
+            }
+            // Don't include the elements which have a value set for "integrity"
+            if ($(this).attr('integrity')) {
+                console.log('Magic CSS will not attempt to reload the following link tag since it uses "integrity" attribute: ', this);
                 return false;
             }
             return true;
