@@ -510,6 +510,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         iconOptions.beforeShow(origin, tooltip, editor);
                                     }
                                 });
+                                // The tooltip would have rendered in hidden mode, but its width might have changed
+                                // due to some changes via .beforeShow(), so, we need to reposition it
+                                $moreIcon.tooltipster('reposition');
                             }
                         });
                     }
@@ -570,6 +573,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             iconOptions.beforeShow(origin, tooltip, editor);
                                         }
                                     });
+                                    // The tooltip would have rendered in hidden mode, but its width might have changed
+                                    // due to some changes via .beforeShow(), so, we need to reposition it
+                                    $divIcon.tooltipster('reposition');
                                 }
                             });
                         };

@@ -120,7 +120,11 @@
             <br />Style defined in css-file-with-unexpected-extension.mystyles (these styles may not load when proper mimetype is not returned by the server)
         </div>
 
-        <link rel="stylesheet" href="css-file-with-invalid-sub-resource-integrity.css" integrity="sha512-anythingAfterValidShaCodeDashHashToActivateSRI" />
+        <!--
+            Valid value for integrity is:
+            integrity="sha256-UJOG/+Pfx8Ykg3vJYX9awFaWYqrI4vzxfZTFDcfpQWI="
+        -->
+        <link rel="stylesheet" href="css-file-with-invalid-sub-resource-integrity.css" integrity="sha256-anythingAfterValidShaCodeDashHashToActivateSRI" />
         <div class="block css-file-with-invalid-sub-resource-integrity-style1">
             .css-file-with-invalid-sub-resource-integrity
             <br />Style defined in css-file-with-invalid-sub-resource-integrity.css

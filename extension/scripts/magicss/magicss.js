@@ -1375,6 +1375,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
+                var flagWatchingCssFiles = false;
                 var cssResourceWatchingInitiated = false,
                     currentlyWatchingCssResources = false,
                     socket = null;
@@ -1649,6 +1650,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             });
                                         }
                                         editor.focus();
+                                    },
+                                    beforeShow: function (origin, tooltip, editor) {
+                                        tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
                                     }
                                 },
                                 {
@@ -1754,6 +1758,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 }
                             },
                             beforeShow: function (origin, tooltip, editor) {
+                                // TODO: Move the .addClass() calls to their corresponding .beforeShow()
                                 tooltip
                                     .addClass(
                                         getLanguageMode() === 'less' ?
