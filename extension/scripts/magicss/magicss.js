@@ -125,7 +125,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
             // Don't include the elements which have a value set for "integrity"
             if ($(this).attr('integrity')) {
-                console.log('Magic CSS will not attempt to reload the following link tag since it uses "integrity" attribute: ', this);
+                // TODO: We should show an "alertNote" message like the following at an appropriate place.
+                // This place may not be the best since this is a general purpose function.
+                // console.log('Magic CSS will not attempt to reload the following link tag since it uses "integrity" attribute: ', this);
                 return false;
             }
             return true;
