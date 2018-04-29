@@ -236,10 +236,10 @@ if (!module.parent) {
             ob.useOnlyFileNamesForMatch = true;
         }
         return ob;
-    }
+    };
 
     watcher
-        .on('add', function (path, asdf, xyz) {
+        .on('add', function (path) {
             logger.verbose('File being watched: ' + path);
             emitter.emit('file-added', getPathValues(path));
         })
