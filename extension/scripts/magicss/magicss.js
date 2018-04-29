@@ -1615,9 +1615,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     }
                                 },
                                 {
-                                    name: 'watch-css-files',
+                                    name: 'watchCssFiles',
                                     title: 'Watch CSS files & apply changes automatically',
-                                    cls: 'magicss-watch-resources',
+                                    // cls: 'magicss-watch-resources',
                                     uniqCls: 'magicss-watch-and-reload-link-tags',
                                     onclick: function (evt, editor) {
                                         if (socket) {
@@ -1648,6 +1648,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 }
                                             });
                                         }
+                                        editor.focus();
+                                    }
+                                },
+                                {
+                                    name: 'stopWatchingCssFiles',
+                                    title: 'Stop watching CSS files',
+                                    // cls: 'magicss-watch-resources',
+                                    uniqCls: 'magicss-stop-watch-and-reload-link-tags',
+                                    onclick: function (evt, editor) {
+                                        utils.alertNote('TODO');
                                         editor.focus();
                                     }
                                 }
