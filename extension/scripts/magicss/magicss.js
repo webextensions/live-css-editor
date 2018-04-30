@@ -1624,6 +1624,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     onclick: function (evt, editor) {
                                         console.log('TODO');
                                         flagWatchingCssFiles = !flagWatchingCssFiles;
+
                                         if (socket) {
                                             socket.close();
                                             socket = null;
@@ -1652,6 +1653,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 }
                                             });
                                         }
+                                        $(editor.container).addClass('watching-css-files');
                                         editor.focus();
                                     },
                                     beforeShow: function (origin, tooltip, editor) {
@@ -1666,6 +1668,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     onclick: function (evt, editor) {
                                         console.log('TODO');
                                         flagWatchingCssFiles = !flagWatchingCssFiles;
+
+                                        $(editor.container).removeClass('watching-css-files');
                                         editor.focus();
                                     }
                                 }

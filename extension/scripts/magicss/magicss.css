@@ -331,6 +331,14 @@ body .tooltipster-default .tooltipster-content {
     background-repeat: no-repeat;
 }
 
+.magicss-reload-css-resources:hover {
+    filter: none;
+}
+
+.watching-css-files .magicss-reload-css-resources {
+    filter: drop-shadow(rgb(255, 255, 0) 0px 0px 7px);
+}
+
 .magicss-reload-all-css-resources {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/reload_edited.svg"); */
