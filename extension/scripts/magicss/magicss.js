@@ -771,7 +771,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     }
 
                                     if (window.existingCSSSelectors[matchingSelectors[i]]) {
-                                        sources = sources.concat(window.existingCSSSelectors[matchingSelectors[i]]);
+                                        sources = sources.concat(
+                                            window.existingCSSSelectors[matchingSelectors[i]].map(function (item) {
+                                                // Remove the "reloadedAt=..." part from the URL
+                                                return item.replace(/[?&]reloadedAt=[\d-_:]+/, '');
+                                            })
+                                        );
                                     }
 
                                     return sources;
