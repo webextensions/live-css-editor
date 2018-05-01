@@ -1607,16 +1607,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             cls: 'magicss-reload-css-resources magicss-gray-out cancelDragHandle',
                             icons: [
                                 {
-                                    name: 'reload-css-resources',
-                                    title: 'Reload all CSS resources',
-                                    cls: 'magicss-reload-all-css-resources',
-                                    uniqCls: 'magicss-reload-all-css-resources',
-                                    onclick: function (evt, editor) {
-                                        reloadAllCSSResourcesInPage();
-                                        editor.focus();
-                                    }
-                                },
-                                {
                                     name: 'watchCssFiles',
                                     title: 'Watch CSS files & apply changes automatically',
                                     // cls: 'magicss-watch-resources',
@@ -1670,6 +1660,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         flagWatchingCssFiles = !flagWatchingCssFiles;
 
                                         $(editor.container).removeClass('watching-css-files');
+                                        editor.focus();
+                                    }
+                                },
+                                {
+                                    name: 'reload-css-resources',
+                                    title: 'Reload all CSS resources',
+                                    cls: 'magicss-reload-all-css-resources',
+                                    uniqCls: 'magicss-reload-all-css-resources',
+                                    onclick: function (evt, editor) {
+                                        reloadAllCSSResourcesInPage();
                                         editor.focus();
                                     }
                                 }
