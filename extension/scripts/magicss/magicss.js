@@ -159,26 +159,42 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 var cssSelectors = [];
                 for (var i = 0; i < cssRules.length; i++) {
                     var cssRule = cssRules[i] || {};
-                    if (cssRule.selectorText) {
-                        var selectorsFound = cssRule.selectorText.split(', ');
-                        for (var j = 0; j < selectorsFound.length; j++) {
-                            // cssSelectors.push(selectorsFound[j]);
-                            cssSelectors.push({
-                                selector: selectorsFound[j],
-                                source: cssRule.parentStyleSheet.href ||
+                    try {
+                        if (cssRule.selectorText) {
+                            var selectorsFound = cssRule.selectorText.split(', ');
+                            for (var j = 0; j < selectorsFound.length; j++) {
+                                // cssSelectors.push(selectorsFound[j]);
+                                cssSelectors.push({
+                                    selector: selectorsFound[j],
+                                    source: cssRule.parentStyleSheet.href ||
                                     (cssRule.parentStyleSheet.ownerNode.tagName === 'STYLE' && '<style> tag') ||
                                     ''
-                            });
+                                });
+                            }
                         }
+                    } catch (e) {
+                        handleErrorInReadingCSS(e);
                     }
-                    if (includeMediaTitle && cssRule instanceof CSSMediaRule) {
-                        cssSelectors.push(cssRule.cssText.substring(0, cssRule.cssText.indexOf('{')).trim());
+                    try {
+                        if (includeMediaTitle && cssRule instanceof CSSMediaRule) {
+                            cssSelectors.push(cssRule.cssText.substring(0, cssRule.cssText.indexOf('{')).trim());
+                        }
+                    } catch (e) {
+                        handleErrorInReadingCSS(e);
                     }
-                    if ((cssRule.styleSheet || {}).cssRules) {
-                        cssSelectors = cssSelectors.concat(getCSSSelectorsRecursively(cssRule.styleSheet.cssRules, includeMediaTitle));
+                    try {
+                        if ((cssRule.styleSheet || {}).cssRules) {
+                            cssSelectors = cssSelectors.concat(getCSSSelectorsRecursively(cssRule.styleSheet.cssRules, includeMediaTitle));
+                        }
+                    } catch (e) {
+                        handleErrorInReadingCSS(e);
                     }
-                    if (cssRule.cssRules) {
-                        cssSelectors = cssSelectors.concat(getCSSSelectorsRecursively(cssRule.cssRules, includeMediaTitle));
+                    try {
+                        if (cssRule.cssRules) {
+                            cssSelectors = cssSelectors.concat(getCSSSelectorsRecursively(cssRule.cssRules, includeMediaTitle));
+                        }
+                    } catch (e) {
+                        handleErrorInReadingCSS(e);
                     }
                 }
                 return cssSelectors;
