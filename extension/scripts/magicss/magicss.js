@@ -1612,37 +1612,36 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     // cls: 'magicss-watch-resources',
                                     uniqCls: 'magicss-watch-and-reload-link-tags',
                                     onclick: function (evt, editor) {
-                                        console.log('TODO');
+                                        console.log('TODO - watch CSS files');
                                         flagWatchingCssFiles = !flagWatchingCssFiles;
 
                                         if (socket) {
                                             socket.close();
                                             socket = null;
-                                        } else {
-                                            socket = io('127.0.0.1:3456');
-                                            socket.on('file-modified', function(changeDetails) {
-                                                if (changeDetails.useOnlyFileNamesForMatch) {
-                                                    reloadCSSResourceInPage({
-                                                        fullPath: changeDetails.fullPath,
-                                                        useOnlyFileNamesForMatch: true,
-                                                        fileName: changeDetails.fileName
-                                                    });
-                                                } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                                                    var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                                                    reloadCSSResourceInPage({
-                                                        fullPath: changeDetails.fullPath,
-                                                        url: resolveUrl(pathWrtRoot)
-                                                    });
-                                                } else {
-                                                    // The code should never reach here
-                                                    utils.alertNote(
-                                                        'Unexpected scenario occurred in reloading some CSS resources.' +
-                                                        '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                                                        10000
-                                                    );
-                                                }
-                                            });
                                         }
+                                        socket = io('127.0.0.1:3456');
+                                        socket.on('file-modified', function(changeDetails) {
+                                            if (changeDetails.useOnlyFileNamesForMatch) {
+                                                reloadCSSResourceInPage({
+                                                    fullPath: changeDetails.fullPath,
+                                                    useOnlyFileNamesForMatch: true,
+                                                    fileName: changeDetails.fileName
+                                                });
+                                            } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                                                var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                                                reloadCSSResourceInPage({
+                                                    fullPath: changeDetails.fullPath,
+                                                    url: resolveUrl(pathWrtRoot)
+                                                });
+                                            } else {
+                                                // The code should never reach here
+                                                utils.alertNote(
+                                                    'Unexpected scenario occurred in reloading some CSS resources.' +
+                                                    '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                                                    10000
+                                                );
+                                            }
+                                        });
                                         $(editor.container).addClass('watching-css-files');
                                         editor.focus();
                                     },
@@ -1656,8 +1655,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     // cls: 'magicss-watch-resources',
                                     uniqCls: 'magicss-stop-watch-and-reload-link-tags',
                                     onclick: function (evt, editor) {
-                                        console.log('TODO');
+                                        console.log('TODO - stop watching CSS files');
                                         flagWatchingCssFiles = !flagWatchingCssFiles;
+                                        if (socket) {
+                                            socket.close();
+                                            socket = null;
+                                        }
 
                                         $(editor.container).removeClass('watching-css-files');
                                         editor.focus();
