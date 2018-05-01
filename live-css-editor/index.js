@@ -120,6 +120,13 @@ if (!module.parent) {
         ],
         {
             cwd: watcherCwd,
+            // https://github.com/paulmillr/chokidar#performance
+            // Sometimes the file is in the process of writing.
+            // It should have a stable filesize before we notify about the change.
+            awaitWriteFinish: {
+                stabilityThreshold: 100,
+                pollInterval: 45
+            },
             ignored: [
                 /(^|[/\\])\../,     // A general rule to ignore the "." files/directories
                 'node_modules',

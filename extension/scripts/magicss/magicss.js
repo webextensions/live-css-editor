@@ -110,7 +110,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // http://stackoverflow.com/questions/10830357/javascript-toisostring-ignores-timezone-offset/28149561#28149561
         var tzoffset = (new Date()).getTimezoneOffset() * 60000, //offset in milliseconds
             localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0,-1);
-        localISOTime = localISOTime.slice(0, -4).replace('T', '_');
+        localISOTime = localISOTime.replace('T', '_');
         return localISOTime;
     };
 
@@ -148,7 +148,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         var fileNameOfItemToMatch = getFilenameFromPath(itemToMatch);
         var matchedIndexes = [];
         arr.forEach(function (item, index) {
-            item = item.replace(/[?&]reloadedAt=[\d-_:]+/, '');
+            item = item.replace(/[?&]reloadedAt=[\d-_:.]+/, '');
             if (useOnlyFileNamesForMatch) {
                 if (getFilenameFromPath(item) === fileNameOfItemToMatch) {
                     matchedIndexes.push(index);
@@ -240,7 +240,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $link = $(link),
                     href = $link.attr('href');
                 if (href.indexOf('reloadedAt=') >= 0) {
-                    href = href.replace(/[?&]reloadedAt=[\d-_:]+/, '');
+                    href = href.replace(/[?&]reloadedAt=[\d-_:.]+/, '');
                 }
                 var newHref;
                 if (href.indexOf('?') >= 0) {
@@ -402,7 +402,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 }
                 sources += ellipsis(
                     source
-                        .replace(/[?&]reloadedAt=[\d-_:]+/, '')
+                        .replace(/[?&]reloadedAt=[\d-_:.]+/, '')
                         .substr(source.lastIndexOf('/') + 1),
                     50
                 );
@@ -943,7 +943,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         sources = sources.concat(
                                             window.existingCSSSelectors[matchingSelectors[i]].map(function (item) {
                                                 // Remove the "reloadedAt=..." part from the URL
-                                                return item.replace(/[?&]reloadedAt=[\d-_:]+/, '');
+                                                return item.replace(/[?&]reloadedAt=[\d-_:.]+/, '');
                                             })
                                         );
                                     }
