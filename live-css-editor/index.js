@@ -24,9 +24,11 @@ if (notifier.update) {
     }, 15000);
 }
 
-var nPath = require('path');
+var nPath = require('path'),
+    fs = require('fs');
 
 var chokidar = require('chokidar'),
+    anymatch = require('anymatch'),
     boxen = require('boxen'),
     _uniq = require('lodash/uniq.js'),
     findFreePort = require('find-free-port');
@@ -102,28 +104,28 @@ if (!module.parent) {
         }
     }());
     var followSymlinks = argv.followSymlinks || false;
+    var watchMatchers = [
+        '**/*.css'
+        // '**/*.css.*',
 
+        // '**/*.less',
+        // '**/*.less.*',
+
+        // '**/*.sass',
+        // '**/*.sass.*',
+
+        // '**/*.scss',
+        // '**/*.scss.*',
+
+        // An example path which is required to be watched, but its parent folder is ignored
+        // See below in this file: The path also needs to be "not" ignored in the "ignored" section
+        // 'node_modules/async-limiter/coverage/lcov-report/base.css',
+    ];
     // Note:
     //     https://github.com/paulmillr/chokidar/issues/544
     //     Executable symlinks are getting watched unnecessarily due to this bug in chokidar
     var watcher = chokidar.watch(
-        [
-            '**/*.css'
-            // '**/*.css.*',
-
-            // '**/*.less',
-            // '**/*.less.*',
-
-            // '**/*.sass',
-            // '**/*.sass.*',
-
-            // '**/*.scss',
-            // '**/*.scss.*',
-
-            // An example path which is required to be watched, but its parent folder is ignored
-            // See below in this file: The path also needs to be "not" ignored in the "ignored" section
-            // 'node_modules/async-limiter/coverage/lcov-report/base.css',
-        ],
+        watchMatchers,
         {
             cwd: watcherCwd,
             // https://github.com/paulmillr/chokidar#performance
@@ -257,11 +259,13 @@ if (!module.parent) {
     // https://github.com/paulmillr/chokidar/issues/544
     var avoidSymbolicLinkDueToChokidarBug = function (path, cb) {
         if (followSymlinks) {
-            cb();
+            if (anymatch(watchMatchers, path)) {
+                cb();
+            }
         } else {
             try {
-                var fullPath = require('path').resolve(watcherCwd, path);
-                var lstat = require('fs').lstatSync(fullPath);
+                var fullPath = nPath.resolve(watcherCwd, path),
+                    lstat = fs.lstatSync(fullPath);
                 if (!lstat.isSymbolicLink()) {
                     cb();
                 }
