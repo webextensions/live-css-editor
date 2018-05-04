@@ -73,6 +73,7 @@ if (!module.parent) {
             '          live-css-editor --root=project/css',
             'Options:  -h --help',
             '          -p --port=<port-number>',
+            '             --list-files',
             '          -v --verbose',
             '          -r --root=<project-root-folder>',
             '             --allow-symlinks',
@@ -86,7 +87,7 @@ if (!module.parent) {
     } else {
         logger.verbose([
             '',
-            'Run ' + logger.chalk.underline('live-css-editor --help') + ' to see all the options'
+            'Run ' + logger.chalk.underline('live-css-editor --help') + ' to see all the available options'
         ].join('\n'));
     }
 
@@ -95,6 +96,8 @@ if (!module.parent) {
     app.get('/', function(req, res) {
         res.sendFile(__dirname + '/index.html');
     });
+
+    var listFiles = argv.listFiles || false;
 
     var allowSymlinks = argv.allowSymlinks || false;
     var watcherCwd = (function () {
@@ -185,6 +188,7 @@ if (!module.parent) {
         }
     );
 
+    var flagFileWatchReady = false;
     var filesBeingWatched = [];
     var fileModifiedHandler = function (changeObj) {
         io.emit('file-modified', changeObj);
@@ -224,9 +228,14 @@ if (!module.parent) {
     };
 
     emitter.on('file-watch-ready', function () {
+        flagFileWatchReady = true;
+        if (!listFiles) {
+            logger.log('');
+        }
         logger.success(
             '\nLive CSS Editor (Magic CSS) server is watching ' + filesBeingWatched.length + ' files from:' +
-            '\n    ' + watcherCwd
+            '\n    ' + watcherCwd +
+            '\n'
         );
         if (!argv.root && anyFileNameIsRepeated(filesBeingWatched)) {
             logger.warn(
@@ -311,7 +320,14 @@ if (!module.parent) {
     watcher
         .on('add', function (path) {
             avoidSymbolicLinkDueToChokidarBug(path, function () {
-                logger.verbose('File being watched: ' + path);
+                if (listFiles || flagFileWatchReady) {
+                    logger.verbose('File being watched: ' + path);
+                } else {
+                    if (filesBeingWatched.length === 0) {
+                        logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css-editor') + ' with ' + logger.chalk.inverse('--list-files') + ')');
+                    }
+                    process.stdout.write('.');
+                }
                 emitter.emit('file-added', getPathValues(path));
             });
         })
@@ -322,10 +338,8 @@ if (!module.parent) {
             });
         })
         .on('unlink', function (path) {
-            avoidSymbolicLinkDueToChokidarBug(path, function () {
-                logger.verbose('File removed: ' + path);
-                emitter.emit('file-deleted', getPathValues(path));
-            });
+            logger.verbose('File removed: ' + path);
+            emitter.emit('file-deleted', getPathValues(path));
         });
 
     io.on('connection', function(socket) {
