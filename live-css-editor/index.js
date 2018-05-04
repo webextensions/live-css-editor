@@ -50,7 +50,12 @@ if (!module.parent) {
         .help(false)
         .argv;
 
-    var localIpAddressesAndHostnames = require('local-ip-addresses-and-hostnames').getLocalIpAddressesAndHostnames();
+    var localIpAddressesAndHostnames = [];
+    try {
+        localIpAddressesAndHostnames = require('local-ip-addresses-and-hostnames').getLocalIpAddressesAndHostnames();
+    } catch (e) {
+        // do nothing
+    }
 
     var log = console.log.bind(console);
 
@@ -309,17 +314,19 @@ if (!module.parent) {
 
     var startServer = function (portNumber) {
         http.listen(portNumber, function() {
-            logger.info(
-                '\nLive CSS Editor (Magic CSS) server is available at any of the following addresses:\n' +
-                (function (localIpAddressesAndHostnames) {
-                    var addresses = [].concat(localIpAddressesAndHostnames);
-                    addresses = addresses.map(function (item) {
-                        return  '    http://' + item + ':' + portNumber + '/';
-                    });
-                    return addresses.join('\n');
-                }(localIpAddressesAndHostnames)) +
-                '\n'
-            );
+            if (localIpAddressesAndHostnames.length) {
+                logger.info(
+                    '\nLive CSS Editor (Magic CSS) server is available at any of the following addresses:\n' +
+                    (function (localIpAddressesAndHostnames) {
+                        var addresses = [].concat(localIpAddressesAndHostnames);
+                        addresses = addresses.map(function (item) {
+                            return  '    http://' + item + ':' + portNumber + '/';
+                        });
+                        return addresses.join('\n');
+                    }(localIpAddressesAndHostnames)) +
+                    '\n'
+                );
+            }
 
             logger.info('Press CTRL-C to stop the server\n');
         });
