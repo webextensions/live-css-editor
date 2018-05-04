@@ -289,13 +289,13 @@ if (!module.parent) {
         })
         .on('change', function (path) {
             avoidSymbolicLinkDueToChokidarBug(path, function () {
-                log('File modified: ' + path);
+                logger.verbose('File modified: ' + path);
                 emitter.emit('file-modified', getPathValues(path));
             });
         })
         .on('unlink', function (path) {
             avoidSymbolicLinkDueToChokidarBug(path, function () {
-                log('File removed: ' + path);
+                logger.verbose('File removed: ' + path);
                 emitter.emit('file-deleted', getPathValues(path));
             });
         });
