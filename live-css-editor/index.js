@@ -68,6 +68,7 @@ if (!module.parent) {
             '          -p --port=<port-number>',
             '          -v --verbose',
             '          -r --root=<project-root-folder>',
+            '             --follow-symlinks',
             ''
         ].join('\n'));
     };
@@ -100,23 +101,28 @@ if (!module.parent) {
             return process.cwd();
         }
     }());
+    var followSymlinks = argv.followSymlinks || false;
+
+    // Note:
+    //     https://github.com/paulmillr/chokidar/issues/544
+    //     Executable symlinks are getting watched unnecessarily due to this bug in chokidar
     var watcher = chokidar.watch(
         [
-            '**/*.css',
-            '**/*.css.*',
+            '**/*.css'
+            // '**/*.css.*',
 
-            '**/*.less',
-            '**/*.less.*',
+            // '**/*.less',
+            // '**/*.less.*',
 
-            '**/*.sass',
-            '**/*.sass.*',
+            // '**/*.sass',
+            // '**/*.sass.*',
 
-            '**/*.scss',
-            '**/*.scss.*',
+            // '**/*.scss',
+            // '**/*.scss.*',
 
             // An example path which is required to be watched, but its parent folder is ignored
             // See below in this file: The path also needs to be "not" ignored in the "ignored" section
-            'node_modules/async-limiter/coverage/lcov-report/base.css',
+            // 'node_modules/async-limiter/coverage/lcov-report/base.css',
         ],
         {
             cwd: watcherCwd,
@@ -137,6 +143,9 @@ if (!module.parent) {
             ],
             // ignored: /(^|[/\\])\../,
             // ignoreInitial: true,
+
+            followSymlinks: followSymlinks,
+
             persistent: true
         }
     );
@@ -245,18 +254,41 @@ if (!module.parent) {
         return ob;
     };
 
+    // https://github.com/paulmillr/chokidar/issues/544
+    var avoidSymbolicLinkDueToChokidarBug = function (path, cb) {
+        if (followSymlinks) {
+            cb();
+        } else {
+            try {
+                var fullPath = require('path').resolve(watcherCwd, path);
+                var lstat = require('fs').lstatSync(fullPath);
+                if (!lstat.isSymbolicLink()) {
+                    cb();
+                }
+            } catch (e) {
+                // do nothing
+            }
+        }
+    };
+
     watcher
         .on('add', function (path) {
-            logger.verbose('File being watched: ' + path);
-            emitter.emit('file-added', getPathValues(path));
+            avoidSymbolicLinkDueToChokidarBug(path, function () {
+                logger.verbose('File being watched: ' + path);
+                emitter.emit('file-added', getPathValues(path));
+            });
         })
         .on('change', function (path) {
-            log('File modified: ' + path);
-            emitter.emit('file-modified', getPathValues(path));
+            avoidSymbolicLinkDueToChokidarBug(path, function () {
+                log('File modified: ' + path);
+                emitter.emit('file-modified', getPathValues(path));
+            });
         })
         .on('unlink', function (path) {
-            log('File removed: ' + path);
-            emitter.emit('file-deleted', getPathValues(path));
+            avoidSymbolicLinkDueToChokidarBug(path, function () {
+                log('File removed: ' + path);
+                emitter.emit('file-deleted', getPathValues(path));
+            });
         });
 
     io.on('connection', function(socket) {
