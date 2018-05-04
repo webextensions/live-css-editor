@@ -75,7 +75,7 @@ if (!module.parent) {
             '          -p --port=<port-number>',
             '          -v --verbose',
             '          -r --root=<project-root-folder>',
-            '             --follow-symlinks',
+            '             --allow-symlinks',
             ''
         ].join('\n'));
     };
@@ -96,10 +96,39 @@ if (!module.parent) {
         res.sendFile(__dirname + '/index.html');
     });
 
+    var allowSymlinks = argv.allowSymlinks || false;
     var watcherCwd = (function () {
         if (argv.root) {
             if (typeof argv.root === 'string') {
-                return nPath.resolve(argv.root);
+                var resolvedPath = nPath.resolve(argv.root),
+                    stat,
+                    lstat;
+                try {
+                    stat = fs.statSync(resolvedPath);
+                    if (!stat.isDirectory()) {
+                        logger.error('Error: ' + resolvedPath + ' needs to be a directory');
+                        process.exit(1);
+                    }
+
+                    lstat = fs.lstatSync(resolvedPath);
+                    if (lstat.isSymbolicLink() && !allowSymlinks) {
+                        logger.warn(
+                            boxen(
+                                'For better experience, try starting live-css-editor' +
+                                '\nwith ' + logger.chalk.bold('--allow-symlinks') + ' parameter',
+                                {
+                                    padding: 1,
+                                    margin: 1,
+                                    borderStyle: 'double'
+                                }
+                            )
+                        );
+                    }
+                } catch (e) {
+                    logger.error('Error: Unable to access ' + resolvedPath);
+                    process.exit(1);
+                }
+                return resolvedPath;
             } else {
                 logger.error('Error: You need to pass an absolute or relative path to the --root parameter');
                 process.exit(1);
@@ -108,7 +137,6 @@ if (!module.parent) {
             return process.cwd();
         }
     }());
-    var followSymlinks = argv.followSymlinks || false;
     var watchMatchers = [
         '**/*.css'
         // '**/*.css.*',
@@ -151,7 +179,7 @@ if (!module.parent) {
             // ignored: /(^|[/\\])\../,
             // ignoreInitial: true,
 
-            followSymlinks: followSymlinks,
+            followSymlinks: allowSymlinks,
 
             persistent: true
         }
@@ -263,7 +291,7 @@ if (!module.parent) {
 
     // https://github.com/paulmillr/chokidar/issues/544
     var avoidSymbolicLinkDueToChokidarBug = function (path, cb) {
-        if (followSymlinks) {
+        if (allowSymlinks) {
             if (anymatch(watchMatchers, path)) {
                 cb();
             }
