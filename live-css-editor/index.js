@@ -67,10 +67,10 @@ if (!module.parent) {
     var showHelp = function () {
         logger.verbose([
             '',
-            'Format:   live-css-editor [--root=<project-root-folder>] [--help]',
-            'Examples: live-css-editor',
-            '          live-css-editor --help',
-            '          live-css-editor --root=project/css',
+            'Format:   live-css [--root=<project-root-folder>] [--help]',
+            'Examples: live-css',
+            '          live-css --help',
+            '          live-css --root=project/css',
             'Options:  -h --help',
             '          -p --port=<port-number>',
             '             --list-files',
@@ -87,7 +87,7 @@ if (!module.parent) {
     } else {
         logger.verbose([
             '',
-            'Run ' + logger.chalk.underline('live-css-editor --help') + ' to see all the available options'
+            'Run ' + logger.chalk.underline('live-css --help') + ' to see all the available options'
         ].join('\n'));
     }
 
@@ -117,7 +117,7 @@ if (!module.parent) {
                     if (lstat.isSymbolicLink() && !allowSymlinks) {
                         logger.warn(
                             boxen(
-                                'For better experience, try starting live-css-editor' +
+                                'For better experience, try starting live-css' +
                                 '\nwith ' + logger.chalk.bold('--allow-symlinks') + ' parameter',
                                 {
                                     padding: 1,
@@ -241,8 +241,8 @@ if (!module.parent) {
             logger.warn(
                 boxen(
                     'Some of the files being watched have the same name.' +
-                    '\nlive-css-editor would still work fine.' +
-                    '\n\nFor better experience, you may start live-css-editor' +
+                    '\nlive-css would still work fine.' +
+                    '\n\nFor better experience, you may start live-css' +
                     '\nwith an appropriate ' + logger.chalk.bold('--root') + ' parameter',
                     {
                         padding: 1,
@@ -324,7 +324,7 @@ if (!module.parent) {
                     logger.verbose('File being watched: ' + path);
                 } else {
                     if (filesBeingWatched.length === 0) {
-                        logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css-editor') + ' with ' + logger.chalk.inverse('--list-files') + ')');
+                        logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css') + ' with ' + logger.chalk.inverse('--list-files') + ')');
                     }
                     process.stdout.write('.');
                 }
