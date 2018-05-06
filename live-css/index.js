@@ -71,13 +71,14 @@ if (!module.parent) {
             'Examples: live-css',
             '          live-css --help',
             '          live-css --root=project/css',
-            'Options:  -h --help',
-            '          -p --port=<port-number>',
-            '             --list-files',
-            '          -v --verbose',
-            '          -r --root=<project-root-folder>',
-            '             --allow-symlinks',
-            '             --init',
+            'Options:  -h --help                        Show help',
+            '          -r --root=<project-root-folder>  Folder containing files to monitor',
+            '             --list-files                  List the files being monitored',
+            '          -p --port=<port-number>          Port number to run live-css server',
+            '             --allow-symlinks              Allow symbolic links',
+            '             --init                        Generate the configuration file',
+            '             --verbose                     Verbose logging',
+            '          -v --version                     Output the version number',
             ''
         ].join('\n'));
     };
@@ -107,7 +108,7 @@ if (!module.parent) {
     } else {
         logger.verbose([
             '',
-            'Run ' + logger.chalk.underline('live-css --help') + ' to see all the available options'
+            'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options'
         ].join('\n'));
 
         var connectedSessions = 0;
