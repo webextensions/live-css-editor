@@ -77,7 +77,7 @@ if (!module.parent) {
             '          -p --port=<port-number>          Port number to run live-css server',
             '             --allow-symlinks              Allow symbolic links',
             '             --init                        Generate the configuration file',
-            '             --verbose                     Verbose logging',
+            // '             --verbose                     Verbose logging',
             '          -v --version                     Output the version number',
             ''
         ].join('\n'));
@@ -110,6 +110,22 @@ if (!module.parent) {
             '',
             'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options'
         ].join('\n'));
+
+        var configFilePath = nPath.resolve(process.cwd(), '.live-css.config.js'),
+            configFileExists = fs.existsSync(configFilePath),
+            configuration = {};
+
+        if (configFileExists) {
+            try {
+                configuration = require(configFilePath);
+            } catch (e) {
+                logger.warn('Unable to fetch configuration from ' + configFilePath);
+            }
+        } else {
+            logger.verbose([
+                'Run ' + logger.chalk.underline('live-css --init') + ' to generate the configuration file'
+            ].join('\n'));
+        }
 
         var connectedSessions = 0;
 
@@ -346,7 +362,7 @@ if (!module.parent) {
                     if (filesBeingWatched.length === 0) {
                         logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css') + ' with ' + logger.chalk.inverse('--list-files') + ')');
                     }
-                    process.stdout.write('.');
+                    process.stdout.write(logger.chalk.dim('.'));
                 }
                 emitter.emit('file-added', getPathValues(path));
             });
