@@ -77,6 +77,7 @@ if (!module.parent) {
             '          -v --verbose',
             '          -r --root=<project-root-folder>',
             '             --allow-symlinks',
+            '             --init',
             ''
         ].join('\n'));
     };
@@ -84,240 +85,251 @@ if (!module.parent) {
     if (argv.h || argv.help) {
         showHelp();
         process.exit(0);
+    } else if (argv.init) {
+        logger.error('TODO');
+        process.exit(1);
+        /*
+        var sampleText = fs.readFileSync(__dirname + '/sample.live-css.config', 'utf8');
+
+        fs.writeFileSync(
+            '.live-css.config',
+            req.body.targetFileContents
+        );
+        logger.log();
+        /* */
     } else {
         logger.verbose([
             '',
             'Run ' + logger.chalk.underline('live-css --help') + ' to see all the available options'
         ].join('\n'));
-    }
 
-    var connectedSessions = 0;
+        var connectedSessions = 0;
 
-    app.get('/', function(req, res) {
-        res.sendFile(__dirname + '/index.html');
-    });
+        app.get('/', function(req, res) {
+            res.sendFile(__dirname + '/index.html');
+        });
 
-    var listFiles = argv.listFiles || false;
+        var listFiles = argv.listFiles || false;
 
-    var allowSymlinks = argv.allowSymlinks || false;
-    var watcherCwd = (function () {
-        if (argv.root) {
-            if (typeof argv.root === 'string') {
-                var resolvedPath = nPath.resolve(argv.root),
+        var allowSymlinks = argv.allowSymlinks || false;
+        var watcherCwd = (function () {
+            if (argv.root) {
+                if (typeof argv.root === 'string') {
+                    var resolvedPath = nPath.resolve(argv.root),
                     stat,
                     lstat;
-                try {
-                    stat = fs.statSync(resolvedPath);
-                    if (!stat.isDirectory()) {
-                        logger.error('Error: ' + resolvedPath + ' needs to be a directory');
+                    try {
+                        stat = fs.statSync(resolvedPath);
+                        if (!stat.isDirectory()) {
+                            logger.error('Error: ' + resolvedPath + ' needs to be a directory');
+                            process.exit(1);
+                        }
+
+                        lstat = fs.lstatSync(resolvedPath);
+                        if (lstat.isSymbolicLink() && !allowSymlinks) {
+                            logger.warn(
+                                boxen(
+                                    'For better experience, try starting live-css' +
+                                    '\nwith ' + logger.chalk.bold('--allow-symlinks') + ' parameter',
+                                    {
+                                        padding: 1,
+                                        margin: 1,
+                                        borderStyle: 'double'
+                                    }
+                                )
+                            );
+                        }
+                    } catch (e) {
+                        logger.error('Error: Unable to access ' + resolvedPath);
                         process.exit(1);
                     }
-
-                    lstat = fs.lstatSync(resolvedPath);
-                    if (lstat.isSymbolicLink() && !allowSymlinks) {
-                        logger.warn(
-                            boxen(
-                                'For better experience, try starting live-css' +
-                                '\nwith ' + logger.chalk.bold('--allow-symlinks') + ' parameter',
-                                {
-                                    padding: 1,
-                                    margin: 1,
-                                    borderStyle: 'double'
-                                }
-                            )
-                        );
-                    }
-                } catch (e) {
-                    logger.error('Error: Unable to access ' + resolvedPath);
+                    return resolvedPath;
+                } else {
+                    logger.error('Error: You need to pass an absolute or relative path to the --root parameter');
                     process.exit(1);
                 }
-                return resolvedPath;
             } else {
-                logger.error('Error: You need to pass an absolute or relative path to the --root parameter');
-                process.exit(1);
+                return process.cwd();
             }
-        } else {
-            return process.cwd();
-        }
-    }());
-    var watchMatchers = [
-        '**/*.css'
-        // '**/*.css.*',
+        }());
+        var watchMatchers = [
+            '**/*.css'
+            // '**/*.css.*',
 
-        // '**/*.less',
-        // '**/*.less.*',
+            // '**/*.less',
+            // '**/*.less.*',
 
-        // '**/*.sass',
-        // '**/*.sass.*',
+            // '**/*.sass',
+            // '**/*.sass.*',
 
-        // '**/*.scss',
-        // '**/*.scss.*',
+            // '**/*.scss',
+            // '**/*.scss.*',
 
-        // An example path which is required to be watched, but its parent folder is ignored
-        // See below in this file: The path also needs to be "not" ignored in the "ignored" section
-        // 'node_modules/async-limiter/coverage/lcov-report/base.css',
-    ];
-    // Note:
-    //     https://github.com/paulmillr/chokidar/issues/544
-    //     Executable symlinks are getting watched unnecessarily due to this bug in chokidar
-    var watcher = chokidar.watch(
-        watchMatchers,
-        {
-            cwd: watcherCwd,
-            // https://github.com/paulmillr/chokidar#performance
-            // Sometimes the file is in the process of writing.
-            // It should have a stable filesize before we notify about the change.
-            awaitWriteFinish: {
-                stabilityThreshold: 100,
-                pollInterval: 45
-            },
-            ignored: [
-                /(^|[/\\])\../,     // A general rule to ignore the "." files/directories
-                'node_modules',
+            // An example path which is required to be watched, but its parent folder is ignored
+            // See below in this file: The path also needs to be "not" ignored in the "ignored" section
+            // 'node_modules/async-limiter/coverage/lcov-report/base.css',
+        ];
+        // Note:
+        //     https://github.com/paulmillr/chokidar/issues/544
+        //     Executable symlinks are getting watched unnecessarily due to this bug in chokidar
+        var watcher = chokidar.watch(
+            watchMatchers,
+            {
+                cwd: watcherCwd,
+                // https://github.com/paulmillr/chokidar#performance
+                // Sometimes the file is in the process of writing.
+                // It should have a stable filesize before we notify about the change.
+                awaitWriteFinish: {
+                    stabilityThreshold: 100,
+                    pollInterval: 45
+                },
+                ignored: [
+                    /(^|[/\\])\../,     // A general rule to ignore the "." files/directories
+                    'node_modules',
 
-                // An example path which is required to be watched, but its parent folder is ignored
-                // See above in this file: The path also needs to be in the watchlist section
-                '!node_modules/async-limiter/coverage/lcov-report/base.css'
-            ],
-            // ignored: /(^|[/\\])\../,
-            // ignoreInitial: true,
+                    // An example path which is required to be watched, but its parent folder is ignored
+                    // See above in this file: The path also needs to be in the watchlist section
+                    '!node_modules/async-limiter/coverage/lcov-report/base.css'
+                ],
+                // ignored: /(^|[/\\])\../,
+                // ignoreInitial: true,
 
-            followSymlinks: allowSymlinks,
+                followSymlinks: allowSymlinks,
 
-            persistent: true
-        }
-    );
-
-    var flagFileWatchReady = false;
-    var filesBeingWatched = [];
-    var fileModifiedHandler = function (changeObj) {
-        io.emit('file-modified', changeObj);
-    };
-    var fileAddedHandler = function (changeObj) {
-        if (verboseLogging) {
-            if (filesBeingWatched.length === 0) {
-                logger.success('Live CSS Editor (Magic CSS) is watching the following file(s):');
+                persistent: true
             }
-            logger.log('    ' + changeObj.relativePath);
-        }
-        filesBeingWatched.push(changeObj);
-        io.emit('file-added', changeObj);
-    };
-    var fileDeletedHandler = function (changeObj) {
-        filesBeingWatched = filesBeingWatched.filter(function(item){
-            return item.relativePath !== changeObj.relativePath;
-        });
-
-        io.emit('file-deleted', changeObj);
-    };
-
-    emitter.on('file-modified', fileModifiedHandler);
-    emitter.on('file-added', fileAddedHandler);
-    emitter.on('file-deleted', fileDeletedHandler);
-
-    var anyFileNameIsRepeated = function (arrPaths) {
-        var arrWithFileNames = arrPaths.map(function (item) {
-            return item.fileName;
-        });
-        var uniqArrWithRelativePaths = _uniq(arrWithFileNames);
-        if (uniqArrWithRelativePaths.length === arrWithFileNames.length) {
-            return false;
-        } else {
-            return true;
-        }
-    };
-
-    emitter.on('file-watch-ready', function () {
-        flagFileWatchReady = true;
-        if (!listFiles) {
-            logger.log('');
-        }
-        logger.success(
-            '\nLive CSS Editor (Magic CSS) server is watching ' + filesBeingWatched.length + ' files from:' +
-            '\n    ' + watcherCwd +
-            '\n'
         );
-        if (!argv.root && anyFileNameIsRepeated(filesBeingWatched)) {
-            logger.warn(
-                boxen(
-                    'Some of the files being watched have the same name.' +
-                    '\nlive-css would still work fine.' +
-                    '\n\nFor better experience, you may start live-css' +
-                    '\nwith an appropriate ' + logger.chalk.bold('--root') + ' parameter',
-                    {
-                        padding: 1,
-                        margin: 1,
-                        borderStyle: 'double'
-                    }
-                )
-            );
-        }
-    });
 
-    watcher.on('ready', function () {
-        emitter.emit('file-watch-ready');
-        // var watchedPaths = watcher.getWatched();
-        // log('**********Watched paths**********');
-        // log(watchedPaths);
-    });
-
-
-    var printSessionCount = function (connectedSessions) {
-        logger.info('Number of active connections: ' + connectedSessions);
-    };
-
-    emitter.on('connected-socket', function () {
-        connectedSessions++;
-        logger.info('Connected to a socket.');
-        printSessionCount(connectedSessions);
-    });
-
-    emitter.on('disconnected-socket', function () {
-        connectedSessions--;
-        logger.info('Disconnected from a socket.');
-        printSessionCount(connectedSessions);
-    });
-
-    var getPathValues = function (path) {
-        var ob = {
-            relativePath: path,
-            fullPath: nPath.join(watcherCwd, path),
-            fileName: nPath.basename(path),
-            useOnlyFileNamesForMatch: (function () {
-
-            }()),
-            root: watcherCwd
+        var flagFileWatchReady = false;
+        var filesBeingWatched = [];
+        var fileModifiedHandler = function (changeObj) {
+            io.emit('file-modified', changeObj);
         };
-        if (argv.root) {
-            ob.root = watcherCwd;
-            ob.useOnlyFileNamesForMatch = false;
-        } else {
-            ob.root = null;
-            ob.useOnlyFileNamesForMatch = true;
-        }
-        return ob;
-    };
-
-    // https://github.com/paulmillr/chokidar/issues/544
-    var avoidSymbolicLinkDueToChokidarBug = function (path, cb) {
-        if (allowSymlinks) {
-            if (anymatch(watchMatchers, path)) {
-                cb();
+        var fileAddedHandler = function (changeObj) {
+            if (verboseLogging) {
+                if (filesBeingWatched.length === 0) {
+                    logger.success('Live CSS Editor (Magic CSS) is watching the following file(s):');
+                }
+                logger.log('    ' + changeObj.relativePath);
             }
-        } else {
-            try {
-                var fullPath = nPath.resolve(watcherCwd, path),
-                    lstat = fs.lstatSync(fullPath);
-                if (!lstat.isSymbolicLink()) {
+            filesBeingWatched.push(changeObj);
+            io.emit('file-added', changeObj);
+        };
+        var fileDeletedHandler = function (changeObj) {
+            filesBeingWatched = filesBeingWatched.filter(function(item){
+                return item.relativePath !== changeObj.relativePath;
+            });
+
+            io.emit('file-deleted', changeObj);
+        };
+
+        emitter.on('file-modified', fileModifiedHandler);
+        emitter.on('file-added', fileAddedHandler);
+        emitter.on('file-deleted', fileDeletedHandler);
+
+        var anyFileNameIsRepeated = function (arrPaths) {
+            var arrWithFileNames = arrPaths.map(function (item) {
+                return item.fileName;
+            });
+            var uniqArrWithRelativePaths = _uniq(arrWithFileNames);
+            if (uniqArrWithRelativePaths.length === arrWithFileNames.length) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+        emitter.on('file-watch-ready', function () {
+            flagFileWatchReady = true;
+            if (!listFiles) {
+                logger.log('');
+            }
+            logger.success(
+                '\nLive CSS Editor (Magic CSS) server is watching ' + filesBeingWatched.length + ' files from:' +
+                '\n    ' + watcherCwd +
+                '\n'
+            );
+            if (!argv.root && anyFileNameIsRepeated(filesBeingWatched)) {
+                logger.warn(
+                    boxen(
+                        'Some of the files being watched have the same name.' +
+                        '\nlive-css would still work fine.' +
+                        '\n\nFor better experience, you may start live-css' +
+                        '\nwith an appropriate ' + logger.chalk.bold('--root') + ' parameter',
+                        {
+                            padding: 1,
+                            margin: 1,
+                            borderStyle: 'double'
+                        }
+                    )
+                );
+            }
+        });
+
+        watcher.on('ready', function () {
+            emitter.emit('file-watch-ready');
+            // var watchedPaths = watcher.getWatched();
+            // log('**********Watched paths**********');
+            // log(watchedPaths);
+        });
+
+
+        var printSessionCount = function (connectedSessions) {
+            logger.info('Number of active connections: ' + connectedSessions);
+        };
+
+        emitter.on('connected-socket', function () {
+            connectedSessions++;
+            logger.info('Connected to a socket.');
+            printSessionCount(connectedSessions);
+        });
+
+        emitter.on('disconnected-socket', function () {
+            connectedSessions--;
+            logger.info('Disconnected from a socket.');
+            printSessionCount(connectedSessions);
+        });
+
+        var getPathValues = function (path) {
+            var ob = {
+                relativePath: path,
+                fullPath: nPath.join(watcherCwd, path),
+                fileName: nPath.basename(path),
+                useOnlyFileNamesForMatch: (function () {
+
+                }()),
+                root: watcherCwd
+            };
+            if (argv.root) {
+                ob.root = watcherCwd;
+                ob.useOnlyFileNamesForMatch = false;
+            } else {
+                ob.root = null;
+                ob.useOnlyFileNamesForMatch = true;
+            }
+            return ob;
+        };
+
+        // https://github.com/paulmillr/chokidar/issues/544
+        var avoidSymbolicLinkDueToChokidarBug = function (path, cb) {
+            if (allowSymlinks) {
+                if (anymatch(watchMatchers, path)) {
                     cb();
                 }
-            } catch (e) {
-                // do nothing
+            } else {
+                try {
+                    var fullPath = nPath.resolve(watcherCwd, path),
+                    lstat = fs.lstatSync(fullPath);
+                    if (!lstat.isSymbolicLink()) {
+                        cb();
+                    }
+                } catch (e) {
+                    // do nothing
+                }
             }
-        }
-    };
+        };
 
-    watcher
+        watcher
         .on('add', function (path) {
             avoidSymbolicLinkDueToChokidarBug(path, function () {
                 if (listFiles || flagFileWatchReady) {
@@ -342,44 +354,45 @@ if (!module.parent) {
             emitter.emit('file-deleted', getPathValues(path));
         });
 
-    io.on('connection', function(socket) {
-        emitter.emit('connected-socket');
+        io.on('connection', function(socket) {
+            emitter.emit('connected-socket');
 
-        // socket.on('chat message', function(msg){
-        //     console.log('message: ' + msg);
-        // });
+            // socket.on('chat message', function(msg){
+            //     console.log('message: ' + msg);
+            // });
 
-        socket.on('disconnect', function(){
-            emitter.emit('disconnected-socket');
+            socket.on('disconnect', function(){
+                emitter.emit('disconnected-socket');
+            });
         });
-    });
 
-    var startServer = function (portNumber) {
-        http.listen(portNumber, function() {
-            if (localIpAddressesAndHostnames.length) {
-                logger.info(
-                    '\nLive CSS Editor (Magic CSS) server is available at any of the following addresses:\n' +
-                    (function (localIpAddressesAndHostnames) {
-                        var addresses = [].concat(localIpAddressesAndHostnames);
-                        addresses = addresses.map(function (item) {
-                            return  '    http://' + item + ':' + portNumber + '/';
-                        });
-                        return addresses.join('\n');
-                    }(localIpAddressesAndHostnames)) +
-                    '\n'
-                );
-            }
+        var startServer = function (portNumber) {
+            http.listen(portNumber, function() {
+                if (localIpAddressesAndHostnames.length) {
+                    logger.info(
+                        '\nLive CSS Editor (Magic CSS) server is available at any of the following addresses:\n' +
+                        (function (localIpAddressesAndHostnames) {
+                            var addresses = [].concat(localIpAddressesAndHostnames);
+                            addresses = addresses.map(function (item) {
+                                return  '    http://' + item + ':' + portNumber + '/';
+                            });
+                            return addresses.join('\n');
+                        }(localIpAddressesAndHostnames)) +
+                        '\n'
+                    );
+                }
 
-            logger.info('Press CTRL-C to stop the server\n');
-        });
-    };
-    var portNumber = argv.port || argv.p;
-    if (portNumber && typeof portNumber === 'number' && portNumber >= 0 && portNumber < 65536) {
-        startServer(parseInt(portNumber, 10));
-    } else {
-        findFreePort(3456, function(err, freePort) {
-            startServer(freePort);
-        });
+                logger.info('Press CTRL-C to stop the server\n');
+            });
+        };
+        var portNumber = argv.port || argv.p;
+        if (portNumber && typeof portNumber === 'number' && portNumber >= 0 && portNumber < 65536) {
+            startServer(parseInt(portNumber, 10));
+        } else {
+            findFreePort(3456, function(err, freePort) {
+                startServer(freePort);
+            });
+        }
     }
 }
 
