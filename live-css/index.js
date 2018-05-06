@@ -86,17 +86,24 @@ if (!module.parent) {
         showHelp();
         process.exit(0);
     } else if (argv.init) {
-        logger.error('TODO');
-        process.exit(1);
-        /*
-        var sampleText = fs.readFileSync(__dirname + '/sample.live-css.config', 'utf8');
+        var exampleConfigFilePath = nPath.resolve(__dirname, 'example.live-css.config.js'),
+            exampleText;
+        try {
+            exampleText = fs.readFileSync(exampleConfigFilePath, 'utf8');
+        } catch (e) {
+            logger.fatal('Error:\nUnable to read example configuration file from ' + exampleConfigFilePath);
+            process.exit(1);
+        }
 
-        fs.writeFileSync(
-            '.live-css.config',
-            req.body.targetFileContents
-        );
-        logger.log();
-        /* */
+        var targetConfigFilePath = nPath.resolve(process.cwd(), '.live-css.config.js');
+        try {
+            fs.writeFileSync(targetConfigFilePath, exampleText);
+            logger.success('Configuration file has been written at:\n    ' + targetConfigFilePath);
+            logger.info('\nNow, when you execute the ' + logger.chalk.underline('live-css') + ' command from this directory, it would load the required options from this configuration file.');
+        } catch (e) {
+            logger.error(' ✗ Error: Unable to write configuration file to: ' + targetConfigFilePath);
+            process.exit(1);
+        }
     } else {
         logger.verbose([
             '',
