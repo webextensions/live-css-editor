@@ -113,13 +113,17 @@ if (!module.parent) {
 
         var configFilePath = nPath.resolve(process.cwd(), '.live-css.config.js'),
             configFileExists = fs.existsSync(configFilePath),
+            flagConfigurationLoaded = false,
             configuration = {};
 
         if (configFileExists) {
             try {
                 configuration = require(configFilePath);
+                flagConfigurationLoaded = true;
+                logger.verbose('Loaded configuration from ' + configFilePath);
             } catch (e) {
-                logger.warn('Unable to fetch configuration from ' + configFilePath);
+                logger.warnHeading('\nUnable to read configuration from ' + configFilePath);
+                logger.warn('The configuration file contents needs to follow JavaScript syntax.\neg: https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js');
             }
         } else {
             logger.verbose([
@@ -136,10 +140,11 @@ if (!module.parent) {
         var listFiles = argv.listFiles || false;
 
         var allowSymlinks = argv.allowSymlinks || false;
+        var configRoot = argv.root || configuration.root;
         var watcherCwd = (function () {
-            if (argv.root) {
-                if (typeof argv.root === 'string') {
-                    var resolvedPath = nPath.resolve(argv.root),
+            if (configRoot) {
+                if (typeof configRoot === 'string') {
+                    var resolvedPath = nPath.resolve(configRoot),
                     stat,
                     lstat;
                     try {
@@ -273,7 +278,7 @@ if (!module.parent) {
                 '\n    ' + watcherCwd +
                 '\n'
             );
-            if (!argv.root && anyFileNameIsRepeated(filesBeingWatched)) {
+            if (!configRoot && anyFileNameIsRepeated(filesBeingWatched)) {
                 logger.warn(
                     boxen(
                         'Some of the files being watched have the same name.' +
@@ -324,7 +329,7 @@ if (!module.parent) {
                 }()),
                 root: watcherCwd
             };
-            if (argv.root) {
+            if (configRoot) {
                 ob.root = watcherCwd;
                 ob.useOnlyFileNamesForMatch = false;
             } else {
@@ -360,7 +365,11 @@ if (!module.parent) {
                     logger.verbose('File being watched: ' + path);
                 } else {
                     if (filesBeingWatched.length === 0) {
-                        logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css') + ' with ' + logger.chalk.inverse('--list-files') + ')');
+                        if (flagConfigurationLoaded) {
+                            logger.verbose('Adding files to watch:');
+                        } else {
+                            logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css') + ' with ' + logger.chalk.inverse('--list-files') + ')');
+                        }
                     }
                     process.stdout.write(logger.chalk.dim('.'));
                 }
