@@ -59,8 +59,6 @@ if (!module.parent) {
         // do nothing
     }
 
-    var log = console.log.bind(console);
-
     var verboseLogging = false;
     if (argv.v || argv.verbose) {
         verboseLogging = true;
@@ -147,8 +145,8 @@ if (!module.parent) {
             if (configRoot) {
                 if (typeof configRoot === 'string') {
                     var resolvedPath = nPath.resolve(configRoot),
-                    stat,
-                    lstat;
+                        stat,
+                        lstat;
                     try {
                         stat = fs.statSync(resolvedPath);
                         if (!stat.isDirectory()) {
@@ -350,7 +348,7 @@ if (!module.parent) {
             } else {
                 try {
                     var fullPath = nPath.resolve(watcherCwd, path),
-                    lstat = fs.lstatSync(fullPath);
+                        lstat = fs.lstatSync(fullPath);
                     if (!lstat.isSymbolicLink()) {
                         cb();
                     }
@@ -361,33 +359,33 @@ if (!module.parent) {
         };
 
         watcher
-        .on('add', function (path) {
-            avoidSymbolicLinkDueToChokidarBug(path, function () {
-                if (listFiles || flagFileWatchReady) {
-                    logger.verbose('File being watched: ' + path);
-                } else {
-                    if (filesBeingWatched.length === 0) {
-                        if (flagConfigurationLoaded) {
-                            logger.verbose('Adding files to watch:');
-                        } else {
-                            logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css') + ' with ' + logger.chalk.inverse('--list-files') + ')');
+            .on('add', function (path) {
+                avoidSymbolicLinkDueToChokidarBug(path, function () {
+                    if (listFiles || flagFileWatchReady) {
+                        logger.verbose('File being watched: ' + path);
+                    } else {
+                        if (filesBeingWatched.length === 0) {
+                            if (flagConfigurationLoaded) {
+                                logger.verbose('Adding files to watch:');
+                            } else {
+                                logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css') + ' with ' + logger.chalk.inverse('--list-files') + ')');
+                            }
                         }
+                        process.stdout.write(logger.chalk.dim('.'));
                     }
-                    process.stdout.write(logger.chalk.dim('.'));
-                }
-                emitter.emit('file-added', getPathValues(path));
+                    emitter.emit('file-added', getPathValues(path));
+                });
+            })
+            .on('change', function (path) {
+                avoidSymbolicLinkDueToChokidarBug(path, function () {
+                    logger.verbose('File modified: ' + path);
+                    emitter.emit('file-modified', getPathValues(path));
+                });
+            })
+            .on('unlink', function (path) {
+                logger.verbose('File removed: ' + path);
+                emitter.emit('file-deleted', getPathValues(path));
             });
-        })
-        .on('change', function (path) {
-            avoidSymbolicLinkDueToChokidarBug(path, function () {
-                logger.verbose('File modified: ' + path);
-                emitter.emit('file-modified', getPathValues(path));
-            });
-        })
-        .on('unlink', function (path) {
-            logger.verbose('File removed: ' + path);
-            emitter.emit('file-deleted', getPathValues(path));
-        });
 
         io.on('connection', function(socket) {
             emitter.emit('connected-socket');

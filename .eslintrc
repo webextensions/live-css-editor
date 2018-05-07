@@ -2,7 +2,7 @@
     // http://eslint.org/docs/user-guide/configuring.html
     // http://bl.ocks.org/cletusw/e01a85e399ab563b1236
     "rules": {
-        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "indent": ["error", 4, { "SwitchCase": 1, "ignoreComments": true }],
         "linebreak-style": ["error", "unix"],
         "semi": ["error", "always"],
         // http://eslint.org/docs/rules/quotes

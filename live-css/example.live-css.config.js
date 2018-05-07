@@ -18,6 +18,8 @@
 //     https://github.com/webextensions/live-css-editor/tree/master/live-css
 //     https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js
 
+/* eslint-env node */                       // https://eslint.org/docs/rules/no-undef#nodejs
+
 module.exports = {                          // Learn more about "module.exports":
                                             //     https://www.sitepoint.com/understanding-module-exports-exports-node-js/
                                             //     http://www.tutorialsteacher.com/nodejs/nodejs-module-exports
