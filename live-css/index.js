@@ -44,6 +44,8 @@ var express = require('express'),
     http = require('http').Server(app),
     io = require('socket.io')(http);
 
+var defaultPort = 3456;
+
 // If being executed as a binary and not via require()
 if (!module.parent) {
     var argv = require('yargs')
@@ -418,14 +420,27 @@ if (!module.parent) {
                 logger.info('Press CTRL-C to stop the server\n');
             });
         };
-        var portNumber = argv.port || argv.p;
-        if (portNumber && typeof portNumber === 'number' && portNumber >= 0 && portNumber < 65536) {
-            startServer(parseInt(portNumber, 10));
-        } else {
-            findFreePort(3456, function(err, freePort) {
-                startServer(freePort);
-            });
+
+        var portRequestedByUser = parseInt(argv.port || argv.p || configuration.port, 10),
+            flagPortSetByUser = false,
+            portToUse = defaultPort;
+        if (
+            portRequestedByUser &&
+            typeof portRequestedByUser === 'number' &&
+            !isNaN(portRequestedByUser) &&
+            portRequestedByUser >= 1 &&
+            portRequestedByUser < 65536
+        ) {
+            portToUse = portRequestedByUser;
+            flagPortSetByUser = true;
         }
+
+        findFreePort(portToUse, function(err, freePort) {
+            if (flagPortSetByUser && freePort !== portToUse) {
+                logger.warnHeading('\nPort number ' + portToUse + ' is not available. Using port number ' + freePort + '.');
+            }
+            startServer(freePort);
+        });
     }
 }
 
