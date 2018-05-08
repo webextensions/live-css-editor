@@ -67,7 +67,10 @@ module.exports = {                          // Learn more about "module.exports"
         "temp",
         "tmp",
 
-        // "Negate" pattern to cancel ignore rule
+        // "Negate" pattern to cancel ignore rule (by using "!" symbol)
+        // An example path which is required to be watched, but its parent folder is ignored
+        // **** IMPORTANT NOTE:
+        // **** For watching, this path would also need to be included in the "watch-rules" section (without the "!" symbol)
         "!node_modules/package/do-not-ignore.css"   // The "!" character in the beginning negates the matching pattern from the "watch-ignore-rules". It means that
                                                     // the file matching this pattern would be included even though "node_modules" is marked to be ignored
                                                     // Learn more:

@@ -78,7 +78,7 @@ if (!module.parent) {
     var argv = require('yargs')
         .help(false)
         .argv;
-    var inDebugMode = argv.d || argv.debug;
+    var inDebugMode = argv.debug;
 
     var localIpAddressesAndHostnames = [];
     try {
@@ -150,10 +150,12 @@ if (!module.parent) {
                 flagConfigurationLoaded = true;
                 logger.verbose('Loaded configuration from ' + configFilePath);
                 if (inDebugMode) {
-                    logger.log('\n\nConfiguration:');
+                    logger.verbose('\nConfiguration:');
                     logger.log(configuration);
                 }
             } catch (e) {
+                logger.log('');
+                logger.verbose(e);
                 logger.warnHeading('\nUnable to read configuration from ' + configFilePath);
                 logger.warn('The configuration file contents needs to follow JavaScript syntax.\neg: https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js');
             }
@@ -216,26 +218,26 @@ if (!module.parent) {
 
         var defaultWatchRules = [
             '**/*.css'
-            // '**/*.css.*',
-
-            // '**/*.less',
-            // '**/*.less.*',
-
-            // '**/*.sass',
-            // '**/*.sass.*',
-
-            // '**/*.scss',
-            // '**/*.scss.*',
-
-            // An example path which is required to be watched, but its parent folder is ignored
-            // See below in this file: The path also needs to be "not" ignored in the "ignored" section
-            // 'node_modules/async-limiter/coverage/lcov-report/base.css',
         ];
-        var watchMatchers = configuration['watch-rules'] || defaultWatchRules;
+
+        var defaultWatchIgnoreRules = [
+            /(^|[/\\])\../,     // A general rule to ignore the "." files/directories
+            'node_modules',
+            '.npm',
+            'logs',
+            'temp',
+            'tmp'
+        ];
+
+        var watchMatchers = configuration['watch-rules'] || defaultWatchRules,
+            watchIgnoreMatchers = configuration['watch-ignore-rules'] || defaultWatchIgnoreRules;
 
         if (inDebugMode) {
-            logger.log('\n\nWatch rules:');
+            logger.verbose('\n"watch-rules":');
             logger.log(watchMatchers);
+
+            logger.verbose('\n"watch-ignore-rules":');
+            logger.log(watchIgnoreMatchers);
         }
         // Note:
         //     https://github.com/paulmillr/chokidar/issues/544
@@ -251,14 +253,7 @@ if (!module.parent) {
                     stabilityThreshold: 100,
                     pollInterval: 45
                 },
-                ignored: [
-                    /(^|[/\\])\../,     // A general rule to ignore the "." files/directories
-                    'node_modules',
-
-                    // An example path which is required to be watched, but its parent folder is ignored
-                    // See above in this file: The path also needs to be in the watchlist section
-                    '!node_modules/async-limiter/coverage/lcov-report/base.css'
-                ],
+                ignored: watchIgnoreMatchers,
                 // ignored: /(^|[/\\])\../,
                 // ignoreInitial: true,
 
@@ -401,7 +396,7 @@ if (!module.parent) {
         watcher
             .on('add', function (path) {
                 avoidSymbolicLinkDueToChokidarBug(path, function () {
-                    if (listFiles || flagFileWatchReady) {
+                    if (listFiles || flagFileWatchReady || inDebugMode) {
                         logger.verbose('Watching file: ' + path);
                     } else {
                         process.stdout.write(logger.chalk.dim('.'));
