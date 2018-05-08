@@ -2,6 +2,21 @@
 
 /* eslint-env node */
 
+var nodeVersion = process.versions.node,
+    semverArrNodeVersion = nodeVersion.split('.');
+if (parseInt(semverArrNodeVersion[0], 10) < 4) {
+    console.log(
+        '\nError: You are currently using Node JS ' + process.version + ' which is outdated.' +
+        '\nFor best experience with live-css, we recommend you to upgrade to the latest Node JS version.\n'
+    );
+    process.exit(1);
+} else if (parseInt(semverArrNodeVersion[0], 10) < 6) {
+    console.log(
+        '\nYou are currently using Node JS ' + process.version +
+        '\nWe recommend you to upgrade to the latest Node JS version for improved experience.'
+    );
+}
+
 var updateNotifier = require('update-notifier'),
     pkg = require('./package.json'),
     notifier = updateNotifier({
@@ -30,8 +45,15 @@ var nPath = require('path'),
 var chokidar = require('chokidar'),
     anymatch = require('anymatch'),
     boxen = require('boxen'),
-    _uniq = require('lodash/uniq.js'),
+    _uniq = require('lodash/uniq.js');
+
+var findFreePort;
+try {
+    // Before Node JS v6.0.0, find-free-port won't work due to the unsupported JavaScript syntax
     findFreePort = require('find-free-port');
+} catch (e) {
+    // do nothing
+}
 
 var logger = require('note-down');
 logger.removeOption('showLogLine');
@@ -472,12 +494,16 @@ if (!module.parent) {
             flagPortSetByUser = true;
         }
 
-        findFreePort(portToUse, function(err, freePort) {
-            if (flagPortSetByUser && freePort !== portToUse) {
-                logger.warnHeading('\nPort number ' + portToUse + ' is not available. Using port number ' + freePort + '.');
-            }
-            startServer(freePort);
-        });
+        if (findFreePort) {
+            findFreePort(portToUse, function(err, freePort) {
+                if (flagPortSetByUser && freePort !== portToUse) {
+                    logger.warnHeading('\nPort number ' + portToUse + ' is not available. Using port number ' + freePort + '.');
+                }
+                startServer(freePort);
+            });
+        } else {
+            startServer(portToUse);
+        }
     }
 } else {
     logAndThrowError('Error: live-css currently does not work with Node JS require()');
