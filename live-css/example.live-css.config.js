@@ -1,22 +1,24 @@
-// This configuration file is used for running "live-css" server (https://www.npmjs.com/package/live-css)
-// It is meant to be used along with:
-//     https://github.com/webextensions/live-css-editor
-//
-// To generate this file, download and install Node JS from https://nodejs.org/en/download/
-//     $ npm install -g live-css
-//     $ cd <project-folder>
-//     $ live-css --init
-//     --------OR--------
-//     Copy the default configuration file from:
-//         https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js
-//     and save it as a file with name ".live-css.config.js" (note that the file name begins with a dot character)
-//
-// For further guidance, visit the following links:
-//     https://www.npmjs.com/package/live-css
-//     https://github.com/webextensions/live-css-editor
-//     https://github.com/webextensions/live-css-editor/issues
-//     https://github.com/webextensions/live-css-editor/tree/master/live-css
-//     https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js
+/*
+    This configuration file is used for running "live-css" server (https://www.npmjs.com/package/live-css)
+    It is meant to be used along with:
+        https://github.com/webextensions/live-css-editor
+
+    To generate this file, download and install Node JS from https://nodejs.org/en/download/
+        $ npm install -g live-css
+        $ cd <project-folder>
+        $ live-css --init
+        --------OR--------
+        Copy the default configuration file from:
+            https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js
+        and save it as a file with name ".live-css.config.js" (note that the file name begins with a dot character)
+
+    For further guidance, visit the following links:
+        https://www.npmjs.com/package/live-css
+        https://github.com/webextensions/live-css-editor
+        https://github.com/webextensions/live-css-editor/issues
+        https://github.com/webextensions/live-css-editor/tree/master/live-css
+        https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js
+*/
 
 /* eslint-env node */                       // https://eslint.org/docs/rules/no-undef#nodejs
 
@@ -36,12 +38,15 @@ module.exports = {                          // Learn more about "module.exports"
                                             // This is the root folder which contains the files you wish to watch for changes
                                             // This folder would be scanned recursively for files matching the "watch-rules"
                                             // while skipping the files matching the "watch-ignore-rules"
+                                            // Learn more:
+                                            //     https://en.wikipedia.org/wiki/Path_(computing)
 
     "watch-rules": [                        // <Array/String/RegExp/Function>
                                             // Glob patterns or paths of files and directories to be watched recursively
                                             // Learn more:
                                             //     https://www.npmjs.com/package/anymatch
                                             //     https://github.com/paulmillr/chokidar#api ("paths" property)
+                                            //     https://en.wikipedia.org/wiki/Path_(computing)
 
         "**/*.css"                          // Include all the ".css" files to watch for changes
     ],
@@ -52,8 +57,11 @@ module.exports = {                          // Learn more about "module.exports"
                                             //     https://www.npmjs.com/package/anymatch
                                             //     https://github.com/paulmillr/chokidar#path-filtering ("ignored" property)
 
-        /(^|[/\\])\../,                     // A regular expression to ignore the "." files/directories
-        "node_modules",                     // Some of the common folders in various projects which you may wish to exclude
+        // Some of the common folders in various projects which you may wish to exclude
+        /(^|[/\\])\../,                     // This regular expression ignores the files/directories having name beginning with "." character
+                                            // Learn more about regular expressions:
+                                            //     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+        "node_modules",
         ".npm",
         "logs",
         "temp",

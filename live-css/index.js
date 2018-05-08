@@ -46,6 +46,11 @@ var express = require('express'),
 
 var defaultPort = 3456;
 
+var logAndThrowError = function (msg) {
+    logger.errorHeading(msg);
+    throw new Error(msg);
+};
+
 // If being executed as a binary and not via require()
 if (!module.parent) {
     var argv = require('yargs')
@@ -99,8 +104,8 @@ if (!module.parent) {
         var targetConfigFilePath = nPath.resolve(process.cwd(), '.live-css.config.js');
         try {
             fs.writeFileSync(targetConfigFilePath, exampleText);
-            logger.success('Configuration file has been written at:\n    ' + targetConfigFilePath);
-            logger.info('\nNow, when you execute the ' + logger.chalk.underline('live-css') + ' command from this directory, it would load the required options from this configuration file.');
+            logger.success('\nConfiguration file has been written at:\n    ' + targetConfigFilePath);
+            logger.info('\nNow, when you execute the ' + logger.chalk.underline('live-css') + ' command from this directory, it would load the required options from this configuration file.\n');
         } catch (e) {
             logger.error(' ✗ Error: Unable to write configuration file to: ' + targetConfigFilePath);
             process.exit(1);
@@ -108,7 +113,7 @@ if (!module.parent) {
     } else {
         logger.verbose([
             '',
-            'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options'
+            'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options.'
         ].join('\n'));
 
         var configFilePath = nPath.resolve(process.cwd(), '.live-css.config.js'),
@@ -127,7 +132,7 @@ if (!module.parent) {
             }
         } else {
             logger.verbose([
-                'Run ' + logger.chalk.underline('live-css --init') + ' to generate the configuration file'
+                'Run ' + logger.chalk.underline('live-css --init') + ' to generate the configuration file (recommended).'
             ].join('\n'));
         }
 
@@ -159,7 +164,7 @@ if (!module.parent) {
                             logger.warn(
                                 boxen(
                                     'For better experience, try starting live-css' +
-                                    '\nwith ' + logger.chalk.bold('--allow-symlinks') + ' parameter',
+                                    '\nwith ' + logger.chalk.bold('--allow-symlinks') + ' parameter.',
                                     {
                                         padding: 1,
                                         margin: 1,
@@ -274,7 +279,8 @@ if (!module.parent) {
                 logger.log('');
             }
             logger.success(
-                '\nLive CSS Editor (Magic CSS) server is watching ' + filesBeingWatched.length + ' files from:' +
+                '\nLive CSS Editor (Magic CSS) server is ready.' +
+                '\nWatching ' + filesBeingWatched.length + ' files from:' +
                 '\n    ' + watcherCwd +
                 '\n'
             );
@@ -283,8 +289,8 @@ if (!module.parent) {
                     boxen(
                         'Some of the files being watched have the same name.' +
                         '\nlive-css would still work fine.' +
-                        '\n\nFor better experience, you may start live-css' +
-                        '\nwith an appropriate ' + logger.chalk.bold('--root') + ' parameter',
+                        '\n\nFor better experience, you may start live-css with' +
+                        '\nan appropriate ' + logger.chalk.bold('--root') + ' parameter.',
                         {
                             padding: 1,
                             margin: 1,
@@ -309,13 +315,13 @@ if (!module.parent) {
 
         emitter.on('connected-socket', function () {
             connectedSessions++;
-            logger.info('Connected to a socket.');
+            logger.info('\nConnected to a socket.');
             printSessionCount(connectedSessions);
         });
 
         emitter.on('disconnected-socket', function () {
             connectedSessions--;
-            logger.info('Disconnected from a socket.');
+            logger.info('\nDisconnected from a socket.');
             printSessionCount(connectedSessions);
         });
 
@@ -341,16 +347,16 @@ if (!module.parent) {
 
         // https://github.com/paulmillr/chokidar/issues/544
         var avoidSymbolicLinkDueToChokidarBug = function (path, cb) {
+            var fullPath = nPath.resolve(watcherCwd, path);
             if (allowSymlinks) {
                 if (anymatch(watchMatchers, path)) {
-                    cb();
+                    cb(fullPath);
                 }
             } else {
                 try {
-                    var fullPath = nPath.resolve(watcherCwd, path),
-                        lstat = fs.lstatSync(fullPath);
+                    var lstat = fs.lstatSync(fullPath);
                     if (!lstat.isSymbolicLink()) {
-                        cb();
+                        cb(fullPath, lstat);
                     }
                 } catch (e) {
                     // do nothing
@@ -362,23 +368,35 @@ if (!module.parent) {
             .on('add', function (path) {
                 avoidSymbolicLinkDueToChokidarBug(path, function () {
                     if (listFiles || flagFileWatchReady) {
-                        logger.verbose('File being watched: ' + path);
+                        logger.verbose('Watching file: ' + path);
                     } else {
-                        if (filesBeingWatched.length === 0) {
-                            if (flagConfigurationLoaded) {
-                                logger.verbose('Adding files to watch:');
-                            } else {
-                                logger.verbose('Adding files to watch: (To list the files being watched, run ' + logger.chalk.underline('live-css') + ' with ' + logger.chalk.inverse('--list-files') + ')');
-                            }
-                        }
                         process.stdout.write(logger.chalk.dim('.'));
                     }
                     emitter.emit('file-added', getPathValues(path));
                 });
             })
             .on('change', function (path) {
-                avoidSymbolicLinkDueToChokidarBug(path, function () {
-                    logger.verbose('File modified: ' + path);
+                avoidSymbolicLinkDueToChokidarBug(path, function (fullPath, lstat) {
+                    var stat;
+                    if (!lstat) {
+                        try {
+                            stat = fs.statSync(fullPath);
+                        } catch (e) {
+                            // do nothing
+                        }
+                    }
+
+                    var timeModified = (lstat || stat || {}).mtime;
+
+                    // mtime / timeModified / toTimeString should be available, but adding extra check to make the code more robust
+                    if (timeModified && timeModified.toTimeString) {
+                        timeModified = timeModified.toTimeString().substring(0, 8);
+                    }
+                    if (timeModified) {
+                        logger.verbose('(' + timeModified + ') File modified: ' + path);
+                    } else {
+                        logger.verbose('File modified: ' + path);
+                    }
                     emitter.emit('file-modified', getPathValues(path));
                 });
             })
@@ -416,6 +434,15 @@ if (!module.parent) {
                 }
 
                 logger.info('Press CTRL-C to stop the server\n');
+
+                if (listFiles || flagFileWatchReady) {
+                    // do nothing
+                } else {
+                    if (!flagConfigurationLoaded) {
+                        logger.verbose('To list the files being watched, run ' + logger.chalk.underline('live-css') + ' with ' + logger.chalk.underline('--list-files') + ' parameter.');
+                    }
+                    process.stdout.write(logger.chalk.dim('Adding files to watch '));
+                }
             });
         };
 
@@ -440,14 +467,13 @@ if (!module.parent) {
             startServer(freePort);
         });
     }
+} else {
+    logAndThrowError('Error: live-css currently does not work with Node JS require()');
 }
 
 process.on('uncaughtException', function(err) {
     if(err.errno === 'EADDRINUSE') {
-        logger.error(
-            '\nError: The requested port number is in use.' +
-            '\nPlease pass a different port number or skip passing the port number and let Live CSS Editor (Magic CSS) choose an available port for you.'
-        );
+        logger.errorHeading('\nError: The requested port number is in use. Please pass a different port number to use.');
     } else {
         console.log(err);
     }
