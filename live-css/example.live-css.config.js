@@ -34,14 +34,22 @@ module.exports = {                          // Learn more about "module.exports"
                                             //     https://computer.howstuffworks.com/web-server8.htm
                                             //     https://en.wikipedia.org/wiki/Registered_port
 
-    "root": ".",                            // <relative-or-absolute-path>
+    // IMPORTANT NOTE: Setting this to an incorrect value may result in failure to auto-refresh styles in the browser.
+    //                 If you are in doubt, don't use this configuration option, live-css would still work fine.
+    // Keeping this configuration option as commented out by default
+    // "root": ".",                         // <relative-or-absolute-path>
+                                            // This path should point to the root ("/") of your web server for which you are using live-css.
+                                            // For example,
+                                            //     If http://localhost/ points to /path/to/project/http-pub/
+                                            //     And this configuration file is placed at /path/to/project/
+                                            //     Then, you may use "root": "http-pub" <OR> "root": "/path/to/project/http-pub"
                                             // This is the root folder which contains the files you wish to watch for changes
-                                            // This folder would be scanned recursively for files matching the "watch-rules"
-                                            // while skipping the files matching the "watch-ignore-rules"
+                                            // This folder would be scanned recursively for files matching the "watch-patterns"
+                                            // while skipping the files matching the "watch-ignore-patterns"
                                             // Learn more:
                                             //     https://en.wikipedia.org/wiki/Path_(computing)
 
-    "watch-rules": [                        // <Array/String/RegExp/Function>
+    "watch-patterns": [                     // <Array/String/RegExp/Function>
                                             // Glob patterns or paths of files and directories to be watched recursively
                                             // Learn more:
                                             //     https://www.npmjs.com/package/anymatch
@@ -51,7 +59,7 @@ module.exports = {                          // Learn more about "module.exports"
         "**/*.css"                          // Include all the ".css" files to watch for changes
     ],
 
-    "watch-ignore-rules": [                 // <Array/String/RegExp/Function>
+    "watch-ignore-patterns": [              // <Array/String/RegExp/Function>
                                             // Glob patterns or paths of files and directories to be ignored from being watched
                                             // Learn more:
                                             //     https://www.npmjs.com/package/anymatch
@@ -70,9 +78,9 @@ module.exports = {                          // Learn more about "module.exports"
         // "Negate" pattern to cancel ignore rule (by using "!" symbol)
         // An example path which is required to be watched, but its parent folder is ignored
         // **** IMPORTANT NOTE:
-        // **** For watching, this path would also need to be included in the "watch-rules" section (without the "!" symbol)
-        "!node_modules/package/do-not-ignore.css"   // The "!" character in the beginning negates the matching pattern from the "watch-ignore-rules". It means that
-                                                    // the file matching this pattern would be included even though "node_modules" is marked to be ignored
+        // **** For watching, this path would also need to be included in the "watch-patterns" section (without the "!" symbol)
+        "!node_modules/package/do-not-ignore.css"   // The "!" symbol in the beginning negates the matching pattern from the "watch-ignore-patterns". It means that
+                                                    // the file matching this pattern would not be ignored even though "node_modules" is marked to be ignored.
                                                     // Learn more:
                                                     //     https://github.com/isaacs/minimatch/blob/master/README.md#properties ("negate" property)
     ],

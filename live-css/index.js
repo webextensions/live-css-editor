@@ -95,10 +95,10 @@ if (!module.parent) {
     var showHelp = function () {
         logger.verbose([
             '',
-            'Format:   live-css [--root=<project-root-folder>] [--help]',
+            'Format:   live-css [--root <project-root-folder>] [--help]',
             'Examples: live-css',
             '          live-css --help',
-            '          live-css --root=project/css',
+            '          live-css --root project/css',
             'Options:  -h --help                        Show help',
             '          -r --root=<project-root-folder>  Folder containing files to monitor',
             '             --list-files                  List the files being monitored',
@@ -136,7 +136,7 @@ if (!module.parent) {
     } else {
         logger.verbose([
             '',
-            'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options.'
+            'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options and examples.'
         ].join('\n'));
 
         var configFilePath = nPath.resolve(process.cwd(), '.live-css.config.js'),
@@ -184,7 +184,7 @@ if (!module.parent) {
                     try {
                         stat = fs.statSync(resolvedPath);
                         if (!stat.isDirectory()) {
-                            logger.error('Error: ' + resolvedPath + ' needs to be a directory');
+                            logger.error('Error: The "--root" parameter or "root" configuration (' + resolvedPath + ') needs to be a directory');
                             process.exit(1);
                         }
 
@@ -208,7 +208,7 @@ if (!module.parent) {
                     }
                     return resolvedPath;
                 } else {
-                    logger.error('Error: You need to pass an absolute or relative path to the --root parameter');
+                    logger.error('Error: If you set --root parameter, it should be followed by an absolute or relative path of a directory');
                     process.exit(1);
                 }
             } else {
@@ -216,11 +216,11 @@ if (!module.parent) {
             }
         }());
 
-        var defaultWatchRules = [
+        var defaultWatchPatterns = [
             '**/*.css'
         ];
 
-        var defaultWatchIgnoreRules = [
+        var defaultWatchIgnorePatterns = [
             /(^|[/\\])\../,     // A general rule to ignore the "." files/directories
             'node_modules',
             '.npm',
@@ -229,14 +229,14 @@ if (!module.parent) {
             'tmp'
         ];
 
-        var watchMatchers = configuration['watch-rules'] || defaultWatchRules,
-            watchIgnoreMatchers = configuration['watch-ignore-rules'] || defaultWatchIgnoreRules;
+        var watchMatchers = configuration['watch-patterns'] || defaultWatchPatterns,
+            watchIgnoreMatchers = configuration['watch-ignore-patterns'] || defaultWatchIgnorePatterns;
 
         if (inDebugMode) {
-            logger.verbose('\n"watch-rules":');
+            logger.verbose('\n"watch-patterns":');
             logger.log(watchMatchers);
 
-            logger.verbose('\n"watch-ignore-rules":');
+            logger.verbose('\n"watch-ignore-patterns":');
             logger.log(watchIgnoreMatchers);
         }
         // Note:
@@ -246,6 +246,7 @@ if (!module.parent) {
             watchMatchers,
             {
                 cwd: watcherCwd,
+
                 // https://github.com/paulmillr/chokidar#performance
                 // Sometimes the file is in the process of writing.
                 // It should have a stable filesize before we notify about the change.
@@ -253,13 +254,10 @@ if (!module.parent) {
                     stabilityThreshold: 100,
                     pollInterval: 45
                 },
+
                 ignored: watchIgnoreMatchers,
-                // ignored: /(^|[/\\])\../,
-                // ignoreInitial: true,
 
-                followSymlinks: allowSymlinks,
-
-                persistent: true
+                followSymlinks: allowSymlinks
             }
         );
 
@@ -517,8 +515,8 @@ process.on('uncaughtException', function(err) {
             '\n    Method 1. For Linux, try following instructions mentioned at https://stackoverflow.com/questions/22475849/node-js-error-enospc/32600959#32600959' +
             '\n    Method 2. You are probably watching too many files, to fix that:' +
             '\n              - try changing "root" directory for live-css' +
-            '\n              - try changing "watch-rules" if you are using live-css configuration file' +
-            '\n              - try changing "watch-ignore-rules" if you are using live-css configuration file' +
+            '\n              - try changing "watch-patterns" if you are using live-css configuration file' +
+            '\n              - try changing "watch-ignore-patterns" if you are using live-css configuration file' +
             '\n    Method 3. You are probably running out of disk space. Delete some of the unnecessary files and try again' +
             '\n'
         );
