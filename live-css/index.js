@@ -56,6 +56,7 @@ if (!module.parent) {
     var argv = require('yargs')
         .help(false)
         .argv;
+    var inDebugMode = argv.d || argv.debug;
 
     var localIpAddressesAndHostnames = [];
     try {
@@ -82,7 +83,7 @@ if (!module.parent) {
             '          -p --port=<port-number>          Port number to run live-css server',
             '             --allow-symlinks              Allow symbolic links',
             '             --init                        Generate the configuration file',
-            // '             --verbose                     Verbose logging',
+            '             --debug                       Extra logging to help in debugging live-css',
             '          -v --version                     Output the version number',
             ''
         ].join('\n'));
@@ -126,6 +127,10 @@ if (!module.parent) {
                 configuration = require(configFilePath);
                 flagConfigurationLoaded = true;
                 logger.verbose('Loaded configuration from ' + configFilePath);
+                if (inDebugMode) {
+                    logger.log('\n\nConfiguration:');
+                    logger.log(configuration);
+                }
             } catch (e) {
                 logger.warnHeading('\nUnable to read configuration from ' + configFilePath);
                 logger.warn('The configuration file contents needs to follow JavaScript syntax.\neg: https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js');
@@ -186,7 +191,8 @@ if (!module.parent) {
                 return process.cwd();
             }
         }());
-        var watchMatchers = [
+
+        var defaultWatchRules = [
             '**/*.css'
             // '**/*.css.*',
 
@@ -203,6 +209,12 @@ if (!module.parent) {
             // See below in this file: The path also needs to be "not" ignored in the "ignored" section
             // 'node_modules/async-limiter/coverage/lcov-report/base.css',
         ];
+        var watchMatchers = configuration['watch-rules'] || defaultWatchRules;
+
+        if (inDebugMode) {
+            logger.log('\n\nWatch rules:');
+            logger.log(watchMatchers);
+        }
         // Note:
         //     https://github.com/paulmillr/chokidar/issues/544
         //     Executable symlinks are getting watched unnecessarily due to this bug in chokidar
@@ -472,8 +484,23 @@ if (!module.parent) {
 }
 
 process.on('uncaughtException', function(err) {
-    if(err.errno === 'EADDRINUSE') {
+    if(err.code === 'EADDRINUSE') {
         logger.errorHeading('\nError: The requested port number is in use. Please pass a different port number to use.');
+    } else if (err.code === 'ENOSPC') {
+        logger.errorHeading(
+            '\n\nError: ENOSPC'
+        );
+        logger.error('Exiting live-css server.');
+        logger.info(
+            '\nMost probably, this issue can be easily fixed. Use one of the following methods and try running live-css again:' +
+            '\n    Method 1. For Linux, try following instructions mentioned at https://stackoverflow.com/questions/22475849/node-js-error-enospc/32600959#32600959' +
+            '\n    Method 2. You are probably watching too many files, to fix that:' +
+            '\n              - try changing "root" directory for live-css' +
+            '\n              - try changing "watch-rules" if you are using live-css configuration file' +
+            '\n              - try changing "watch-ignore-rules" if you are using live-css configuration file' +
+            '\n    Method 3. You are probably running out of disk space. Delete some of the unnecessary files and try again' +
+            '\n'
+        );
     } else {
         console.log(err);
     }
