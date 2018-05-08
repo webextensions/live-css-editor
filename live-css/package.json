@@ -1,6 +1,6 @@
 {
   "name": "live-css",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Server application meant to be used along with browser extension \"Live editor for CSS, Less & Sass - Magic CSS\" for Chrome/Edge/Firefox/Opera",
   "main": "index.js",
   "bin": {
