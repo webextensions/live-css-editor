@@ -87,11 +87,6 @@ if (!module.parent) {
         // do nothing
     }
 
-    var verboseLogging = false;
-    if (argv.v || argv.verbose) {
-        verboseLogging = true;
-    }
-
     var showHelp = function () {
         logger.verbose([
             '',
@@ -267,7 +262,7 @@ if (!module.parent) {
             io.emit('file-modified', changeObj);
         };
         var fileAddedHandler = function (changeObj) {
-            if (verboseLogging) {
+            if (inDebugMode) {
                 if (filesBeingWatched.length === 0) {
                     logger.success('Live CSS Editor (Magic CSS) is watching the following file(s):');
                 }
