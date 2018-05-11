@@ -9,15 +9,14 @@
         $ live-css --init
         --------OR--------
         Copy the default configuration file from:
-            https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js
+            https://github.com/webextensions/live-css-editor/tree/master/live-css/default.live-css.config.js
         and save it as a file with name ".live-css.config.js" (note that the file name begins with a dot character)
 
     For further guidance, visit the following links:
         https://www.npmjs.com/package/live-css
+        https://github.com/webextensions/live-css-editor/tree/master/live-css
         https://github.com/webextensions/live-css-editor
         https://github.com/webextensions/live-css-editor/issues
-        https://github.com/webextensions/live-css-editor/tree/master/live-css
-        https://github.com/webextensions/live-css-editor/tree/master/live-css/example.live-css.config.js
 */
 
 /* eslint-env node */                       // https://eslint.org/docs/rules/no-undef#nodejs
@@ -75,7 +74,7 @@ module.exports = {                          // Learn more about "module.exports"
         "temp",
         "tmp",
 
-        // "Negate" pattern to cancel ignore rule (by using "!" symbol)
+        // "Negate" pattern (by using "!" symbol) to cancel ignore rule
         // An example path which is required to be watched, but its parent folder is ignored
         // **** IMPORTANT NOTE:
         // **** For watching, this path would also need to be included in the "watch-patterns" section (without the "!" symbol)
@@ -93,4 +92,6 @@ module.exports = {                          // Learn more about "module.exports"
     "list-files": false                     // <true/false>
                                             // true: List the paths of the files being watched
                                             // false: Print a "." (dot) character on the terminal screen for each file being watched
+                                            // This setting is applicable only during the initial launch of the "live-css" server. When a file matching the
+                                            // "watch-pattern" is newly created while the "live-css" server is already running, the path is listed anyways
 };
