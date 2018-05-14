@@ -307,7 +307,7 @@ var generatePermissionPattern = function (url) {
     if (parsedUrl.protocol === 'file:') {
         pattern = 'file:///*';
     } else if (['http:', 'https:', 'ftp:'].indexOf(parsedUrl.protocol) >= 0) {
-        pattern = parsedUrl.protocol + '//' + parsedUrl.hostname + '/*';
+        pattern = parsedUrl.protocol + '//' + parsedUrl.hostname + (parsedUrl.port ? (':' + parsedUrl.port) : '') + '/*';
     } else {
         pattern = url;
     }
