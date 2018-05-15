@@ -346,11 +346,11 @@ if (!utils.defined) {
 
         var alertNote = function (msg, hideDelay, options) {
             options = options || {};
-            var alignment = options.alignment || 'center',
-                textAlignment = options.textAlignment || alignment,
+            var verticalAlignment = options.verticalAlignment || 'top',
+                horizontalAlignment = options.horizontalAlignment || 'center',
+                textAlignment = options.textAlignment || horizontalAlignment,
                 backgroundColor = options.backgroundColor || '#f9edbe',
                 borderColor = options.borderColor || '#eb7',
-                margin = options.margin || '0 10px',
                 opacity = options.opacity || '1',
                 unobtrusive = options.unobtrusive || false;
             // TODO:
@@ -359,21 +359,49 @@ if (!utils.defined) {
 
             /*eslint-disable indent */
             div.innerHTML = [
-                '<div style="position:fixed;left:0;top:0;width:100%;text-align:' + alignment + ';height:0;z-index:2147483647;opacity:' + opacity + ';">',
-                                                                                         // margin:0 is useful for some sites (eg: https://developer.chrome.com/home)
-                    '<table style="display:inline-table;border-collapse:collapse;width:auto;margin:0"><tr><td style="padding:0px;border:0">',
-                                                        // background-color:#feb;
-                        '<div style="border:1px solid ' + borderColor + ';background-color:' + backgroundColor + ';margin:' + margin + ';padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font-family:Arial,sans-serif;font-weight:bold;font-size:12px">',
-                            '<div style="clear:both">',
-                                '<div class="alert-note-text" style="float:left;color:#000;text-align:' + textAlignment + ';">',
-                                    msg,
-                                '</div>',
-                                // '<div style="float:right;margin-left:10px;font-weight:normal;text-decoration:underline;cursor:pointer">',
-                                //     'OK',
-                                // '</div>',
+                '<div ' +
+                    'style="' +
+                        'position:fixed;width:100%;z-index:2147483647;' +
+                        (verticalAlignment === 'bottom' ? 'bottom:0;' : 'top:0;') +
+                        (function () {
+                            if (horizontalAlignment === 'left') {
+                                return 'left:0;';
+                            } else if (horizontalAlignment === 'right') {
+                                return 'right:0;';
+                            } else {
+                                /* Even for center aligning, we need to set left or right as 0, without that
+                                    it would try to center align whithout considering the width taken by vertical scrollbar */
+                                return 'left:0;';
+                            }
+                        }()) +
+                        'text-align:' + horizontalAlignment + ';' +     // TODO: Check if we need this
+                        'opacity:' + opacity + ';' +
+                        '"' +
+                    '>',
+                    '<div ' +
+                        'style="' +
+                            'display:flex;width:auto;margin:0;padding:0;border:0;' +
+                            (function () {
+                                if (horizontalAlignment === 'left') {
+                                    return 'justify-content:flex-start;';
+                                } else if (horizontalAlignment === 'right') {
+                                    return 'justify-content:flex-end;';
+                                } else {
+                                    return 'justify-content:center;';
+                                }
+                            }()) +
+                                    // margin:0 is useful for some sites (eg: https://developer.chrome.com/home)
+                            '"' +
+                        '>',
+                        '<div style="border:1px solid ' + borderColor + ';' +
+                                'background-color:' + backgroundColor + ';' +   // background-color:#feb;
+                                                                                // TODO: Check if we need "text-align: left". Maybe it helps to set the default style.
+                                'padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font-family:Arial,sans-serif;font-weight:bold;font-size:12px">',
+                            '<div class="alert-note-text" style="color:#000;text-align:' + textAlignment + ';word-wrap:break-word;">',
+                                msg,
                             '</div>',
                         '</div>',
-                    '</td></tr></table>',
+                    '</div>',
                 '</div>'
             ].join('');
             /*eslint-enable indent */

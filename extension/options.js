@@ -3,6 +3,8 @@
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_ALL_FRAMES = 'all-frames',
+    USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
+    USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT = 'show-reapplying-styles-notification-at',
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
@@ -49,6 +51,46 @@ jQuery(function ($) {
             valueToSet = 'yes';
         }
         chromeStorage.set({[USER_PREFERENCE_ALL_FRAMES]: valueToSet});
+        notifyUser();
+    });
+
+    chromeStorage.get(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION, function (values) {
+        var $reapplyingStylesNotification = $('#reapplying-styles-notification'),
+            markChecked = true;
+        if (values && values[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION] === 'no') {
+            markChecked = false;
+        }
+        $reapplyingStylesNotification.prop('checked', markChecked);
+    });
+    $('#reapplying-styles-notification').on('click', function () {
+        var valueToSet = 'yes';
+        if(!$(this).is(':checked')) {
+            valueToSet = 'no';
+        }
+        chromeStorage.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION]: valueToSet});
+        notifyUser();
+    });
+
+    chromeStorage.get(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT, function (values) {
+        var value = values && values[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT];
+        if (['bottom-right', 'bottom-left', 'top-left'].indexOf(value) >= 0) {
+            // do nothing
+        } else {
+            value = 'top-right';
+        }
+        $('.notification-at-corner').val(value);
+    });
+    $('.notification-at-corner').change(function () {
+        var value = $(this).val(),
+            valueToSet = 'top-right';
+        if (['bottom-right', 'bottom-left', 'top-left'].indexOf(value) >= 0) {
+            valueToSet = value; // default value
+        }
+        chromeStorage.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT]: valueToSet});
+
+        // Also mark that "Show notification" would be checked
+        $('#reapplying-styles-notification').prop('checked', true);
+        chromeStorage.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION]: 'yes'});
         notifyUser();
     });
 

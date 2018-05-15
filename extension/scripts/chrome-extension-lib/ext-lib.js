@@ -62,15 +62,20 @@ var extLib = {
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
     insertCSS: function (options, cb) {
         var file = options.file,
+            code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null;
 
         if (typeof chrome !== "undefined" && chrome && chrome.tabs) {
-            chrome.tabs.insertCSS(tabId, {file: file, allFrames: allFrames}, function () {
+            chrome.tabs.insertCSS(tabId, {file: file, code: code, allFrames: allFrames}, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {
-            extLib.loadCSS(file);
+            if (file) {
+                extLib.loadCSS(file);
+            } else {
+                console.log('Error: It appears that you are in normal webpage mode while trying to load CSS "code". Currently, that works only in extension mode.');
+            }
             cb();
             // extLib.loadCSS(file, function (err) {
             //     if (err) {
@@ -100,20 +105,26 @@ var extLib = {
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
     executeScript: function (options, cb) {
         var file = options.file,
+            code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null;
         if (typeof chrome !== "undefined" && chrome && chrome.tabs) {
-            chrome.tabs.executeScript(tabId, {file: file, allFrames: allFrames}, function () {
+            chrome.tabs.executeScript(tabId, {file: file, code: code, allFrames: allFrames}, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {
-            extLib.loadJS(file, function (err) {
-                if (err) {
-                    console.error(err);
-                } else {
-                    cb();
-                }
-            });
+            if (file) {
+                extLib.loadJS(file, function (err) {
+                    if (err) {
+                        console.error(err);
+                    } else {
+                        cb();
+                    }
+                });
+            } else {
+                console.log('Error: It appears that you are in normal webpage mode while trying to execute JS "code". Currently, that works only in extension mode.');
+                cb();
+            }
         }
     },
 
@@ -121,15 +132,28 @@ var extLib = {
         asyncEachSeries(
             arrSources,
             function (source, cb) {
+                var sourceText, type;
                 // source can also be an object and can have "src" and "skip" parameters
                 if (typeof source === "object") {
                     if (source.skip) {
                         source = null;
+                    } else if (source.sourceText && source.type) {
+                        sourceText = source.sourceText;
+                        type = source.type;
                     } else {
                         source = source.src;
                     }
                 }
-                if (source) {
+                if (type && sourceText) {
+                    if (type === 'js') {
+                        extLib.executeScript({code: sourceText, allFrames: allFrames, tabId: tabId}, cb);
+                    } else if (type === 'css') {
+                        extLib.insertCSS({code: sourceText, allFrames: allFrames, tabId: tabId}, cb);
+                    } else {
+                        console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJSCSS(). Please check the "type" for the "sourceText".');
+                        cb();
+                    }
+                } else if (source) {
                     if (source.match('.js$')) {
                         extLib.executeScript({file: source, allFrames: allFrames, tabId: tabId}, cb);
                     } else if (source.match('.css$')) {
