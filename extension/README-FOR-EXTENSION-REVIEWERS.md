@@ -39,7 +39,7 @@ The file, `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browse
 
 3rdparty code which is used "as-is" from https://cdnjs.cloudflare.com/ajax/libs/
 --------------------------------------------------------------------------------
-- For parsing Sass, during runtime, we load https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.6/sass.sync.min.js
+- For parsing Sass, during runtime, we load https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js
 
 3rdparty code which is customized
 ---------------------------------
