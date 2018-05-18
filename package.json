@@ -15,12 +15,12 @@
     "codemirror": "5.31.0",
     "emmetio-codemirror-plugin-webextensions": "0.3.7",
     "jquery": "3.3.1",
-    "socket.io": "2.1.0"
+    "socket.io": "2.1.1"
   },
   "devDependencies": {
     "archiver": "2.1.1",
-    "chalk": "2.3.2",
-    "copy-files-from-to": "0.2.1",
+    "chalk": "2.4.1",
+    "copy-files-from-to": "0.2.2",
     "cp-file": "5.0.0",
     "del": "3.0.0",
     "eslint": "4.19.1",

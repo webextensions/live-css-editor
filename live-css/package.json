@@ -23,7 +23,7 @@
     "local-ip-addresses-and-hostnames": "0.1.0",
     "lodash": "4.17.10",
     "note-down": "0.1.1",
-    "socket.io": "2.1.0",
+    "socket.io": "2.1.1",
     "tiny-emitter": "2.0.2",
     "update-notifier": "2.5.0",
     "yargs": "11.0.0"
