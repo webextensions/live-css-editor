@@ -151,6 +151,14 @@
             "latestVersion": "https://raw.githubusercontent.com/furf/jquery-ui-touch-punch/master/jquery.ui.touch-punch.js"
         },
         {
+            "to": "extension/scripts/3rdparty/toastr/toastr.css",
+            "from": { "default": { "src": "node_modules/toastr/build/toastr.min.css" } }
+        },
+        {
+            "to": "extension/scripts/3rdparty/toastr/toastr.js",
+            "from": { "default": { "src": "node_modules/toastr/build/toastr.min.js" } }
+        },
+        {
             "to": "extension/scripts/3rdparty/socket.io/socket.io.slim.js",
             "from": { "default": { "src": "node_modules/socket.io-client/dist/socket.io.slim.js" } }
         },

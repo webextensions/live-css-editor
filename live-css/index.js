@@ -443,6 +443,22 @@ if (!module.parent) {
     });
 
     var startServer = function (portNumber) {
+        /* Begin: Temporarily hang application */
+        console.log('TODO: Remove this section "Temporarily hang application" when debugging is done');
+        var t1 = new Date();
+        setTimeout(function () {
+            console.log('Entering sleep');
+            while (true) {
+                // do nothing
+                var t2 = new Date();
+                if (t2 - t1 >= 30000) {
+                    break;
+                }
+            }
+            console.log('Exiting sleep');
+        }, 5000);
+        /* End: Temporarily hang application */
+
         http.listen(portNumber, function () {
             if (localIpAddressesAndHostnames.length) {
                 logger.info(

@@ -570,6 +570,171 @@ html .magicss-mouse-over-dom-element {
     fill: red !important;   /* Helps in highlighting SVG elements */
 }
 
+
+
+
+/* Begin: Server connectivity UI */
+#MagiCSS-bookmarklet .link-tag-to-edit,
+#MagiCSS-bookmarklet .file-to-edit {
+    color: #fff;
+    display: inline-block;
+}
+
+#MagiCSS-bookmarklet .file-to-edit {
+    float: right;
+}
+
+#MagiCSS-bookmarklet .link-tag-to-edit {
+    float: right;
+}
+
+.magic-css-full-page-overlay {
+    background-color: rgba(0,0,0,0.5);
+    -pointer-events: none;
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2147483647;
+}
+
+.magic-css-full-page-contents {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2147483647;
+}
+
+.magic-css-back-end-connectivity-options {
+    width: 350px;
+    position: fixed !important; /* Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;" */
+    z-index: 2147483647;
+    box-sizing: border-box;
+    background-color: #eee;
+    border-radius: 10px;
+    font-family: Helvetica, "Trebuchet MS", sans-serif;
+    font-size: 12px;
+}
+
+/* Begin: Useful while debugging. Comment it out before publishing. */
+.magic-css-full-page-overlay,
+.magic-css-full-page-overlay {
+    z-index: 2147483646;
+}
+/* End */
+
+.magic-css-back-end-connectivity-options {
+    box-sizing: border-box;
+}
+
+.magic-css-back-end-connectivity-options * {
+    box-sizing: inherit;
+}
+
+.magic-css-file-field-header {
+    color: #777;
+    margin-bottom: 2px;
+}
+
+/*
+.magic-css-row {
+	clear: both;
+	margin-top: 7px;
+}
+.magic-css-row-item-1 {
+	float: left;
+	width: 125px;
+	text-align: right;
+}
+.magic-css-row-item-2 {
+    margin-left: 135px;
+}
+.magic-css-row input {
+	padding-left: 3px;
+}
+.magic-css-row input:invalid {
+	border-color: #e81a1a;
+	border-style: solid;
+}
+.magic-css-row .link-tag-to-refresh select {
+    width: 300px;
+}
+/* */
+.magic-css-file-config-item {
+    background-color: #ddd;
+    border-bottom: 1px solid #999;
+    margin-bottom: 0;
+    padding: 10px;
+
+    border: 1px solid #999;
+    border-bottom-width: 0;
+}
+
+.magic-css-file-config-item:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.magic-css-file-config-item:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.magic-css-file-config-item:last-child {
+    border-bottom: 1px solid #999;
+}
+
+.magic-css-file-config-item input[type="number"],
+.magic-css-file-config-item input[type="text"],
+.magic-css-file-config-item select {
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 100%;
+    height: 21px;
+}
+
+.magic-css-file-config-item select {
+    background-color: #fff;
+}
+
+.magic-css-back-end-connectivity-options .ms-res-ctn.dropdown-menu {
+    height: 58px;
+    position: absolute;
+    border: 1px solid #777;
+    width: calc(100% - 2px);
+    z-index: 10000;
+    background-color: #fff;
+    left: 0px;
+    bottom: 30px;
+}
+.magic-css-back-end-connectivity-options .ms-ctn {
+    padding-left: 7px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.magic-css-back-end-connectivity-options .ms-ctn .ms-trigger .ms-trigger-ico {
+    margin-top: 9px;
+}
+.magic-css-back-end-connectivity-options .ms-ctn-focus {
+    box-shadow: none;
+    outline: -webkit-focus-ring-color auto 5px
+}
+.magic-css-back-end-connectivity-options .ms-ctn .ms-helper {
+    display: none !important;
+}
+.magic-css-back-end-connectivity-options .ms-ctn.form-control {
+    border: 1px solid #aaa;
+}
+/* End: Server connectivity UI */
+
+
+
+
+
+
 /*
     Begin: Site-specific / CSS-style-specific fixes
     (where sites over-ride some default styles in an unexpected manner)
@@ -627,3 +792,78 @@ html .magicss-mouse-over-dom-element {
 }
 
 /* End: Site-specific fixes */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.magic-css-toastr#toast-container {
+    z-index: 2147483647;
+    font-family: Helvetica, "Trebuchet MS", sans-serif;
+    font-size: 12px;
+}
+
+.magic-css-toastr#toast-container > div {
+    opacity: 1;
+    padding: 10px 20px 10px 40px;
+    background-position: 15px center;
+    background-position: 10px center;
+    width: auto;
+    max-width: 400px;
+}
+
+.magic-css-toastr .toast-close-button {
+    top: -4px;
+    right: -10px;
+}
+
+.magic-css-row-item-2 * {
+    display: inline-block;
+    -float: left;
+}
+.magic-css-file-config-item input[type="number"],
+.magic-css-file-config-item input[type="text"],
+.magic-css-file-config-item select {
+    width: 20%
+}
+
+
+
+.magic-css-server-connectivity-status {
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    /* https://www.iconfinder.com/icons/282474/check_done_ok_icon#size=128 */
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAuMDA3OTk1NjEwMTI1MzYyODcgMTM2Ljc2MTAwMTU4NjkxNCAxMDcuOTkyMDA0Mzg5ODc1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImRlZjAiIHgxPSIwLjUwMDAwNSIgeDI9IjAuNTAwMDA1IiB5MT0iMS42NDI0NiIgeTI9Ii0wLjEzOTQ5MyI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDA0NDAwIi8+PHN0b3Agb2Zmc2V0PSIwLjUxMDk4OSIgc3RvcC1jb2xvcj0iIzAxOEMwMSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzkxQ0Q5MSIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJkZWYxIiB4MT0iLTUuMzc0MjZFLTA2IiB4Mj0iMC45OTk5OTciIHkxPSIwLjQ5OTk5NiIgeTI9IjAuNDk5OTk2Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0eWxlPSJzdG9wLW9wYWNpdHk6MC4zMDE5NjA3ODQzMTM3MjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0eWxlPSJzdG9wLW9wYWNpdHk6MC4yIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PGc+PHBhdGggZD0iTTUyLjk4NCwxMDhMMCw1NS4wMDggMjMuMjczMywzMS43MzIgNTIuOTg1Myw2MS40NDI3IDExNC40MzIsMC4wMDc5OTU2MSAxMzYuNzYxLDIyLjM0MTMgMTM0Ljg3NSwyNC4yMjY3IDExNC40MzIsMy43Nzg2NiA1Mi45ODUzLDY1LjIxMzMgMjMuMjczMywzNS41MDI3IDMuNzcwNjcsNTUuMDA4IDU0Ljg2OTMsMTA2LjExNSA1Mi45ODQsMTA4eiIgZmlsbD0iIzAwNjYwMCIvPjxwYXRoIGQ9Ik0xMzUuODE4LDIzLjI4NDVMMTE0LjQzMywxLjg5Mzg2IDUyLjk4NjQsNjMuMzI4NSAyMy4yNzMxLDMzLjYxNzkgMS44ODUwNyw1NS4wMDg1IDIxLjE3MzEsNzQuMjk2NSAzNC41MjI0LDg3LjY1MjUgNTMuOTI2NCwxMDcuMDU4IiBmaWxsPSJ1cmwoI2RlZjApIi8+PHBhdGggZD0iTTUyLjk4NjQsNjMuMzI3MkwyMy4yNzQ0LDMzLjYxNzkgMS44ODY0LDU1LjAwODUgMjEuMTczMSw3NC4yOTY1IDMyLjE4NzcsODUuMzE3OUM0Ny4zNDc3LDc1Ljk3MzksNzIuNTkxNyw2Mi45ODcyLDEwMS41MTcsNTguMzczOUwxMzUuODE4LDIzLjI4NDUgMTE0LjQzMywxLjg5Mzg2IDUyLjk4NjQsNjMuMzI3MnoiIGZpbGw9InVybCgjZGVmMSkiLz48L2c+PC9zdmc+');
+}
+
+.magic-css-server-connectivity-status {
+    /* https://www.iconfinder.com/icons/282471/cross_delete_remove_icon#size=128 */
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIyLjU0MzEyOTk5NDU5MjE2RS0wNiAtMC4xOTQ2NTU5OTk1NDEyODMgMTEzLjUyNjk5Nzg4NDExNiAxMTMuNTI3NjU2MTgyNjQ3IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImRlZjAiIHgxPSIwLjQ5OTk5NSIgeDI9IjAuNDk5OTk1IiB5MT0iMS43Mzc3OUUtMDYiIHkyPSIxLjAwMDAxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGMjdFNUUiLz48c3RvcCBvZmZzZXQ9IjAuNSIgc3RvcC1jb2xvcj0iI0VCMUMyNCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0NFMjIyOSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxnPjxwYXRoIGQ9Ik0yLjU0MzEzRS0wNiw4Ny41MzQ3TDMwLjk2NCw1Ni41NjQgMi41NDMxM0UtMDYsMjUuNjAxMyAyNS43OTczLC0wLjE5NDY1NiA1Ni43NjI3LDMwLjc3MDcgODcuNzI2NywtMC4xOTQ2NTYgMTEzLjUyNywyNS42MDEzIDgyLjU2MjcsNTYuNTY5MyAxMTMuNTI3LDg3LjUzNDcgODcuNzI2NywxMTMuMzI5IDU2Ljc2NjcsODIuMzY0IDI1Ljc5NzMsMTEzLjMzMyAyLjU0MzEzRS0wNiw4Ny41MzQ3eiIgZmlsbD0iIzk5MDAwMCIvPjxwYXRoIGQ9Ik0xMTEuNjQxLDg3LjUzNDFMODAuNjc2OCw1Ni41NzAxIDExMS42NDEsMjUuNjAyMSA4Ny43MjYxLDEuNjkwMTQgNTYuNzYzNSwzMi42NTU1IDI1Ljc5NjgsMS42OTAxNCAxLjg4NDgsMjUuNjAyMSAzMi44NTAxLDU2LjU2NDggMS44ODQ4LDg3LjUzNDEgMjUuNzk2OCwxMTEuNDQ3IDU2Ljc2NzUsODAuNDc4MSA4Ny43MjYxLDExMS40NDMgMTExLjY0MSw4Ny41MzQxeiIgZmlsbD0idXJsKCNkZWYwKSIvPjxwYXRoIGQ9Ik01My41NTA3LDQyLjE1OTdDNjkuOTc3MywzNi45MTg0LDg2LjI5ODcsMzUuMDc4NCwxMDEuMDM2LDM2LjIwNzdMMTExLjY0LDI1LjYwMjQgODcuNzI2NywxLjY5MDQgNTYuNzYyNywzMi42NTU3IDI1Ljc5NzMsMS42OTA0IDEuODg1MzQsMjUuNjAyNCAyOS4wMzQ3LDUyLjc0OTFDMzYuNTE4Nyw0OC41NjUxLDQ0LjczODcsNDQuOTcxNyw1My41NTA3LDQyLjE1OTd6IiBmaWxsPSIjRkZGRkZGIiBzdHlsZT0iZmlsbC1vcGFjaXR5OjAuMTAxOTYwNzg0MzEzNzI1Ii8+PC9nPjwvc3ZnPg==');
+}

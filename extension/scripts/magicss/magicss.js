@@ -1,4 +1,4 @@
-/*globals jQuery, less, utils, sourceMap, chrome, CodeMirror, io */
+/*globals jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr */
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
@@ -29,14 +29,24 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         }
     };
 
+    var strAboutToBeInstantiated = '<about-to-be-instantiated>';
     if (window.MagiCSSEditor) {
-        utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
+        if (window.MagiCSSEditor === strAboutToBeInstantiated) {
+            // do nothing
+        } else {
+            utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
 
-        // 'Magic CSS window is already there. Repositioning it.'
-        window.MagiCSSEditor.reposition(function () {
-            checkIfMagicCssLoadedFine(window.MagiCSSEditor);
-        });
+            // 'Magic CSS window is already there. Repositioning it.'
+            window.MagiCSSEditor.reposition(function () {
+                checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+            });
+        }
         return;
+    } else {
+        // Temporarily instantiating window.MagiCSSEditor as a truthy value
+        // Without this, if a user quickly runs Magic CSS twice, then in both
+        // the runs, window.MagiCSSEditor would be unavailable
+        window.MagiCSSEditor = strAboutToBeInstantiated;
     }
 
     /* eslint-disable */
@@ -95,6 +105,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     if (document.body.tagName !== 'BODY') {
         return;
     }
+
+    toastr.options.positionClass = 'toast-top-right magic-css-toastr';
+    toastr.options.newestOnTop = false;
+    // toastr.options.closeButton = true;
+    toastr.options.hideDuration = 300;
+    toastr.options.timeOut = 5000;
+    toastr.options.extendedTimeOut = 0;
+
 
     var rememberLastAppliedCss = function (css) {
         var editor = window.MagiCSSEditor;
@@ -1238,6 +1256,272 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     return mode;
                 };
 
+                var getDisconnectedWithBackEnd = function (cb) {
+                    console.log('TODO: getDisconnectedWithBackEnd');
+                    cb();
+                };
+
+                var getConnectedWithBackEnd = function (editor, options, cb) {
+                    console.log('TODO: getConnectedWithBackEnd');
+                    // debugger;
+                    // cb();
+                    // return;
+
+                    options = options || {};
+                    var needInputThroughUi = true;
+
+                    var pathOfFileToEdit = editor.userPreference('file-to-edit');
+                    if (pathOfFileToEdit) {
+                        needInputThroughUi = false;
+                    }
+
+                    if (needInputThroughUi || options.showUi) {
+                        showBackEndConnectivityOptions(editor, function () {
+                            console.log('TODO');
+                            debugger;
+                        });
+                    } else {
+                        console.log('TODO');
+                    }
+                    /* */
+                };
+
+                var getServerDetailsFromUser = function (editor) {
+                    /* eslint-disable indent */
+                    var $backEndConnectivityOptions = $(
+                        [
+                            '<div>',
+                                '<div class="magic-css-full-page-overlay">',
+                                '</div>',
+                                '<div class="magic-css-full-page-contents" style="pointer-events:none;">',
+                                    '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
+                                        '<div class="magic-css-back-end-connectivity-options" style="pointer-events:initial;">',
+                                            '<div class="magic-css-row magic-css-file-config-item">',
+                                                '<div class="magic-css-row-item-1 magic-css-file-field-header">',
+                                                    'Server path <span style="color:#888;font-size:12px">',
+                                                        '(eg: ',
+                                                        (function () {
+                                                            var protocol = (window.location.protocol === 'https:') ? 'https:' : 'http:',
+                                                                hostname = window.location.hostname || '127.0.0.1',
+                                                                port = '3456';
+                                                            return protocol + '//' + hostname + ':' + port;
+                                                        }()),
+                                                        ')',
+                                                    '</span>',
+                                                '</div>',
+                                                '<div class="magic-css-row-item-2">',
+                                                    '<span>http://&nbsp;</span>',
+                                                    '<input type="text" spellcheck="false" class="magic-css-server-hostname" placeholder="',
+                                                        window.location.hostname || '127.0.0.1',
+                                                        '" style="width:165px"',
+                                                    ' />',
+                                                    '<span>&nbsp;:&nbsp;</span>',
+                                                    '<input type="text" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px; margin-right:10px;" />',
+                                                    '<span class="magic-css-server-connectivity-status" style="width:16px; height:16px; background-repeat:no-repeat;">&nbsp;</span>',
+                                                    // '<div class="magic-css-row-item-2"><input type="button" value="Check connectivity" /></div>',
+                                                '</div>',
+                                            '</div>',
+                                            // '<div class="magic-css-row magic-css-file-config-item">',
+                                            //     '<div class="magic-css-row-item-1 magic-css-file-field-header">&nbsp;</div>',
+                                            // '</div>',
+                                            '<div class="magic-css-row magic-css-file-config-item">',
+                                                '<input type="button" class="magicss-start-file-editing" value="Start Editing" />',
+                                                '<input type="button" class="magicss-cancel-file-mode" value="Cancel" />',
+                                            '</div>',
+                                        '</div>',
+                                    '</div>',
+                                '</div>',
+                            '</div>'
+                        ].join('')
+                    );
+                    /* eslint-enable indent */
+
+                    var $serverHostname = $backEndConnectivityOptions.find('.magic-css-server-hostname'),
+                        serverHostnameValue = editor.userPreference('magic-css-server-hostname');
+                    $serverHostname.val(serverHostnameValue);
+                    $serverHostname.on('change', function () {
+                        var serverHostnameValue = $(this).val().trim().replace(/\/$/, '');
+                        editor.userPreference('magic-css-server-hostname', serverHostnameValue);
+                    });
+
+                    var $serverPort = $backEndConnectivityOptions.find('.magic-css-server-port'),
+                        serverPortValue = editor.userPreference('magic-css-server-port');
+                    $serverPort.val(serverPortValue);
+                    $serverPort.on('change', function () {
+                        var serverPortValue = $(this).val().trim().replace(/\/$/, '');
+                        editor.userPreference('magic-css-server-port', serverPortValue);
+                    });
+
+                    // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
+                    $backEndConnectivityOptions.find('.magic-css-back-end-connectivity-options').draggable();
+
+                    $backEndConnectivityOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
+                        console.log('TODO');
+                        $backEndConnectivityOptions.remove();
+                    });
+                    $backEndConnectivityOptions.find('.magicss-start-file-editing').on('click', function () {
+                        console.log('TODO');
+                        $backEndConnectivityOptions.remove();
+                    });
+                    $('body').append($backEndConnectivityOptions);
+                };
+
+                var $toastrConnecting,
+                    $toastrConnected,
+                    $toastrReconnectAttempt;
+                    // $toastrError;
+                var showBackEndConnectivityOptions = function (editor, cb) {
+                    var serverHostnameValue = editor.userPreference('magic-css-server-hostname'),
+                        serverPortValue = editor.userPreference('magic-css-server-port');
+
+                    if (socket) {
+                        socket.close();
+                        socket = null;
+                    }
+
+                    var backEndPath = serverHostnameValue + ':' + serverPortValue;
+                    if ($toastrConnecting) {
+                        $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                    }
+                    if ($toastrConnected) {
+                        $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                    }
+                    if ($toastrReconnectAttempt) {
+                        $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                    }
+
+                    // if ($toastrError) {
+                    //     $toastrError.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                    // }
+                    $toastrConnecting = toastr.info(
+                        'Connecting to live-css server at: ' + backEndPath +
+                        '<br /><br />' +
+                        '<button type="button">Cancel</button>' +
+                        ' ' +
+                        '<button type="button">Configure</button>',
+                        undefined,
+                        {
+                            timeOut: 0,
+                            onclick: function () {
+                                getServerDetailsFromUser(editor);
+                            }
+                        }
+                    );
+
+                    console.log('TODO: flagConnectedAtLeastOnce can be reset within the same session as well');
+                    var flagConnectedAtLeastOnce = false;
+                    socket = io(backEndPath, {
+                        timeout: 5000,
+                        reconnectionAttempts: 0
+                        // requestTimeout: 5
+                        // 'sync disconnect on unload' : true
+                    });
+                    // socket = io('127.0.0.1:3456');
+                    socket.on('connect', function () {
+                        flagConnectedAtLeastOnce = true;
+                        if ($toastrReconnectAttempt) {
+                            $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                            $toastrReconnectAttempt = null;
+                        }
+
+                        $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                        $toastrConnected = toastr.success(
+                            'Successfully connected to live-css server' +
+                            '<br /><br />' +
+                            '<button type="button">Disconnect</button>' +
+                            ' ' +
+                            '<button type="button">Configure</button>',
+                            undefined,
+                            {
+                                closeButton: true
+                            }
+                        );
+                        var $toastrToHide = $toastrConnected;
+                        setTimeout(function () {
+                            toastr.clear($toastrToHide);
+                        }, 4000);
+                    });
+
+                    socket.on('reconnect_attempt', function () {
+                        if (flagConnectedAtLeastOnce) {
+                            if ($toastrReconnectAttempt) {
+                                // do nothing
+                            } else {
+                                if ($toastrConnected) {
+                                    $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                                }
+                                $toastrReconnectAttempt = toastr.warning(
+                                    'Trying to reconnect to live-css server' +
+                                    '<br /><br />' +
+                                    '<button type="button">Cancel</button>' +
+                                    '&nbsp;' +
+                                    '<button type="button">Configure</button>',
+                                    undefined,
+                                    {
+                                        timeOut: 0
+                                    }
+                                );
+                            }
+                        }
+
+                        console.log('event reconnect_attempt');
+                    });
+
+                    // socket.on('*', function(event, data) {
+                    //     console.log('event ' + event);
+                    //     console.log(data);
+                    // });
+
+                    // socket.on('reconnect', function () {
+                    //     console.log('event reconnect');
+                    // });
+                    // socket.on('reconnecting', function () {
+                    //     console.log('event reconnecting');
+                    // });
+                    /*
+                    socket.on('reconnect_error', function () {
+                        console.log('event reconnect_error');
+                    }); /* */
+                    /*
+                    socket.on('connect_error', function () {
+                        console.log('event connect_error');
+                    }); /* */
+                    // socket.on('reconnect_failed', function () {
+                    //     console.log('event reconnect_failed');
+                    // });
+
+                    /*
+                    socket.on('connect_timeout', function () {
+                        console.log('connect_timeout');
+                        toastr.error('connect_timeout');
+
+                        // getServerDetailsFromUser(editor);
+                    });
+                    /* */
+                    socket.on('file-modified', function(changeDetails) {
+                        if (changeDetails.useOnlyFileNamesForMatch) {
+                            reloadCSSResourceInPage({
+                                fullPath: changeDetails.fullPath,
+                                useOnlyFileNamesForMatch: true,
+                                fileName: changeDetails.fileName
+                            });
+                        } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                            var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                            reloadCSSResourceInPage({
+                                fullPath: changeDetails.fullPath,
+                                url: resolveUrl(pathWrtRoot)
+                            });
+                        } else {
+                            // The code should never reach here
+                            utils.alertNote(
+                                'Unexpected scenario occurred in reloading some CSS resources.' +
+                                '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                                10000
+                            );
+                        }
+                    });
+                };
+
                 var getMagicCSSForChrome = null,
                     getMagicCSSForEdge = null,
                     getMagicCSSForFirefox = null;
@@ -1613,6 +1897,32 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     // cls: 'magicss-watch-resources',
                                     uniqCls: 'magicss-watch-and-reload-link-tags',
                                     onclick: function (evt, editor) {
+                                        /*
+                                        toastr.info('Establishing connectivity with back-end Establishing connectivity with back-end Establishing connectivity with back-end Establishing connectivity with back-end ');
+                                        /* */
+
+                                        var flagWatchingFiles = false;
+                                        if (!flagWatchingFiles) {
+                                            getConnectedWithBackEnd(
+                                                editor,
+                                                {},
+                                                function () {
+                                                    console.log('TODO: Update in UI that files are being watched now');
+                                                    editor.focus();
+                                                }
+                                            );
+                                        } else {
+                                            getDisconnectedWithBackEnd(
+                                                editor,
+                                                {},
+                                                function () {
+                                                    console.log('TODO: Update in UI that files are not being watched now');
+                                                    editor.focus();
+                                                }
+                                            );
+                                        }
+
+                                        /*
                                         console.log('TODO - watch CSS files');
                                         flagWatchingCssFiles = !flagWatchingCssFiles;
 
@@ -1645,6 +1955,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         });
                                         $(editor.container).addClass('watching-css-files');
                                         editor.focus();
+                                        /* */
                                     },
                                     beforeShow: function (origin, tooltip, editor) {
                                         tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
