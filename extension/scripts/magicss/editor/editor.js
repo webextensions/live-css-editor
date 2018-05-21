@@ -493,7 +493,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 $(document).on('click', '.' + iconOptions.uniqCls, function(evt){
                                     evt.preventDefault();   // Useful in preventing the opening of a new tab in Firefox if the anchor-tag icon has target="_blank"
                                     iconOptions.onclick(evt, editor, $moreIcon);
+
+                                    var originalSpeed = $moreIcon.tooltipster('option', 'speed');
+                                    $moreIcon.tooltipster('option', 'speed', 0);
                                     $moreIcon.tooltipster('hide');
+                                    $moreIcon.tooltipster('option', 'speed', originalSpeed);
                                 });
                             }
                         });
@@ -556,7 +560,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     $(document).on('click', '.' + iconOptions.uniqCls, function(evt){
                                         evt.preventDefault();   // Useful in preventing the opening of a new tab in Firefox if the anchor-tag icon has target="_blank"
                                         iconOptions.onclick(evt, editor, $divIcon);
+
+                                        var originalSpeed = $divIcon.tooltipster('option', 'speed');
+                                        $divIcon.tooltipster('option', 'speed', 0);
                                         $divIcon.tooltipster('hide');
+                                        $divIcon.tooltipster('option', 'speed', originalSpeed);
                                     });
                                 }
                             });

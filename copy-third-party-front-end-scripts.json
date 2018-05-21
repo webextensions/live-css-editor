@@ -156,7 +156,8 @@
         },
         {
             "to": "extension/scripts/3rdparty/toastr/toastr.js",
-            "from": { "default": { "src": "node_modules/toastr/build/toastr.min.js" } }
+            "from": { "default": { "src": "node_modules/toastr/toastr.js" } },
+            "_": { "default": { "src": "node_modules/toastr/build/toastr.min.js" } }
         },
         {
             "to": "extension/scripts/3rdparty/socket.io/socket.io.slim.js",

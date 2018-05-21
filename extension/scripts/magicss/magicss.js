@@ -112,6 +112,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     toastr.options.hideDuration = 300;
     toastr.options.timeOut = 5000;
     toastr.options.extendedTimeOut = 0;
+    // toastr.options.tapToDismiss = false;
 
 
     var rememberLastAppliedCss = function (css) {
@@ -1256,36 +1257,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     return mode;
                 };
 
-                var getDisconnectedWithBackEnd = function (cb) {
-                    console.log('TODO: getDisconnectedWithBackEnd');
-                    cb();
-                };
-
-                var getConnectedWithBackEnd = function (editor, options, cb) {
-                    console.log('TODO: getConnectedWithBackEnd');
-                    // debugger;
-                    // cb();
-                    // return;
-
-                    options = options || {};
-                    var needInputThroughUi = true;
-
-                    var pathOfFileToEdit = editor.userPreference('file-to-edit');
-                    if (pathOfFileToEdit) {
-                        needInputThroughUi = false;
-                    }
-
-                    if (needInputThroughUi || options.showUi) {
-                        showBackEndConnectivityOptions(editor, function () {
-                            console.log('TODO');
-                            debugger;
-                        });
-                    } else {
-                        console.log('TODO');
-                    }
-                    /* */
-                };
-
                 var getServerDetailsFromUser = function (editor) {
                     /* eslint-disable indent */
                     var $backEndConnectivityOptions = $(
@@ -1366,11 +1337,25 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $('body').append($backEndConnectivityOptions);
                 };
 
+                var updateUiMentioningNotWatchingCssFiles = function (editor) {
+                    if (flagWatchingCssFiles) {
+                        flagWatchingCssFiles = false;
+                        utils.alertNote('Stopped watching CSS file changes');
+                        $(editor.container).removeClass('watching-css-files');
+                    }
+                };
+
+                var liveCssServerSessionClosedByUser = function (editor) {
+                    console.log('TODO: Disable editing file');
+
+                    updateUiMentioningNotWatchingCssFiles(editor);
+                };
+
                 var $toastrConnecting,
                     $toastrConnected,
                     $toastrReconnectAttempt;
-                    // $toastrError;
-                var showBackEndConnectivityOptions = function (editor, cb) {
+                var establishBackEndConnectivity = function (editor, callback) {
+                    var flagCallbackCalledOnce = false;
                     var serverHostnameValue = editor.userPreference('magic-css-server-hostname'),
                         serverPortValue = editor.userPreference('magic-css-server-port');
 
@@ -1390,20 +1375,31 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
                     }
 
-                    // if ($toastrError) {
-                    //     $toastrError.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-                    // }
                     $toastrConnecting = toastr.info(
                         'Connecting to live-css server at: ' + backEndPath +
                         '<br /><br />' +
-                        '<button type="button">Cancel</button>' +
+                        '<button type="button" class="magic-css-toastr-socket-cancel">Cancel</button>' +
                         ' ' +
-                        '<button type="button">Configure</button>',
+                        '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>',
                         undefined,
                         {
                             timeOut: 0,
-                            onclick: function () {
-                                getServerDetailsFromUser(editor);
+                            onclick: function (evt) {
+                                if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                                    // debugger;
+                                    getServerDetailsFromUser(editor);
+                                } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
+                                    if (socket) {
+                                        socket.close();
+                                        socket = null;
+                                    }
+                                    // debugger;
+                                    toastr.clear($toastrConnecting, {force: true});
+                                    if (!flagCallbackCalledOnce) {
+                                        flagCallbackCalledOnce = true;
+                                        callback('cancelled-by-user', socket);
+                                    }
+                                }
                             }
                         }
                     );
@@ -1419,6 +1415,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     // socket = io('127.0.0.1:3456');
                     socket.on('connect', function () {
                         flagConnectedAtLeastOnce = true;
+
+                        if (!flagCallbackCalledOnce) {
+                            flagCallbackCalledOnce = true;
+                            callback(null, socket);
+                        }
+
                         if ($toastrReconnectAttempt) {
                             $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
                             $toastrReconnectAttempt = null;
@@ -1428,12 +1430,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         $toastrConnected = toastr.success(
                             'Successfully connected to live-css server' +
                             '<br /><br />' +
-                            '<button type="button">Disconnect</button>' +
-                            ' ' +
-                            '<button type="button">Configure</button>',
+                            '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>',
                             undefined,
                             {
-                                closeButton: true
+                                closeButton: true,
+                                onclick: function (evt) {
+                                    if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                                        // debugger;
+                                        toastr.clear($toastrConnected, {force: true});
+                                        getServerDetailsFromUser(editor);
+                                    }
+                                }
                             }
                         );
                         var $toastrToHide = $toastrConnected;
@@ -1453,18 +1460,30 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 $toastrReconnectAttempt = toastr.warning(
                                     'Trying to reconnect to live-css server' +
                                     '<br /><br />' +
-                                    '<button type="button">Cancel</button>' +
+                                    '<button type="button" class="magic-css-toastr-socket-cancel">Cancel</button>' +
                                     '&nbsp;' +
-                                    '<button type="button">Configure</button>',
+                                    '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>',
                                     undefined,
                                     {
-                                        timeOut: 0
+                                        timeOut: 0,
+                                        onclick: function (evt) {
+                                            if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                                                // debugger;
+                                                getServerDetailsFromUser(editor);
+                                            } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
+                                                if (socket) {
+                                                    socket.close();
+                                                    socket = null;
+                                                }
+                                                // debugger;
+                                                toastr.clear($toastrReconnectAttempt, {force: true});
+                                                liveCssServerSessionClosedByUser(editor);
+                                            }
+                                        }
                                     }
                                 );
                             }
                         }
-
-                        console.log('event reconnect_attempt');
                     });
 
                     // socket.on('*', function(event, data) {
@@ -1498,6 +1517,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         // getServerDetailsFromUser(editor);
                     });
                     /* */
+                    /*
                     socket.on('file-modified', function(changeDetails) {
                         if (changeDetails.useOnlyFileNamesForMatch) {
                             reloadCSSResourceInPage({
@@ -1519,7 +1539,55 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 10000
                             );
                         }
-                    });
+                    }); /* */
+                };
+
+                var getDisconnectedWithBackEnd = function (editor, options, cb) {
+                    if (socket) {
+                        socket.close();
+                        socket = null;
+                    }
+                    if ($toastrConnected) {
+                        toastr.clear($toastrConnected, {force: true});
+                    }
+                    if ($toastrConnecting) {
+                        toastr.clear($toastrConnecting, {force: true});
+                    }
+                    if ($toastrReconnectAttempt) {
+                        toastr.clear($toastrReconnectAttempt, {force: true});
+                    }
+                    cb();
+                };
+
+                var getConnectedWithBackEnd = function (editor, options, cb) {
+                    console.log('TODO: getConnectedWithBackEnd');
+                    // debugger;
+                    // cb();
+                    // return;
+
+                    options = options || {};
+                    var needInputThroughUi = true;
+
+                    var pathOfFileToEdit = editor.userPreference('file-to-edit');
+                    if (pathOfFileToEdit) {
+                        needInputThroughUi = false;
+                    }
+
+                    if (needInputThroughUi || options.showUi) {
+                        establishBackEndConnectivity(editor, function (err, socket) {
+                            cb(err, socket);
+                            // if (err) {
+                            //     console.log('TODO: Error handler');
+                            // } else {
+                            //     console.log('TODO: Success handler');
+                            //     cb(err);
+                            // }
+                            // debugger;
+                        });
+                    } else {
+                        console.log('TODO');
+                    }
+                    /* */
                 };
 
                 var getMagicCSSForChrome = null,
@@ -1901,26 +1969,50 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         toastr.info('Establishing connectivity with back-end Establishing connectivity with back-end Establishing connectivity with back-end Establishing connectivity with back-end ');
                                         /* */
 
-                                        var flagWatchingFiles = false;
-                                        if (!flagWatchingFiles) {
+                                        // var flagWatchingFiles = false;
+                                        // if (!flagWatchingFiles) {
+                                        if (!flagWatchingCssFiles) {
                                             getConnectedWithBackEnd(
                                                 editor,
                                                 {},
-                                                function () {
-                                                    console.log('TODO: Update in UI that files are being watched now');
-                                                    editor.focus();
-                                                }
-                                            );
-                                        } else {
-                                            getDisconnectedWithBackEnd(
-                                                editor,
-                                                {},
-                                                function () {
-                                                    console.log('TODO: Update in UI that files are not being watched now');
-                                                    editor.focus();
+                                                function (err, socket) {
+                                                    if (err) {
+                                                        // the user cancelled watching files
+                                                        utils.alertNote('You cancelled watching CSS file changes');
+                                                    } else {
+                                                        socket.on('file-modified', function(changeDetails) {
+                                                            if (changeDetails.useOnlyFileNamesForMatch) {
+                                                                reloadCSSResourceInPage({
+                                                                    fullPath: changeDetails.fullPath,
+                                                                    useOnlyFileNamesForMatch: true,
+                                                                    fileName: changeDetails.fileName
+                                                                });
+                                                            } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                                                                var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                                                                reloadCSSResourceInPage({
+                                                                    fullPath: changeDetails.fullPath,
+                                                                    url: resolveUrl(pathWrtRoot)
+                                                                });
+                                                            } else {
+                                                                // The code should never reach here
+                                                                utils.alertNote(
+                                                                    'Unexpected scenario occurred in reloading some CSS resources.' +
+                                                                    '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                                                                    10000
+                                                                );
+                                                            }
+                                                        });
+
+                                                        flagWatchingCssFiles = true;
+                                                        utils.alertNote('Now watching CSS file changes');
+                                                        $(editor.container).addClass('watching-css-files');
+                                                    }
+                                                    // debugger;
+                                                    // console.log('TODO: Update in UI that files are being watched now');
                                                 }
                                             );
                                         }
+                                        editor.focus();
 
                                         /*
                                         console.log('TODO - watch CSS files');
@@ -1967,14 +2059,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     // cls: 'magicss-watch-resources',
                                     uniqCls: 'magicss-stop-watch-and-reload-link-tags',
                                     onclick: function (evt, editor) {
-                                        console.log('TODO - stop watching CSS files');
-                                        flagWatchingCssFiles = !flagWatchingCssFiles;
-                                        if (socket) {
-                                            socket.close();
-                                            socket = null;
+                                        // console.log('TODO - stop watching CSS files');
+                                        // console.log(+new Date());
+                                        if (flagWatchingCssFiles) {
+                                            // debugger;
+                                            getDisconnectedWithBackEnd(
+                                                editor,
+                                                {},
+                                                function () {
+                                                    updateUiMentioningNotWatchingCssFiles(editor);
+                                                }
+                                            );
                                         }
 
-                                        $(editor.container).removeClass('watching-css-files');
+                                        // flagWatchingCssFiles = !flagWatchingCssFiles;
+                                        // if (socket) {
+                                        //     socket.close();
+                                        //     socket = null;
+                                        // }
+
+                                        // $(editor.container).removeClass('watching-css-files');
                                         editor.focus();
                                     }
                                 },
