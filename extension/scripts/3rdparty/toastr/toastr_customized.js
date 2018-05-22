@@ -312,7 +312,7 @@
                     if (options.onclick) {
                         $toastElement.click(function (event) {
                             options.onclick(event);
-                            hideToast();
+                            // hideToast();     // Commenting it out since hiding toast couldn't be turned off in case of 'onclick()'
                         });
                     }
                 }

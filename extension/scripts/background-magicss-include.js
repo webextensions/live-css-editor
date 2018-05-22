@@ -222,7 +222,7 @@ var main = function (tabId) {
             path3rdparty + 'tooltipster/jquery.tooltipster.js',
 
             path3rdparty + 'toastr/toastr.css',
-            path3rdparty + 'toastr/toastr.js',
+            path3rdparty + 'toastr/toastr_customized.js',
 
             path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
             path3rdparty + 'csspretty/csspretty.js',

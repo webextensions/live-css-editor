@@ -1,1 +1,1 @@
-node_modules/toastr/build/toastr.min.js
+node_modules/toastr/toastr.js
