@@ -23,5 +23,5 @@
 }
 
 html .CodeMirror-hints {
-    z-index: 2147483647;
+    z-index: 2147483600;
 }

@@ -361,7 +361,7 @@ if (!utils.defined) {
             div.innerHTML = [
                 '<div ' +
                     'style="' +
-                        'position:fixed;width:100%;z-index:2147483647;' +
+                        'position:fixed;width:100%;z-index:2147483600;' +
                         (verticalAlignment === 'bottom' ? 'bottom:0;' : 'top:0;') +
                         (function () {
                             if (horizontalAlignment === 'left') {

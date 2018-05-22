@@ -106,6 +106,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return;
     }
 
+    var constants = {
+        liveCssServer: {
+            defaultProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
+            defaultHostname: window.location.hostname || '127.0.0.1',
+            defaultPort: '3456'
+        },
+        defaultLiveCssServerProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
+        defaultLiveCssServerHostname: window.location.hostname || '127.0.0.1',
+        defaultLiveCssServerPort: '3456'
+    };
+
     toastr.options.positionClass = 'toast-top-right magic-css-toastr';
     toastr.options.newestOnTop = false;
     // toastr.options.closeButton = true;
@@ -903,7 +914,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $div.attr('class', 'magicss-block-click');
                     $div.css('position', 'fixed');
                     $div.css('background-color', 'rgba(0,0,0,0)');
-                    $div.css('z-index', '2147483647');
+                    $div.css('z-index', '2147483600');
                     $div.css('width', '100%');
                     $div.css('height', '100%');
                     $div.css('left', '0px');
@@ -1257,7 +1268,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     return mode;
                 };
 
-                var getServerDetailsFromUser = function (editor) {
+                var getServerDetailsFromUser = function (editor, callback) {
                     /* eslint-disable indent */
                     var $backEndConnectivityOptions = $(
                         [
@@ -1272,32 +1283,28 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                     'Server path <span style="color:#888;font-size:12px">',
                                                         '(eg: ',
                                                         (function () {
-                                                            var protocol = (window.location.protocol === 'https:') ? 'https:' : 'http:',
-                                                                hostname = window.location.hostname || '127.0.0.1',
-                                                                port = '3456';
+                                                            var protocol = constants.liveCssServer.defaultProtocol,
+                                                                hostname = constants.liveCssServer.defaultHostname,
+                                                                port = constants.liveCssServer.defaultPort;
                                                             return protocol + '//' + hostname + ':' + port;
                                                         }()),
                                                         ')',
                                                     '</span>',
                                                 '</div>',
                                                 '<div class="magic-css-row-item-2">',
-                                                    '<span>http://&nbsp;</span>',
+                                                    '<div>http://&nbsp;</div>',
                                                     '<input type="text" spellcheck="false" class="magic-css-server-hostname" placeholder="',
-                                                        window.location.hostname || '127.0.0.1',
+                                                        constants.liveCssServer.defaultHostname,
                                                         '" style="width:165px"',
                                                     ' />',
-                                                    '<span>&nbsp;:&nbsp;</span>',
-                                                    '<input type="text" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px; margin-right:10px;" />',
-                                                    '<span class="magic-css-server-connectivity-status" style="width:16px; height:16px; background-repeat:no-repeat;">&nbsp;</span>',
-                                                    // '<div class="magic-css-row-item-2"><input type="button" value="Check connectivity" /></div>',
+                                                    '<div>&nbsp;:&nbsp;</div>',
+                                                    '<input type="number" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px; margin-right:10px;" />',
+                                                    '<div class="magic-css-server-connectivity-status" style="float:right; margin-top:2px; width:16px; height:16px; background-repeat:no-repeat;">&nbsp;</div>',
                                                 '</div>',
                                             '</div>',
-                                            // '<div class="magic-css-row magic-css-file-config-item">',
-                                            //     '<div class="magic-css-row-item-1 magic-css-file-field-header">&nbsp;</div>',
-                                            // '</div>',
                                             '<div class="magic-css-row magic-css-file-config-item">',
-                                                '<input type="button" class="magicss-start-file-editing" value="Start Editing" />',
-                                                '<input type="button" class="magicss-cancel-file-mode" value="Cancel" />',
+                                                '<input type="button" class="magicss-save-server-path-changes" style="float:right" value="Save & Apply" />',
+                                                '<input type="button" class="magicss-cancel-server-path-changes" value="Cancel" />',
                                             '</div>',
                                         '</div>',
                                     '</div>',
@@ -1308,45 +1315,80 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     /* eslint-enable indent */
 
                     var $serverHostname = $backEndConnectivityOptions.find('.magic-css-server-hostname'),
-                        serverHostnameValue = editor.userPreference('magic-css-server-hostname');
+                        serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
 
-                    var applyChange = function () {
+                    var $serverPort = $backEndConnectivityOptions.find('.magic-css-server-port'),
+                        serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+
+                    var connectionTestingSocket = null;
+                    var refreshConnectivityUi = function () {
                         var backEndPath = serverHostnameValue + ':' + serverPortValue;
-                        var connectionTestingSocket = null;
+                        if (connectionTestingSocket) {
+                            connectionTestingSocket.close();
+                            connectionTestingSocket = null;
+                        }
+                        $backEndConnectivityOptions
+                            .find('.magic-css-server-connectivity-status')
+                            .removeClass('connected')
+                            .removeClass('disconnected');
+                        $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
+
                         connectionTestingSocket = io(backEndPath);
-                        console.log(connectionTestingSocket);
-                        console.log('TODO: Update the connectivity status check/cross-mark');
-                        console.log('TODO: Connect to the updated server path');
+                        connectionTestingSocket.on('connect', function () {
+                            $backEndConnectivityOptions
+                                .find('.magic-css-server-connectivity-status')
+                                .removeClass('disconnected')
+                                .addClass('connected');
+                            $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', false);
+                        });
+                        connectionTestingSocket.on('connect_error', function () {
+                            $backEndConnectivityOptions
+                                .find('.magic-css-server-connectivity-status')
+                                .removeClass('connected')
+                                .addClass('disconnected');
+                            $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
+                        });
                     };
 
                     $serverHostname.val(serverHostnameValue);
-                    $serverHostname.on('change', function () {
-                        serverHostnameValue = $(this).val().trim().replace(/\/$/, '');
-                        editor.userPreference('magic-css-server-hostname', serverHostnameValue);
-                        applyChange();
+                    $serverHostname.on('input', function () {
+                        serverHostnameValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultHostname;
+                        refreshConnectivityUi();
                     });
 
-                    var $serverPort = $backEndConnectivityOptions.find('.magic-css-server-port'),
-                        serverPortValue = editor.userPreference('magic-css-server-port');
                     $serverPort.val(serverPortValue);
-                    $serverPort.on('change', function () {
-                        serverPortValue = $(this).val().trim().replace(/\/$/, '');
-                        editor.userPreference('magic-css-server-port', serverPortValue);
-                        applyChange();
+                    $serverPort.on('input', function () {
+                        serverPortValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultPort;
+                        refreshConnectivityUi();
                     });
 
-                    // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
-                    $backEndConnectivityOptions.find('.magic-css-back-end-connectivity-options').draggable();
+                    // Useful when developing/debugging
+                    // $backEndConnectivityOptions.find('.magic-css-back-end-connectivity-options').draggable();   // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
-                    $backEndConnectivityOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
-                        console.log('TODO');
+                    var disconnectConnectionTestingSocket = function () {
+                        if (connectionTestingSocket) {
+                            connectionTestingSocket.close();
+                            connectionTestingSocket = null;
+                        }
+                    };
+                    $backEndConnectivityOptions.find('.magic-css-full-page-overlay, .magicss-cancel-server-path-changes').on('click', function () {
+                        disconnectConnectionTestingSocket();
                         $backEndConnectivityOptions.remove();
                     });
-                    $backEndConnectivityOptions.find('.magicss-start-file-editing').on('click', function () {
-                        console.log('TODO');
+                    $backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', function () {
+                        editor.userPreference('live-css-server-hostname', serverHostnameValue);
+                        editor.userPreference('live-css-server-port', serverPortValue);
+
+                        disconnectConnectionTestingSocket();
                         $backEndConnectivityOptions.remove();
+
+                        callback(null, {
+                            serverHostname: serverHostnameValue,
+                            serverPort: serverPortValue
+                        });
                     });
                     $('body').append($backEndConnectivityOptions);
+                    refreshConnectivityUi();
                 };
 
                 var updateUiMentioningNotWatchingCssFiles = function (editor) {
@@ -1358,7 +1400,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 };
 
                 var liveCssServerSessionClosedByUser = function (editor) {
-                    console.log('TODO: Disable editing file');
+                    // TODO:
+                    //     When file editing feature is available,
+                    //     disable editing file / notify user when
+                    //     the server session is disconnected
 
                     updateUiMentioningNotWatchingCssFiles(editor);
                 };
@@ -1366,10 +1411,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 var $toastrConnecting,
                     $toastrConnected,
                     $toastrReconnectAttempt;
-                var establishBackEndConnectivity = function (editor, callback) {
+                var getConnectedWithBackEnd = function (editor, callback, callbackForReconfiguration) {
                     var flagCallbackCalledOnce = false;
-                    var serverHostnameValue = editor.userPreference('magic-css-server-hostname'),
-                        serverPortValue = editor.userPreference('magic-css-server-port');
+                    var serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+                        serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
                     if (socket) {
                         socket.close();
@@ -1398,14 +1443,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             timeOut: 0,
                             onclick: function (evt) {
                                 if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                    // debugger;
-                                    getServerDetailsFromUser(editor);
+                                    getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                        if (!err) {
+                                            callbackForReconfiguration(serverDetails);
+                                        }
+                                    });
                                 } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
                                     if (socket) {
                                         socket.close();
                                         socket = null;
                                     }
-                                    // debugger;
                                     toastr.clear($toastrConnecting, {force: true});
                                     if (!flagCallbackCalledOnce) {
                                         flagCallbackCalledOnce = true;
@@ -1416,7 +1463,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     );
 
-                    console.log('TODO: flagConnectedAtLeastOnce can be reset within the same session as well');
                     var flagConnectedAtLeastOnce = false;
                     socket = io(backEndPath, {
                         // timeout: 5000
@@ -1424,7 +1470,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         // requestTimeout: 5
                         // 'sync disconnect on unload' : true
                     });
-                    // socket = io('127.0.0.1:3456');
                     socket.on('connect', function () {
                         flagConnectedAtLeastOnce = true;
 
@@ -1448,9 +1493,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 closeButton: true,
                                 onclick: function (evt) {
                                     if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                        // debugger;
                                         toastr.clear($toastrConnected, {force: true});
-                                        getServerDetailsFromUser(editor);
+                                        getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                            if (!err) {
+                                                callbackForReconfiguration(serverDetails);
+                                            }
+                                        });
                                     }
                                 }
                             }
@@ -1470,7 +1518,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
                                 }
                                 $toastrReconnectAttempt = toastr.warning(
-                                    'Trying to reconnect to live-css server' +
+                                    'Trying to reconnect to live-css server at: ' + backEndPath +
                                     '<br /><br />' +
                                     '<button type="button" class="magic-css-toastr-socket-cancel">Cancel</button>' +
                                     '&nbsp;' +
@@ -1480,14 +1528,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         timeOut: 0,
                                         onclick: function (evt) {
                                             if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                                // debugger;
-                                                getServerDetailsFromUser(editor);
+                                                getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                                    if (!err) {
+                                                        callbackForReconfiguration(serverDetails);
+                                                    }
+                                                });
                                             } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
                                                 if (socket) {
                                                     socket.close();
                                                     socket = null;
                                                 }
-                                                // debugger;
                                                 toastr.clear($toastrReconnectAttempt, {force: true});
                                                 liveCssServerSessionClosedByUser(editor);
                                             }
@@ -1497,61 +1547,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         }
                     });
-
-                    // socket.on('*', function(event, data) {
-                    //     console.log('event ' + event);
-                    //     console.log(data);
-                    // });
-
-                    // socket.on('reconnect', function () {
-                    //     console.log('event reconnect');
-                    // });
-                    // socket.on('reconnecting', function () {
-                    //     console.log('event reconnecting');
-                    // });
-                    /*
-                    socket.on('reconnect_error', function () {
-                        console.log('event reconnect_error');
-                    }); /* */
-                    /*
-                    socket.on('connect_error', function () {
-                        console.log('event connect_error');
-                    }); /* */
-                    // socket.on('reconnect_failed', function () {
-                    //     console.log('event reconnect_failed');
-                    // });
-
-                    /*
-                    socket.on('connect_timeout', function () {
-                        console.log('connect_timeout');
-                        toastr.error('connect_timeout');
-
-                        // getServerDetailsFromUser(editor);
-                    });
-                    /* */
-                    /*
-                    socket.on('file-modified', function(changeDetails) {
-                        if (changeDetails.useOnlyFileNamesForMatch) {
-                            reloadCSSResourceInPage({
-                                fullPath: changeDetails.fullPath,
-                                useOnlyFileNamesForMatch: true,
-                                fileName: changeDetails.fileName
-                            });
-                        } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                            var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                            reloadCSSResourceInPage({
-                                fullPath: changeDetails.fullPath,
-                                url: resolveUrl(pathWrtRoot)
-                            });
-                        } else {
-                            // The code should never reach here
-                            utils.alertNote(
-                                'Unexpected scenario occurred in reloading some CSS resources.' +
-                                '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                                10000
-                            );
-                        }
-                    }); /* */
                 };
 
                 var getDisconnectedWithBackEnd = function (editor, options, cb) {
@@ -1569,40 +1564,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         toastr.clear($toastrReconnectAttempt, {force: true});
                     }
                     cb();
-                };
-
-                var getConnectedWithBackEnd = function (editor, options, cb, attachEvents) {
-                    console.log('TODO: getConnectedWithBackEnd');
-                    // debugger;
-                    // cb();
-                    // return;
-
-                    options = options || {};
-                    var needInputThroughUi = true;
-
-                    var pathOfFileToEdit = editor.userPreference('file-to-edit');
-                    if (pathOfFileToEdit) {
-                        needInputThroughUi = false;
-                    }
-
-                    if (needInputThroughUi || options.showUi) {
-                        establishBackEndConnectivity(editor, function (err, socket) {
-                            cb(err, socket);
-                            if (!err) {
-                                attachEvents(socket);
-                            }
-                            // if (err) {
-                            //     console.log('TODO: Error handler');
-                            // } else {
-                            //     console.log('TODO: Success handler');
-                            //     cb(err);
-                            // }
-                            // debugger;
-                        });
-                    } else {
-                        console.log('TODO');
-                    }
-                    /* */
                 };
 
                 var getMagicCSSForChrome = null,
@@ -1947,138 +1908,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         /* */
-                        /*
-                        {
-                            name: 'watch-css-files',
-                            title: 'Watch CSS file changes and reload them',
-                            cls: 'magicss-watch-resources magicss-gray-out',
-                            onclick: function (evt, editor) {
-                                if (socket) {
-                                    socket.close();
-                                    socket = null;
-                                } else {
-                                    socket = io('127.0.0.1:3456');
-                                    socket.on('file-modified', function(changeDetails) {
-                                        // $('#messages').append($('<li>').text(msg));
-                                        // console.log(changeDetails);
-
-                                        reloadCSSResourceInPage(changeDetails.relativePath);
-                                    });
-                                }
-                                editor.focus();
-                            }
-                        },
-                        /* */
                         {
                             name: 'css-reloader-and-file-changes-watcher',
                             title: 'CSS reloader and watch file changes',
                             cls: 'magicss-reload-css-resources magicss-gray-out cancelDragHandle',
                             icons: [
                                 {
-                                    name: 'watchCssFiles',
-                                    title: 'Watch CSS files & apply changes automatically',
-                                    // cls: 'magicss-watch-resources',
-                                    uniqCls: 'magicss-watch-and-reload-link-tags',
-                                    onclick: function (evt, editor) {
-                                        /*
-                                        toastr.info('Establishing connectivity with back-end Establishing connectivity with back-end Establishing connectivity with back-end Establishing connectivity with back-end ');
-                                        /* */
-
-                                        // var flagWatchingFiles = false;
-                                        // if (!flagWatchingFiles) {
-                                        if (!flagWatchingCssFiles) {
-                                            getConnectedWithBackEnd(
-                                                editor,
-                                                {},
-                                                function (err, socket) {
-                                                    if (err) {
-                                                        // the user cancelled watching files
-                                                        utils.alertNote('You cancelled watching CSS file changes');
-                                                    } else {
-                                                        flagWatchingCssFiles = true;
-                                                        utils.alertNote('Now watching CSS file changes');
-                                                        $(editor.container).addClass('watching-css-files');
-                                                    }
-                                                    // debugger;
-                                                    // console.log('TODO: Update in UI that files are being watched now');
-                                                },
-                                                function attachEvents (socket) {
-                                                    socket.on('file-modified', function(changeDetails) {
-                                                        if (changeDetails.useOnlyFileNamesForMatch) {
-                                                            reloadCSSResourceInPage({
-                                                                fullPath: changeDetails.fullPath,
-                                                                useOnlyFileNamesForMatch: true,
-                                                                fileName: changeDetails.fileName
-                                                            });
-                                                        } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                                                            var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                                                            reloadCSSResourceInPage({
-                                                                fullPath: changeDetails.fullPath,
-                                                                url: resolveUrl(pathWrtRoot)
-                                                            });
-                                                        } else {
-                                                            // The code should never reach here
-                                                            utils.alertNote(
-                                                                'Unexpected scenario occurred in reloading some CSS resources.' +
-                                                                '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                                                                10000
-                                                            );
-                                                        }
-                                                    });
-                                                }
-                                            );
-                                        }
-                                        editor.focus();
-
-                                        /*
-                                        console.log('TODO - watch CSS files');
-                                        flagWatchingCssFiles = !flagWatchingCssFiles;
-
-                                        if (socket) {
-                                            socket.close();
-                                            socket = null;
-                                        }
-                                        socket = io('127.0.0.1:3456');
-                                        socket.on('file-modified', function(changeDetails) {
-                                            if (changeDetails.useOnlyFileNamesForMatch) {
-                                                reloadCSSResourceInPage({
-                                                    fullPath: changeDetails.fullPath,
-                                                    useOnlyFileNamesForMatch: true,
-                                                    fileName: changeDetails.fileName
-                                                });
-                                            } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                                                var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                                                reloadCSSResourceInPage({
-                                                    fullPath: changeDetails.fullPath,
-                                                    url: resolveUrl(pathWrtRoot)
-                                                });
-                                            } else {
-                                                // The code should never reach here
-                                                utils.alertNote(
-                                                    'Unexpected scenario occurred in reloading some CSS resources.' +
-                                                    '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                                                    10000
-                                                );
-                                            }
-                                        });
-                                        $(editor.container).addClass('watching-css-files');
-                                        editor.focus();
-                                        /* */
-                                    },
-                                    beforeShow: function (origin, tooltip, editor) {
-                                        tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
-                                    }
-                                },
-                                {
                                     name: 'stopWatchingCssFiles',
                                     title: 'Stop watching CSS files',
                                     // cls: 'magicss-watch-resources',
                                     uniqCls: 'magicss-stop-watch-and-reload-link-tags',
                                     onclick: function (evt, editor) {
-                                        // console.log('TODO - stop watching CSS files');
-                                        // console.log(+new Date());
                                         if (flagWatchingCssFiles) {
-                                            // debugger;
                                             getDisconnectedWithBackEnd(
                                                 editor,
                                                 {},
@@ -2087,15 +1928,68 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 }
                                             );
                                         }
-
-                                        // flagWatchingCssFiles = !flagWatchingCssFiles;
-                                        // if (socket) {
-                                        //     socket.close();
-                                        //     socket = null;
-                                        // }
-
-                                        // $(editor.container).removeClass('watching-css-files');
                                         editor.focus();
+                                    }
+                                },
+                                {
+                                    name: 'watchCssFiles',
+                                    title: 'Watch CSS files & apply changes automatically',
+                                    // cls: 'magicss-watch-resources',
+                                    uniqCls: 'magicss-watch-and-reload-link-tags',
+                                    onclick: function (evt, editor) {
+                                        // TODO:
+                                        //     Remember about watching files in localStorage
+                                        //     Auto reconnect when Magic CSS is loaded again
+
+                                        if (!flagWatchingCssFiles) {
+                                            var getConnected = function () {
+                                                getConnectedWithBackEnd(
+                                                    editor,
+                                                    function callback (err, socket) {
+                                                        if (err) {
+                                                            // The user cancelled watching files
+                                                            utils.alertNote('You cancelled watching CSS file changes');
+                                                        } else {
+                                                            socket.on('file-modified', function(changeDetails) {
+                                                                if (changeDetails.useOnlyFileNamesForMatch) {
+                                                                    reloadCSSResourceInPage({
+                                                                        fullPath: changeDetails.fullPath,
+                                                                        useOnlyFileNamesForMatch: true,
+                                                                        fileName: changeDetails.fileName
+                                                                    });
+                                                                } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                                                                    var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                                                                    reloadCSSResourceInPage({
+                                                                        fullPath: changeDetails.fullPath,
+                                                                        url: resolveUrl(pathWrtRoot)
+                                                                    });
+                                                                } else {
+                                                                    // The code should never reach here
+                                                                    utils.alertNote(
+                                                                        'Unexpected scenario occurred in reloading some CSS resources.' +
+                                                                        '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                                                                        10000
+                                                                    );
+                                                                }
+                                                            });
+                                                            if (!flagWatchingCssFiles) {
+                                                                flagWatchingCssFiles = true;
+                                                                utils.alertNote('Now watching CSS file changes');
+                                                                $(editor.container).addClass('watching-css-files');
+                                                            }
+                                                        }
+                                                    },
+                                                    function callbackForReconfiguration () {
+                                                        getConnected();
+                                                    }
+                                                );
+                                            };
+                                            getConnected();
+                                        }
+                                        editor.focus();
+                                    },
+                                    beforeShow: function (origin, tooltip, editor) {
+                                        tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
                                     }
                                 },
                                 {

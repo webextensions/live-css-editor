@@ -762,7 +762,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             thisOb.container.style.width = 'auto';
             thisOb.container.style.height = 'auto';
             thisOb.container.style.borderRadius = '5px';
-            thisOb.container.style.zIndex = '2147483647';
+            thisOb.container.style.zIndex = '2147483600';
             thisOb.container.style.backgroundColor = 'rgba(' + options.bgColor + ')';
         }
 

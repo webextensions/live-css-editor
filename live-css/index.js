@@ -444,6 +444,7 @@ if (!module.parent) {
 
     var startServer = function (portNumber) {
         /* Begin: Temporarily hang application */
+        /*
         console.log('TODO: Remove this section "Temporarily hang application" when debugging is done');
         var t1 = new Date();
         setTimeout(function () {
