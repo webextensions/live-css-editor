@@ -831,17 +831,23 @@ html .magicss-mouse-over-dom-element {
 
 .magic-css-toastr#toast-container > div {
     opacity: 1;
-    padding: 10px 20px 10px 40px;
-    background-position: 15px center;
-    background-position: 10px center;
+    padding: 10px 20px 10px 50px;
+    background-position: 15px 10px;
     width: auto;
     max-width: 400px;
 }
 
+/* Begin: These styles would be useful when close button is enabled for the toastr */
+/* Positioning */
 .magic-css-toastr .toast-close-button {
     top: -4px;
     right: -10px;
 }
+/* Without this, the last word in the title may wrap to next line when close button is there */
+.magic-css-toastr#toast-container .toast-title {
+    float: left;
+}
+/* End */
 
 .magic-css-row-item-2 * {
     display: inline-block;

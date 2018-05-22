@@ -1433,12 +1433,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
 
                     $toastrConnecting = toastr.info(
-                        'Connecting to live-css server at: ' + backEndPath +
-                        '<br /><br />' +
-                        '<button type="button" class="magic-css-toastr-socket-cancel">Cancel</button>' +
-                        ' ' +
-                        '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>',
-                        undefined,
+                        '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                            backEndPath +
+                        '</div>' +
+                        '<div>' +
+                            '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right;">Cancel</button>' +
+                            '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>' +
+                        '</div>',
+                        'Connecting with live-css server at: ',
                         {
                             timeOut: 0,
                             onclick: function (evt) {
@@ -1485,12 +1487,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                         $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
                         $toastrConnected = toastr.success(
-                            'Connected to live-css server at: ' + backEndPath +
-                            '<br /><br />' +
-                            '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>',
-                            undefined,
+                            '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                                backEndPath +
+                            '</div>' +
+                            '<div>' +
+                            '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
+                                '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>' +
+                            '</div>',
+                            'Connected with live-css server at:',
                             {
-                                closeButton: true,
                                 onclick: function (evt) {
                                     if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
                                         toastr.clear($toastrConnected, {force: true});
@@ -1499,6 +1504,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 callbackForReconfiguration(serverDetails);
                                             }
                                         });
+                                    } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
+                                        toastr.clear($toastrConnected, {force: true});
                                     }
                                 }
                             }
@@ -1518,12 +1525,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
                                 }
                                 $toastrReconnectAttempt = toastr.warning(
-                                    'Trying to reconnect to live-css server at: ' + backEndPath +
-                                    '<br /><br />' +
-                                    '<button type="button" class="magic-css-toastr-socket-cancel">Cancel</button>' +
-                                    '&nbsp;' +
-                                    '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>',
-                                    undefined,
+                                    '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                                        backEndPath +
+                                    '</div>' +
+                                    '<div>' +
+                                        '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right">Cancel</button>' +
+                                        '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>' +
+                                    '</div>',
+                                    'Reconnecting with live-css server at:',
                                     {
                                         timeOut: 0,
                                         onclick: function (evt) {
