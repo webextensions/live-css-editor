@@ -1465,6 +1465,20 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     );
 
+                    // If the user is loading it for the first time on this domain,
+                    // show them the configuration options along with the guide/help
+                    // about the live-css server
+                    if (
+                        !editor.userPreference('live-css-server-hostname') &&
+                        !editor.userPreference('live-css-server-port')
+                    ) {
+                        getServerDetailsFromUser(editor, function (err, serverDetails) {
+                            if (!err) {
+                                callbackForReconfiguration(serverDetails);
+                            }
+                        });
+                    }
+
                     var flagConnectedAtLeastOnce = false;
                     socket = io(backEndPath, {
                         // timeout: 5000
