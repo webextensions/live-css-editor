@@ -621,6 +621,19 @@ html .magicss-mouse-over-dom-element {
     font-size: 12px;
 }
 
+/* Begin: Site specific fixes */
+.magic-css-back-end-connectivity-options {
+    color: #000;
+}
+.magic-css-back-end-connectivity-options a {
+    color: #777;
+}
+.magic-css-back-end-connectivity-options a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+/* End */
+
 /* Begin: Useful while debugging. Comment it out before publishing. */
 .magic-css-full-page-overlay,
 .magic-css-full-page-overlay {
@@ -789,6 +802,11 @@ html .magicss-mouse-over-dom-element {
 /* http://stackoverflow.com/ */
 #MagiCSS-bookmarklet .CodeMirror {
     position: relative !important;
+}
+
+/* http://koimoi.com/ */
+.tooltipster-content ul li {
+    margin: 0;
 }
 
 /* End: Site-specific fixes */

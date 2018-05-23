@@ -1268,6 +1268,24 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     return mode;
                 };
 
+                // A pretty basic OS detection logic based on:
+                // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js/38241481#38241481
+                var getOS = function () {
+                    var platform = window.navigator.platform,
+                        os = null;
+
+                    if (platform.indexOf('Mac') === 0) {
+                        os = 'Mac OS';
+                    } else if (platform.indexOf('Win') === 0) {
+                        os = 'Windows';
+                    } else if (platform.indexOf('Linux') === 0) {
+                        os = 'Linux';
+                    }
+
+                    return os;
+                };
+
+
                 var getServerDetailsFromUser = function (editor, callback) {
                     /* eslint-disable indent */
                     var $backEndConnectivityOptions = $(
@@ -1279,8 +1297,71 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
                                         '<div class="magic-css-back-end-connectivity-options" style="pointer-events:initial;">',
                                             '<div class="magic-css-row magic-css-file-config-item">',
+                                                '<div class="magic-css-row-item-1">',
+                                                    '<div>',
+                                                        'You need to run a small development server called',
+                                                        ' <a target="_blank" href="https://www.npmjs.com/package/live-css" style="font-weight:bold; text-decoration:underline; color:#000;">live-css</a>',
+                                                        ', for using the feature',
+                                                        ' "Watch CSS files & apply changes automatically".',
+                                                    '</div>',
+                                                    '<div>&nbsp;</div>',
+                                                    '<div>',
+                                                        '<div style="font-weight:bold; float:left;">Step 1:</div>',
+                                                        '<div style="margin-left:50px;">',
+                                                            'Install Node JS',
+                                                            ' <a target="_blank" href="https://nodejs.org/en/download/" style="margin-left:10px;">Download</a>',
+                                                            (function () {
+                                                                var os = getOS(),
+                                                                    link;
+                                                                if (os === 'Linux') {
+                                                                    link = 'https://www.ostechnix.com/install-node-js-linux/';
+                                                                } else if (os === 'Windows') {
+                                                                    link = 'https://www.wikihow.com/Install-Node.Js-on-Windows';
+                                                                } else if (os === 'Mac OS') {
+                                                                    link = 'https://nodesource.com/blog/installing-nodejs-tutorial-mac-os-x/';
+                                                                }
+                                                                if (link) {
+                                                                    return ' <a target="_blank" href="' + link + '" style="margin-left:10px;">Help</a>';
+                                                                } else {
+                                                                    return '';
+                                                                }
+                                                            }()),
+                                                        '</div>',
+                                                    '</div>',
+                                                    '<div style="padding-top:4px;">',
+                                                        '<div style="font-weight:bold; float:left;">Step 2:</div>',
+                                                        '<div style="margin-left:50px;">',
+                                                            'Install live-css server',
+                                                            ' <a target="_blank" href="https://www.npmjs.com/package/live-css" style="margin-left:10px;">Link</a>',
+                                                            ' <a target="_blank" href="https://docs.npmjs.com/cli/npm" style="margin-left:10px;">Help</a>',
+                                                            ' <a target="_blank" href="https://docs.npmjs.com/getting-started/fixing-npm-permissions" style="margin-left:10px;">Extra</a>',
+                                                            '<br />',
+                                                            '<div style="float:left; line-height:16px; background-color:#bbb; padding:3px 7px; border-radius:3px; margin-top:2px; font-family:monospace;">',
+                                                                '<svg viewBox="0 0 12.32 9.33" style="width:12px; height:16px; display:block; float:left;"><g><line class="st1" x1="7.6" y1="8.9" x2="7.6" y2="6.9"></line><rect width="1.9" height="1.9"></rect><rect x="1.9" y="1.9" width="1.9" height="1.9"></rect><rect x="3.7" y="3.7" width="1.9" height="1.9"></rect><rect x="1.9" y="5.6" width="1.9" height="1.9"></rect><rect y="7.5" width="1.9" height="1.9"></rect></g></svg>',
+                                                                'npm install -g live-css',
+                                                            '</div>',
+                                                        '</div>',
+                                                    '</div>',
+                                                    '<div style="clear:both; padding-top:4px;">',
+                                                        '<div style="font-weight:bold; float:left;">Step 3:</div>',
+                                                        '<div style="margin-left:50px;">',
+                                                            'Start live-css server',
+                                                            '<br />',
+                                                            '<div style="float:left; line-height:16px; background-color:#bbb; padding:3px 7px; border-radius:3px; margin-top:2px; font-family:monospace;">',
+                                                            '<svg viewBox="0 0 12.32 9.33" style="width:12px; height:16px; display:block; float:left;"><g><line class="st1" x1="7.6" y1="8.9" x2="7.6" y2="6.9"></line><rect width="1.9" height="1.9"></rect><rect x="1.9" y="1.9" width="1.9" height="1.9"></rect><rect x="3.7" y="3.7" width="1.9" height="1.9"></rect><rect x="1.9" y="5.6" width="1.9" height="1.9"></rect><rect y="7.5" width="1.9" height="1.9"></rect></g></svg>',
+                                                                'live-css',
+                                                            '</div>',
+                                                        '</div>',
+                                                    '</div>',
+                                                    '<div style="clear:both; padding-top:4px;">',
+                                                        '<div style="font-weight:bold; float:left;">Step 4:</div>',
+                                                        '<div style="margin-left:50px;">Fill up the following details from the output of the previous command</div>',
+                                                    '</div>',
+                                                    '<div>&nbsp;</div>',
+                                                '</div>',
                                                 '<div class="magic-css-row-item-1 magic-css-file-field-header">',
-                                                    'Server path <span style="color:#888;font-size:12px">',
+                                                    '<span style="color:#000; font-weight:bold;">Server path:</span> ',
+                                                    '<span style="color:#888;font-size:12px;">',
                                                         '(eg: ',
                                                         (function () {
                                                             var protocol = constants.liveCssServer.defaultProtocol,
@@ -1292,13 +1373,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                     '</span>',
                                                 '</div>',
                                                 '<div class="magic-css-row-item-2">',
-                                                    '<div>http://&nbsp;</div>',
+                                                    '<div>' + constants.liveCssServer.defaultProtocol + '//&nbsp;</div>',
                                                     '<input type="text" spellcheck="false" class="magic-css-server-hostname" placeholder="',
                                                         constants.liveCssServer.defaultHostname,
                                                         '" style="width:165px"',
                                                     ' />',
                                                     '<div>&nbsp;:&nbsp;</div>',
-                                                    '<input type="number" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px; margin-right:10px;" />',
+                                                    '<input type="number" min="1" max="65535" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px; margin-right:10px;" />',
                                                     '<div class="magic-css-server-connectivity-status" style="float:right; margin-top:2px; width:16px; height:16px; background-repeat:no-repeat;">&nbsp;</div>',
                                                 '</div>',
                                             '</div>',

@@ -496,7 +496,7 @@ if (!module.parent) {
         typeof portRequestedByUser === 'number' &&
         !isNaN(portRequestedByUser) &&
         portRequestedByUser >= 1 &&
-        portRequestedByUser < 65536
+        portRequestedByUser <= 65535
     ) {
         portToUse = portRequestedByUser;
         flagPortSetByUser = true;
