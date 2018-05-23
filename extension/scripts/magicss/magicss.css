@@ -627,6 +627,7 @@ html .magicss-mouse-over-dom-element {
 }
 .magic-css-back-end-connectivity-options a {
     color: #777;
+    text-decoration: none;
 }
 .magic-css-back-end-connectivity-options a:hover {
     color: #000;
