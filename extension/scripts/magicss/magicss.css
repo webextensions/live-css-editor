@@ -655,6 +655,19 @@ html .magicss-mouse-over-dom-element {
     margin-bottom: 2px;
 }
 
+.magic-css-server-client-incompatible .magic-css-highlight-if-server-client-incompatible {
+    font-weight: bold;
+    background-color: #fe5;
+}
+.magic-css-server-client-incompatible-error-message {
+    font-weight: bold;
+    color: brown;
+    margin-top: 3px;
+}
+.magic-css-server-client-incompatible .magic-css-server-client-incompatible-error-message {
+    display: block !important;
+}
+
 /*
 .magic-css-row {
 	clear: both;

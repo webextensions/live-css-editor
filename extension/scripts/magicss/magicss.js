@@ -106,15 +106,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return;
     }
 
+    console.log('TODO: constants.appVersion needs to be dynamic');
     var constants = {
-        liveCssServer: {
-            defaultProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
-            defaultHostname: window.location.hostname || '127.0.0.1',
-            defaultPort: '3456'
-        },
-        defaultLiveCssServerProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
-        defaultLiveCssServerHostname: window.location.hostname || '127.0.0.1',
-        defaultLiveCssServerPort: '3456'
+        appVersion: '6.2.36'
+    };
+    constants.appMajorVersion = parseInt(constants.appVersion, 10);
+    constants.liveCssServer = {
+        defaultProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
+        defaultHostname: window.location.hostname || '127.0.0.1',
+        defaultPort: '3456',
+        apiVersionPath: '/api/v' + constants.appMajorVersion
     };
 
     toastr.options.positionClass = 'toast-top-right magic-css-toastr';
@@ -1286,7 +1287,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 };
 
 
+                var getServerDetailsFromUserAlreadyOpen = false;
                 var getServerDetailsFromUser = function (editor, callback) {
+                    if (getServerDetailsFromUserAlreadyOpen) {
+                        return;
+                    }
+                    getServerDetailsFromUserAlreadyOpen = true;
                     /* eslint-disable indent */
                     var $backEndConnectivityOptions = $(
                         [
@@ -1338,7 +1344,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                             '<br />',
                                                             '<div style="float:left; line-height:16px; background-color:#bbb; padding:3px 7px; border-radius:3px; margin-top:2px; font-family:monospace;">',
                                                                 '<svg viewBox="0 0 12.32 9.33" style="width:12px; height:16px; display:block; float:left;"><g><line class="st1" x1="7.6" y1="8.9" x2="7.6" y2="6.9"></line><rect width="1.9" height="1.9"></rect><rect x="1.9" y="1.9" width="1.9" height="1.9"></rect><rect x="3.7" y="3.7" width="1.9" height="1.9"></rect><rect x="1.9" y="5.6" width="1.9" height="1.9"></rect><rect y="7.5" width="1.9" height="1.9"></rect></g></svg>',
-                                                                'npm install -g live-css',
+                                                                '<span>npm install -g <span class="magic-css-highlight-if-server-client-incompatible">live-css@', constants.appMajorVersion, '</span></span>',
                                                             '</div>',
                                                         '</div>',
                                                     '</div>',
@@ -1382,6 +1388,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                     '<input type="number" min="1" max="65535" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px; margin-right:10px;" />',
                                                     '<div class="magic-css-server-connectivity-status" style="float:right; margin-top:2px; width:16px; height:16px; background-repeat:no-repeat;">&nbsp;</div>',
                                                 '</div>',
+                                                '<div class="magic-css-server-client-incompatible-error-message" style="display:none;">',
+                                                    'Error: You need to use version ', constants.appMajorVersion, ' of the live-css server',
+                                                '</div>',
                                             '</div>',
                                             '<div class="magic-css-row magic-css-file-config-item">',
                                                 '<input type="button" class="magicss-save-server-path-changes" style="float:right" value="Save & Apply" />',
@@ -1403,12 +1412,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                     var connectionTestingSocket = null;
                     var refreshConnectivityUi = function () {
-                        var backEndPath = serverHostnameValue + ':' + serverPortValue;
+                        var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
                         if (connectionTestingSocket) {
                             connectionTestingSocket.close();
                             connectionTestingSocket = null;
                         }
                         $backEndConnectivityOptions
+                            .removeClass('magic-css-server-client-incompatible')
                             .find('.magic-css-server-connectivity-status')
                             .removeClass('connected')
                             .removeClass('disconnected');
@@ -1417,18 +1427,27 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         connectionTestingSocket = io(backEndPath);
                         connectionTestingSocket.on('connect', function () {
                             $backEndConnectivityOptions
+                                .removeClass('magic-css-server-client-incompatible')
                                 .find('.magic-css-server-connectivity-status')
                                 .removeClass('disconnected')
                                 .addClass('connected');
                             $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', false);
                         });
-                        connectionTestingSocket.on('connect_error', function () {
+                        var errorHandler = function (err) {
                             $backEndConnectivityOptions
+                                .removeClass('magic-css-server-client-incompatible')
                                 .find('.magic-css-server-connectivity-status')
                                 .removeClass('connected')
                                 .addClass('disconnected');
+
+                            if (err === 'Invalid namespace') {
+                                $backEndConnectivityOptions
+                                    .addClass('magic-css-server-client-incompatible');
+                            }
                             $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
-                        });
+                        };
+                        connectionTestingSocket.on('connect_error', errorHandler);
+                        connectionTestingSocket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
                     };
 
                     $serverHostname.val(serverHostnameValue);
@@ -1455,6 +1474,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $backEndConnectivityOptions.find('.magic-css-full-page-overlay, .magicss-cancel-server-path-changes').on('click', function () {
                         disconnectConnectionTestingSocket();
                         $backEndConnectivityOptions.remove();
+                        getServerDetailsFromUserAlreadyOpen = false;
                     });
                     $backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', function () {
                         editor.userPreference('live-css-server-hostname', serverHostnameValue);
@@ -1462,6 +1482,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                         disconnectConnectionTestingSocket();
                         $backEndConnectivityOptions.remove();
+                        getServerDetailsFromUserAlreadyOpen = false;
 
                         callback(null, {
                             serverHostname: serverHostnameValue,
@@ -1502,7 +1523,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         socket = null;
                     }
 
-                    var backEndPath = serverHostnameValue + ':' + serverPortValue;
+                    var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
+                    var backEndPathToShowToUser = serverHostnameValue + ':' + serverPortValue;
                     if ($toastrConnecting) {
                         $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
                     }
@@ -1515,11 +1537,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                     $toastrConnecting = toastr.info(
                         '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
-                            backEndPath +
+                            backEndPathToShowToUser +
                         '</div>' +
                         '<div>' +
                             '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right;">Cancel</button>' +
-                            '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>' +
+                            '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
                         '</div>',
                         'Connecting with live-css server at: ',
                         {
@@ -1567,6 +1589,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         // requestTimeout: 5
                         // 'sync disconnect on unload' : true
                     });
+                    socket.on('error', function (err) {
+                        // In case of "Invalid namespace", we open the UI for details to inform that they are using
+                        // incompatible version of the live-css server
+                        if (err === 'Invalid namespace') {
+                            getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                if (!err) {
+                                    callbackForReconfiguration(serverDetails);
+                                }
+                            });
+                        }
+                    });
                     socket.on('connect', function () {
                         flagConnectedAtLeastOnce = true;
 
@@ -1583,11 +1616,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
                         $toastrConnected = toastr.success(
                             '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
-                                backEndPath +
+                                backEndPathToShowToUser +
                             '</div>' +
                             '<div>' +
                             '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
-                                '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>' +
+                                '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
                             '</div>',
                             'Connected with live-css server at:',
                             {
@@ -1621,11 +1654,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 }
                                 $toastrReconnectAttempt = toastr.warning(
                                     '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
-                                        backEndPath +
+                                        backEndPathToShowToUser +
                                     '</div>' +
                                     '<div>' +
                                         '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right">Cancel</button>' +
-                                        '<button type="button" class="magic-css-toastr-socket-configure">Configure</button>' +
+                                        '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
                                     '</div>',
                                     'Reconnecting with live-css server at:',
                                     {

@@ -120,9 +120,9 @@ if (!module.parent) {
     if (paramVersion || paramDebug) {
         logger.log('live-css version: ' + require('./package.json').version);
         logger.log('Node JS version: ' + nodeVersion);
-    }
-    if (paramVersion) {
-        process.exit(0);
+        if (paramVersion) {
+            process.exit(0);
+        }
     }
     if (paramInit) {
         var defaultConfigFilePath = nPath.resolve(__dirname, 'default.live-css.config.js'),
@@ -137,7 +137,7 @@ if (!module.parent) {
         var targetConfigFilePath = nPath.resolve(process.cwd(), '.live-css.config.js');
         try {
             fs.writeFileSync(targetConfigFilePath, defaultConfigurationText);
-            logger.success('\nConfiguration file has been written at:\n    ' + targetConfigFilePath);
+            logger.success('\nConfiguration file of live-css server has been written at:\n    ' + targetConfigFilePath);
             logger.info('\nNow, when you execute the ' + logger.chalk.underline('live-css') + ' command from this directory, it would load the required options from this configuration file.\n');
             process.exit(0);
         } catch (e) {
@@ -148,6 +148,7 @@ if (!module.parent) {
 
     logger.verbose([
         '',
+        'live-css server version: ' + require('./package.json').version,
         'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options and examples.'
     ].join('\n'));
 
@@ -265,21 +266,22 @@ if (!module.parent) {
         }
     );
 
+    var versionNamespace = io.of('/api/v' + parseInt(pkg.version, 10));
     var flagFileWatchReady = false;
     var filesBeingWatched = [];
     var fileModifiedHandler = function (changeObj) {
-        io.emit('file-modified', changeObj);
+        versionNamespace.emit('file-modified', changeObj);
     };
     var fileAddedHandler = function (changeObj) {
         filesBeingWatched.push(changeObj);
-        io.emit('file-added', changeObj);
+        versionNamespace.emit('file-added', changeObj);
     };
     var fileDeletedHandler = function (changeObj) {
         filesBeingWatched = filesBeingWatched.filter(function (item) {
             return item.relativePath !== changeObj.relativePath;
         });
 
-        io.emit('file-deleted', changeObj);
+        versionNamespace.emit('file-deleted', changeObj);
     };
 
     emitter.on('file-modified', fileModifiedHandler);
@@ -430,12 +432,8 @@ if (!module.parent) {
             emitter.emit('file-deleted', getPathValues(path));
         });
 
-    io.on('connection', function (socket) {
+    versionNamespace.on('connection', function (socket) {
         emitter.emit('connected-socket');
-
-        // socket.on('chat message', function(msg){
-        //     console.log('message: ' + msg);
-        // });
 
         socket.on('disconnect', function () {
             emitter.emit('disconnected-socket');
