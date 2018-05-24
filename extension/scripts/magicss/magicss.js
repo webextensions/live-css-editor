@@ -118,7 +118,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         apiVersionPath: '/api/v' + constants.appMajorVersion
     };
 
-    toastr.options.positionClass = 'toast-top-right magic-css-toastr';
+    toastr.options.positionClass = 'toast-top-right magic-css-toastr magic-css-ui';
     toastr.options.newestOnTop = false;
     // toastr.options.closeButton = true;
     toastr.options.hideDuration = 300;
@@ -1299,7 +1299,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             '<div>',
                                 '<div class="magic-css-full-page-overlay">',
                                 '</div>',
-                                '<div class="magic-css-full-page-contents" style="pointer-events:none;">',
+                                '<div class="magic-css-full-page-contents magic-css-ui" style="pointer-events:none;">',
                                     '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
                                         '<div class="magic-css-back-end-connectivity-options" style="pointer-events:initial;">',
                                             '<div class="magic-css-row magic-css-file-config-item">',
@@ -1393,8 +1393,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 '</div>',
                                             '</div>',
                                             '<div class="magic-css-row magic-css-file-config-item">',
-                                                '<input type="button" class="magicss-save-server-path-changes" style="float:right" value="Save & Apply" />',
-                                                '<input type="button" class="magicss-cancel-server-path-changes" value="Cancel" />',
+                                                '<button type="button" class="magicss-save-server-path-changes" style="float:right">Save & Apply</button>',
+                                                '<button type="button" class="magicss-cancel-server-path-changes">Cancel</button>',
                                             '</div>',
                                         '</div>',
                                     '</div>',

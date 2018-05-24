@@ -619,6 +619,7 @@ html .magicss-mouse-over-dom-element {
     border-radius: 10px;
     font-family: Helvetica, "Trebuchet MS", sans-serif;
     font-size: 12px;
+    box-shadow: #555 0px 0px 20px 3px;
 }
 
 /* Begin: Site specific fixes */
@@ -849,6 +850,31 @@ html .magicss-mouse-over-dom-element {
 
 
 
+.magic-css-ui button {
+    padding: 7px 12px;
+
+    background-color: #2e8bcc;
+    border: 1px solid #0c619e;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 #3af;
+    color: rgba(255, 255, 255, 0.95);
+
+    font-size: 12px;
+    cursor: pointer;
+}
+.magic-css-ui button:hover {
+    background-color: rgba(68, 88, 174, 0.85);
+    border-color: rgb(0, 110, 200);
+    box-shadow: rgb(70, 151, 255) 0px 1px 0px 0px inset;
+    color: #fff;
+}
+.magic-css-ui button[disabled] {
+    pointer-events: none;
+    background-color: #cde;
+    border-color: #bcd;
+    box-shadow: none;
+}
+
 
 
 
@@ -867,6 +893,9 @@ html .magicss-mouse-over-dom-element {
     background-position: 15px 10px;
     width: auto;
     max-width: 400px;
+}
+.magic-css-toastr#toast-container > div:hover {
+    cursor: initial;
 }
 
 /* Begin: These styles would be useful when close button is enabled for the toastr */
