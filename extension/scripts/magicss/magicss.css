@@ -937,7 +937,7 @@ html .magicss-mouse-over-dom-element {
 }
 .magic-css-ui button[disabled] {
     pointer-events: none;
-    background-color: #cde;
+    background-color: #b1cbe4;
     border-color: #bcd;
     box-shadow: none;
 }
