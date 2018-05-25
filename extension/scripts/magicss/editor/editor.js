@@ -483,8 +483,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 '<li class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '">' +
                                     '<a' +
                                     ' class="more-icons ' + (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + '"' +
-                                    ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
-                                    ' target="_blank">' +
+                                    ' href="' + (iconOptions.href || 'javascript:void(0);') + '"' +
+                                    (iconOptions.href ? ' target="_blank"' : '') +
+                                    '>' +
                                         iconOptions.title +
                                     '</a>' +
                                 '</li>'
@@ -553,7 +554,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         '<a' +
                                         ' class="more-icons ' + (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + '"' +
                                         ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
-                                        ' target="_blank">' +
+                                        (iconOptions.href ? ' target="_blank"' : '') +
+                                        '>' +
                                             iconOptions.title +
                                         '</a>' +
                                     '</li>'
@@ -611,7 +613,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     if (iconOptions.href) {
                         divIcon.innerHTML = '<a' +
                             ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
-                            ' target="_blank" style="width:100%;height:100%;display:block;text-decoration:none;">&nbsp;</a>';
+                            (iconOptions.href ? ' target="_blank"' : '') +
+                            ' style="width:100%;height:100%;display:block;text-decoration:none;">&nbsp;</a>';
                     }
 
                     parentDivRightAligned.appendChild(divIcon);
