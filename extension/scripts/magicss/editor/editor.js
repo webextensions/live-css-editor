@@ -1037,11 +1037,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
         }
     }
+    // TODO:
+    // Move out the default preferences of Magic CSS into magicss.js
     Editor.defaultPreferences = {
         'language-mode': 'css',
         'use-css-linting': 'no',
         'disable-styles': 'no',
         'apply-styles-automatically': 'no',
+        'watching-css-files': 'no',
         'use-tab-for-indentation': 'no',
         'indentation-spaces-count': '4',
         [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',
