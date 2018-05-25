@@ -490,7 +490,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 '</li>'
                             );
                             if (iconOptions.uniqCls && iconOptions.onclick) {
-                                $(document).on('click', '.' + iconOptions.uniqCls, function(evt){
+                                $('body').on('click', '.' + iconOptions.uniqCls, function(evt){
                                     evt.preventDefault();   // Useful in preventing the opening of a new tab in Firefox if the anchor-tag icon has target="_blank"
                                     iconOptions.onclick(evt, editor, $moreIcon);
 
@@ -506,6 +506,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             content: tooltipContent.join(''),
                             contentAsHTML: true,
                             position: 'bottom',
+                            // https://github.com/iamceege/tooltipster/blob/3.3.0/js/jquery.tooltipster.js#L338
+                            theme: 'tooltipster-default magic-css-tooltipster',
                             interactive: true,
                             interactiveTolerance: 350,
                             functionReady: function (origin, tooltip) {
@@ -557,7 +559,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     '</li>'
                                 );
                                 if (iconOptions.uniqCls && iconOptions.onclick) {
-                                    $(document).on('click', '.' + iconOptions.uniqCls, function(evt){
+                                    // $(document).on('click', '<selector>', callback(){...}) and
+                                    // $('body').on('click', '<selector>', callback(){...}) are generally equivalent
+                                    // and rather "$(document).on('click' ..." approach is more safe because that
+                                    // script can be placed even in <head> section, but some sites may have
+                                    // stopPropagation() like:
+                                    //     $("body").on("click", function(evt) {
+                                    //         evt.stopPropagation();
+                                    //         ...
+                                    //     }
+                                    // So, in those cases, delegating the event via "body" element works better
+                                    $('body').on('click', '.' + iconOptions.uniqCls, function(evt){
                                         evt.preventDefault();   // Useful in preventing the opening of a new tab in Firefox if the anchor-tag icon has target="_blank"
                                         iconOptions.onclick(evt, editor, $divIcon);
 
@@ -573,6 +585,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 content: tooltipContent.join(''),
                                 contentAsHTML: true,
                                 position: 'bottom',
+                                // https://github.com/iamceege/tooltipster/blob/3.3.0/js/jquery.tooltipster.js#L338
+                                theme: 'tooltipster-default magic-css-tooltipster',
                                 interactive: true,
                                 interactiveTolerance: 350,
                                 functionReady: function (origin, tooltip) {

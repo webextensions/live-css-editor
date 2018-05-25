@@ -252,35 +252,39 @@
 }
 
 /* Begin: More icons */
-body .tooltipster-default {
+.magic-css-tooltipster.tooltipster-default {
     z-index: 2147483600;
     background-color: #7A89C6;
 }
 
-body .tooltipster-default,
-body .tooltipster-arrow-border {
+.magic-css-tooltipster.tooltipster-default {
     border-color: #475A9B !important;
 }
+.magic-css-tooltipster .tooltipster-arrow-border {
+    border-top-color: #475A9B !important;
+    border-bottom-color: #475A9B !important;
+}
 
-body .tooltipster-default .tooltipster-content {
+.magic-css-tooltipster.tooltipster-default .tooltipster-content {
     padding: 0;
     margin: 0;
     line-height: 1.4;
 }
-.tooltipster-content ul {
+.magic-css-tooltipster .tooltipster-content ul {
     padding: 0;
     margin: 0;
+    list-style-position: initial;
 }
 
-.tooltipster-content ul li {
+.magic-css-tooltipster .tooltipster-content ul li {
     padding: 0;
 }
 
-.tooltipster-content ul li:hover {
+.magic-css-tooltipster .tooltipster-content ul li:hover {
     background-color: #5A69A6 !important;
 }
 
-.tooltipster-base ul li a {
+.magic-css-tooltipster.tooltipster-base ul li a {
     color: #fff;
     text-decoration: none;
     font-size: 11px;
@@ -289,7 +293,7 @@ body .tooltipster-default .tooltipster-content {
     padding: 3px 10px 1px 25px;
 }
 
-.tooltipster-content > ul li a {
+.magic-css-tooltipster .tooltipster-content > ul li a {
     background-position: 7px 50%;
 }
 
@@ -307,14 +311,14 @@ body .tooltipster-default .tooltipster-content {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxklEQVQ4y53TMWpCQRCA4Q8JasAiRcQjWBixsUiRQPAwOYW9dmIpBMUTSCBtTpDOOoGQQBoru1RPmxUeq+CuA8OyMP8/sDPLcfQxQtMFcYcv7PCCm1zBPMBFOGdo5Ai6+AjwIZe4zpH0sI4kC9RyJH38RJIpqjmSe2wjyRBXOZKHSLDDc7mgckbwj03pXqCd2n2Av1LnAuNU+LG0UIecoJ4Cd/AZwfPUCbTwHcGrnFd/j+C33L/QwW+AXxOmdDKewv7fphTvATvpPMc4jdhXAAAAAElFTkSuQmCC");
 }
 
-.tooltipster-base ul li a.magicss-less-or-sass-to-css,
-.tooltipster-base ul li a.magicss-css-to-less {
+.magic-css-tooltipster.tooltipster-base ul li a.magicss-less-or-sass-to-css,
+.magic-css-tooltipster.tooltipster-base ul li a.magicss-css-to-less {
     opacity: 0.35;
 }
 
-.tooltipster-selected-mode-less.tooltipster-base ul li a.magicss-less-or-sass-to-css,
-.tooltipster-selected-mode-sass.tooltipster-base ul li a.magicss-less-or-sass-to-css,
-.tooltipster-selected-mode-css.tooltipster-base ul li a.magicss-css-to-less {
+.magic-css-tooltipster.tooltipster-base.tooltipster-selected-mode-less ul li a.magicss-less-or-sass-to-css,
+.magic-css-tooltipster.tooltipster-base.tooltipster-selected-mode-sass ul li a.magicss-less-or-sass-to-css,
+.magic-css-tooltipster.tooltipster-base.tooltipster-selected-mode-css ul li a.magicss-css-to-less {
     opacity: 1;
 }
 
@@ -400,7 +404,7 @@ body .tooltipster-default .tooltipster-content {
 }
 
 .magicss-cache-image-to-prevent-CSP-problem-disable-css-linting,
-.tooltipster-content > ul li a.magicss-disable-css-linting {
+.magic-css-tooltipster .tooltipster-content > ul li a.magicss-disable-css-linting {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited.svg"),
         url("chrome-extension://__MSG_@@extension_id__/ui-images/warning.svg"); */
@@ -417,18 +421,18 @@ body .tooltipster-default .tooltipster-content {
     display: block;
 }
 
-.tooltipster-base ul li a.magicss-enable-css-linting,
-.tooltipster-base ul li a.magicss-disable-css-linting {
+.magic-css-tooltipster.tooltipster-base ul li a.magicss-enable-css-linting,
+.magic-css-tooltipster.tooltipster-base ul li a.magicss-disable-css-linting {
     opacity: 0.35;
 }
 
-.tooltipster-selected-mode-css.tooltipster-base ul li a.magicss-enable-css-linting,
-.tooltipster-selected-mode-css.tooltipster-base ul li a.magicss-disable-css-linting {
+.tooltipster-selected-mode-css.magic-css-tooltipster.tooltipster-base ul li a.magicss-enable-css-linting,
+.tooltipster-selected-mode-css.magic-css-tooltipster.tooltipster-base ul li a.magicss-disable-css-linting {
     opacity: 1;
 }
 
 .magicss-cache-image-to-prevent-CSP-problem-hide-line-numbers,
-.tooltipster-content > ul li a.magicss-hide-line-numbers {
+.magic-css-tooltipster .tooltipster-content > ul li a.magicss-hide-line-numbers {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited.svg"),
         url("chrome-extension://__MSG_@@extension_id__/ui-images/hash_edited.svg"); */
@@ -626,13 +630,18 @@ html .magicss-mouse-over-dom-element {
 .magic-css-back-end-connectivity-options {
     color: #000;
 }
-.magic-css-back-end-connectivity-options a {
+.magic-css-back-end-connectivity-options a,
+.magic-css-back-end-connectivity-options a:link,
+.magic-css-back-end-connectivity-options a:visited {
     color: #777;
+    font-weight: normal;
     text-decoration: none;
 }
-.magic-css-back-end-connectivity-options a:hover {
+.magic-css-back-end-connectivity-options a:hover,
+.magic-css-back-end-connectivity-options a:active {
     color: #000;
     text-decoration: underline;
+    font-weight: normal;
 }
 /* End */
 
@@ -769,11 +778,25 @@ html .magicss-mouse-over-dom-element {
     (these styles would be non-essential for most of the sites)
 */
 
+#topCenterAlertNote {
+    line-height: initial;
+}
+
+.magic-css-container {
+    text-shadow: none;
+}
+
 /* Use left-to-right direction for all sites */
 #topCenterAlertNote,
-#MagiCSS-bookmarklet .CodeMirror,
-.CodeMirror-hints {
+#MagiCSS-bookmarklet,
+.CodeMirror-hints,
+.magic-css-ui {
     direction: ltr;
+}
+
+/* https://www.accuweather.com */
+.CodeMirror span {
+    font-family: monospace;
 }
 
 /* Show cursors if the CSS contains style like: div { overflow: hidden } */
@@ -820,8 +843,21 @@ html .magicss-mouse-over-dom-element {
 }
 
 /* http://koimoi.com/ */
-.tooltipster-content ul li {
+.magic-css-tooltipster .tooltipster-content ul li {
     margin: 0;
+}
+
+.magic-css-tooltipster.tooltipster-base a,
+.magic-css-tooltipster.tooltipster-base a:link,
+.magic-css-tooltipster.tooltipster-base a:hover {
+    background-color: initial;
+}
+
+/* http://susanhefuna.com */
+.magic-css-ui,
+#MagiCSS-bookmarklet .CodeMirror,
+.magic-css-tooltipster.tooltipster-base {
+    letter-spacing: initial;
 }
 
 /* End: Site-specific fixes */
@@ -845,10 +881,36 @@ html .magicss-mouse-over-dom-element {
 
 
 
+/* Begin: Fix some general styles which might be overridden in some sites */
+.magic-css-ui,
+.magic-css-ui input,
+.magic-css-ui input[type],
+.magic-css-ui button {
+    margin: 0;
+    display: initial;
+    line-height: initial;
+    letter-spacing: initial;
+    text-shadow: initial;
+    text-align: left;
+    font-family: sans-serif;
+    font-weight: initial;
+}
+.magic-css-ui input[type] {
+    box-sizing: inherit;
+}
 
+.magic-css-ui a {
+    font-size: inherit;
+}
 
+.magic-css-ui span {
+    font-size: inherit;
+}
 
-
+.magic-css-ui * {
+    text-transform: initial;
+}
+/* End */
 
 .magic-css-ui button {
     padding: 7px 12px;
@@ -875,6 +937,17 @@ html .magicss-mouse-over-dom-element {
     box-shadow: none;
 }
 
+/* Begin: Site specific fixes */
+
+/* http://xtremezerowaste.org.nz */
+.magic-css-ui button,
+.magic-css-ui button:hover,
+.magic-css-ui button[disabled] {
+    padding: 7px 12px;
+    margin: 0;
+}
+
+/* End */
 
 
 
