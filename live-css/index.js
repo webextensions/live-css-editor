@@ -45,6 +45,7 @@ var nPath = require('path'),
 var chokidar = require('chokidar'),
     anymatch = require('anymatch'),
     boxen = require('boxen'),
+    unusedFilename = require('unused-filename'),
     _uniq = require('lodash/uniq.js');
 
 var findFreePort;
@@ -72,6 +73,11 @@ var defaultConfig = require('./default.live-css.config.js'),
 var logAndThrowError = function (msg) {
     logger.errorHeading(msg);
     throw new Error(msg);
+};
+
+var exitWithError = function (msg) {
+    logger.error(msg);
+    process.exit(1);
 };
 
 // If being executed as a binary and not via require()
@@ -130,19 +136,35 @@ if (!module.parent) {
         try {
             defaultConfigurationText = fs.readFileSync(defaultConfigFilePath, 'utf8');
         } catch (e) {
-            logger.fatal('Error:\nUnable to read default configuration file from ' + defaultConfigFilePath);
-            process.exit(1);
+            exitWithError('An error occurred.\nUnable to read the default configuration file from:\n    ' + defaultConfigFilePath);
         }
 
         var targetConfigFilePath = nPath.resolve(process.cwd(), '.live-css.config.js');
         try {
+            try {
+                if (fs.existsSync(targetConfigFilePath)) {
+                    // Copy and rename the existing file
+                    try {
+                        var renameTo = unusedFilename.sync(targetConfigFilePath);
+                        try {
+                            fs.renameSync(targetConfigFilePath, renameTo);
+                            logger.warn('\nThe old configuration file has been renamed to:\n    ' + renameTo);
+                        } catch (e) {
+                            exitWithError('An error occurred.\nUnable to create a backup of the existing configuration file at:\n    ' + renameTo);
+                        }
+                    } catch (e) {
+                        exitWithError('An error occurred.\nUnable to access the files in directory:\n    ' + nPath.dirname(targetConfigFilePath));
+                    }
+                }
+            } catch (e) {
+                exitWithError('An error occurred.\nUnable to access the path:\n    ' + targetConfigFilePath);
+            }
             fs.writeFileSync(targetConfigFilePath, defaultConfigurationText);
             logger.success('\nConfiguration file of live-css server has been written at:\n    ' + targetConfigFilePath);
             logger.info('\nNow, when you execute the ' + logger.chalk.underline('live-css') + ' command from this directory, it would load the required options from this configuration file.\n');
             process.exit(0);
         } catch (e) {
-            logger.error(' ✗ Error: Unable to write configuration file to: ' + targetConfigFilePath);
-            process.exit(1);
+            exitWithError('An error occurred.\nUnable to write configuration file to:\n    ' + targetConfigFilePath);
         }
     }
 
@@ -471,6 +493,8 @@ if (!module.parent) {
                     }(localIpAddressesAndHostnames)) +
                     '\n'
                 );
+            } else {
+                logger.info('\nLive CSS Editor (Magic CSS) server is running at port ' + portNumber);
             }
 
             logger.info('Press CTRL-C to stop the server\n');
