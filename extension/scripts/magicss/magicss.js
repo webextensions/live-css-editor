@@ -246,11 +246,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (linkTags.length === successCount + errorCount) {
                 setTimeout(function () {
                     if (errorCount) {
+                        var msg = '';
                         if (errorCount === 1) {
-                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tag failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                            msg = htmlEscape(errorCount + ' of the CSS <link> tag failed to reload.');
                         } else {
-                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                            msg = htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.');
                         }
+                        msg += '<br/><span style="font-weight:normal;">Please check availability of the CSS resources included in this page.</span>';
+                        utils.alertNote(msg);
                     } else {
                         if (successCount === 1) {
                             utils.alertNote(htmlEscape(successCount + ' active CSS <link> tag got reloaded successfully :-)'));
@@ -2111,7 +2114,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                             });
                                                             if (!flagWatchingCssFiles) {
                                                                 flagWatchingCssFiles = true;
-                                                                utils.alertNote('Now watching CSS file changes');
+                                                                utils.alertNote(
+                                                                    'Watching CSS files for changes.' +
+                                                                    '<br />' +
+                                                                    '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                                                                    20000,
+                                                                    {
+                                                                        unobtrusive: true
+                                                                    }
+                                                                );
                                                                 $(editor.container).addClass('watching-css-files');
                                                             }
                                                         }

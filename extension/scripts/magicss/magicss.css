@@ -974,7 +974,7 @@ html .magicss-mouse-over-dom-element {
 
 
 .magic-css-toastr#toast-container {
-    z-index: 2147483600;
+    z-index: 2147483610;
     font-family: Helvetica, "Trebuchet MS", sans-serif;
     font-size: 12px;
 }
