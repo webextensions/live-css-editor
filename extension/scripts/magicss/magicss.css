@@ -896,6 +896,12 @@ html .magicss-mouse-over-dom-element {
 .magic-css-ui {
     word-wrap: break-word;
 }
+.magic-css-tooltipster {
+    box-sizing: content-box;
+}
+.magic-css-tooltipster * {
+    box-sizing: inherit;
+}
 /* End */
 
 
