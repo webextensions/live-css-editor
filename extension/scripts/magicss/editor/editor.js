@@ -1053,8 +1053,21 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         'textarea-value': '',
         'ui-position-left': 20,
         'ui-position-top': 20,
-        'ui-size-height': 250,
-        'ui-size-width': 300
+
+        // Previously, we were using:
+        //     'ui-size-width': 300,
+        //     'ui-size-height': 250
+        // But, some of the advertisement blocking extensions have logic like:
+        //     [style*="width:300px; height:250px;"],
+        //     [style*="width: 300px; height: 250px;"] {
+        //         display: none !important;
+        //     }
+        // For example, one (or more) of the lists in uBlock Origin and Adblock Plus
+        // was applying a style like the above for the page:
+        //     https://www.msn.com/en-ae/
+        // Now, we use 301x249 as the default size to avoid that
+        'ui-size-width': 301,
+        'ui-size-height': 249
     };
 
     window.Editor = Editor;
