@@ -786,13 +786,15 @@ html .magicss-mouse-over-dom-element {
     text-shadow: none;
 }
 
-/* Use left-to-right direction for all sites */
 #topCenterAlertNote,
 #MagiCSS-bookmarklet,
 .CodeMirror-hints,
+.magic-css-tooltipster,
 .magic-css-ui {
-    direction: ltr;
+    direction: ltr;                 /* Use left-to-right direction for all sites */
+    -webkit-text-stroke-width: 0;   /* https://www.digit.in */
 }
+
 
 /* https://www.accuweather.com */
 .CodeMirror span {
@@ -851,6 +853,7 @@ html .magicss-mouse-over-dom-element {
 .magic-css-tooltipster.tooltipster-base a:link,
 .magic-css-tooltipster.tooltipster-base a:hover {
     background-color: initial;
+    margin: 0;                  /* https://www.thesnookergym.com */
 }
 
 /* http://susanhefuna.com */
@@ -877,7 +880,11 @@ html .magicss-mouse-over-dom-element {
 
 
 
-
+/* Begin: General purpose CSS */
+.magic-css-ui {
+    word-wrap: break-word;
+}
+/* End */
 
 
 
@@ -980,6 +987,10 @@ html .magicss-mouse-over-dom-element {
 /* Without this, the last word in the title may wrap to next line when close button is there */
 .magic-css-toastr#toast-container .toast-title {
     float: left;
+}
+/* Since we are using float for .toast-title , we need to "clear" it for displaying long contents in ".toast-message" */
+.magic-css-toastr#toast-container .toast-message {
+    clear: both;
 }
 /* End */
 
