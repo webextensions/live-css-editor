@@ -1525,8 +1525,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
                     if (socket) {
-                        socket.close();
-                        socket = null;
+                        var socketOpts = (socket.io || {}).opts || {};
+                        if (
+                            socket.connected &&
+                            socketOpts.hostname === serverHostnameValue &&
+                            socketOpts.port === serverPortValue
+                        ) {
+                            return;
+                        } else {
+                            socket.close();
+                            socket = null;
+                        }
                     }
 
                     var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
