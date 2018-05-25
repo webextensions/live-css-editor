@@ -839,6 +839,18 @@ html .magicss-mouse-over-dom-element {
     background-color: #ccc;
 }
 
+/* https://jsfiddle.net */
+#MagiCSS-bookmarklet .CodeMirror {
+    margin: 0;
+    background-color: #fff;
+}
+#MagiCSS-bookmarklet .CodeMirror-selected {
+    background-color: rgb(217, 217, 217);
+}
+#MagiCSS-bookmarklet .CodeMirror-cursor {
+    border-left-color: #000;
+}
+
 /* http://stackoverflow.com/ */
 #MagiCSS-bookmarklet .CodeMirror {
     position: relative !important;
