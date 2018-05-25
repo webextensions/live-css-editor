@@ -5,6 +5,9 @@ ban.svg
 ban_edited.svg
     Slightly edited version of "ban.svg"
 
+ban_edited-yellow.svg
+    Slightly edited version of "ban.svg"
+
 compress.svg
     https://www.iconfinder.com/icons/1608651/compress_icon#size=128
     https://www.iconfinder.com/icons/1608651/download/svg/128
@@ -62,6 +65,13 @@ mail.svg
 
 mail_edited.svg
     Slightly edited version (using http://vectorpaint.yaks.co.nz/) of "mail.svg"
+
+plus.svg
+    https://www.iconfinder.com/icons/103172/add_plus_icon#size=128
+    https://www.iconfinder.com/icons/103172/download/svg/128
+
+plus_edited.svg
+    Slightly edited version of "plus.svg"
 
 point-and-click.png
     chrome-devtools://devtools/bundled/Images/toolbarButtonGlyphs_2x.png (in Google Chrome browser)

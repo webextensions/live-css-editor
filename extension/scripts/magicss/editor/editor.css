@@ -5,6 +5,22 @@
     opacity: 1;
 }
 
+.editor-gray-out {
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+}
+.editor-gray-out:hover {
+    -webkit-filter: none;
+    filter: none;
+}
+
+.editor-opaque-on-hover {
+    opacity: 0.66;
+}
+.editor-opaque-on-hover:hover {
+    opacity: 1;
+}
+
 .editor-icon {
     cursor: pointer;
     margin-left: 10px;
@@ -18,8 +34,11 @@
 }
 
 .editor-more-icons {
-    /* Source: http://www.iconfinder.com/icondetails/103172/128/add_plus_icon (http://www.iconfinder.com/icons/103172/download/png/16) ; https://creativecommons.org/licenses/by/3.0/ */
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gsNFBETrRJXUQAAAENJREFUOMtjYBjs4D8SDsWmgIlSG4aBAYxoAUYq8KXUBZxU9YILFvndSOxmBgaGQ2jy50cTEgMDCwF5JwYGBmZ8AQYAZQEMOYOgsd0AAAAASUVORK5CYII=");
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/plus_edited.svg */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiBoZWlnaHQ9IjI0cHgiIGlkPSJMYXllcl8xIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0cHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIGZpbGw9IiNmY2Q2NGUiPjxwYXRoIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTIyLjUsMTRIMTR2OC41YzAsMC4yNzYtMC4yMjQsMC41LTAuNSwwLjVoLTRDOS4yMjQsMjMsOSwyMi43NzYsOSwyMi41VjE0SDAuNSAgQzAuMjI0LDE0LDAsMTMuNzc2LDAsMTMuNXYtNEMwLDkuMjI0LDAuMjI0LDksMC41LDlIOVYwLjVDOSwwLjIyNCw5LjIyNCwwLDkuNSwwaDRDMTMuNzc2LDAsMTQsMC4yMjQsMTQsMC41VjloOC41ICBDMjIuNzc2LDksMjMsOS4yMjQsMjMsOS41djRDMjMsMTMuNzc2LDIyLjc3NiwxNCwyMi41LDE0eiIgZmlsbC1ydWxlPSJldmVub2RkIi8+PC9zdmc+");
+    background-repeat: no-repeat;
+    background-size: 14px;
+    background-position: center center;
 }
 
 /* Style the cursor for "Insert" mode */

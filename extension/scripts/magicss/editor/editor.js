@@ -473,7 +473,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 options.headerIcons = options.headerIcons || [];
                 options.headerIcons.unshift({
                     name: 'more',
-                    cls: 'editor-more-icons editor-translucent-out cancelDragHandle',
+                    cls: 'editor-more-icons editor-gray-out cancelDragHandle',
                     afterrender: function (editor, moreIcon) {
                         var $moreIcon = $(moreIcon),
                             tooltipContent = ['<ul>'];

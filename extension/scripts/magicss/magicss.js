@@ -1785,7 +1785,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                         if (icon && icon.cls) {
                             if (options.addOpaqueOnHoverClass) {
-                                icon.cls += ' magicss-opaque-on-hover';
+                                icon.cls += ' editor-opaque-on-hover';
                             }
                         }
                     }
@@ -1965,7 +1965,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         {
                             name: 'reapply',
                             title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
-                            cls: 'magicss-reapply-styles magicss-gray-out',
+                            cls: 'magicss-reapply-styles editor-gray-out',
                             onclick: function (evt, editor, divIcon) {
                                 if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
                                     markAsPinnedOrNotPinned(editor, 'not-pinned');
@@ -2005,7 +2005,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         {
                             name: 'disable',
                             title: 'Deactivate code',
-                            cls: 'magicss-disable-css magicss-gray-out',
+                            cls: 'magicss-disable-css editor-gray-out',
                             onclick: function (evt, editor, divIcon) {
                                 if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
                                     editor.disableEnableCSS('enable');
@@ -2042,7 +2042,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         {
                             name: 'beautify',
                             title: 'Beautify code',
-                            cls: 'magicss-beautify magicss-gray-out',
+                            cls: 'magicss-beautify editor-gray-out',
                             onclick: function (evt, editor) {
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
@@ -2063,7 +2063,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         {
                             name: 'css-reloader-and-file-changes-watcher',
                             title: 'CSS reloader and watch file changes',
-                            cls: 'magicss-reload-css-resources magicss-gray-out cancelDragHandle',
+                            cls: 'magicss-reload-css-resources editor-gray-out cancelDragHandle',
                             icons: [
                                 {
                                     name: 'stopWatchingCssFiles',

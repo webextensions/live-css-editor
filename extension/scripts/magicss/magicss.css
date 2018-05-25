@@ -112,32 +112,14 @@
     color: #ffff00;
 }
 
-
-.magicss-gray-out {
-    -webkit-filter: grayscale(1);
-    filter: grayscale(1);
-}
-.magicss-gray-out:hover {
-    -webkit-filter: none;
-    filter: none;
-}
-
-.magicss-opaque-on-hover {
-    opacity: 0.66;
-}
-.magicss-opaque-on-hover:hover {
-    opacity: 1;
-}
-
 .magicss-disable-css {
-    /* Source: http://findicons.com/icon/download/116499/150/16/png */
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJFSURBVHjapJO/T1pRFMe/Dx7ypEXri4lUGUhsHF40hODSpQ61cTH+2HSoZaF1dHSxpU7+Ca04NE7dyuBiapcuLFokTdD4A01awNdBSkAf8ut5zhUoxq3e5OS+nPv5nnvuyfdJpmniPksSBd68aM1pFDMU4xS+ei5GsUHxmSLRJD9+hcx7rVqFZWwMtc3NIGy2Zam31yX19ABdXTdgNuszdd1nptNBlMtviQ0TC0ujg1LgGWNByelctQ4M4G8qhfN4HLmDA6HvpJzq9eJRXx+qlDPz+deUDrd9+i6KoFouazVg2erx4M/uLn5FItGLk5NX/qUliYO+I2o2C4vLBWaYZQ1rRYFyqTQDVXXl02mcb29HbXb7S+/CwjqKRSAaDXlHRqYwOoqdxUUww6zQNApUSqVxuaMDF8kk2hTlgxYIHMMwaHSxEB2/a4g7u7sjzDDLmn8dXF35ZJsNVWrzycTEOtxuYH//lpjWezqbZoZZ1rQ+AXyj3eEQO7a27oj9s7OhVkZoWjqIFXUdD1QVub29L3fEk5MhXF7y2RwzzLKmdQYb+UwGiqLwO6duiVdWxM2GrvfTfOaZYZY1TScmvE7NKsvf3B6PyzE8jB9ra6DJR2TTnBYXSNIcbfN021Mjl8Pv09OzaqXyXIvnE6LAT00RRlLa21cfk1kesgNpULBab5xITiUHokADzJDJioYhjDSUKNafUKlgaHAwXCCHJQ8Pz1JHRyhQm2RhEfzNOT5jhlnWNJ+w0y/918/kPzbrf+M91rUAAwCuQDz94e2kLwAAAABJRU5ErkJggg==');
-    -webkit-filter: grayscale(1);
-    filter: grayscale(1);
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited-yellow.svg */
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB3aWR0aD0iMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQ0MCA4OTNxMC0xNjEtODctMjk1bC03NTQgNzUzcTEzNyA4OSAyOTcgODkgMTExIDAgMjExLjUtNDMuNXQxNzMuNS0xMTYuNSAxMTYtMTc0LjUgNDMtMjEyLjV6bS05OTkgMjk5bDc1NS03NTRxLTEzNS05MS0zMDAtOTEtMTQ4IDAtMjczIDczdC0xOTggMTk5LTczIDI3NHEwIDE2MiA4OSAyOTl6bTEyMjMtMjk5cTAgMTU3LTYxIDMwMHQtMTYzLjUgMjQ2LTI0NSAxNjQtMjk4LjUgNjEtMjk4LjUtNjEtMjQ1LTE2NC0xNjMuNS0yNDYtNjEtMzAwIDYxLTI5OS41IDE2My41LTI0NS41IDI0NS0xNjQgMjk4LjUtNjEgMjk4LjUgNjEgMjQ1IDE2NCAxNjMuNSAyNDUuNSA2MSAyOTkuNXoiIGZpbGw9IiNGQ0Q2NEQiLz48L3N2Zz4K');
+    background-size: contain;
 }
 .indicate-disabled#MagiCSS-bookmarklet .magicss-disable-css {
-    -webkit-filter: drop-shadow(0px 0px 10px #ff0000);
-    filter: drop-shadow(0px 0px 7px #ff0000);
+    -webkit-filter: drop-shadow(0px 0px 10px #ff0);
+    filter: drop-shadow(0px 0px 7px #ff0);
 }
 
 .magicss-point-and-click {
