@@ -1,9 +1,10 @@
 /*
     This configuration file is used for running "live-css" server (https://www.npmjs.com/package/live-css)
-    It is meant to be used along with:
+    It is meant to be used along with browser extension "Live editor for CSS, Less & Sass - Magic CSS":
         https://github.com/webextensions/live-css-editor
 
     To generate this file, download and install Node JS from https://nodejs.org/en/download/
+    After that:
         $ npm install -g live-css
         $ cd <project-folder>
         $ live-css --init
@@ -27,13 +28,15 @@ module.exports = {                          // Learn more about "module.exports"
                                             //     http://stackabuse.com/how-to-use-module-exports-in-node-js/
                                             //     https://nodejs.org/api/modules.html#modules_module_exports
 
+
     "port": 3456,                           // Recommended value: A number between 1024 and 49151
                                             // The "live-css" server would start at this port number
                                             // Learn more about ports:
                                             //     https://computer.howstuffworks.com/web-server8.htm
                                             //     https://en.wikipedia.org/wiki/Registered_port
 
-    // IMPORTANT NOTE: Setting this to an incorrect value may result in failure to auto-refresh styles in the browser.
+
+    // IMPORTANT NOTE: Setting "root" to an incorrect value may result in failure to auto-refresh styles in the browser.
     //                 If you are in doubt, don't use this configuration option, live-css would still work fine.
     // Keeping this configuration option as commented out by default
     // "root": ".",                         // <relative-or-absolute-path>
@@ -48,6 +51,7 @@ module.exports = {                          // Learn more about "module.exports"
                                             // Learn more:
                                             //     https://en.wikipedia.org/wiki/Path_(computing)
 
+
     "watch-patterns": [                     // <Array/String/RegExp/Function>
                                             // Glob patterns or paths of files and directories to be watched recursively
                                             // Learn more:
@@ -57,6 +61,7 @@ module.exports = {                          // Learn more about "module.exports"
 
         "**/*.css"                          // Include all the ".css" files to watch for changes
     ],
+
 
     "watch-ignore-patterns": [              // <Array/String/RegExp/Function>
                                             // Glob patterns or paths of files and directories to be ignored from being watched
@@ -84,10 +89,12 @@ module.exports = {                          // Learn more about "module.exports"
                                                     //     https://github.com/isaacs/minimatch/blob/master/README.md#properties ("negate" property)
     ],
 
+
     "allow-symlinks": false,                // <true/false>
                                             // Learn more about symlinks / symbolic-links:
                                             //     https://en.wikipedia.org/wiki/Symbolic_link
                                             //     https://github.com/paulmillr/chokidar#path-filtering ("followSymlinks")
+
 
     "list-files": false                     // <true/false>
                                             // true: List the paths of the files being watched

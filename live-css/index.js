@@ -328,7 +328,7 @@ if (!module.parent) {
             logger.log('');
         }
         logger.success(
-            '\nLive CSS Editor (Magic CSS) server is ready.' +
+            '\nlive-css server is ready.' +
             '\nWatching ' + filesBeingWatched.length + ' files from:' +
             '\n    ' + watcherCwd +
             '\n'
@@ -483,7 +483,7 @@ if (!module.parent) {
         http.listen(portNumber, function () {
             if (localIpAddressesAndHostnames.length) {
                 logger.info(
-                    '\nLive CSS Editor (Magic CSS) server is available at any of the following addresses:\n' +
+                    '\nlive-css server is available at any of the following addresses:\n' +
                     (function (localIpAddressesAndHostnames) {
                         var addresses = [].concat(localIpAddressesAndHostnames);
                         addresses = addresses.map(function (item) {
@@ -494,10 +494,13 @@ if (!module.parent) {
                     '\n'
                 );
             } else {
-                logger.info('\nLive CSS Editor (Magic CSS) server is running at port ' + portNumber);
+                logger.info('\nlive-css server is running at port ' + portNumber);
             }
 
-            logger.info('Press CTRL-C to stop the server\n');
+            logger.info('Use it along with the browser extension "Live editor for CSS, Less & Sass - Magic CSS":');
+            logger.info('    https://github.com/webextensions/live-css-editor');
+
+            logger.info('\nPress CTRL-C to stop the server\n');
 
             if (paramListFiles || flagFileWatchReady || paramDebug) {
                 // do nothing
