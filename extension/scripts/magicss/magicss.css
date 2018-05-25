@@ -646,7 +646,6 @@ html .magicss-mouse-over-dom-element {
 /* End */
 
 /* Begin: Useful while debugging. Comment it out before publishing. */
-.magic-css-full-page-overlay,
 .magic-css-full-page-overlay {
     z-index: 2147483647;
 }
@@ -890,6 +889,11 @@ html .magicss-mouse-over-dom-element {
 .magic-css-ui {
     word-wrap: break-word;
 }
+.magic-css-ui input:invalid {
+    border-color: rgba(255, 0, 0, 0.7);
+    outline-color: rgba(255, 0, 0, 0.5);
+}
+
 .magic-css-tooltipster {
     box-sizing: content-box;
 }
@@ -1017,10 +1021,22 @@ html .magicss-mouse-over-dom-element {
 .magic-css-server-connectivity-status {
     width: 16px;
     height: 16px;
-    background-repeat: no-repeat;
     background-size: 16px;
-    /* https://www.iconfinder.com/icons/1167970/arrow_arrows_arrowupdown_data_transfer_down_up_icon#size=128 */
-    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iMTI4cHgiIGlkPSJMYXllcl8xIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMjggMTI4OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCIgd2lkdGg9IjEyOHB4IiB4bWw6c3BhY2U9InByZXNlcnZlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48Zz48Zz48Zz48bGluZSBzdHlsZT0iZmlsbDpub25lO3N0cm9rZTojMkYzNDM1O3N0cm9rZS13aWR0aDoxMjtzdHJva2UtbGluZWNhcDpzcXVhcmU7c3Ryb2tlLW1pdGVybGltaXQ6MTA7IiB4MT0iNjMuMTg1IiB4Mj0iMzcuODIxIiB5MT0iODQuMDYxIiB5Mj0iMTA5LjQyMyIvPjxsaW5lIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiMyRjM0MzU7c3Ryb2tlLXdpZHRoOjEyO3N0cm9rZS1saW5lY2FwOnNxdWFyZTtzdHJva2UtbWl0ZXJsaW1pdDoxMDsiIHgxPSIzNy44MjEiIHgyPSIxMi40NTYiIHkxPSIxMDkuNDIzIiB5Mj0iODQuMDYxIi8+PC9nPjxsaW5lIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiMyRjM0MzU7c3Ryb2tlLXdpZHRoOjEyO3N0cm9rZS1taXRlcmxpbWl0OjEwOyIgeDE9IjM3LjgyMSIgeDI9IjM3LjgyMSIgeTE9IjEwOS40MjMiIHkyPSI5LjgwMSIvPjwvZz48Zz48Zz48bGluZSBzdHlsZT0iZmlsbDpub25lO3N0cm9rZTojMkYzNDM1O3N0cm9rZS13aWR0aDoxMjtzdHJva2UtbGluZWNhcDpzcXVhcmU7c3Ryb2tlLW1pdGVybGltaXQ6MTA7IiB4MT0iNjQuODE1IiB4Mj0iOTAuMTgxIiB5MT0iNDQuMjQxIiB5Mj0iMTguODc3Ii8+PGxpbmUgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6IzJGMzQzNTtzdHJva2Utd2lkdGg6MTI7c3Ryb2tlLWxpbmVjYXA6c3F1YXJlO3N0cm9rZS1taXRlcmxpbWl0OjEwOyIgeDE9IjkwLjE4MSIgeDI9IjExNS41NDQiIHkxPSIxOC44NzciIHkyPSI0NC4yNDEiLz48L2c+PGxpbmUgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6IzJGMzQzNTtzdHJva2Utd2lkdGg6MTI7c3Ryb2tlLW1pdGVybGltaXQ6MTA7IiB4MT0iOTAuMTgxIiB4Mj0iOTAuMTgxIiB5MT0iMTguODc3IiB5Mj0iMTE4LjE5OSIvPjwvZz48L2c+PC9zdmc+');
+    background-repeat: no-repeat;
+}
+@keyframes magic-css-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.magic-css-server-connectivity-status.connecting {
+    border: 3px solid rgba(150,150,150,1);
+    border-radius: 50%;
+    border-left: 3px solid rgba(0,0,0,1);
+    animation: magic-css-rotate 1s infinite linear;
 }
 .magic-css-server-connectivity-status.connected {
     /* https://www.iconfinder.com/icons/282474/check_done_ok_icon#size=128 */

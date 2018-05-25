@@ -463,7 +463,7 @@ if (!module.parent) {
     });
 
     var startServer = function (portNumber) {
-        /* Begin: Temporarily hang application */
+        /* Begin: Temporarily hang application for testing purposes */
         /*
         console.log('TODO: Remove this section "Temporarily hang application" when debugging is done');
         var t1 = new Date();
@@ -472,7 +472,7 @@ if (!module.parent) {
             while (true) {
                 // do nothing
                 var t2 = new Date();
-                if (t2 - t1 >= 30000) {
+                if (t2 - t1 >= 15000) {
                     break;
                 }
             }

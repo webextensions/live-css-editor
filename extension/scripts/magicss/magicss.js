@@ -1424,7 +1424,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             .removeClass('magic-css-server-client-incompatible')
                             .find('.magic-css-server-connectivity-status')
                             .removeClass('connected')
-                            .removeClass('disconnected');
+                            .removeClass('disconnected')
+                            .addClass('connecting');
                         $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
 
                         connectionTestingSocket = io(backEndPath);
@@ -1433,6 +1434,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 .removeClass('magic-css-server-client-incompatible')
                                 .find('.magic-css-server-connectivity-status')
                                 .removeClass('disconnected')
+                                .removeClass('connecting')
                                 .addClass('connected');
                             $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', false);
                         });
@@ -1441,6 +1443,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 .removeClass('magic-css-server-client-incompatible')
                                 .find('.magic-css-server-connectivity-status')
                                 .removeClass('connected')
+                                .removeClass('connecting')
                                 .addClass('disconnected');
 
                             if (err === 'Invalid namespace') {
