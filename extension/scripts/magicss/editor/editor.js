@@ -424,6 +424,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             $(cm.getWrapperElement()).addClass('cancelDragHandle');
             $(cm.getWrapperElement()).resizable({
                 handles: 'se',
+                minHeight: 40,
+                minWidth: 200,
                 stop: function (event, ui) {
                     thisOb.setTextContainerDimensions(
                         {
