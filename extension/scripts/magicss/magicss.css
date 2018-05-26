@@ -528,10 +528,8 @@
 }
 
 #MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se {
-    width: 15px;
-    height: 15px;
-    right: 0;
-    bottom: 0;
+    width: 15px !important;     /* !important is useful to avoid FOUC kind of effect when re-initializing Magic CSS */
+    height: 15px !important;    /* !important is useful to avoid FOUC kind of effect when re-initializing Magic CSS */
     background-color: #fff;
 }
 .indicate-disabled#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,

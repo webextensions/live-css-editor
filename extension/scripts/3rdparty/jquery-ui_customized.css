@@ -140,8 +140,21 @@
 	cursor: se-resize;
 	width: 12px;
 	height: 12px;
-	right: 1px;
-	bottom: 1px;
+
+	/*
+		Due to the way some of these UI gets applied and scrollbar calculations of
+		CodeMirror get handled (mainly while animation), it works correct if the
+		right and bottom CSS properties are fixed here (at the origin) itself. Otherwise,
+		if CodeMirror was resized to a small size and Magic CSS was re-initialized,
+		then the horizontal scrollbar would remain shown (in a disabled state though).
+		In a related issue, a momentary jump could be seen at the resize handle on
+		reinitializing, which is fixed by overriding width & height for
+		"#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se" in another file
+	*/
+	/* right: 1px; */
+	/* bottom: 1px; */
+	right: 0;
+	bottom: 0;
 }
 #MagiCSS-bookmarklet .ui-resizable-sw {
 	cursor: sw-resize;
