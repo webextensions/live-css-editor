@@ -500,7 +500,7 @@ if (!module.parent) {
             logger.info('Use it along with the browser extension "Live editor for CSS, Less & Sass - Magic CSS":');
             logger.info('    https://github.com/webextensions/live-css-editor');
 
-            logger.info('\nPress CTRL-C to stop the server\n');
+            logger.info('\nPress CTRL+C to stop the server\n');
 
             if (paramListFiles || flagFileWatchReady || paramDebug) {
                 // do nothing

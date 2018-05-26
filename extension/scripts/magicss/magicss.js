@@ -106,10 +106,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return;
     }
 
-    console.log('TODO: constants.appVersion needs to be dynamic');
-    var constants = {
-        appVersion: '6.2.36'
-    };
+    var constants = {};
+    try {
+        constants.appVersion = chrome.runtime.getManifest().version;
+    } catch (e) {
+        // Just being cautious to have a fallback.
+        // In future, we may adopt just one of these two approaches to get the
+        // version number, once stability is proven across platforms and environments.
+        constants.appVersion = window.magicCssVersion;
+    }
     constants.appMajorVersion = parseInt(constants.appVersion, 10);
     constants.liveCssServer = {
         defaultProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
@@ -1313,12 +1318,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             window.generateSelector(targetElement, {skipClass: 'magicss-mouse-over-dom-element', sortClasses: true, reverseClasses: true})
                         ];
                     } catch (e) {
-                        var errorMessage = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
+                        var errorMessageHTML = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
+                        var errorMessageConsole = 'Sorry! Magic CSS encountered an error in generating CSS selector!\nKindly report this issue at https://github.com/webextensions/live-css-editor/issues (GitHub repository for Magic CSS)';
                         // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
                         //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
                         //               always gets fired
-                        setTimeout(function() { utils.alertNote(errorMessage, 10000); }, 0);
-                        console.log(errorMessage);
+                        setTimeout(function() { utils.alertNote(errorMessageHTML, 10000); }, 0);
+                        console.log(errorMessageConsole);
                         console.log(e);     // The user might wish to add these detais for the report/issue in GitHub about this error.
                     }
                     suggestedSelectors = suggestedSelectors.filter(function(item, pos, self) {

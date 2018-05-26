@@ -165,6 +165,10 @@ var main = function (tabId) {
 
         extLib.loadJSCSS([
             {
+                type: 'js',
+                sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
+            },
+            {
                 src: path3rdparty + 'jquery-3.2.1.js',
                 skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
             },
