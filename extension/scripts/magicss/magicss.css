@@ -527,6 +527,14 @@
     color: #aaa;
 }
 
+#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se {
+    /*
+        Originally defined in CSS of jQuery UI as:
+            background-position: -64px -224px;
+    */
+    background-position: -63px -223px;
+}
+
 .indicate-disabled#MagiCSS-bookmarklet .CodeMirror,
 .indicate-disabled#MagiCSS-bookmarklet .CodeMirror-scrollbar-filler {
     background-color: #bbb;

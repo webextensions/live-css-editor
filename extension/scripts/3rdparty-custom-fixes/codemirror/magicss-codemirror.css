@@ -1,10 +1,10 @@
 #MagiCSS-bookmarklet .CodeMirror-hscrollbar {
-    right: 17px !important;
+    right: 15px !important;
 }
 #MagiCSS-bookmarklet .CodeMirror-vscrollbar {
-	bottom: 0px !important;
-	margin-bottom: 17px;
-    padding-right: 17px;
+    bottom: 0px !important;
+    margin-bottom: 15px;
+    padding-right: 15px;
 }
 
 #MagiCSS-bookmarklet .codemirror-hscrollbar {
@@ -15,7 +15,7 @@
 }
 
 #MagiCSS-bookmarklet {
-	width: auto;
+    width: auto;
 }
 
 #MagiCSS-bookmarklet .CodeMirror-activeline-background {
