@@ -80,6 +80,16 @@ var exitWithError = function (msg) {
     process.exit(1);
 };
 
+// TODO: This function can be simplified
+var getLocalISOTime = function () {
+    // http://stackoverflow.com/questions/10830357/javascript-toisostring-ignores-timezone-offset/28149561#28149561
+    var tzoffset = (new Date()).getTimezoneOffset() * 60000, //offset in milliseconds
+        localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0,-1);
+    localISOTime = localISOTime.replace('T', ' ');
+    localISOTime = localISOTime.substring(11, 19);
+    return localISOTime;
+};
+
 // If being executed as a binary and not via require()
 if (!module.parent) {
     var argv = require('yargs')
@@ -327,12 +337,6 @@ if (!module.parent) {
         if (!paramListFiles) {
             logger.log('');
         }
-        logger.success(
-            '\nlive-css server is ready.' +
-            '\nWatching ' + filesBeingWatched.length + ' files from:' +
-            '\n    ' + watcherCwd +
-            '\n'
-        );
         if (!paramRoot && anyFileNameIsRepeated(filesBeingWatched)) {
             logger.warn(
                 boxen(
@@ -347,7 +351,16 @@ if (!module.parent) {
                     }
                 )
             );
+        } else {
+            // Print an empty line for whitespacing
+            logger.log('');
         }
+        logger.success(
+            'live-css server is ready.' +
+            '\nWatching ' + filesBeingWatched.length + ' files from:' +
+            '\n    ' + watcherCwd +
+            '\n'
+        );
     });
 
     watcher.on('ready', function () {
@@ -357,20 +370,19 @@ if (!module.parent) {
         // log(watchedPaths);
     });
 
-
     var printSessionCount = function (connectedSessions) {
-        logger.info('Number of active connections: ' + connectedSessions);
+        logger.info(logger.chalk.gray(getLocalISOTime()) + ' Number of active connections: ' + connectedSessions);
     };
 
     emitter.on('connected-socket', function () {
         connectedSessions++;
-        logger.info('\nConnected to a socket.');
+        logger.info(logger.chalk.gray(getLocalISOTime()) + ' Connected to a socket.');
         printSessionCount(connectedSessions);
     });
 
     emitter.on('disconnected-socket', function () {
         connectedSessions--;
-        logger.info('\nDisconnected from a socket.');
+        logger.info(logger.chalk.gray(getLocalISOTime()) + ' Disconnected from a socket.');
         printSessionCount(connectedSessions);
     });
 
@@ -416,7 +428,9 @@ if (!module.parent) {
     watcher
         .on('add', function (path) {
             avoidSymbolicLinkDueToChokidarBug(path, function () {
-                if (paramListFiles || flagFileWatchReady || paramDebug) {
+                if (flagFileWatchReady || paramDebug) {
+                    logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Watching file: ' + path));
+                } else if (paramListFiles) {
                     logger.verbose('Watching file: ' + path);
                 } else {
                     process.stdout.write(logger.chalk.dim('.'));
@@ -442,15 +456,15 @@ if (!module.parent) {
                     timeModified = timeModified.toTimeString().substring(0, 8);
                 }
                 if (timeModified) {
-                    logger.verbose('(' + timeModified + ') File modified: ' + path);
+                    logger.log(logger.chalk.gray(timeModified) + logger.chalk.dim(' File modified: ' + path));
                 } else {
-                    logger.verbose('File modified: ' + path);
+                    logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' File modified: ' + path));
                 }
                 emitter.emit('file-modified', getPathValues(path));
             });
         })
         .on('unlink', function (path) {
-            logger.verbose('File removed: ' + path);
+            logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' File removed: ' + path));
             emitter.emit('file-deleted', getPathValues(path));
         });
 

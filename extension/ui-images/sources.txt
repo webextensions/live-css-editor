@@ -101,6 +101,13 @@ warning.svg
     https://www.iconfinder.com/icons/293711/warning_icon#size=128
     https://www.iconfinder.com/icons/293711/download/svg/128
 
+warning-circle.svg
+    https://www.iconfinder.com/icons/183525/error_exclamation_mark_warning_icon#size=128
+    https://www.iconfinder.com/icons/183525/download/svg/128
+
+warning-circle_edited.svg
+    Slightly edited version of "reload.svg"
+
 watch.svg
     https://www.iconfinder.com/icons/2561502/watch_icon#size=128
     https://www.iconfinder.com/icons/2561502/download/svg/128

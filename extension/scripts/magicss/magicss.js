@@ -843,15 +843,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     '<div class="magic-css-full-page-contents magic-css-ui" style="pointer-events:none;">',
                         '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
                             '<div class="magic-css-back-end-connectivity-options" style="pointer-events:initial;">',
-                                '<div class="magic-css-file-config-item">',
+                                '<div class="magic-css-file-config-item" style="padding-bottom:0;">',
                                     '<div>',
-                                        '<div>',
-                                            'You need to run a small development server called',
+                                        '<div style="margin-bottom:20px;">',
+                                            'You need to run a small development server, called',
                                             ' <a target="_blank" href="https://www.npmjs.com/package/live-css" style="font-weight:bold; text-decoration:underline; color:#000;">live-css</a>',
                                             ', for using the feature',
                                             ' "Watch CSS files & apply changes automatically".',
+                                            ' This feature is meant for use during web development.',
                                         '</div>',
-                                        '<div>&nbsp;</div>',
                                         '<div>',
                                             '<div style="font-weight:bold; float:left;">Step 1:</div>',
                                             '<div style="margin-left:50px;">',
@@ -885,7 +885,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 '<br />',
                                                 '<div style="float:left; line-height:16px; background-color:#bbb; padding:3px 7px; border-radius:3px; margin-top:2px; font-family:monospace;">',
                                                     '<svg viewBox="0 0 12.32 9.33" style="width:12px; height:16px; display:block; float:left;"><g><line class="st1" x1="7.6" y1="8.9" x2="7.6" y2="6.9"></line><rect width="1.9" height="1.9"></rect><rect x="1.9" y="1.9" width="1.9" height="1.9"></rect><rect x="3.7" y="3.7" width="1.9" height="1.9"></rect><rect x="1.9" y="5.6" width="1.9" height="1.9"></rect><rect y="7.5" width="1.9" height="1.9"></rect></g></svg>',
-                                                    '<span>npm install -g <span class="magic-css-highlight-if-server-client-incompatible">live-css@', constants.appMajorVersion, '</span></span>',
+                                                    '<span>npm install -g <span class="live-css-highlight-if-server-client-incompatible">live-css@', constants.appMajorVersion, '</span></span>',
                                                 '</div>',
                                             '</div>',
                                         '</div>',
@@ -902,11 +902,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         '</div>',
                                         '<div style="clear:both; padding-top:4px;">',
                                             '<div style="font-weight:bold; float:left;">Step 4:</div>',
-                                            '<div style="margin-left:50px;">Fill up the following details from the output of the previous command</div>',
+                                            '<div style="margin-left:50px;">Enter server path based on output of the previous command</div>',
                                         '</div>',
-                                        '<div>&nbsp;</div>',
                                     '</div>',
-                                    '<div class="magic-css-file-field-header">',
+                                    '<div class="magic-css-file-field-header" style="margin-top:20px;">',
                                         '<span style="color:#000; font-weight:bold;">Server path:</span> ',
                                         '<span style="color:#888;font-size:12px;">',
                                             '(eg: ',
@@ -920,17 +919,30 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         '</span>',
                                     '</div>',
                                     '<div>',
-                                        '<span style="display:inline-block;">' + constants.liveCssServer.defaultProtocol + '//&nbsp;</span>',
-                                        '<input type="text" spellcheck="false" class="magic-css-server-hostname" placeholder="',
-                                            constants.liveCssServer.defaultHostname,
-                                            '" style="width:165px"',
-                                        ' />',
-                                        '<span style="display:inline-block;">&nbsp;:&nbsp;</span>',
-                                        '<input type="number" min="1" max="65535" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px; margin-right:10px;" />',
-                                        '<span class="magic-css-server-connectivity-status" style="float:right; display:inline-block; margin-top:2px; width:16px; height:16px; background-repeat:no-repeat;">&nbsp;</span>',
+                                        '<div style="width:50px; height:20px; float:left;">',
+                                            '<div class="magic-css-server-connectivity-status" style="float:right; margin-right:10px; display:block; margin-top:2px; width:16px; height:16px; background-repeat:no-repeat;"></div>',
+                                        '</div>',
+                                        '<div style="margin-left:50px;">',
+                                            '<span style="display:inline-block; line-height:21px;">' + constants.liveCssServer.defaultProtocol + '//&nbsp;</span>',
+                                            '<input type="text" spellcheck="false" class="magic-css-server-hostname" placeholder="',
+                                                constants.liveCssServer.defaultHostname,
+                                                '" style="width:165px;"',
+                                            ' />',
+                                            '<span style="display:inline-block; line-height:21px;">&nbsp;:&nbsp;</span>',
+                                            '<input type="number" min="1" max="65535" step="1" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px;" />',
+                                        '</div>',
                                     '</div>',
-                                    '<div class="magic-css-server-client-incompatible-error-message" style="display:none;">',
-                                        'Error: You need to use version ', constants.appMajorVersion, ' of the live-css server',
+                                    '<div style="min-height:35px; padding-top:3px; clear:both;">',
+                                        '<div class="live-css-connectivity-error-message live-css-server-client-general-error-message" style="display:none;">',
+                                            '<div>You are not connected. Is live-css server running?</div>',
+                                            '<div>',
+                                                'Do you need to enable CORS? ',
+                                                '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" style="margin-left:10px;">Help</a>',
+                                            '</div>',
+                                        '</div>',
+                                        '<div class="live-css-connectivity-error-message live-css-server-client-incompatible-error-message" style="display:none;">',
+                                            'Error: You need to use version ', constants.appMajorVersion, ' of the live-css server',
+                                        '</div>',
                                     '</div>',
                                 '</div>',
                                 '<div class="magic-css-file-config-item">',
@@ -959,7 +971,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 connectionTestingSocket = null;
             }
             $backEndConnectivityOptions
-                .removeClass('magic-css-server-client-incompatible')
+                .removeClass('live-css-server-client-general-error')
+                .removeClass('live-css-server-client-incompatible-error')
                 .find('.magic-css-server-connectivity-status')
                 .removeClass('connected')
                 .removeClass('disconnected')
@@ -969,7 +982,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             connectionTestingSocket = io(backEndPath);
             connectionTestingSocket.on('connect', function () {
                 $backEndConnectivityOptions
-                    .removeClass('magic-css-server-client-incompatible')
+                    .removeClass('live-css-server-client-general-error')
+                    .removeClass('live-css-server-client-incompatible-error')
                     .find('.magic-css-server-connectivity-status')
                     .removeClass('disconnected')
                     .removeClass('connecting')
@@ -978,7 +992,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             });
             var errorHandler = function (err) {
                 $backEndConnectivityOptions
-                    .removeClass('magic-css-server-client-incompatible')
+                    .removeClass('live-css-server-client-general-error')
+                    .removeClass('live-css-server-client-incompatible-error')
                     .find('.magic-css-server-connectivity-status')
                     .removeClass('connected')
                     .removeClass('connecting')
@@ -986,7 +1001,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                 if (err === 'Invalid namespace') {
                     $backEndConnectivityOptions
-                        .addClass('magic-css-server-client-incompatible');
+                        .addClass('live-css-server-client-incompatible-error');
+                } else {
+                    $backEndConnectivityOptions
+                        .addClass('live-css-server-client-general-error');
                 }
                 $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
             };

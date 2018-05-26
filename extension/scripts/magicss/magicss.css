@@ -602,7 +602,7 @@ html .magicss-mouse-over-dom-element {
 }
 
 .magic-css-back-end-connectivity-options {
-    width: 350px;
+    width: 410px;
     position: fixed !important; /* Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;" */
     z-index: 2147483647;
     box-sizing: border-box;
@@ -651,18 +651,20 @@ html .magicss-mouse-over-dom-element {
     margin-bottom: 2px;
 }
 
-.magic-css-server-client-incompatible .magic-css-highlight-if-server-client-incompatible {
+.live-css-connectivity-error-message {
+    margin-left: 50px;
+    font-weight: bold;
+    color: brown;
+}
+.live-css-server-client-general-error .live-css-server-client-general-error-message,
+.live-css-server-client-incompatible-error .live-css-server-client-incompatible-error-message {
+    display: block !important;
+}
+.live-css-server-client-incompatible-error .live-css-highlight-if-server-client-incompatible {
     font-weight: bold;
     background-color: #fe5;
 }
-.magic-css-server-client-incompatible-error-message {
-    font-weight: bold;
-    color: brown;
-    margin-top: 3px;
-}
-.magic-css-server-client-incompatible .magic-css-server-client-incompatible-error-message {
-    display: block !important;
-}
+
 
 
 
@@ -672,7 +674,7 @@ html .magicss-mouse-over-dom-element {
     background-color: #ddd;
     border-bottom: 1px solid #999;
     margin-bottom: 0;
-    padding: 10px;
+    padding: 15px;
 
     border: 1px solid #999;
     border-bottom-width: 0;
@@ -1031,6 +1033,6 @@ html .magicss-mouse-over-dom-element {
 }
 
 .magic-css-server-connectivity-status.disconnected {
-    /* https://www.iconfinder.com/icons/282471/cross_delete_remove_icon#size=128 */
-    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIyLjU0MzEyOTk5NDU5MjE2RS0wNiAtMC4xOTQ2NTU5OTk1NDEyODMgMTEzLjUyNjk5Nzg4NDExNiAxMTMuNTI3NjU2MTgyNjQ3IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImRlZjAiIHgxPSIwLjQ5OTk5NSIgeDI9IjAuNDk5OTk1IiB5MT0iMS43Mzc3OUUtMDYiIHkyPSIxLjAwMDAxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGMjdFNUUiLz48c3RvcCBvZmZzZXQ9IjAuNSIgc3RvcC1jb2xvcj0iI0VCMUMyNCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0NFMjIyOSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxnPjxwYXRoIGQ9Ik0yLjU0MzEzRS0wNiw4Ny41MzQ3TDMwLjk2NCw1Ni41NjQgMi41NDMxM0UtMDYsMjUuNjAxMyAyNS43OTczLC0wLjE5NDY1NiA1Ni43NjI3LDMwLjc3MDcgODcuNzI2NywtMC4xOTQ2NTYgMTEzLjUyNywyNS42MDEzIDgyLjU2MjcsNTYuNTY5MyAxMTMuNTI3LDg3LjUzNDcgODcuNzI2NywxMTMuMzI5IDU2Ljc2NjcsODIuMzY0IDI1Ljc5NzMsMTEzLjMzMyAyLjU0MzEzRS0wNiw4Ny41MzQ3eiIgZmlsbD0iIzk5MDAwMCIvPjxwYXRoIGQ9Ik0xMTEuNjQxLDg3LjUzNDFMODAuNjc2OCw1Ni41NzAxIDExMS42NDEsMjUuNjAyMSA4Ny43MjYxLDEuNjkwMTQgNTYuNzYzNSwzMi42NTU1IDI1Ljc5NjgsMS42OTAxNCAxLjg4NDgsMjUuNjAyMSAzMi44NTAxLDU2LjU2NDggMS44ODQ4LDg3LjUzNDEgMjUuNzk2OCwxMTEuNDQ3IDU2Ljc2NzUsODAuNDc4MSA4Ny43MjYxLDExMS40NDMgMTExLjY0MSw4Ny41MzQxeiIgZmlsbD0idXJsKCNkZWYwKSIvPjxwYXRoIGQ9Ik01My41NTA3LDQyLjE1OTdDNjkuOTc3MywzNi45MTg0LDg2LjI5ODcsMzUuMDc4NCwxMDEuMDM2LDM2LjIwNzdMMTExLjY0LDI1LjYwMjQgODcuNzI2NywxLjY5MDQgNTYuNzYyNywzMi42NTU3IDI1Ljc5NzMsMS42OTA0IDEuODg1MzQsMjUuNjAyNCAyOS4wMzQ3LDUyLjc0OTFDMzYuNTE4Nyw0OC41NjUxLDQ0LjczODcsNDQuOTcxNyw1My41NTA3LDQyLjE1OTd6IiBmaWxsPSIjRkZGRkZGIiBzdHlsZT0iZmlsbC1vcGFjaXR5OjAuMTAxOTYwNzg0MzEzNzI1Ii8+PC9nPjwvc3ZnPg==');
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/warning-circle_edited.svg */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAxNiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZWZzLz48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGlkPSJJY29ucyB3aXRoIG51bWJlcnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIj48ZyBmaWxsPSIjMTU3RUZCIiBpZD0iR3JvdXAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC05Ni4wMDAwMDAsIC00MzIuMDAwMDAwKSI+PHBhdGggZD0iTTEwMyw0NDMgTDEwMyw0NDUgTDEwNSw0NDUgTDEwNSw0NDMgWiBNMTA0LDQ0OCBDOTkuNTgxNzIxOCw0NDggOTYsNDQ0LjQxODI3OCA5Niw0NDAgQzk2LDQzNS41ODE3MjIgOTkuNTgxNzIxOCw0MzIgMTA0LDQzMiBDMTA4LjQxODI3OCw0MzIgMTEyLDQzNS41ODE3MjIgMTEyLDQ0MCBDMTEyLDQ0NC40MTgyNzggMTA4LjQxODI3OCw0NDggMTA0LDQ0OCBaIE0xMDMsNDM1IEwxMDMsNDQyIEwxMDUsNDQyIEwxMDUsNDM1IFogTTEwMyw0MzUiIGlkPSJPdmFsIDIwOCBjb3B5Ii8+PC9nPjwvZz48L3N2Zz4=");
 }
