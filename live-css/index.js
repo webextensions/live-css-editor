@@ -42,7 +42,7 @@ if (notifier.update) {
 var nPath = require('path'),
     fs = require('fs');
 
-var chokidar = require('chokidar'),
+var chokidar = require('chokidar-webextensions'),
     anymatch = require('anymatch'),
     boxen = require('boxen'),
     unusedFilename = require('unused-filename'),
