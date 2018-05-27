@@ -112,14 +112,14 @@ if (!module.parent) {
             '          live-css --help',
             '          live-css --root project/http-pub',
             '          live-css --init',
-            'Options:  -h --help                        Show help',
+            'Options:  -h --help                            Show help',
             '          -r --root=<http-server-root-folder>  Folder mapping to root (/) of your HTTP server',
-            '          -p --port=<port-number>          Port number to run live-css server',
-            '             --init                        Generate the configuration file',
-            '             --list-files                  List the files being monitored',
-            '             --allow-symlinks              Allow symbolic links',
-            '          -v --version                     Output the version number',
-            '             --debug                       Extra logging to help in debugging live-css',
+            '          -p --port=<port-number>              Port number to run live-css server',
+            '             --init                            Generate the configuration file',
+            '             --list-files                      List the files being monitored',
+            '             --allow-symlinks                  Allow symbolic links',
+            '          -v --version                         Output the version number',
+            '             --debug                           Extra logging to help in debugging live-css',
             ''
         ].join('\n'));
     };
@@ -341,8 +341,8 @@ if (!module.parent) {
             logger.warn(
                 boxen(
                     'Some of the files being watched have the same name.' +
-                    '\nlive-css would still work fine.' +
-                    '\n\nFor better experience, you may start live-css with' +
+                    '\nYou may see some extra notifications in such cases.' +
+                    '\n\nFor better experience, kindly start live-css with' +
                     '\nan appropriate ' + logger.chalk.bold('--root') + ' parameter.',
                     {
                         padding: 1,
