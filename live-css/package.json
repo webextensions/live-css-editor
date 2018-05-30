@@ -1,7 +1,8 @@
 {
   "name": "live-css",
   "version": "6.2.36",
-  "description": "Server application meant to be used along with browser extension \"Live editor for CSS, Less & Sass - Magic CSS\" for Chrome/Edge/Firefox/Opera",
+  "description": "Development server meant to be used along with browser extension \"Live editor for CSS, Less & Sass - Magic CSS\" for Chrome/Edge/Firefox/Opera",
+  "repository": "https://github.com/webextensions/live-css-editor.git",
   "main": "index.js",
   "bin": {
     "live-css": "./index.js",
