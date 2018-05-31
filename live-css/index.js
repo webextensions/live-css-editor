@@ -62,10 +62,10 @@ logger.removeOption('showLogLine');
 var Emitter = require('tiny-emitter'),
     emitter = new Emitter();
 
-var express = require('express'),
-    app = express(),
-    http = require('http').Server(app),
-    io = require('socket.io')(http);
+// var express = require('express'),
+//     app = express(),
+//     http = require('http').Server(app),
+//     io = require('socket.io')(http);
 
 var defaultConfig = require('./default.live-css.config.js'),
     defaultPort = defaultConfig.port;
@@ -90,102 +90,17 @@ var getLocalISOTime = function () {
     return localISOTime;
 };
 
-// If being executed as a binary and not via require()
-if (!module.parent) {
-    var argv = require('yargs')
-        .help(false)
-        .version(false)
-        .argv;
+var handleLiveCss = function (options) {
+    options = options || {};
+    var app = options.app;
+    var argv = options.argv || [];
+    var configFilePath = options.configFilePath || '.live-css.config.js';
 
-    var localIpAddressesAndHostnames = [];
-    try {
-        localIpAddressesAndHostnames = require('local-ip-addresses-and-hostnames').getLocalIpAddressesAndHostnames();
-    } catch (e) {
-        // do nothing
-    }
+    var http = options.http || require('http').Server(app),
+        io = require('socket.io')(http);
 
-    var showHelp = function () {
-        logger.verbose([
-            '',
-            'Format:   live-css [--root <http-server-root-folder>] [--help]',
-            'Examples: live-css',
-            '          live-css --help',
-            '          live-css --root project/http-pub',
-            '          live-css --init',
-            'Options:  -h --help                            Show help',
-            '          -r --root <http-server-root-folder>  Folder mapping to root (/) of your HTTP server',
-            '          -p --port <port-number>              Port number to run live-css server',
-            '             --init                            Generate the configuration file',
-            '             --list-files                      List the files being monitored',
-            '             --allow-symlinks                  Allow symbolic links',
-            '          -v --version                         Output the version number',
-            '             --debug                           Extra logging to help in debugging live-css',
-            ''
-        ].join('\n'));
-    };
-
-    var paramHelp = argv.h || argv.help,
-        paramInit = argv.init,
-        paramVersion = argv.v || argv.version,
-        paramDebug = argv.debug;
-
-    if (paramHelp) {
-        showHelp();
-        process.exit(0);
-    }
-    if (paramVersion || paramDebug) {
-        logger.log('live-css version: ' + require('./package.json').version);
-        logger.log('Node JS version: ' + nodeVersion);
-        if (paramVersion) {
-            process.exit(0);
-        }
-    }
-    if (paramInit) {
-        var defaultConfigFilePath = nPath.resolve(__dirname, 'default.live-css.config.js'),
-            defaultConfigurationText;
-        try {
-            defaultConfigurationText = fs.readFileSync(defaultConfigFilePath, 'utf8');
-        } catch (e) {
-            exitWithError('An error occurred.\nUnable to read the default configuration file from:\n    ' + defaultConfigFilePath);
-        }
-
-        var targetConfigFilePath = nPath.resolve(process.cwd(), '.live-css.config.js');
-        try {
-            try {
-                if (fs.existsSync(targetConfigFilePath)) {
-                    // Copy and rename the existing file
-                    try {
-                        var renameTo = unusedFilename.sync(targetConfigFilePath);
-                        try {
-                            fs.renameSync(targetConfigFilePath, renameTo);
-                            logger.warn('\nThe old configuration file has been renamed to:\n    ' + renameTo);
-                        } catch (e) {
-                            exitWithError('An error occurred.\nUnable to create a backup of the existing configuration file at:\n    ' + renameTo);
-                        }
-                    } catch (e) {
-                        exitWithError('An error occurred.\nUnable to access the files in directory:\n    ' + nPath.dirname(targetConfigFilePath));
-                    }
-                }
-            } catch (e) {
-                exitWithError('An error occurred.\nUnable to access the path:\n    ' + targetConfigFilePath);
-            }
-            fs.writeFileSync(targetConfigFilePath, defaultConfigurationText);
-            logger.success('\nConfiguration file of live-css server has been written at:\n    ' + targetConfigFilePath);
-            logger.info('\nNow, when you execute the ' + logger.chalk.underline('live-css') + ' command from this directory, it would load the required options from this configuration file.\n');
-            process.exit(0);
-        } catch (e) {
-            exitWithError('An error occurred.\nUnable to write configuration file to:\n    ' + targetConfigFilePath);
-        }
-    }
-
-    logger.verbose([
-        '',
-        'live-css server version: ' + require('./package.json').version,
-        'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options and examples.'
-    ].join('\n'));
-
-    var configFilePath = nPath.resolve(process.cwd(), '.live-css.config.js'),
-        configFileExists = fs.existsSync(configFilePath),
+    configFilePath = nPath.resolve(process.cwd(), configFilePath);
+    var configFileExists = fs.existsSync(configFilePath),
         flagConfigurationLoaded = false,
         configuration = {};
 
@@ -212,7 +127,10 @@ if (!module.parent) {
 
     var connectedSessions = 0;
 
-    app.get('/', function (req, res) {
+    console.log('*******%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+    console.log('*******%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+    // app.get('/', function (req, res) {
+    app.get('/live-css', function (req, res) {
         res.sendFile(__dirname + '/index.html');
     });
 
@@ -476,6 +394,129 @@ if (!module.parent) {
         });
     });
 
+    return configuration;
+};
+
+// If being executed as a binary and not via require()
+if (!module.parent) {
+    var argv = require('yargs')
+        .help(false)
+        .version(false)
+        .argv;
+
+    var localIpAddressesAndHostnames = [];
+    try {
+        localIpAddressesAndHostnames = require('local-ip-addresses-and-hostnames').getLocalIpAddressesAndHostnames();
+    } catch (e) {
+        // do nothing
+    }
+
+    var showHelp = function () {
+        logger.verbose([
+            '',
+            'Format:   live-css [--root <http-server-root-folder>] [--help]',
+            'Examples: live-css',
+            '          live-css --help',
+            '          live-css --root project/http-pub',
+            '          live-css --init',
+            'Options:  -h --help                            Show help',
+            '          -r --root <http-server-root-folder>  Folder mapping to root (/) of your HTTP server',
+            '          -p --port <port-number>              Port number to run live-css server',
+            '             --init                            Generate the configuration file',
+            '             --list-files                      List the files being monitored',
+            '             --allow-symlinks                  Allow symbolic links',
+            '          -v --version                         Output the version number',
+            '             --debug                           Extra logging to help in debugging live-css',
+            ''
+        ].join('\n'));
+    };
+
+    var paramHelp = argv.h || argv.help,
+        paramInit = argv.init,
+        paramVersion = argv.v || argv.version,
+        paramDebug = argv.debug;
+
+    if (paramHelp) {
+        showHelp();
+        process.exit(0);
+    }
+    if (paramVersion || paramDebug) {
+        logger.log('live-css version: ' + require('./package.json').version);
+        logger.log('Node JS version: ' + nodeVersion);
+        if (paramVersion) {
+            process.exit(0);
+        }
+    }
+    if (paramInit) {
+        var defaultConfigFilePath = nPath.resolve(__dirname, 'default.live-css.config.js'),
+            defaultConfigurationText;
+        try {
+            defaultConfigurationText = fs.readFileSync(defaultConfigFilePath, 'utf8');
+        } catch (e) {
+            exitWithError('An error occurred.\nUnable to read the default configuration file from:\n    ' + defaultConfigFilePath);
+        }
+
+        var targetConfigFilePath = nPath.resolve(process.cwd(), '.live-css.config.js');
+        try {
+            try {
+                if (fs.existsSync(targetConfigFilePath)) {
+                    // Copy and rename the existing file
+                    try {
+                        var renameTo = unusedFilename.sync(targetConfigFilePath);
+                        try {
+                            fs.renameSync(targetConfigFilePath, renameTo);
+                            logger.warn('\nThe old configuration file has been renamed to:\n    ' + renameTo);
+                        } catch (e) {
+                            exitWithError('An error occurred.\nUnable to create a backup of the existing configuration file at:\n    ' + renameTo);
+                        }
+                    } catch (e) {
+                        exitWithError('An error occurred.\nUnable to access the files in directory:\n    ' + nPath.dirname(targetConfigFilePath));
+                    }
+                }
+            } catch (e) {
+                exitWithError('An error occurred.\nUnable to access the path:\n    ' + targetConfigFilePath);
+            }
+            fs.writeFileSync(targetConfigFilePath, defaultConfigurationText);
+            logger.success('\nConfiguration file of live-css server has been written at:\n    ' + targetConfigFilePath);
+            logger.info('\nNow, when you execute the ' + logger.chalk.underline('live-css') + ' command from this directory, it would load the required options from this configuration file.\n');
+            process.exit(0);
+        } catch (e) {
+            exitWithError('An error occurred.\nUnable to write configuration file to:\n    ' + targetConfigFilePath);
+        }
+    }
+
+    logger.verbose([
+        '',
+        'live-css server version: ' + require('./package.json').version,
+        'Run ' + logger.chalk.underline('live-css --help') + ' to see the available options and examples.'
+    ].join('\n'));
+
+    // var configFilePath = nPath.resolve(process.cwd(), '.live-css.config.js'),
+    //     configFileExists = fs.existsSync(configFilePath),
+    //     flagConfigurationLoaded = false,
+    //     configuration = {};
+
+    var express = require('express'),
+        app = express();
+
+    var configFilePath = nPath.resolve(process.cwd(), '.live-css.config.js');
+    var http = require('http').Server(app);
+
+    var configuration = handleLiveCss({
+        app: app,
+        http: http,
+        argv: argv,
+        configFilePath: configFilePath
+    });
+
+
+
+
+
+
+
+
+
     var startServer = function (portNumber) {
         /* Begin: Temporarily hang application for testing purposes */
         /*
@@ -516,6 +557,8 @@ if (!module.parent) {
 
             logger.info('\nPress CTRL+C to stop the server\n');
 
+            console.log('Uncomment the following lines');
+            /*
             if (paramListFiles || flagFileWatchReady || paramDebug) {
                 // do nothing
             } else {
@@ -524,8 +567,11 @@ if (!module.parent) {
                 }
                 process.stdout.write(logger.chalk.dim('Adding files to watch '));
             }
+            /* */
         });
     };
+
+    var paramPort = parseInt(argv.port || argv.p || configuration.port, 10) || null;    // Not initiating paramPort from defaultConfig['port'] because we want to follow a special flow when the user doesn't set its value
 
     var portRequestedByUser = paramPort,
         flagPortSetByUser = false,
@@ -551,30 +597,83 @@ if (!module.parent) {
     } else {
         startServer(portToUse);
     }
-} else {
-    logAndThrowError('Error: live-css currently does not work with Node JS require()');
-}
 
-process.on('uncaughtException', function (err) {
-    if (err.code === 'EADDRINUSE') {
-        logger.errorHeading('\nError: The requested port number is in use. Please pass a different port number to use.');
-    } else if (err.code === 'ENOSPC') {
-        logger.errorHeading(
-            '\n\nError: ENOSPC'
-        );
-        logger.error('Exiting live-css server.');
-        logger.info(
-            '\nMost probably, this issue can be easily fixed. Use one of the following methods and try running live-css again:' +
-            '\n    Method 1. For Linux, try following instructions mentioned at https://stackoverflow.com/questions/22475849/node-js-error-enospc/32600959#32600959' +
-            '\n    Method 2. You are probably watching too many files, to fix that:' +
-            '\n              - try changing "root" directory for live-css' +
-            '\n              - try changing "watch-patterns" if you are using live-css configuration file' +
-            '\n              - try changing "watch-ignore-patterns" if you are using live-css configuration file' +
-            '\n    Method 3. You are probably running out of disk space. Delete some of the unnecessary files and try again' +
-            '\n'
-        );
-    } else {
-        console.log(err);
-    }
-    process.exit(1);
-});
+    process.on('uncaughtException', function (err) {
+        if (err.code === 'EADDRINUSE') {
+            logger.errorHeading('\nError: The requested port number is in use. Please pass a different port number to use.');
+        } else if (err.code === 'ENOSPC') {
+            logger.errorHeading(
+                '\n\nError: ENOSPC'
+            );
+            logger.error('Exiting live-css server.');
+            logger.info(
+                '\nMost probably, this issue can be easily fixed. Use one of the following methods and try running live-css again:' +
+                '\n    Method 1. For Linux, try following instructions mentioned at https://stackoverflow.com/questions/22475849/node-js-error-enospc/32600959#32600959' +
+                '\n    Method 2. You are probably watching too many files, to fix that:' +
+                '\n              - try changing "root" directory for live-css' +
+                '\n              - try changing "watch-patterns" if you are using live-css configuration file' +
+                '\n              - try changing "watch-ignore-patterns" if you are using live-css configuration file' +
+                '\n    Method 3. You are probably running out of disk space. Delete some of the unnecessary files and try again' +
+                '\n'
+            );
+        } else {
+            console.log(err);
+        }
+        process.exit(1);
+    });
+} else {
+    // logAndThrowError('Error: live-css currently does not work with Node JS require()');
+
+    // var liveCssMiddleware = function (configFile) {
+    var liveCssMiddleware = function (app, configFile) {
+        handleLiveCss({
+            app: app,
+            http: http,
+            argv: argv,
+            configFilePath: configFilePath
+        });
+
+        // var min = originalMin,
+        //     max = originalMax;
+
+        // min = parseInt(min || 0, 10);
+        // if (!Number.isInteger(min) || min < 0) {
+        //     min = 0;
+        // }
+
+        // max = parseInt(max || 0, 10 || max < 0);
+        // if (!Number.isInteger(max)) {
+        //     max = 0;
+        // }
+
+        // max = max || min;
+
+        // if (min > max) {
+        //     min = [max, max = min][0];      // Swap 'min' and 'max' :-)
+        // }
+
+        // if (
+        //     (originalMin !== undefined && originalMin !== null && min !== originalMin) ||
+        //     (originalMax !== undefined && originalMax !== null && max !== originalMax)
+        // ) {
+        //     console.warn(
+        //         'Warning: The range of time passed for the network-delay was inconsistent.' +
+        //         ' It should consist of valid positive integers with minimum and maximum values (both optional; default is 0).' +
+        //         ' Using range ' + min + ' to ' + max + ' milliseconds.'
+        //     );
+        // }
+
+        return function (req, res, next) {
+            // If 'min' or 'max' is above 0
+            // if (min || max) {
+            //     setTimeout(function () {
+            //         next();
+            //     }, getRandomIntInclusive(min, max));
+            // } else {
+            //     next();
+            // }
+            next();
+        };
+    };
+    module.exports = liveCssMiddleware;
+}
