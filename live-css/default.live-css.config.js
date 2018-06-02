@@ -1,11 +1,11 @@
 /*
-    This configuration file is used for running "live-css" server (https://www.npmjs.com/package/live-css)
+    This configuration file is used for running "live-css" server (https://www.npmjs.com/package/@webextensions/live-css)
     It is meant to be used along with browser extension "Live editor for CSS, Less & Sass - Magic CSS":
         https://github.com/webextensions/live-css-editor
 
     To generate this file, download and install Node JS from https://nodejs.org/en/download/
     After that:
-        $ npm install -g live-css
+        $ npm install -g @webextensions/live-css
         $ cd <project-folder>
         $ live-css --init
         --------OR--------
@@ -14,7 +14,7 @@
         and save it as a file with name ".live-css.config.js" (note that the file name begins with a dot character)
 
     For further guidance, visit the following links:
-        https://www.npmjs.com/package/live-css
+        https://www.npmjs.com/package/@webextensions/live-css
         https://github.com/webextensions/live-css-editor/tree/master/live-css
         https://github.com/webextensions/live-css-editor
         https://github.com/webextensions/live-css-editor/issues

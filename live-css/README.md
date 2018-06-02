@@ -1,6 +1,6 @@
 # live-css server
 
-live-css is a development server for use with the browser extension **Live editor for CSS, Less & Sass - Magic CSS**.  
+live-css is a Node JS based development server for use with the browser extension **Live editor for CSS, Less & Sass - Magic CSS**.  
 
 > <img width="32" alt="Google Chrome Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-google-chrome.svg"> &nbsp; https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol  
 
@@ -13,7 +13,7 @@ There are two ways to install live-css server: globally and locally.
 
 ### Global installation and usage
 ```sh
-$ npm install --global live-css
+$ npm install --global @webextensions/live-css
 ```
 
 ```sh
@@ -22,7 +22,7 @@ $ live-css
 
 ### Local installation and usage (for Node JS based projects)
 ```sh
-$ npm install --save-dev live-css
+$ npm install --save-dev @webextensions/live-css
 ```
 
 ```js
@@ -33,7 +33,7 @@ var httpServer = app.listen(3000, function () {
 });
 
 if (codeIsRunningInDevelopmentMode) {
-    var liveCssServer = require('live-css');
+    var liveCssServer = require('@webextensions/live-css');
 
     // Start live-css server
     liveCssServer({
