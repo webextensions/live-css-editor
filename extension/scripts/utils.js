@@ -361,6 +361,7 @@ if (!utils.defined) {
             div.innerHTML = [
                 '<div ' +
                     'style="' +
+                        'pointer-events:none;' +    // To avoid it from stealing hover (the pointer-events will be enabled for a child element)
                         'position:fixed;width:100%;z-index:2147483600;' +
                         (verticalAlignment === 'bottom' ? 'bottom:0;' : 'top:0;') +
                         (function () {
@@ -393,10 +394,15 @@ if (!utils.defined) {
                                     // margin:0 is useful for some sites (eg: https://developer.chrome.com/home)
                             '"' +
                         '>',
-                        '<div style="border:1px solid ' + borderColor + ';' +
+                        '<div ' +
+                            'style="' +
+                                'pointer-events:initial;' +    // To gain back the pointer-events which were disabled in one of the parent elements
+                                'border:1px solid ' + borderColor + ';' +
                                 'background-color:' + backgroundColor + ';' +   // background-color:#feb;
                                                                                 // TODO: Check if we need "text-align: left". Maybe it helps to set the default style.
-                                'padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font-family:Arial,sans-serif;font-weight:bold;font-size:12px">',
+                                'padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font-family:Arial,sans-serif;font-weight:bold;font-size:12px' +
+                            '"' +
+                        '>',
                             '<div class="alert-note-text" style="color:#000;text-align:' + textAlignment + ';word-wrap:break-word;">',
                                 msg,
                             '</div>',
