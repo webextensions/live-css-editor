@@ -712,5 +712,28 @@ if (module.parent) {    // If being loaded via require()
         startTheServer({
             processedParams: processedParams
         });
+
+        /* Begin: Improved handling of process termination in Windows */
+        // Without the following code, on Windows, you would observe the behavior like:
+        //     https://www.triplet.fi/blog/getting_rid_of_terminate_batch_job_while_developing_node_application_on_windows/
+        // Reference:
+        //     https://github.com/indexzero/http-server/blob/966ce9c27cd3596b74859c94b4e68346565bd8d3/bin/http-server#L161
+        if (process.platform === 'win32') {
+            require('readline').createInterface({
+                input: process.stdin,
+                output: process.stdout
+            }).on('SIGINT', function () {
+                process.emit('SIGINT');
+            });
+        }
+        process.on('SIGINT', function () {
+            logger.info('\nStopped live-css server.');
+            process.exit(0);
+        });
+        process.on('SIGTERM', function () {
+            logger.info('\nStopped live-css server.');
+            process.exit(0);
+        });
+        /* End */
     }());
 }
