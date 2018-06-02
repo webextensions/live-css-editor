@@ -81,11 +81,10 @@ The configuration file can be generated using ```$ live-css --init```
 * Ability to auto-connect live-css server without launching the browser extension
 * Ability to integrate webpage front-end and live-css server without the browser extension
 
-## Created by
-* Priyank Parashar
+## Author
+* Priyank Parashar - [GitHub](https://github.com/paras20xx) | [Twitter](https://twitter.com/paras20xx) | [LinkedIn](https://linkedin.com/in/ParasharPriyank/)
 
-## Connect to us at
+## Connect to us
 * https://webextensions.org/
 * [GitHub](https://github.com/webextensions/live-css-editor)
 * [Twitter](https://twitter.com/webextensions)
-* [LinkedIn - Priyank Parashar](https://linkedin.com/in/ParasharPriyank/)
