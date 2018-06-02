@@ -33,8 +33,7 @@ module.exports = {                          // Learn more about "module.exports"
     // on a separate port of its own. If the specified port is busy, the next available port may be used.
     // It will be used when:
     //     - you run live-css from command-line
-    //     - you run live-css in a Node JS project using require() syntax, but do not pass the
-    //       "httpServer" option
+    //     - you run live-css in a Node JS project using require() syntax, but do not pass the "httpServer" option
     "port": 3456,                           // Recommended value: A number between 1024 and 49151
                                             // The "live-css" server would start at this port number
                                             // Learn more about ports:

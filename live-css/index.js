@@ -195,7 +195,7 @@ var startTheServer = function (options) {
         var beginServerListening = function (portNumber) {
             /* Begin: Temporarily hang application for testing purposes */
             /*
-                console.log('TODO: Remove this section "Temporarily hang application" when debugging is done');
+                console.log('TODO: Remove/comment this section "Temporarily hang application" when debugging is done');
                 var t1 = new Date();
                 setTimeout(function () {
                     console.log('Entering sleep');
@@ -502,23 +502,13 @@ var handleLiveCss = function (options) {
     });
 
     var getPathValues = function (strPath) {
-        var ob = {
+        return {
             relativePath: strPath,
             fullPath: path.join(watcherCwd, strPath),
             fileName: path.basename(strPath),
-            useOnlyFileNamesForMatch: (function () {
-                // TODO ?
-            }()),
-            root: watcherCwd
+            useOnlyFileNamesForMatch: paramRoot ? false : true,
+            root: paramRoot ? watcherCwd : null
         };
-        if (paramRoot) {
-            ob.root = watcherCwd;
-            ob.useOnlyFileNamesForMatch = false;
-        } else {
-            ob.root = null;
-            ob.useOnlyFileNamesForMatch = true;
-        }
-        return ob;
     };
 
     // https://github.com/paulmillr/chokidar/issues/544
