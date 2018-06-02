@@ -42,7 +42,7 @@ else
     if [ "$exitCodeVersionConsistency" != "0" ]; then
         printf "\n${RED}Error: Failure in code version consistency${NORMAL}"
     fi
-    if [ "$exitCode1" != "0" ]; then
+    if [ "$exitCodeLint" != "0" ]; then
         printf "\n${RED}Error: Failure in code linting${NORMAL}"
     fi
     printf "\n"
