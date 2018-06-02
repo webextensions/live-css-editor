@@ -12,16 +12,16 @@ For availability of the latest version of Magic CSS extension on Microsoft Edge,
 There are two ways to install live-css server: globally and locally.
 
 ### Global installation and usage
-```bash
+```sh
 $ npm install --global live-css
 ```
 
-```bash
+```sh
 $ live-css
 ```
 
 ### Local installation and usage (for Node JS based projects)
-```bash
+```sh
 $ npm install --save-dev live-css
 ```
 
