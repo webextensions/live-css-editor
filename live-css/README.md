@@ -49,12 +49,12 @@ if (codeIsRunningInDevelopmentMode) {
 * Install the Magic CSS browser extension from the link mentioned above
 * Open the web page you are developing
 * Click on the Magic CSS icon to launch the floating CSS editor
-* Under the reload icon, click on the option "Watch CSS files to apply changes automatically"
-* A pop-up would open up which would guide you how to connect this live-css server with the Magic CSS extension
+* In top bar of the floating CSS editor, under the reload icon, click on the option "Watch CSS files to apply changes automatically"
+* A dialog would open, which would guide you how to connect this live-css server with the Magic CSS extension
 * Once the connection is setup, you can edit and save the CSS files in your favorite code editor and they would automatically get reloaded in the web page
 
-## Command line
-* To get full list of options:  
+## Command line options
+* To get the full list of options:  
   &nbsp; &nbsp; &nbsp; &nbsp;```$ live-css --help```
 * To generate the configuration file:  
   &nbsp; &nbsp; &nbsp; &nbsp;```$ live-css --init```
