@@ -29,6 +29,12 @@ module.exports = {                          // Learn more about "module.exports"
                                             //     https://nodejs.org/api/modules.html#modules_module_exports
 
 
+    // The "port" configuration option is used as a suggested port number when the live-css server needs to run
+    // on a separate port of its own. If the specified port is busy, the next available port may be used.
+    // It will be used when:
+    //     - you run live-css from command-line
+    //     - you run live-css in a Node JS project using require() syntax, but do not pass the
+    //       "httpServer" option
     "port": 3456,                           // Recommended value: A number between 1024 and 49151
                                             // The "live-css" server would start at this port number
                                             // Learn more about ports:
@@ -37,8 +43,8 @@ module.exports = {                          // Learn more about "module.exports"
 
 
     // IMPORTANT NOTE: Setting "root" to an incorrect value may result in failure to auto-refresh styles in the browser.
-    //                 If you are in doubt, don't use this configuration option, live-css would still work fine.
-    // Keeping this configuration option as commented out by default
+    //                 If you are in doubt, don't use the "root" configuration option, live-css would still work fine.
+    // Keeping "root" configuration option as commented out by default
     // "root": ".",                         // <relative-or-absolute-path>
                                             // This path should point to the root ("/") of your web server for which you are using live-css.
                                             // For example,
@@ -48,6 +54,8 @@ module.exports = {                          // Learn more about "module.exports"
                                             // This is the root folder which contains the files you wish to watch for changes
                                             // This folder would be scanned recursively for files matching the "watch-patterns"
                                             // while skipping the files matching the "watch-ignore-patterns"
+                                            // If you are setting "root" with a relative path value, then keep that path value
+                                            // as relative to this configuration file.
                                             // Learn more:
                                             //     https://en.wikipedia.org/wiki/Path_(computing)
 
@@ -96,9 +104,18 @@ module.exports = {                          // Learn more about "module.exports"
                                             //     https://github.com/paulmillr/chokidar#path-filtering ("followSymlinks")
 
 
-    "list-files": false                     // <true/false>
+    "list-files": false,                    // <true/false>
                                             // true: List the paths of the files being watched
                                             // false: Print a "." (dot) character on the terminal screen for each file being watched
                                             // This setting is applicable only during the initial launch of the "live-css" server. When a file matching the
                                             // "watch-pattern" is newly created while the "live-css" server is already running, the path is listed anyways
+
+
+    "debug": false,                         // <true/false>
+                                            // true: Logs some extra information which is helpful in debugging
+                                            // false: Does not log the extra debugging related information
+
+
+    "version": "6.2.36"                     // This represents the version of the live-css server which was used for generating this configuration file
+                                            // This may be helpful while debugging some issues and informing users about new features
 };

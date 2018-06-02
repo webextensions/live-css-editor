@@ -40,7 +40,8 @@ var mismatchFound = matchVersions(
         '../extension/manifest.json',
         '../extension/manifest-chrome.json',
         '../extension/manifest-firefox.json',
-        '../extension/manifest-opera.json'
+        '../extension/manifest-opera.json',
+        '../live-css/default.live-css.config.js'
     ]
 );
 

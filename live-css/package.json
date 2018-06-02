@@ -23,6 +23,7 @@
     "find-free-port": "1.2.0",
     "local-ip-addresses-and-hostnames": "0.1.0",
     "lodash": "4.17.10",
+    "nocache": "2.0.0",
     "note-down": "0.1.1",
     "socket.io": "2.1.1",
     "tiny-emitter": "2.0.2",
