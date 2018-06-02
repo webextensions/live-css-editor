@@ -948,8 +948,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     '</div>',
                                 '</div>',
                                 '<div class="magic-css-file-config-item">',
-                                    '<button type="button" class="magicss-save-server-path-changes" style="float:right">Save & Apply</button>',
-                                    '<button type="button" class="magicss-cancel-server-path-changes">Cancel</button>',
+                                    '<div>',
+                                        '<button type="button" class="magicss-save-server-path-changes" style="float:right">Save & Apply</button>',
+                                        '<button type="button" class="magicss-cancel-server-path-changes">Cancel</button>',
+                                    '</div>',
                                 '</div>',
                             '</div>',
                         '</div>',
@@ -2436,16 +2438,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         getMagicCSSForEdge,
                         getMagicCSSForFirefox,
                         {
-                            name: 'github-repo',
-                            title: 'Contribute / Report issue',
-                            uniqCls: 'magicss-github-repo',
-                            href: 'https://github.com/webextensions/live-css-editor'
-                        },
-                        {
                             name: 'share-on-facebook',
                             title: 'Share this extension with friends',
                             uniqCls: 'magicss-share-on-facebook',
                             href: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser)
+                        },
+                        {
+                            name: 'github-repo',
+                            title: 'Contribute / Report issue',
+                            uniqCls: 'magicss-github-repo',
+                            href: 'https://github.com/webextensions/live-css-editor'
                         },
                         {
                             name: 'options',
