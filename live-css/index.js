@@ -70,6 +70,11 @@ var Emitter = require('tiny-emitter'),
 var defaultConfig = require('./default.live-css.config.js'),
     defaultPort = defaultConfig.port;
 
+var exitWithError = function (msg) {
+    logger.error(msg);
+    process.exit(1);
+};
+
 /*
 var logAndThrowError = function (msg) {
     logger.errorHeading(msg);
@@ -77,10 +82,23 @@ var logAndThrowError = function (msg) {
 };
 /* */
 
-var exitWithError = function (msg) {
-    logger.error(msg);
-    process.exit(1);
-};
+/*
+// Temporarily hang application thread for testing purposes
+(function () {
+    console.log('TODO: Remove/comment this section ("Temporarily hang application thread") when debugging is done');
+    var t1 = new Date();
+    setTimeout(function () {
+        console.log('Entering sleep');
+        while (true) {
+            var t2 = new Date();
+            if (t2 - t1 >= 15000) {
+                break;
+            }
+        }
+        console.log('Exiting sleep');
+    }, 5000);
+}());
+/* */
 
 // TODO: This function can be simplified
 var getLocalISOTime = function () {
@@ -137,9 +155,22 @@ var getLiveCssParams = function (configFilePath, argv) {
         }
     }
 
-    var paramPort = parseInt(argv.port || argv.p || configuration.port, 10) || null,    // Not initiating paramPort from defaultConfig['port'] because we want to follow a special flow when the user doesn't set its value
-        paramRoot = argv.root || configuration['root'] || null;                         // Not initiating paramRoot from defaultConfig['root'] because it is not set by default
+    var paramPort = parseInt(argv.port || argv.p || configuration.port, 10) || null;    // Not initiating paramPort from defaultConfig['port'] because we want to follow a special flow when the user doesn't set its value
+    var portRequestedByUser = paramPort,
+        flagPortSetByUser = false,
+        portToUse = defaultPort;
+    if (
+        portRequestedByUser &&
+        typeof portRequestedByUser === 'number' &&
+        !isNaN(portRequestedByUser) &&
+        portRequestedByUser >= 1 &&
+        portRequestedByUser <= 65535
+    ) {
+        portToUse = portRequestedByUser;
+        flagPortSetByUser = true;
+    }
 
+    var paramRoot = argv.root || configuration['root'] || null;                         // Not initiating paramRoot from defaultConfig['root'] because it is not set by default
     if (paramRoot) {
         paramRoot = path.resolve(
             configFilePath ?
@@ -176,7 +207,11 @@ var getLiveCssParams = function (configFilePath, argv) {
         paramWatchPatterns: paramWatchPatterns,
         paramWatchIgnorePatterns: paramWatchIgnorePatterns,
         paramListFiles: paramListFiles,
+
         paramPort: paramPort,
+        flagPortSetByUser: flagPortSetByUser,
+        portToUse: portToUse,
+
         paramRoot: paramRoot,
         paramDebug: paramDebug
     };
@@ -193,22 +228,6 @@ var startTheServer = function (options) {
         });
     } else {
         var beginServerListening = function (portNumber) {
-            /* Begin: Temporarily hang application for testing purposes */
-            /*
-                console.log('TODO: Remove/comment this section "Temporarily hang application" when debugging is done');
-                var t1 = new Date();
-                setTimeout(function () {
-                    console.log('Entering sleep');
-                    while (true) {
-                        var t2 = new Date();
-                        if (t2 - t1 >= 15000) {
-                            break;
-                        }
-                    }
-                    console.log('Exiting sleep');
-                }, 5000);
-            /* End: Temporarily hang application */
-
             var express = require('express'),
                 expressApp = express();
             var httpServer = expressApp.listen(portNumber, function () {
@@ -250,21 +269,8 @@ var startTheServer = function (options) {
             });
         };
 
-        var paramPort = processedParams.paramPort;
-
-        var portRequestedByUser = paramPort,
-            flagPortSetByUser = false,
-            portToUse = defaultPort;
-        if (
-            portRequestedByUser &&
-            typeof portRequestedByUser === 'number' &&
-            !isNaN(portRequestedByUser) &&
-            portRequestedByUser >= 1 &&
-            portRequestedByUser <= 65535
-        ) {
-            portToUse = portRequestedByUser;
-            flagPortSetByUser = true;
-        }
+        var flagPortSetByUser = processedParams.flagPortSetByUser,
+            portToUse = processedParams.portToUse;
 
         if (findFreePort) {
             findFreePort(portToUse, function (err, freePort) {
