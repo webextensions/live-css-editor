@@ -315,7 +315,6 @@
 .magicss-reload-css-resources {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/reload_edited.svg"); */
-    /* background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iIzAwMDAwMCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4="); */
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iI2ZlZDEzOCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4=");
     background-size: 12px !important;
     background-repeat: no-repeat;
@@ -334,7 +333,6 @@
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/reload_edited.svg"); */
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iIzAwMDAwMCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4="); /* */
-    /* background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iI2ZlZDEzOCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4="); */
     background-size: 12px !important;
     background-position: 9px 50% !important;
     background-repeat: no-repeat;
@@ -479,12 +477,6 @@
     background-position: 7px calc(50% + 1px) !important;
 }
 
-/*
-.more-icons.magicss-rate-on-webstore {
-    background-position: 7px 50% !important;
-}
-*/
-
 .get-magic-css-for-chrome {
     /* Source: https://upload.wikimedia.org/wikipedia/commons/e/e2/Google_Chrome_icon_%282011%29.svg */
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1LjUgMTUuNSAyMjQuNSAyMjQuNSI+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgY3k9IjAiIGN4PSIwLjUiIGlkPSJyIj4KICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjZjA2YjU5Ii8+CiAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZGYyMjI3Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IHI9IjAuNzYiIGN5PSIwLjMiIGN4PSIwLjY1IiBpZD0iZyI+CiAgICAgPHN0b3Agb2Zmc2V0PSIwLjY1IiBzdG9wLWNvbG9yPSIjNGNiNzQ5Ii8+CiAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMzg4YjQxIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IHI9IjAuOCIgY3k9IjAuMjUiIGN4PSIwLjM2IiBpZD0ieSI+CiAgICAgPHN0b3Agb2Zmc2V0PSIwLjYiIHN0b3AtY29sb3I9IiNGQ0QyMDkiLz4KICAgICA8c3RvcCBvZmZzZXQ9IjAuNyIgc3RvcC1jb2xvcj0iI2Y3YzYxNiIvPgogICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2JjODIxZSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCByPSIxIiBjeT0iMCIgY3g9IjAuNSIgc3ByZWFkTWV0aG9kPSJwYWQiIGlkPSJjZiI+CiAgICAgPHN0b3Agb2Zmc2V0PSIwLjEiIHN0b3AtY29sb3I9IiM3RkIzREYiLz4KICAgICA8c3RvcCBvZmZzZXQ9IjAuOSIgc3RvcC1jb2xvcj0iIzBGNUI5NCIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iY2IiIHI9IjEiIGN5PSIwIiBjeD0iMC41Ij4KICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGNkYwRUUiLz4KICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNkZGQiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxwYXRoIGQ9Im0xOTgsMTQ4YTcwLDcwIDAgMCAwIC0xNDAsMGwyMCwwYTUwLDUwIDAgMCAxIDEwMCwwIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgogIDxjaXJjbGUgcj0iNDUiIGN4PSIxMjcuNSIgY3k9IjEyNy42IiBmaWxsPSJ1cmwoI2NmKSIgc3Ryb2tlPSJ1cmwoI2NiKSIgc3Ryb2tlLXdpZHRoPSI5IiAvPgogIDxwYXRoIGQ9Im0yMjgsNzhhMTEyLDExMiAwIDAgMCAtMTkzLC0xM2w0NSw3OGE1MCw1MCAwIDAgMSA0NywtNjUiIGZpbGw9InVybCgjcikiLz4KICA8cGF0aCBkPSJtMzUsNjVhMTEyLDExMiAwIDAgMCA4NCwxNzRsNDcsLTgwYTUwLDUwIDAgMCAxIC04NiwtMTYiIGZpbGw9InVybCgjZykiLz4KICA8cGF0aCBkPSJtMTE5LDIzOWExMTIsMTEyIDAgMCAwIDEwOSwtMTYxbC0xMDEsMGE1MCw1MCAwIDAgMSAzOSw4MSIgZmlsbD0idXJsKCN5KSIvPgogIDxwYXRoIGQ9Im0zNSw2NWw0NSw3OGE1MCw1MCAwIDAgMSAyLC0zNGwtNDUsLTQ3IiBvcGFjaXR5PSIwLjA3NSIvPgogIDxwYXRoIGQ9Im0xMTksMjM5bDQ3LC04MGE1MCw1MCAwIDAgMSAtMjksMTdsLTIwLDYzIiBvcGFjaXR5PSIwLjA1Ii8+CiAgPHBhdGggZD0ibTIyOCw3OGwtMTAxLDBhNTAsNTAgMCAwIDEgMzksMTlsNjQsLTE2IiBvcGFjaXR5PSIwLjA1Ii8+Cjwvc3ZnPg==");
@@ -567,26 +559,9 @@ html .magicss-mouse-over-dom-element {
 }
 
 
-
-
 /* Begin: Server connectivity UI */
-#MagiCSS-bookmarklet .link-tag-to-edit,
-#MagiCSS-bookmarklet .file-to-edit {
-    color: #fff;
-    display: inline-block;
-}
-
-#MagiCSS-bookmarklet .file-to-edit {
-    float: right;
-}
-
-#MagiCSS-bookmarklet .link-tag-to-edit {
-    float: right;
-}
-
 .magic-css-full-page-overlay {
     background-color: rgba(0,0,0,0.5);
-    -pointer-events: none;
     width: 100px;
     height: 100px;
     position: fixed;
@@ -595,6 +570,10 @@ html .magicss-mouse-over-dom-element {
     width: 100%;
     height: 100%;
     z-index: 2147483647;
+    /*
+        Useful while debugging. Comment it out before publishing.
+        z-index: 10;
+    */
 }
 
 .magic-css-full-page-contents {
@@ -617,31 +596,6 @@ html .magicss-mouse-over-dom-element {
     font-size: 12px;
     box-shadow: #555 0px 0px 20px 3px;
 }
-
-/* Begin: Site specific fixes */
-.magic-css-back-end-connectivity-options {
-    color: #000;
-}
-.magic-css-back-end-connectivity-options a,
-.magic-css-back-end-connectivity-options a:link,
-.magic-css-back-end-connectivity-options a:visited {
-    color: #777;
-    font-weight: normal;
-    text-decoration: none;
-}
-.magic-css-back-end-connectivity-options a:hover,
-.magic-css-back-end-connectivity-options a:active {
-    color: #000;
-    text-decoration: underline;
-    font-weight: normal;
-}
-/* End */
-
-/* Begin: Useful while debugging. Comment it out before publishing. */
-.magic-css-full-page-overlay {
-    z-index: 2147483647;
-}
-/* End */
 
 .magic-css-back-end-connectivity-options {
     box-sizing: border-box;
@@ -669,11 +623,6 @@ html .magicss-mouse-over-dom-element {
     font-weight: bold;
     background-color: #fe5;
 }
-
-
-
-
-
 
 .magic-css-server-config-item {
     background-color: #ddd;
@@ -710,6 +659,12 @@ html .magicss-mouse-over-dom-element {
     background-color: #fff;
 }
 
+.magic-css-server-config-item input[type="number"],
+.magic-css-server-config-item input[type="text"],
+.magic-css-server-config-item select {
+    width: 20%
+}
+
 .magic-css-back-end-connectivity-options .ms-res-ctn.dropdown-menu {
     height: 58px;
     position: absolute;
@@ -738,11 +693,145 @@ html .magicss-mouse-over-dom-element {
 .magic-css-back-end-connectivity-options .ms-ctn.form-control {
     border: 1px solid #aaa;
 }
+
+.magic-css-server-connectivity-status {
+    width: 16px;
+    height: 16px;
+    background-size: 16px;
+    background-repeat: no-repeat;
+}
+@keyframes magic-css-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.magic-css-server-connectivity-status.connecting {
+    border: 3px solid rgba(150,150,150,1);
+    border-radius: 50%;
+    border-left: 3px solid rgba(0,0,0,1);
+    animation: magic-css-rotate 1s infinite linear;
+}
+.magic-css-server-connectivity-status.connected {
+    /* https://www.iconfinder.com/icons/282474/check_done_ok_icon#size=128 */
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAuMDA3OTk1NjEwMTI1MzYyODcgMTM2Ljc2MTAwMTU4NjkxNCAxMDcuOTkyMDA0Mzg5ODc1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImRlZjAiIHgxPSIwLjUwMDAwNSIgeDI9IjAuNTAwMDA1IiB5MT0iMS42NDI0NiIgeTI9Ii0wLjEzOTQ5MyI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDA0NDAwIi8+PHN0b3Agb2Zmc2V0PSIwLjUxMDk4OSIgc3RvcC1jb2xvcj0iIzAxOEMwMSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzkxQ0Q5MSIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJkZWYxIiB4MT0iLTUuMzc0MjZFLTA2IiB4Mj0iMC45OTk5OTciIHkxPSIwLjQ5OTk5NiIgeTI9IjAuNDk5OTk2Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0eWxlPSJzdG9wLW9wYWNpdHk6MC4zMDE5NjA3ODQzMTM3MjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0eWxlPSJzdG9wLW9wYWNpdHk6MC4yIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PGc+PHBhdGggZD0iTTUyLjk4NCwxMDhMMCw1NS4wMDggMjMuMjczMywzMS43MzIgNTIuOTg1Myw2MS40NDI3IDExNC40MzIsMC4wMDc5OTU2MSAxMzYuNzYxLDIyLjM0MTMgMTM0Ljg3NSwyNC4yMjY3IDExNC40MzIsMy43Nzg2NiA1Mi45ODUzLDY1LjIxMzMgMjMuMjczMywzNS41MDI3IDMuNzcwNjcsNTUuMDA4IDU0Ljg2OTMsMTA2LjExNSA1Mi45ODQsMTA4eiIgZmlsbD0iIzAwNjYwMCIvPjxwYXRoIGQ9Ik0xMzUuODE4LDIzLjI4NDVMMTE0LjQzMywxLjg5Mzg2IDUyLjk4NjQsNjMuMzI4NSAyMy4yNzMxLDMzLjYxNzkgMS44ODUwNyw1NS4wMDg1IDIxLjE3MzEsNzQuMjk2NSAzNC41MjI0LDg3LjY1MjUgNTMuOTI2NCwxMDcuMDU4IiBmaWxsPSJ1cmwoI2RlZjApIi8+PHBhdGggZD0iTTUyLjk4NjQsNjMuMzI3MkwyMy4yNzQ0LDMzLjYxNzkgMS44ODY0LDU1LjAwODUgMjEuMTczMSw3NC4yOTY1IDMyLjE4NzcsODUuMzE3OUM0Ny4zNDc3LDc1Ljk3MzksNzIuNTkxNyw2Mi45ODcyLDEwMS41MTcsNTguMzczOUwxMzUuODE4LDIzLjI4NDUgMTE0LjQzMywxLjg5Mzg2IDUyLjk4NjQsNjMuMzI3MnoiIGZpbGw9InVybCgjZGVmMSkiLz48L2c+PC9zdmc+');
+}
+
+.magic-css-server-connectivity-status.disconnected {
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/warning-circle_edited.svg */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAxNiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZWZzLz48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGlkPSJJY29ucyB3aXRoIG51bWJlcnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIj48ZyBmaWxsPSIjMTU3RUZCIiBpZD0iR3JvdXAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC05Ni4wMDAwMDAsIC00MzIuMDAwMDAwKSI+PHBhdGggZD0iTTEwMyw0NDMgTDEwMyw0NDUgTDEwNSw0NDUgTDEwNSw0NDMgWiBNMTA0LDQ0OCBDOTkuNTgxNzIxOCw0NDggOTYsNDQ0LjQxODI3OCA5Niw0NDAgQzk2LDQzNS41ODE3MjIgOTkuNTgxNzIxOCw0MzIgMTA0LDQzMiBDMTA4LjQxODI3OCw0MzIgMTEyLDQzNS41ODE3MjIgMTEyLDQ0MCBDMTEyLDQ0NC40MTgyNzggMTA4LjQxODI3OCw0NDggMTA0LDQ0OCBaIE0xMDMsNDM1IEwxMDMsNDQyIEwxMDUsNDQyIEwxMDUsNDM1IFogTTEwMyw0MzUiIGlkPSJPdmFsIDIwOCBjb3B5Ii8+PC9nPjwvZz48L3N2Zz4=");
+}
+
+/* Begin: General purpose CSS */
+.magic-css-ui {
+    word-wrap: break-word;
+}
+.magic-css-ui input:invalid {
+    border-color: rgba(255, 0, 0, 0.7);
+    outline-color: rgba(255, 0, 0, 0.5);
+}
+
+.magic-css-tooltipster {
+    box-sizing: content-box;
+}
+.magic-css-tooltipster * {
+    box-sizing: inherit;
+}
+/* End */
+
+
+/* Begin: Fix some general styles which might be overridden in some sites */
+.magic-css-ui,
+.magic-css-ui input,
+.magic-css-ui input[type],
+.magic-css-ui button {
+    margin: 0;
+    display: initial;
+    line-height: initial;
+    letter-spacing: initial;
+    text-shadow: initial;
+    text-align: left;
+    font-family: sans-serif;
+    font-weight: initial;
+}
+.magic-css-ui input[type] {
+    box-sizing: inherit;
+}
+
+.magic-css-ui a {
+    font-size: inherit;
+}
+
+.magic-css-ui span {
+    font-size: inherit;
+}
+
+.magic-css-ui * {
+    text-transform: initial;
+}
+/* End */
+
+.magic-css-ui button {
+    padding: 7px 12px;
+
+    background-color: #2e8bcc;
+    border: 1px solid #0c619e;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 #3af;
+    color: rgba(255, 255, 255, 0.95);
+
+    font-size: 12px;
+    cursor: pointer;
+}
+.magic-css-ui button:hover {
+    background-color: rgba(68, 88, 174, 0.85);
+    border-color: rgb(0, 110, 200);
+    box-shadow: rgb(70, 151, 255) 0px 1px 0px 0px inset;
+    color: #fff;
+}
+.magic-css-ui button[disabled] {
+    pointer-events: none;
+    background-color: #b1cbe4;
+    border-color: #bcd;
+    box-shadow: none;
+}
+
+.magic-css-toastr#toast-container {
+    z-index: 2147483610;
+    font-family: Helvetica, "Trebuchet MS", sans-serif;
+    font-size: 12px;
+}
+
+.magic-css-toastr#toast-container > div {
+    opacity: 1;
+    padding: 10px 20px 10px 50px;
+    background-position: 15px 10px;
+    width: auto;
+    max-width: 400px;
+}
+.magic-css-toastr#toast-container > div:hover {
+    cursor: initial;
+}
+
+/* Begin: These styles would be useful when close button is enabled for the toastr */
+/* Positioning */
+.magic-css-toastr .toast-close-button {
+    top: -4px;
+    right: -10px;
+}
+/* Without this, the last word in the title may wrap to next line when close button is there */
+.magic-css-toastr#toast-container .toast-title {
+    float: left;
+}
+/* Since we are using float for .toast-title , we need to "clear" it for displaying long contents in ".toast-message" */
+.magic-css-toastr#toast-container .toast-message {
+    clear: both;
+}
+/* End */
+
 /* End: Server connectivity UI */
-
-
-
-
 
 
 /*
@@ -865,100 +954,6 @@ html .magicss-mouse-over-dom-element {
     flex-direction: initial;
 }
 
-/* End: Site-specific fixes */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Begin: General purpose CSS */
-.magic-css-ui {
-    word-wrap: break-word;
-}
-.magic-css-ui input:invalid {
-    border-color: rgba(255, 0, 0, 0.7);
-    outline-color: rgba(255, 0, 0, 0.5);
-}
-
-.magic-css-tooltipster {
-    box-sizing: content-box;
-}
-.magic-css-tooltipster * {
-    box-sizing: inherit;
-}
-/* End */
-
-
-
-/* Begin: Fix some general styles which might be overridden in some sites */
-.magic-css-ui,
-.magic-css-ui input,
-.magic-css-ui input[type],
-.magic-css-ui button {
-    margin: 0;
-    display: initial;
-    line-height: initial;
-    letter-spacing: initial;
-    text-shadow: initial;
-    text-align: left;
-    font-family: sans-serif;
-    font-weight: initial;
-}
-.magic-css-ui input[type] {
-    box-sizing: inherit;
-}
-
-.magic-css-ui a {
-    font-size: inherit;
-}
-
-.magic-css-ui span {
-    font-size: inherit;
-}
-
-.magic-css-ui * {
-    text-transform: initial;
-}
-/* End */
-
-.magic-css-ui button {
-    padding: 7px 12px;
-
-    background-color: #2e8bcc;
-    border: 1px solid #0c619e;
-    border-radius: 3px;
-    box-shadow: inset 0 1px 0 #3af;
-    color: rgba(255, 255, 255, 0.95);
-
-    font-size: 12px;
-    cursor: pointer;
-}
-.magic-css-ui button:hover {
-    background-color: rgba(68, 88, 174, 0.85);
-    border-color: rgb(0, 110, 200);
-    box-shadow: rgb(70, 151, 255) 0px 1px 0px 0px inset;
-    color: #fff;
-}
-.magic-css-ui button[disabled] {
-    pointer-events: none;
-    background-color: #b1cbe4;
-    border-color: #bcd;
-    box-shadow: none;
-}
-
-/* Begin: Site specific fixes */
-
 /* http://xtremezerowaste.org.nz */
 .magic-css-ui button,
 .magic-css-ui button:hover,
@@ -967,80 +962,22 @@ html .magicss-mouse-over-dom-element {
     margin: 0;
 }
 
+/* Some other sites */
+.magic-css-back-end-connectivity-options {
+    color: #000;
+}
+.magic-css-back-end-connectivity-options a,
+.magic-css-back-end-connectivity-options a:link,
+.magic-css-back-end-connectivity-options a:visited {
+    color: #777;
+    font-weight: normal;
+    text-decoration: none;
+}
+.magic-css-back-end-connectivity-options a:hover,
+.magic-css-back-end-connectivity-options a:active {
+    color: #000;
+    text-decoration: underline;
+    font-weight: normal;
+}
+
 /* End */
-
-
-
-
-
-
-.magic-css-toastr#toast-container {
-    z-index: 2147483610;
-    font-family: Helvetica, "Trebuchet MS", sans-serif;
-    font-size: 12px;
-}
-
-.magic-css-toastr#toast-container > div {
-    opacity: 1;
-    padding: 10px 20px 10px 50px;
-    background-position: 15px 10px;
-    width: auto;
-    max-width: 400px;
-}
-.magic-css-toastr#toast-container > div:hover {
-    cursor: initial;
-}
-
-/* Begin: These styles would be useful when close button is enabled for the toastr */
-/* Positioning */
-.magic-css-toastr .toast-close-button {
-    top: -4px;
-    right: -10px;
-}
-/* Without this, the last word in the title may wrap to next line when close button is there */
-.magic-css-toastr#toast-container .toast-title {
-    float: left;
-}
-/* Since we are using float for .toast-title , we need to "clear" it for displaying long contents in ".toast-message" */
-.magic-css-toastr#toast-container .toast-message {
-    clear: both;
-}
-/* End */
-
-.magic-css-server-config-item input[type="number"],
-.magic-css-server-config-item input[type="text"],
-.magic-css-server-config-item select {
-    width: 20%
-}
-
-
-
-.magic-css-server-connectivity-status {
-    width: 16px;
-    height: 16px;
-    background-size: 16px;
-    background-repeat: no-repeat;
-}
-@keyframes magic-css-rotate {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-.magic-css-server-connectivity-status.connecting {
-    border: 3px solid rgba(150,150,150,1);
-    border-radius: 50%;
-    border-left: 3px solid rgba(0,0,0,1);
-    animation: magic-css-rotate 1s infinite linear;
-}
-.magic-css-server-connectivity-status.connected {
-    /* https://www.iconfinder.com/icons/282474/check_done_ok_icon#size=128 */
-    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAuMDA3OTk1NjEwMTI1MzYyODcgMTM2Ljc2MTAwMTU4NjkxNCAxMDcuOTkyMDA0Mzg5ODc1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImRlZjAiIHgxPSIwLjUwMDAwNSIgeDI9IjAuNTAwMDA1IiB5MT0iMS42NDI0NiIgeTI9Ii0wLjEzOTQ5MyI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDA0NDAwIi8+PHN0b3Agb2Zmc2V0PSIwLjUxMDk4OSIgc3RvcC1jb2xvcj0iIzAxOEMwMSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzkxQ0Q5MSIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJkZWYxIiB4MT0iLTUuMzc0MjZFLTA2IiB4Mj0iMC45OTk5OTciIHkxPSIwLjQ5OTk5NiIgeTI9IjAuNDk5OTk2Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0eWxlPSJzdG9wLW9wYWNpdHk6MC4zMDE5NjA3ODQzMTM3MjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0eWxlPSJzdG9wLW9wYWNpdHk6MC4yIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PGc+PHBhdGggZD0iTTUyLjk4NCwxMDhMMCw1NS4wMDggMjMuMjczMywzMS43MzIgNTIuOTg1Myw2MS40NDI3IDExNC40MzIsMC4wMDc5OTU2MSAxMzYuNzYxLDIyLjM0MTMgMTM0Ljg3NSwyNC4yMjY3IDExNC40MzIsMy43Nzg2NiA1Mi45ODUzLDY1LjIxMzMgMjMuMjczMywzNS41MDI3IDMuNzcwNjcsNTUuMDA4IDU0Ljg2OTMsMTA2LjExNSA1Mi45ODQsMTA4eiIgZmlsbD0iIzAwNjYwMCIvPjxwYXRoIGQ9Ik0xMzUuODE4LDIzLjI4NDVMMTE0LjQzMywxLjg5Mzg2IDUyLjk4NjQsNjMuMzI4NSAyMy4yNzMxLDMzLjYxNzkgMS44ODUwNyw1NS4wMDg1IDIxLjE3MzEsNzQuMjk2NSAzNC41MjI0LDg3LjY1MjUgNTMuOTI2NCwxMDcuMDU4IiBmaWxsPSJ1cmwoI2RlZjApIi8+PHBhdGggZD0iTTUyLjk4NjQsNjMuMzI3MkwyMy4yNzQ0LDMzLjYxNzkgMS44ODY0LDU1LjAwODUgMjEuMTczMSw3NC4yOTY1IDMyLjE4NzcsODUuMzE3OUM0Ny4zNDc3LDc1Ljk3MzksNzIuNTkxNyw2Mi45ODcyLDEwMS41MTcsNTguMzczOUwxMzUuODE4LDIzLjI4NDUgMTE0LjQzMywxLjg5Mzg2IDUyLjk4NjQsNjMuMzI3MnoiIGZpbGw9InVybCgjZGVmMSkiLz48L2c+PC9zdmc+');
-}
-
-.magic-css-server-connectivity-status.disconnected {
-    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/warning-circle_edited.svg */
-    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAxNiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZWZzLz48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGlkPSJJY29ucyB3aXRoIG51bWJlcnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIj48ZyBmaWxsPSIjMTU3RUZCIiBpZD0iR3JvdXAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC05Ni4wMDAwMDAsIC00MzIuMDAwMDAwKSI+PHBhdGggZD0iTTEwMyw0NDMgTDEwMyw0NDUgTDEwNSw0NDUgTDEwNSw0NDMgWiBNMTA0LDQ0OCBDOTkuNTgxNzIxOCw0NDggOTYsNDQ0LjQxODI3OCA5Niw0NDAgQzk2LDQzNS41ODE3MjIgOTkuNTgxNzIxOCw0MzIgMTA0LDQzMiBDMTA4LjQxODI3OCw0MzIgMTEyLDQzNS41ODE3MjIgMTEyLDQ0MCBDMTEyLDQ0NC40MTgyNzggMTA4LjQxODI3OCw0NDggMTA0LDQ0OCBaIE0xMDMsNDM1IEwxMDMsNDQyIEwxMDUsNDQyIEwxMDUsNDM1IFogTTEwMyw0MzUiIGlkPSJPdmFsIDIwOCBjb3B5Ii8+PC9nPjwvZz48L3N2Zz4=");
-}
