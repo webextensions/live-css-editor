@@ -1,5 +1,9 @@
 /*globals chrome, alert, extLib, jQuery */
 
+var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
+    USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
+    USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT = 'show-reapplying-styles-notification-at';
+
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
 
 // https://github.com/webextensions/live-css-editor/issues/5
@@ -100,7 +104,7 @@ var getFromChromeStorage = function (property, cb) {
 };
 
 var getAllFrames = function (cb) {
-    getFromChromeStorage('all-frames', function (value) {
+    getFromChromeStorage(USER_PREFERENCE_ALL_FRAMES, function (value) {
         if (value === 'yes') {
             cb(true);
         } else {
@@ -110,15 +114,39 @@ var getAllFrames = function (cb) {
 };
 
 var reapplyCss = function (tabId) {
-    getAllFrames(function (allFrames) {
-        var pathScripts = 'scripts/',
-            path3rdparty = pathScripts + '3rdparty/';
+    getFromChromeStorage(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION, function (value) {
+        var showReapplyingStylesNotification = true;
+        if (value === 'no') {
+            showReapplyingStylesNotification = false;
+        }
 
-        extLib.loadJSCSS([
-            path3rdparty + 'amplify-store.js',
-            pathScripts + 'utils.js',
-            pathScripts + 'reapply-css.js'
-        ], allFrames, tabId);
+        getFromChromeStorage(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT, function (value) {
+            var showReapplyingStylesNotificationAt = 'top-right';
+            if (['bottom-right', 'bottom-left', 'top-left'].indexOf(value) >= 0) {
+                showReapplyingStylesNotificationAt = value;
+            }
+            getAllFrames(function (allFrames) {
+                var pathScripts = 'scripts/',
+                    path3rdparty = pathScripts + '3rdparty/';
+
+                var arrScripts = [];
+                if (!showReapplyingStylesNotification) {
+                    arrScripts.push({
+                        type: 'js',
+                        sourceText: 'window.hideReapplyingStylesNotification = true;'
+                    });
+                } else {
+                    arrScripts.push({
+                        type: 'js',
+                        sourceText: 'window.showReapplyingStylesNotificationAt = "' + showReapplyingStylesNotificationAt + '";'
+                    });
+                }
+                arrScripts.push(path3rdparty + 'amplify-store.js');
+                arrScripts.push(pathScripts + 'utils.js');
+                arrScripts.push(pathScripts + 'reapply-css.js');
+                extLib.loadJSCSS(arrScripts, allFrames, tabId);
+            });
+        });
     });
 };
 
@@ -136,6 +164,10 @@ var main = function (tabId) {
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
         extLib.loadJSCSS([
+            {
+                type: 'js',
+                sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
+            },
             {
                 src: path3rdparty + 'jquery-3.2.1.js',
                 skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
@@ -186,10 +218,15 @@ var main = function (tabId) {
             path3rdparty + 'jquery-ui.js',
             path3rdparty + 'jquery.ui.touch-punch_customized.js',
 
+            path3rdparty + 'socket.io/socket.io.slim.js',
+
             path3rdparty + 'amplify-store.js',
 
             path3rdparty + 'tooltipster/tooltipster.css',
             path3rdparty + 'tooltipster/jquery.tooltipster.js',
+
+            path3rdparty + 'toastr/toastr.css',
+            path3rdparty + 'toastr/toastr_customized.js',
 
             path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
             path3rdparty + 'csspretty/csspretty.js',

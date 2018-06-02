@@ -4,6 +4,8 @@
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
+    USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function ($) {
@@ -363,6 +365,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             delete passedOptionsCombined.optionsBasedOnUserPreference;  // Just cleaning up the object (not a compulsory thing to do)
             codemirrorOptions = $.extend(true, {}, codemirrorOptions, passedOptionsCombined);
 
+            thisOb.triggerEvent('beforeInstantiatingCodeMirror');
             var cm = thisOb.cm = CodeMirror(newDiv.get(0), codemirrorOptions);
 
             cm.on('focus', function (cm, evt) { // eslint-disable-line no-unused-vars
@@ -421,6 +424,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             $(cm.getWrapperElement()).addClass('cancelDragHandle');
             $(cm.getWrapperElement()).resizable({
                 handles: 'se',
+                minHeight: 40,
+                minWidth: 200,
                 stop: function (event, ui) {
                     thisOb.setTextContainerDimensions(
                         {
@@ -447,18 +452,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 rememberDimensions = options.rememberDimensions;
 
             var divHeader = document.createElement('div');
+            divHeader.className = 'magic-css-header';
             thisOb.container.appendChild(divHeader);
 
             var parentDivRightAligned = divHeader;
 
             var divHeaderLeft = document.createElement('div');
+            divHeaderLeft.className = 'magic-css-header-left-section';
             divHeader.appendChild(divHeaderLeft);
-            if (divHeaderLeft.style.cssFloat !== undefined) {
-                divHeaderLeft.style.cssFloat = 'left';
-            }
-            if (divHeaderLeft.style.styleFloat !== undefined) {
-                divHeaderLeft.style.styleFloat = 'left';
-            }
 
             var title = options.title || 'Editor';
 
@@ -472,9 +473,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             options.headerOtherIcons = (options.headerOtherIcons || []).filter(function (item) { return !!item; });
             if (options.headerOtherIcons.length) {
                 options.headerIcons = options.headerIcons || [];
-                options.headerIcons.push({
+                options.headerIcons.unshift({
                     name: 'more',
-                    cls: 'editor-more-icons editor-translucent-out cancelDragHandle',
+                    cls: 'editor-more-icons editor-gray-out cancelDragHandle',
                     afterrender: function (editor, moreIcon) {
                         var $moreIcon = $(moreIcon),
                             tooltipContent = ['<ul>'];
@@ -484,17 +485,22 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 '<li class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '">' +
                                     '<a' +
                                     ' class="more-icons ' + (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + '"' +
-                                    ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
-                                    ' target="_blank">' +
+                                    ' href="' + (iconOptions.href || 'javascript:void(0);') + '"' +
+                                    (iconOptions.href ? ' target="_blank"' : '') +
+                                    '>' +
                                         iconOptions.title +
                                     '</a>' +
                                 '</li>'
                             );
                             if (iconOptions.uniqCls && iconOptions.onclick) {
-                                $(document).on('click', '.' + iconOptions.uniqCls, function(evt){
+                                $('body').on('click', '.' + iconOptions.uniqCls, function(evt){
                                     evt.preventDefault();   // Useful in preventing the opening of a new tab in Firefox if the anchor-tag icon has target="_blank"
                                     iconOptions.onclick(evt, editor, $moreIcon);
+
+                                    var originalSpeed = $moreIcon.tooltipster('option', 'speed');
+                                    $moreIcon.tooltipster('option', 'speed', 0);
                                     $moreIcon.tooltipster('hide');
+                                    $moreIcon.tooltipster('option', 'speed', originalSpeed);
                                 });
                             }
                         });
@@ -503,6 +509,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             content: tooltipContent.join(''),
                             contentAsHTML: true,
                             position: 'bottom',
+                            // https://github.com/iamceege/tooltipster/blob/3.3.0/js/jquery.tooltipster.js#L338
+                            theme: 'tooltipster-default magic-css-tooltipster',
                             interactive: true,
                             interactiveTolerance: 350,
                             functionReady: function (origin, tooltip) {
@@ -511,16 +519,21 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         iconOptions.beforeShow(origin, tooltip, editor);
                                     }
                                 });
+                                // The tooltip would have rendered in hidden mode, but its width might have changed
+                                // due to some changes via .beforeShow(), so, we need to reposition it
+                                $moreIcon.tooltipster('reposition');
                             }
                         });
                     }
                 });
             }
 
+            options.headerIcons = (options.headerIcons || []).filter(function (item) { return !!item; });
+
             var disableCloseIcon = !!options.disableCloseIcon;
             if (!disableCloseIcon) {
                 options.headerIcons = options.headerIcons || [];
-                options.headerIcons.unshift({
+                options.headerIcons.push({
                     name: 'close',
                     title: 'Close',
                     cls: 'editor-close',
@@ -530,16 +543,71 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             }
 
-            options.headerIcons = (options.headerIcons || []).filter(function (item) { return !!item; });
             if (options.headerIcons.length) {
                 options.headerIcons.forEach(function (iconOptions) {
+                    if (iconOptions.icons) {
+                        iconOptions.afterrender = function (editor, divIcon) {
+                            var $divIcon = $(divIcon),
+                                tooltipContent = ['<ul>'];
+
+                            iconOptions.icons.forEach(function (iconOptions) {
+                                tooltipContent.push(
+                                    '<li class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '">' +
+                                        '<a' +
+                                        ' class="more-icons ' + (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + '"' +
+                                        ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
+                                        (iconOptions.href ? ' target="_blank"' : '') +
+                                        '>' +
+                                            iconOptions.title +
+                                        '</a>' +
+                                    '</li>'
+                                );
+                                if (iconOptions.uniqCls && iconOptions.onclick) {
+                                    // $(document).on('click', '<selector>', callback(){...}) and
+                                    // $('body').on('click', '<selector>', callback(){...}) are generally equivalent
+                                    // and rather "$(document).on('click' ..." approach is more safe because that
+                                    // script can be placed even in <head> section, but some sites may have
+                                    // stopPropagation() like:
+                                    //     $("body").on("click", function(evt) {
+                                    //         evt.stopPropagation();
+                                    //         ...
+                                    //     }
+                                    // So, in those cases, delegating the event via "body" element works better
+                                    $('body').on('click', '.' + iconOptions.uniqCls, function(evt){
+                                        evt.preventDefault();   // Useful in preventing the opening of a new tab in Firefox if the anchor-tag icon has target="_blank"
+                                        iconOptions.onclick(evt, editor, $divIcon);
+
+                                        var originalSpeed = $divIcon.tooltipster('option', 'speed');
+                                        $divIcon.tooltipster('option', 'speed', 0);
+                                        $divIcon.tooltipster('hide');
+                                        $divIcon.tooltipster('option', 'speed', originalSpeed);
+                                    });
+                                }
+                            });
+                            tooltipContent.push('</ul>');
+                            $divIcon.tooltipster({
+                                content: tooltipContent.join(''),
+                                contentAsHTML: true,
+                                position: 'bottom',
+                                // https://github.com/iamceege/tooltipster/blob/3.3.0/js/jquery.tooltipster.js#L338
+                                theme: 'tooltipster-default magic-css-tooltipster',
+                                interactive: true,
+                                interactiveTolerance: 350,
+                                functionReady: function (origin, tooltip) {
+                                    iconOptions.icons.forEach(function (iconOptions) {
+                                        if (iconOptions && iconOptions.beforeShow) {
+                                            iconOptions.beforeShow(origin, tooltip, editor);
+                                        }
+                                    });
+                                    // The tooltip would have rendered in hidden mode, but its width might have changed
+                                    // due to some changes via .beforeShow(), so, we need to reposition it
+                                    $divIcon.tooltipster('reposition');
+                                }
+                            });
+                        };
+                    }
+
                     var divIcon = document.createElement('div');
-                    if (divIcon.style.cssFloat !== undefined) {
-                        divIcon.style.cssFloat = 'right';
-                    }
-                    if (divIcon.style.styleFloat !== undefined) {
-                        divIcon.style.styleFloat = 'right';
-                    }
                     divIcon.className = (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + ' editor-icon';
                     if (iconOptions.title) {
                         divIcon.title = iconOptions.title;
@@ -547,7 +615,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     if (iconOptions.href) {
                         divIcon.innerHTML = '<a' +
                             ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
-                            ' target="_blank" style="width:100%;height:100%;display:block;text-decoration:none;">&nbsp;</a>';
+                            (iconOptions.href ? ' target="_blank"' : '') +
+                            ' style="width:100%;height:100%;display:block;text-decoration:none;">&nbsp;</a>';
                     }
 
                     parentDivRightAligned.appendChild(divIcon);
@@ -609,7 +678,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             }
 
-            thisOb.container.style.padding = '7px';
+            thisOb.container.style.padding = '0 7px 7px 7px';
 
             var disableResize = !!options.disableResize;
             if (!disableResize) {
@@ -712,7 +781,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             thisOb.container.style.width = 'auto';
             thisOb.container.style.height = 'auto';
             thisOb.container.style.borderRadius = '5px';
-            thisOb.container.style.zIndex = '2147483647';
+            thisOb.container.style.zIndex = '2147483600';
             thisOb.container.style.backgroundColor = 'rgba(' + options.bgColor + ')';
         }
 
@@ -798,6 +867,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                     thisOb.triggerEvent('delayedtestfortextchange');
                     thisOb.triggerEvent('_delayedcursorprobablymoved');
+                    break;
+                case 'beforeInstantiatingCodeMirror':
+                    if (events.beforeInstantiatingCodeMirror) {
+                        events.beforeInstantiatingCodeMirror(thisOb);
+                    }
                     break;
                 // There is a chance that something is problematic in focus behavior
                 case 'problematicFocusDetected':
@@ -965,22 +1039,40 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
         }
     }
+    // TODO:
+    // Move out the default preferences of Magic CSS into magicss.js
     Editor.defaultPreferences = {
         'language-mode': 'css',
         'use-css-linting': 'no',
         'disable-styles': 'no',
         'apply-styles-automatically': 'no',
+        'watching-css-files': 'no',
         'use-tab-for-indentation': 'no',
         'indentation-spaces-count': '4',
         [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',
         [USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: 'no',
+        [USER_PREFERENCE_USE_CUSTOM_FONT_SIZE]: 'no',
+        [USER_PREFERENCE_FONT_SIZE_IN_PX]: '12',
         'syntax-highlighting': 'yes',
         'show-line-numbers': 'no',
         'textarea-value': '',
         'ui-position-left': 20,
         'ui-position-top': 20,
-        'ui-size-height': 250,
-        'ui-size-width': 300
+
+        // Previously, we were using:
+        //     'ui-size-width': 300,
+        //     'ui-size-height': 250
+        // But, some of the advertisement blocking extensions have logic like:
+        //     [style*="width:300px; height:250px;"],
+        //     [style*="width: 300px; height: 250px;"] {
+        //         display: none !important;
+        //     }
+        // For example, one (or more) of the lists in uBlock Origin and Adblock Plus
+        // was applying a style like the above for the page:
+        //     https://www.msn.com/en-ae/
+        // Now, we use 301x249 as the default size to avoid that
+        'ui-size-width': 301,
+        'ui-size-height': 249
     };
 
     window.Editor = Editor;
@@ -1030,6 +1122,23 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     var value = parseInt(values && values['indentation-spaces-count'], 10);
                     if (!isNaN(value)) {
                         Editor.defaultPreferences['indentation-spaces-count'] = '' + value;
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorage.get(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE, function (values) {
+                    if (values && values[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] === 'yes') {
+                        Editor.defaultPreferences[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] = 'yes';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorage.get(USER_PREFERENCE_FONT_SIZE_IN_PX, function (values) {
+                    var value = parseInt(values && values[USER_PREFERENCE_FONT_SIZE_IN_PX], 10);
+                    if (!isNaN(value)) {
+                        Editor.defaultPreferences[USER_PREFERENCE_FONT_SIZE_IN_PX] = '' + value;
                     }
                     callback(null);
                 });

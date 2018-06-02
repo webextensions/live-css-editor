@@ -8,6 +8,10 @@ extension-firefox/
 extension-opera.zip
 extension-opera/
 
+# Temporary files and directories
+tmp
+temp
+
 # Logs
 logs
 *.log

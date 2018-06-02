@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+
+<head>
+</head>
+
+<body>
+    <div>
+        <style>
+            div.block {
+                margin-bottom: 20px;
+            }
+        </style>
+
+        <link rel="stylesheet" href="styles.css" />
+        <div class="block styles-style1">
+            .styles-style1
+            <br />Style defined in styles.css
+        </div>
+
+        <link rel="stylesheet" href="file-which-gets-linked-twice.css" />
+        <link rel="stylesheet" href="file-which-gets-linked-twice.css" />
+        <div class="block file-which-gets-linked-twice-style1">
+            .file-which-gets-linked-twice-style1
+            <br />Style defined in file-which-gets-linked-twice.css
+        </div>
+
+        <link rel="stylesheet" href="example2.css" />
+        <link rel="stylesheet" href="example2.css?xyz" />
+        <link rel="stylesheet" href="example2.css?123" />
+        <link rel="stylesheet" href="example2.css?abcd" />
+        <link rel="stylesheet" href="example2.css?abcd=123" />
+        <link rel="stylesheet" href="example2.css?abcd=123&" />
+        <link rel="stylesheet" href="example2.css?abcd=123&xyz=456" />
+        <div class="block example2-style1">
+            .example2-style1
+            <br />Style defined in example2.css
+            <br />Style defined in example2.css?xyz
+            <br />Style defined in example2.css?123
+            <br />Style defined in example2.css?abcd
+            <br />Style defined in example2.css?abcd=123
+            <br />Style defined in example2.css?abcd=123&
+            <br />Style defined in example2.css?abcd=123&xyz=456
+        </div>
+
+        <link rel="stylesheet" href="./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css" />
+        <div class="block file-placed-at-same-level-as-html-file-accessed-with-relative-path-style1">
+            .file-placed-at-same-level-as-html-file-accessed-with-relative-path-style1
+            <br />Style defined in ./file-placed-at-same-level-as-html-file-accessed-with-relative-path.css
+        </div>
+
+        <link rel="stylesheet" href="node_modules/file-placed-in-a-folder-disabled-from-watch-by-default.css" />
+        <div class="block file-placed-in-a-folder-disabled-from-watch-by-default-style1">
+            .file-placed-in-a-folder-disabled-from-watch-by-default-style1
+            <br />Style defined in node_modules/file-placed-in-a-folder-disabled-from-watch-by-default.css
+        </div>
+
+        <link rel="stylesheet" href="../file-placed-one-level-up-than-html-file-accessed-with-relative-path.css" />
+        <div class="block file-placed-one-level-up-than-html-file-accessed-with-relative-path-style1">
+            .file-placed-one-level-up-than-html-file-accessed-with-relative-path-style1
+            <br />Style defined in ../file-placed-one-level-up-than-html-file-accessed-with-relative-path.css
+        </div>
+
+        <link rel="stylesheet" href="../../file-placed-two-levels-up-than-html-file-accessed-with-relative-path.css" />
+        <div class="block file-placed-two-levels-up-than-html-file-accessed-with-relative-path-style1">
+            .file-placed-two-levels-up-than-html-file-accessed-with-relative-path-style1
+            <br />Style defined in ../../file-placed-two-levels-up-than-html-file-accessed-with-relative-path.css
+        </div>
+
+        <link rel="stylesheet" href=".css" />
+        <div class="block file-name-is-dot-css-style1">
+            .file-name-is-dot-css-style1
+            <br />Style defined in .css
+        </div>
+
+        <link rel="stylesheet" href=".file-name-starting-with-dot.css" />
+        <div class="block file-name-starting-with-dot-style1">
+            .file-name-starting-with-dot-style1
+            <br />Style defined in .file-name-starting-with-dot.css
+        </div>
+
+        <link rel="stylesheet" href="node_modules.css" />
+        <div class="block node_modules-style1">
+            .node_modules-style1
+            <br />Style defined in node_modules.css (to test that that default folders being ignored from watch are handled appropriately and don't affect files partly-matching with the ignored)
+        </div>
+
+        <link rel="stylesheet" href="file-with-unicode-character-á.css" />
+        <div class="block file-with-unicode-character-á-style1">
+            .file-with-unicode-character-á-style1
+            <br />Style defined in file-with-unicode-character-á.css
+        </div>
+
+        <link rel="stylesheet" href="file-with-unicode-character-ë.css" />
+        <div class="block file-with-unicode-character-ë-style1">
+            .file-with-unicode-character-ë-style1
+            <br />Style defined in file-with-unicode-character-ë.css
+        </div>
+
+        <link rel="stylesheet" href="file-with-same-name-existing-at-two-different-paths.css" />
+        <div class="block file-with-same-name-existing-at-two-different-paths-style1">
+            .file-with-same-name-existing-at-two-different-paths-style1
+            <br />Style defined in file-with-same-name-existing-at-two-different-paths.css
+        </div>
+        <link rel="stylesheet" href="dummy-folder/file-with-same-name-existing-at-two-different-paths.css" />
+        <div class="block file-with-same-name-existing-at-two-different-paths-style2">
+            .file-with-same-name-existing-at-two-different-paths-style2
+            <br />Style defined in dummy-folder/file-with-same-name-existing-at-two-different-paths.css
+        </div>
+
+        <link rel="stylesheet" href="css-file-without-any-extension" />
+        <div class="block css-file-without-any-extension-style1">
+            .css-file-without-any-extension-style1
+            <br />Style defined in css-file-without-any-extension (these styles may not load when proper mimetype is not returned by the server)
+        </div>
+
+        <link rel="stylesheet" href="css-file-with-unexpected-extension.mystyles" />
+        <div class="block css-file-with-unexpected-extension-style1">
+            .css-file-with-unexpected-extension-style1
+            <br />Style defined in css-file-with-unexpected-extension.mystyles (these styles may not load when proper mimetype is not returned by the server)
+        </div>
+
+        <!--
+            Valid value for integrity is:
+            integrity="sha256-UJOG/+Pfx8Ykg3vJYX9awFaWYqrI4vzxfZTFDcfpQWI="
+        -->
+        <link rel="stylesheet" href="css-file-with-invalid-sub-resource-integrity.css" integrity="sha256-anythingAfterValidShaCodeDashHashToActivateSRI" />
+        <div class="block css-file-with-invalid-sub-resource-integrity-style1">
+            .css-file-with-invalid-sub-resource-integrity
+            <br />Style defined in css-file-with-invalid-sub-resource-integrity.css
+        </div>
+
+        <link rel="stylesheet" href="file-which-does-not-exist.css" />
+        <div class="block file-which-does-not-exist-style1">
+            .file-which-does-not-exist-style1
+            <br />Style not defined in any file
+        </div>
+
+        <!--
+        <div class="block ">
+            .
+            <br />Style defined in
+        </div>
+        -->
+    </div>
+</body>
+
+</html>

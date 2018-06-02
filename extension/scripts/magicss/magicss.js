@@ -1,9 +1,11 @@
-/*globals jQuery, less, utils, sourceMap, chrome, CodeMirror */
+/*globals jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr */
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
+    USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function($){
@@ -27,21 +29,94 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         }
     };
 
+    var strAboutToBeInstantiated = '<about-to-be-instantiated>';
     if (window.MagiCSSEditor) {
-        utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
+        if (window.MagiCSSEditor === strAboutToBeInstantiated) {
+            // do nothing
+        } else {
+            utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
 
-        // 'Magic CSS window is already there. Repositioning it.'
-        window.MagiCSSEditor.reposition(function () {
-            checkIfMagicCssLoadedFine(window.MagiCSSEditor);
-        });
+            // 'Magic CSS window is already there. Repositioning it.'
+            window.MagiCSSEditor.reposition(function () {
+                checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+            });
+        }
         return;
+    } else {
+        // Temporarily instantiating window.MagiCSSEditor as a truthy value
+        // Without this, if a user quickly runs Magic CSS twice, then in both
+        // the runs, window.MagiCSSEditor would be unavailable
+        window.MagiCSSEditor = strAboutToBeInstantiated;
     }
+
+    /* eslint-disable */
+    // TODO: Move this functionality into utils.js
+    // https://github.com/lydell/resolve-url/blob/master/resolve-url.js
+    // Copyright 2014 Simon Lydell
+    // X11 (“MIT”) Licensed. (See LICENSE.)
+    function resolveUrl( /* ...urls */ ) {
+        var numUrls = arguments.length
+
+        if (numUrls === 0) {
+            throw new Error("resolveUrl requires at least one argument; got none.")
+        }
+
+        var base = document.createElement("base")
+        base.href = arguments[0]
+
+        if (numUrls === 1) {
+            return base.href
+        }
+
+        var head = document.getElementsByTagName("head")[0]
+        head.insertBefore(base, head.firstChild)
+
+        var a = document.createElement("a")
+        var resolved
+
+        for (var index = 1; index < numUrls; index++) {
+            a.href = arguments[index]
+            resolved = a.href
+            base.href = resolved
+        }
+
+        head.removeChild(base)
+
+        return resolved
+    }
+    /* eslint-enable */
 
     // for HTML frameset pages, this value would be 'FRAMESET'
     // chrome.tabs.executeScript uses allFrames: true, to run inside all frames
     if (document.body.tagName !== 'BODY') {
         return;
     }
+
+    var constants = {};
+    try {
+        constants.appVersion = chrome.runtime.getManifest().version;
+    } catch (e) {
+        // Just being cautious to have a fallback.
+        // In future, we may adopt just one of these two approaches to get the
+        // version number, once stability is proven across platforms and environments.
+        constants.appVersion = window.magicCssVersion;
+    }
+    constants.appMajorVersion = parseInt(constants.appVersion, 10);
+    constants.liveCssServer = {
+        defaultProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
+        defaultHostname: window.location.hostname || '127.0.0.1',
+        defaultPort: '3456',
+        apiVersionPath: '/api/v' + constants.appMajorVersion
+    };
+
+    toastr.options.positionClass = 'toast-top-right magic-css-toastr magic-css-ui';
+    toastr.options.newestOnTop = false;
+    // toastr.options.closeButton = true;
+    toastr.options.hideDuration = 300;
+    toastr.options.timeOut = 5000;
+    toastr.options.extendedTimeOut = 0;
+    // toastr.options.tapToDismiss = false;
+
 
     var rememberLastAppliedCss = function (css) {
         var editor = window.MagiCSSEditor;
@@ -53,38 +128,129 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return (str.length <= limit) ? str : (str.substring(0, limit - 3) + '...');
     };
 
-    var reloadCSSInPage = function () {
+    var getLocalISOTime = function () {
         // http://stackoverflow.com/questions/10830357/javascript-toisostring-ignores-timezone-offset/28149561#28149561
         var tzoffset = (new Date()).getTimezoneOffset() * 60000, //offset in milliseconds
             localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0,-1);
-        localISOTime = localISOTime.slice(0, -4).replace('T', '_');
+        localISOTime = localISOTime.replace('T', '_');
+        return localISOTime;
+    };
 
-        // The disabled <link> tags are not loaded when href is changed, so don't include them
-        // Don't include the elements which don't have a value set for href
-        var $links = $('link[rel~="stylesheet"]:not([disabled])').filter(function () {
+    var getActiveStylesheetLinkTags = function (options) {
+        options = options || {};
+        // The disabled <link> tags are not loaded when "href" is changed, so don't include them
+        var linkTags = $('link[rel~="stylesheet"]:not([disabled])').filter(function () {
             if (this.reloadingActiveWithMagicCSS) {
                 return false;
             }
+            // Don't include the elements which don't have a value set for "href"
             if (!$(this).attr('href')) {
                 return false;
             }
+            if (!options.skipIntegrityCheck) {
+                // Don't include the elements which have a value set for "integrity"
+                if ($(this).attr('integrity')) {
+                    return false;
+                }
+            }
             return true;
+        }).toArray();
+
+        return linkTags;
+    };
+
+    var getFilenameFromPath = function (path) {
+        path = path.split('?')[0];
+        path = path.split('#')[0];
+        path = path.split('/').pop();
+        return path;
+    };
+
+    var findProbableMatchElementIndexes = function (arr, useOnlyFileNamesForMatch, itemToMatch) {
+        var fileNameOfItemToMatch = getFilenameFromPath(itemToMatch);
+        var matchedIndexes = [];
+        arr.forEach(function (item, index) {
+            item = item.replace(/[?&]reloadedAt=[\d-_:.]+/, '');
+            if (useOnlyFileNamesForMatch) {
+                if (getFilenameFromPath(item) === fileNameOfItemToMatch) {
+                    matchedIndexes.push(index);
+                }
+            } else {
+                if (resolveUrl(item) === itemToMatch) {
+                    matchedIndexes.push(index);
+                }
+            }
         });
+        return matchedIndexes;
+    };
+
+    var reloadCSSResourceInPage = function (config) {
+        var useOnlyFileNamesForMatch = config.useOnlyFileNamesForMatch,
+            fileName = config.fileName,
+            fullUrl = config.url,
+            fullPath = config.fullPath;
+
+        var activeLinkTagsSkipIntegrityCheck = getActiveStylesheetLinkTags({skipIntegrityCheck: true});
+
+        var arrLinkTags = [];
+        activeLinkTagsSkipIntegrityCheck.forEach(function (linkTag) {
+            arrLinkTags.push($(linkTag).attr('href'));
+        });
+
+        var indexes = findProbableMatchElementIndexes(
+            arrLinkTags,
+            useOnlyFileNamesForMatch,
+            useOnlyFileNamesForMatch ? fileName : fullUrl
+        );
+
+        var linkTagsToReload = [];
+        var linkTagsNotToReloadBecauseOfIntegrityAttribute = 0;
+        indexes.forEach(function (index) {
+            if (activeLinkTagsSkipIntegrityCheck[index].getAttribute('integrity')) {
+                linkTagsNotToReloadBecauseOfIntegrityAttribute += 1;
+            } else {
+                linkTagsToReload.push(activeLinkTagsSkipIntegrityCheck[index]);
+            }
+        });
+        if (linkTagsNotToReloadBecauseOfIntegrityAttribute) {
+            console.log('Note: Magic CSS will not attempt to reload the link tags which use "integrity" attribute.');
+        }
+        reloadPassedLinkTags(linkTagsToReload, {
+            noMatchesPrepend: 'Modified: <span style="font-weight:normal">' + (function (str) {
+                if (str.length >= 53) {
+                    return '...' + str.substr(-50);
+                } else {
+                    return str;
+                }
+            }(fullPath)) +
+            '</span>'
+        });
+    };
+
+    var reloadPassedLinkTags = function (linkTags, extraInfo) {
+        var localISOTime = getLocalISOTime();
 
         var successCount = 0,
             errorCount = 0;
         var checkCompletion = function () {
-            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + $links.length);
-            if ($links.length === successCount + errorCount) {
+            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + linkTags.length);
+            if (linkTags.length === successCount + errorCount) {
                 setTimeout(function () {
                     if (errorCount) {
+                        var msg = '';
                         if (errorCount === 1) {
-                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tag failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                            msg = htmlEscape(errorCount + ' of the CSS <link> tag failed to reload.');
                         } else {
-                            utils.alertNote(htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.') + '<br/>Please check availability of the CSS resources included in this page.');
+                            msg = htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.');
                         }
+                        msg += '<br/><span style="font-weight:normal;">Please check availability of the CSS resources included in this page.</span>';
+                        utils.alertNote(msg);
                     } else {
-                        utils.alertNote(htmlEscape('All active CSS <link> tags got reloaded successfully :-)'));
+                        if (successCount === 1) {
+                            utils.alertNote(htmlEscape(successCount + ' active CSS <link> tag got reloaded successfully :-)'));
+                        } else {
+                            utils.alertNote(htmlEscape(successCount + ' active CSS <link> tags got reloaded successfully :-)'));
+                        }
                     }
                 }, 750);
 
@@ -92,14 +258,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 updateExistingCSSSelectorsAndAutocomplete(tagsToExclude);
             }
         };
-        if ($links.length) {
+        if (linkTags.length) {
             checkCompletion();
-            $links.each(function () {
-                var link = this,
+            linkTags.forEach(function (linkTag) {
+                var link = linkTag,
                     $link = $(link),
                     href = $link.attr('href');
                 if (href.indexOf('reloadedAt=') >= 0) {
-                    href = href.replace(/[?&]reloadedAt=[\d-_:]+/, '');
+                    href = href.replace(/[?&]reloadedAt=[\d-_:.]+/, '');
                 }
                 var newHref;
                 if (href.indexOf('?') >= 0) {
@@ -132,8 +298,20 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 $link.after($newLink);
             });
         } else {
-            utils.alertNote(htmlEscape('There are no active CSS <link> tags to be reloaded.'));
+            utils.alertNote(
+                ((extraInfo && extraInfo.noMatchesPrepend) ? (extraInfo.noMatchesPrepend + '<br />') : '') +
+                htmlEscape('There are no active CSS <link> tags that need to be reloaded.')
+            );
         }
+    };
+
+    var reloadAllCSSResourcesInPage = function () {
+        var linkTags = getActiveStylesheetLinkTags();
+        var activeLinkTagsSkipIntegrityCheck = getActiveStylesheetLinkTags({skipIntegrityCheck: true});
+        if (linkTags.length !== activeLinkTagsSkipIntegrityCheck.length) {
+            console.log('Note: Magic CSS will not attempt to reload the link tags which use "integrity" attribute.');
+        }
+        reloadPassedLinkTags(linkTags);
     };
 
     var getExistingCSSSelectors = function (tagsToExclude) {
@@ -249,7 +427,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 }
                 sources += ellipsis(
                     source
-                        .replace(/[?&]reloadedAt=[\d-_:]+/, '')
+                        .replace(/[?&]reloadedAt=[\d-_:.]+/, '')
                         .substr(source.lastIndexOf('/') + 1),
                     50
                 );
@@ -471,8 +649,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     };
 
     var elementHadClassAttributeBeforePointAndSelect;
-        // elementHadTitleAttributeBeforePointAndSelect,
-        // titleValueOfElementBeforePointAndSelect;
+    // elementHadTitleAttributeBeforePointAndSelect,
+    // titleValueOfElementBeforePointAndSelect;
 
     var removeMouseOverDomElementEffect = function (cb) {
         var $el = $('.magicss-mouse-over-dom-element');
@@ -557,6 +735,532 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         }, duration);
     };
 
+    var flagWatchingCssFiles = false;
+    var socket = null;
+
+    var startWatchingFiles = function (editor) {
+        var getConnected = function () {
+            getConnectedWithBackEnd(
+                editor,
+                function callback (err, socket) {
+                    if (err) {
+                        // The user cancelled watching files
+                        utils.alertNote('You cancelled watching CSS files for changes');
+                        editor.userPreference('watching-css-files', 'no');
+                    } else {
+                        socket.on('file-modified', function(changeDetails) {
+                            if (changeDetails.useOnlyFileNamesForMatch) {
+                                reloadCSSResourceInPage({
+                                    fullPath: changeDetails.fullPath,
+                                    useOnlyFileNamesForMatch: true,
+                                    fileName: changeDetails.fileName
+                                });
+                            } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                                var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                                reloadCSSResourceInPage({
+                                    fullPath: changeDetails.fullPath,
+                                    url: resolveUrl(pathWrtRoot)
+                                });
+                            } else {
+                                // The code should never reach here
+                                utils.alertNote(
+                                    'Unexpected scenario occurred in reloading some CSS resources.' +
+                                    '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                                    10000
+                                );
+                            }
+                        });
+                        if (!flagWatchingCssFiles) {
+                            flagWatchingCssFiles = true;
+                            utils.alertNote(
+                                'Watching CSS files for changes.' +
+                                '<br />' +
+                                '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                                20000,
+                                {
+                                    unobtrusive: true
+                                }
+                            );
+                            $(editor.container).addClass('watching-css-files');
+                            editor.userPreference('watching-css-files', 'yes');
+                        }
+                    }
+                },
+                function callbackForReconfiguration () {
+                    getConnected();
+                }
+            );
+        };
+        getConnected();
+    };
+
+    // A pretty basic OS detection logic based on:
+    // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js/38241481#38241481
+    var getOS = function () {
+        var platform = window.navigator.platform,
+            os = null;
+
+        if (platform.indexOf('Mac') === 0) {
+            os = 'Mac OS';
+        } else if (platform.indexOf('Win') === 0) {
+            os = 'Windows';
+        } else if (platform.indexOf('Linux') === 0) {
+            os = 'Linux';
+        }
+
+        return os;
+    };
+
+
+    var getServerDetailsFromUserAlreadyOpen = false;
+    var getServerDetailsFromUser = function (editor, callback) {
+        if (getServerDetailsFromUserAlreadyOpen) {
+            return;
+        }
+        getServerDetailsFromUserAlreadyOpen = true;
+        /* eslint-disable indent */
+        var $backEndConnectivityOptions = $(
+            [
+                '<div>',
+                    '<div class="magic-css-full-page-overlay">',
+                    '</div>',
+                    '<div class="magic-css-full-page-contents magic-css-ui" style="pointer-events:none;">',
+                        '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
+                            '<div class="magic-css-back-end-connectivity-options" style="pointer-events:initial;">',
+                                '<div class="magic-css-server-config-item" style="padding-bottom:0;">',
+                                    '<div>',
+                                        '<div style="margin-bottom:20px;">',
+                                            'You need to run a development server, called',
+                                            ' <a target="_blank" href="https://www.npmjs.com/package/live-css" style="font-weight:bold; text-decoration:underline; color:#000;">live-css</a>',
+                                            ', for using the feature',
+                                            ' "Watch CSS files to apply changes automatically".',
+                                            ' This feature is meant for use during web development.',
+                                        '</div>',
+                                        '<div>',
+                                            '<div style="font-weight:bold; float:left;">Step 1:</div>',
+                                            '<div style="margin-left:50px;">',
+                                                'Install Node JS',
+                                                ' <a target="_blank" href="https://nodejs.org/en/download/" style="margin-left:10px;">Download</a>',
+                                                (function () {
+                                                    var os = getOS(),
+                                                        link;
+                                                    if (os === 'Linux') {
+                                                        link = 'https://www.ostechnix.com/install-node-js-linux/';
+                                                    } else if (os === 'Windows') {
+                                                        link = 'https://www.wikihow.com/Install-Node.Js-on-Windows';
+                                                    } else if (os === 'Mac OS') {
+                                                        link = 'https://nodesource.com/blog/installing-nodejs-tutorial-mac-os-x/';
+                                                    }
+                                                    if (link) {
+                                                        return ' <a target="_blank" href="' + link + '" style="margin-left:10px;">Help</a>';
+                                                    } else {
+                                                        return '';
+                                                    }
+                                                }()),
+                                            '</div>',
+                                        '</div>',
+                                        '<div style="padding-top:4px;">',
+                                            '<div style="font-weight:bold; float:left;">Step 2:</div>',
+                                            '<div style="margin-left:50px;">',
+                                                'Install live-css server',
+                                                ' <a target="_blank" href="https://www.npmjs.com/package/live-css" style="margin-left:10px;">Link</a>',
+                                                ' <a target="_blank" href="https://docs.npmjs.com/cli/npm" style="margin-left:10px;">Help</a>',
+                                                ' <a target="_blank" href="https://docs.npmjs.com/getting-started/fixing-npm-permissions" style="margin-left:10px;">Extra</a>',
+                                                '<br />',
+                                                '<div style="float:left; line-height:16px; background-color:#bbb; padding:3px 7px; border-radius:3px; margin-top:2px; font-family:monospace;">',
+                                                    // Source for SVG: https://www.npmjs.com/package/live-css
+                                                    '<svg viewBox="0 0 12.32 9.33" style="width:12px; height:16px; display:block; float:left;"><g><line class="st1" x1="7.6" y1="8.9" x2="7.6" y2="6.9"></line><rect width="1.9" height="1.9"></rect><rect x="1.9" y="1.9" width="1.9" height="1.9"></rect><rect x="3.7" y="3.7" width="1.9" height="1.9"></rect><rect x="1.9" y="5.6" width="1.9" height="1.9"></rect><rect y="7.5" width="1.9" height="1.9"></rect></g></svg>',
+                                                    '<span>npm install --global <span class="live-css-highlight-if-server-client-incompatible">live-css@', constants.appMajorVersion, '</span></span>',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+                                        '<div style="clear:both; padding-top:4px;">',
+                                            '<div style="font-weight:bold; float:left;">Step 3:</div>',
+                                            '<div style="margin-left:50px;">',
+                                                'Start live-css server',
+                                                '<br />',
+                                                '<div style="float:left; line-height:16px; background-color:#bbb; padding:3px 7px; border-radius:3px; margin-top:2px; font-family:monospace;">',
+                                                    // Source for SVG: https://www.npmjs.com/package/live-css
+                                                    '<svg viewBox="0 0 12.32 9.33" style="width:12px; height:16px; display:block; float:left;"><g><line class="st1" x1="7.6" y1="8.9" x2="7.6" y2="6.9"></line><rect width="1.9" height="1.9"></rect><rect x="1.9" y="1.9" width="1.9" height="1.9"></rect><rect x="3.7" y="3.7" width="1.9" height="1.9"></rect><rect x="1.9" y="5.6" width="1.9" height="1.9"></rect><rect y="7.5" width="1.9" height="1.9"></rect></g></svg>',
+                                                    'live-css',
+                                                '</div>',
+                                            '</div>',
+                                        '</div>',
+                                        '<div style="clear:both; padding-top:4px;">',
+                                            '<div style="font-weight:bold; float:left;">Step 4:</div>',
+                                            '<div style="margin-left:50px;">Enter server path based on output of the previous command</div>',
+                                        '</div>',
+                                    '</div>',
+                                    '<div class="magic-css-server-config-field-header" style="margin-top:20px;">',
+                                        '<span style="color:#000; font-weight:bold;">Server path:</span> ',
+                                        '<span style="color:#888;font-size:12px;">',
+                                            '(eg: ',
+                                            (function () {
+                                                var protocol = constants.liveCssServer.defaultProtocol,
+                                                    hostname = constants.liveCssServer.defaultHostname,
+                                                    port = constants.liveCssServer.defaultPort;
+                                                return protocol + '//' + hostname + ':' + port;
+                                            }()),
+                                            ')',
+                                        '</span>',
+                                    '</div>',
+                                    '<div>',
+                                        '<div style="width:50px; height:20px; float:left;">',
+                                            '<div class="magic-css-server-connectivity-status" style="float:right; margin-right:10px; display:block; margin-top:2px; width:16px; height:16px; background-repeat:no-repeat;"></div>',
+                                        '</div>',
+                                        '<div style="margin-left:50px;">',
+                                            '<span style="display:inline-block; line-height:21px;">' + constants.liveCssServer.defaultProtocol + '//&nbsp;</span>',
+                                            '<input type="text" spellcheck="false" class="magic-css-server-hostname" placeholder="',
+                                                constants.liveCssServer.defaultHostname,
+                                                '" style="width:165px;"',
+                                            ' />',
+                                            '<span style="display:inline-block; line-height:21px;">&nbsp;:&nbsp;</span>',
+                                            '<input type="number" min="1" max="65535" step="1" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px;" />',
+                                        '</div>',
+                                    '</div>',
+                                    '<div style="min-height:35px; padding-top:3px; clear:both;">',
+                                        '<div class="live-css-connectivity-error-message live-css-server-client-general-error-message" style="display:none;">',
+                                            '<div>You are not connected. Is live-css server running?</div>',
+                                            '<div>',
+                                                'Do you need to enable CORS? ',
+                                                '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" style="margin-left:10px;">Learn more</a>',
+                                            '</div>',
+                                        '</div>',
+                                        '<div class="live-css-connectivity-error-message live-css-server-client-incompatible-error-message" style="display:none;">',
+                                            'Error: You need to use version ', constants.appMajorVersion, ' of the live-css server',
+                                        '</div>',
+                                    '</div>',
+                                '</div>',
+                                '<div class="magic-css-server-config-item">',
+                                    '<div>',
+                                        '<button type="button" class="magicss-save-server-path-changes" style="float:right">Save & Apply</button>',
+                                        '<button type="button" class="magicss-cancel-server-path-changes">Cancel</button>',
+                                    '</div>',
+                                '</div>',
+                            '</div>',
+                        '</div>',
+                    '</div>',
+                '</div>'
+            ].join('')
+        );
+        /* eslint-enable indent */
+
+        var $serverHostname = $backEndConnectivityOptions.find('.magic-css-server-hostname'),
+            serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
+
+        var $serverPort = $backEndConnectivityOptions.find('.magic-css-server-port'),
+            serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+
+        var connectionTestingSocket = null;
+        var refreshConnectivityUi = function () {
+            var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
+            if (connectionTestingSocket) {
+                connectionTestingSocket.close();
+                connectionTestingSocket = null;
+            }
+            $backEndConnectivityOptions
+                .removeClass('live-css-server-client-general-error')
+                .removeClass('live-css-server-client-incompatible-error')
+                .find('.magic-css-server-connectivity-status')
+                .removeClass('connected')
+                .removeClass('disconnected')
+                .addClass('connecting');
+            $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
+
+            connectionTestingSocket = io(backEndPath);
+            connectionTestingSocket.on('connect', function () {
+                $backEndConnectivityOptions
+                    .removeClass('live-css-server-client-general-error')
+                    .removeClass('live-css-server-client-incompatible-error')
+                    .find('.magic-css-server-connectivity-status')
+                    .removeClass('disconnected')
+                    .removeClass('connecting')
+                    .addClass('connected');
+                $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', false);
+            });
+            var errorHandler = function (err) {
+                $backEndConnectivityOptions
+                    .removeClass('live-css-server-client-general-error')
+                    .removeClass('live-css-server-client-incompatible-error')
+                    .find('.magic-css-server-connectivity-status')
+                    .removeClass('connected')
+                    .removeClass('connecting')
+                    .addClass('disconnected');
+
+                if (err === 'Invalid namespace') {
+                    $backEndConnectivityOptions
+                        .addClass('live-css-server-client-incompatible-error');
+                } else {
+                    $backEndConnectivityOptions
+                        .addClass('live-css-server-client-general-error');
+                }
+                $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
+            };
+            connectionTestingSocket.on('connect_error', errorHandler);
+            connectionTestingSocket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
+        };
+
+        $serverHostname.val(serverHostnameValue);
+        $serverHostname.on('input', function () {
+            serverHostnameValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultHostname;
+            refreshConnectivityUi();
+        });
+
+        $serverPort.val(serverPortValue);
+        $serverPort.on('input', function () {
+            serverPortValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultPort;
+            refreshConnectivityUi();
+        });
+
+        // Useful when developing/debugging
+        // $backEndConnectivityOptions.find('.magic-css-back-end-connectivity-options').draggable();   // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
+
+        var disconnectConnectionTestingSocket = function () {
+            if (connectionTestingSocket) {
+                connectionTestingSocket.close();
+                connectionTestingSocket = null;
+            }
+        };
+        $backEndConnectivityOptions.find('.magic-css-full-page-overlay, .magicss-cancel-server-path-changes').on('click', function () {
+            disconnectConnectionTestingSocket();
+            $backEndConnectivityOptions.remove();
+            getServerDetailsFromUserAlreadyOpen = false;
+        });
+        $backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', function () {
+            editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            editor.userPreference('live-css-server-port', serverPortValue);
+
+            disconnectConnectionTestingSocket();
+            $backEndConnectivityOptions.remove();
+            getServerDetailsFromUserAlreadyOpen = false;
+
+            callback(null, {
+                serverHostname: serverHostnameValue,
+                serverPort: serverPortValue
+            });
+        });
+        $('body').append($backEndConnectivityOptions);
+        refreshConnectivityUi();
+    };
+
+    var updateUiMentioningNotWatchingCssFiles = function (editor) {
+        if (flagWatchingCssFiles) {
+            flagWatchingCssFiles = false;
+            utils.alertNote('Stopped watching CSS files for changes');
+            $(editor.container).removeClass('watching-css-files');
+            editor.userPreference('watching-css-files', 'no');
+        }
+    };
+
+    var liveCssServerSessionClosedByUser = function (editor) {
+        // TODO:
+        //     When file editing feature is available,
+        //     disable editing file / notify user when
+        //     the server session is disconnected
+
+        updateUiMentioningNotWatchingCssFiles(editor);
+    };
+
+    var $toastrConnecting,
+        $toastrConnected,
+        $toastrReconnectAttempt;
+    var getConnectedWithBackEnd = function (editor, callback, callbackForReconfiguration) {
+        var flagCallbackCalledOnce = false;
+        var serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+            serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+
+        if (socket) {
+            var socketOpts = (socket.io || {}).opts || {};
+            if (
+                socket.connected &&
+                socketOpts.hostname === serverHostnameValue &&
+                socketOpts.port === serverPortValue
+            ) {
+                return;
+            } else {
+                socket.close();
+                socket = null;
+            }
+        }
+
+        var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
+        var backEndPathToShowToUser = serverHostnameValue + ':' + serverPortValue;
+        if ($toastrConnecting) {
+            $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+        }
+        if ($toastrConnected) {
+            $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+        }
+        if ($toastrReconnectAttempt) {
+            $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+        }
+
+        $toastrConnecting = toastr.info(
+            '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                backEndPathToShowToUser +
+            '</div>' +
+            '<div>' +
+                '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right;">Cancel</button>' +
+                '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
+            '</div>',
+            'Connecting with live-css server at: ',
+            {
+                timeOut: 0,
+                onclick: function (evt) {
+                    if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                        getServerDetailsFromUser(editor, function (err, serverDetails) {
+                            if (!err) {
+                                callbackForReconfiguration(serverDetails);
+                            }
+                        });
+                    } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
+                        if (socket) {
+                            socket.close();
+                            socket = null;
+                        }
+                        toastr.clear($toastrConnecting, {force: true});
+                        if (!flagCallbackCalledOnce) {
+                            flagCallbackCalledOnce = true;
+                            callback('cancelled-by-user', socket);
+                        }
+                    }
+                }
+            }
+        );
+
+        // If the user is loading it for the first time on this domain,
+        // show them the configuration options along with the guide/help
+        // about the live-css server
+        if (
+            !editor.userPreference('live-css-server-hostname') &&
+            !editor.userPreference('live-css-server-port')
+        ) {
+            getServerDetailsFromUser(editor, function (err, serverDetails) {
+                if (!err) {
+                    callbackForReconfiguration(serverDetails);
+                }
+            });
+        }
+
+        var flagConnectedAtLeastOnce = false;
+        socket = io(backEndPath, {
+            // timeout: 5000
+            // reconnectionAttempts: 100
+        });
+        socket.on('error', function (err) {
+            // In case of "Invalid namespace", we open the UI for details to inform that they are using
+            // incompatible version of the live-css server
+            if (err === 'Invalid namespace') {
+                getServerDetailsFromUser(editor, function (err, serverDetails) {
+                    if (!err) {
+                        callbackForReconfiguration(serverDetails);
+                    }
+                });
+            }
+        });
+        socket.on('connect', function () {
+            flagConnectedAtLeastOnce = true;
+
+            if (!flagCallbackCalledOnce) {
+                flagCallbackCalledOnce = true;
+                callback(null, socket);
+            }
+
+            if ($toastrReconnectAttempt) {
+                $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                $toastrReconnectAttempt = null;
+            }
+
+            $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+            $toastrConnected = toastr.success(
+                '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                    backEndPathToShowToUser +
+                '</div>' +
+                '<div>' +
+                '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
+                    '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
+                '</div>',
+                'Connected with live-css server at:',
+                {
+                    onclick: function (evt) {
+                        if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                            toastr.clear($toastrConnected, {force: true});
+                            getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                if (!err) {
+                                    callbackForReconfiguration(serverDetails);
+                                }
+                            });
+                        } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
+                            toastr.clear($toastrConnected, {force: true});
+                        }
+                    }
+                }
+            );
+            var $toastrToHide = $toastrConnected;
+            setTimeout(function () {
+                toastr.clear($toastrToHide);
+            }, 4000);
+        });
+
+        socket.on('reconnect_attempt', function () {
+            if (flagConnectedAtLeastOnce) {
+                if ($toastrReconnectAttempt) {
+                    // do nothing
+                } else {
+                    if ($toastrConnected) {
+                        $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                    }
+                    $toastrReconnectAttempt = toastr.warning(
+                        '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                            backEndPathToShowToUser +
+                        '</div>' +
+                        '<div>' +
+                            '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right">Cancel</button>' +
+                            '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
+                        '</div>',
+                        'Reconnecting with live-css server at:',
+                        {
+                            timeOut: 0,
+                            onclick: function (evt) {
+                                if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                                    getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                        if (!err) {
+                                            callbackForReconfiguration(serverDetails);
+                                        }
+                                    });
+                                } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
+                                    if (socket) {
+                                        socket.close();
+                                        socket = null;
+                                    }
+                                    toastr.clear($toastrReconnectAttempt, {force: true});
+                                    liveCssServerSessionClosedByUser(editor);
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        });
+    };
+
+    var getDisconnectedWithBackEnd = function (editor, options, cb) {
+        if (socket) {
+            socket.close();
+            socket = null;
+        }
+        if ($toastrConnected) {
+            toastr.clear($toastrConnected, {force: true});
+        }
+        if ($toastrConnecting) {
+            toastr.clear($toastrConnecting, {force: true});
+        }
+        if ($toastrReconnectAttempt) {
+            toastr.clear($toastrReconnectAttempt, {force: true});
+        }
+        cb();
+    };
+
     var isMac = false;
     try {
         isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -618,12 +1322,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             window.generateSelector(targetElement, {skipClass: 'magicss-mouse-over-dom-element', sortClasses: true, reverseClasses: true})
                         ];
                     } catch (e) {
-                        var errorMessage = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
+                        var errorMessageHTML = 'Sorry! Magic CSS encountered an error in generating CSS selector!<br />Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>';
+                        var errorMessageConsole = 'Sorry! Magic CSS encountered an error in generating CSS selector!\nKindly report this issue at https://github.com/webextensions/live-css-editor/issues (GitHub repository for Magic CSS)';
                         // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
                         //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
                         //               always gets fired
-                        setTimeout(function() { utils.alertNote(errorMessage, 10000); }, 0);
-                        console.log(errorMessage);
+                        setTimeout(function() { utils.alertNote(errorMessageHTML, 10000); }, 0);
+                        console.log(errorMessageConsole);
                         console.log(e);     // The user might wish to add these detais for the report/issue in GitHub about this error.
                     }
                     suggestedSelectors = suggestedSelectors.filter(function(item, pos, self) {
@@ -731,7 +1436,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $div.attr('class', 'magicss-block-click');
                     $div.css('position', 'fixed');
                     $div.css('background-color', 'rgba(0,0,0,0)');
-                    $div.css('z-index', '2147483647');
+                    $div.css('z-index', '2147483600');
                     $div.css('width', '100%');
                     $div.css('height', '100%');
                     $div.css('left', '0px');
@@ -790,7 +1495,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         sources = sources.concat(
                                             window.existingCSSSelectors[matchingSelectors[i]].map(function (item) {
                                                 // Remove the "reloadedAt=..." part from the URL
-                                                return item.replace(/[?&]reloadedAt=[\d-_:]+/, '');
+                                                return item.replace(/[?&]reloadedAt=[\d-_:.]+/, '');
                                             })
                                         );
                                     }
@@ -990,7 +1695,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             // Ensure that we don't send multiple load requests at once, by not sending request if previous one is still pending for succeess/failure
                             if (!window.isActiveLoadSassRequest) {
                                 window.isActiveLoadSassRequest = true;
-                                var sassJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.6/sass.sync.min.js',
+                                                // https://github.com/medialize/sass.js
+                                var sassJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js',
                                     preRunReplace = [{oldText: 'this,function', newText: 'window,function'}];   // Required for making Sass load in Firefox - Reference: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Xray_vision
                                 utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
 
@@ -1151,7 +1857,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                         if (icon && icon.cls) {
                             if (options.addOpaqueOnHoverClass) {
-                                icon.cls += ' magicss-opaque-on-hover';
+                                icon.cls += ' editor-opaque-on-hover';
                             }
                         }
                     }
@@ -1316,75 +2022,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     },
                     bgColor: '68,88,174,0.85',
                     headerIcons: [
-                        {
-                            name: 'point-and-click',
-                            title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
-                            cls: 'magicss-point-and-click',
-                            onclick: function (evt, editor) {
-                                togglePointAndClick(editor);
-                                editor.focus();
+                        (function () {
+                            if (executionCounter < 25 || 50 <= executionCounter) {
+                                return null;
+                            } else {
+                                return iconForRateUs({addOpaqueOnHoverClass: true});
                             }
-                        },
-                        {
-                            name: 'beautify',
-                            title: 'Beautify code',
-                            cls: 'magicss-beautify magicss-gray-out',
-                            onclick: function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    utils.alertNote('Please type some code to be beautified', 5000);
-                                } else {
-                                    var beautifiedCSS = beautifyCSS(textValue);
-                                    if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Your code has been beautified :-)', 5000);
-                                    } else {
-                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
-                                    }
-                                }
-                                editor.focus();
-                            }
-                        },
-                        {
-                            name: 'disable',
-                            title: 'Deactivate code',
-                            cls: 'magicss-disable-css magicss-gray-out',
-                            onclick: function (evt, editor, divIcon) {
-                                if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
-                                    editor.disableEnableCSS('enable');
-                                } else {
-                                    editor.disableEnableCSS('disable');
-                                }
-                                editor.focus();
-                            },
-                            afterrender: function (editor, divIcon) {
-                                // TODO: Make the code independent of this setTimeout logic.
-                                setTimeout(function () {
-                                    if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
-                                        divIcon.title = 'Activate code';
-                                    } else {
-                                        divIcon.title = 'Deactivate code';
-                                    }
-                                }, 0);
-
-                                /* HACK: Remove this hack which is being used to handle "divIcon.title" change
-                                         for the case of "editor.disableEnableCSS('disable')" under "reInitialized()" */
-                                editor.originalDisableEnableCSS = editor.disableEnableCSS;
-                                editor.disableEnableCSS = function (doWhat) {
-                                    var state = editor.originalDisableEnableCSS(doWhat);
-                                    if (state === 'disabled') {
-                                        divIcon.title = 'Activate code';
-                                    } else {
-                                        divIcon.title = 'Deactivate code';
-                                    }
-                                    return state;
-                                };
-                            }
-                        },
+                        }()),
                         {
                             name: 'reapply',
                             title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
-                            cls: 'magicss-reapply-styles magicss-gray-out',
+                            cls: 'magicss-reapply-styles editor-gray-out',
                             onclick: function (evt, editor, divIcon) {
                                 if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
                                     markAsPinnedOrNotPinned(editor, 'not-pinned');
@@ -1421,13 +2069,123 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.focus();
                             }
                         },
-                        (function () {
-                            if (executionCounter < 25 || 50 <= executionCounter) {
-                                return null;
-                            } else {
-                                return iconForRateUs({addOpaqueOnHoverClass: true});
+                        {
+                            name: 'disable',
+                            title: 'Deactivate code',
+                            cls: 'magicss-disable-css editor-gray-out',
+                            onclick: function (evt, editor, divIcon) {
+                                if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
+                                    editor.disableEnableCSS('enable');
+                                } else {
+                                    editor.disableEnableCSS('disable');
+                                }
+                                editor.focus();
+                            },
+                            afterrender: function (editor, divIcon) {
+                                // TODO: Make the code independent of this setTimeout logic.
+                                setTimeout(function () {
+                                    if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
+                                        divIcon.title = 'Activate code';
+                                    } else {
+                                        divIcon.title = 'Deactivate code';
+                                    }
+                                }, 0);
+
+                                /* HACK: Remove this hack which is being used to handle "divIcon.title" change
+                                         for the case of "editor.disableEnableCSS('disable')" under "reInitialized()" */
+                                editor.originalDisableEnableCSS = editor.disableEnableCSS;
+                                editor.disableEnableCSS = function (doWhat) {
+                                    var state = editor.originalDisableEnableCSS(doWhat);
+                                    if (state === 'disabled') {
+                                        divIcon.title = 'Activate code';
+                                    } else {
+                                        divIcon.title = 'Deactivate code';
+                                    }
+                                    return state;
+                                };
                             }
-                        }())
+                        },
+                        /*
+                        {
+                            name: 'beautify',
+                            title: 'Beautify code',
+                            cls: 'magicss-beautify editor-gray-out',
+                            onclick: function (evt, editor) {
+                                var textValue = editor.getTextValue();
+                                if (!textValue.trim()) {
+                                    utils.alertNote('Please type some code to be beautified', 5000);
+                                } else {
+                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    if (textValue.trim() !== beautifiedCSS.trim()) {
+                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been beautified :-)', 5000);
+                                    } else {
+                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
+                                    }
+                                }
+                                editor.focus();
+                            }
+                        },
+                        /* */
+                        {
+                            name: 'css-reloader-and-file-changes-watcher',
+                            title: 'CSS reloader and watch file changes',
+                            cls: 'magicss-reload-css-resources editor-gray-out cancelDragHandle',
+                            icons: [
+                                {
+                                    name: 'stopWatchingCssFiles',
+                                    title: 'Stop watching CSS files',
+                                    // cls: 'magicss-watch-resources',
+                                    uniqCls: 'magicss-stop-watch-and-reload-link-tags',
+                                    onclick: function (evt, editor) {
+                                        if (flagWatchingCssFiles) {
+                                            getDisconnectedWithBackEnd(
+                                                editor,
+                                                {},
+                                                function () {
+                                                    updateUiMentioningNotWatchingCssFiles(editor);
+                                                }
+                                            );
+                                        }
+                                        editor.focus();
+                                    }
+                                },
+                                {
+                                    name: 'watchCssFiles',
+                                    title: 'Watch CSS files to apply changes automatically',
+                                    // cls: 'magicss-watch-resources',
+                                    uniqCls: 'magicss-watch-and-reload-link-tags',
+                                    onclick: function (evt, editor) {
+                                        if (!flagWatchingCssFiles) {
+                                            startWatchingFiles(editor);
+                                        }
+                                        editor.focus();
+                                    },
+                                    beforeShow: function (origin, tooltip) {
+                                        tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
+                                    }
+                                },
+                                {
+                                    name: 'reload-css-resources',
+                                    title: 'Reload all CSS resources',
+                                    cls: 'magicss-reload-all-css-resources',
+                                    uniqCls: 'magicss-reload-all-css-resources',
+                                    onclick: function (evt, editor) {
+                                        reloadAllCSSResourcesInPage();
+                                        editor.focus();
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            name: 'point-and-click',
+                            title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
+                            cls: 'magicss-point-and-click',
+                            onclick: function (evt, editor) {
+                                togglePointAndClick(editor);
+                                editor.focus();
+                            }
+                        }
                     ],
                     headerOtherIcons: [
                         (function () {
@@ -1510,6 +2268,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 }
                             },
                             beforeShow: function (origin, tooltip, editor) {
+                                // TODO: Move the .addClass() calls to their corresponding .beforeShow()
                                 tooltip
                                     .addClass(
                                         getLanguageMode() === 'less' ?
@@ -1541,12 +2300,56 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         /* */
+
+                        /*
                         {
                             name: 'reload-css-resources',
                             title: 'Reload CSS resources',
                             uniqCls: 'magicss-reload-css-resources',
                             onclick: function (evt, editor) {
-                                reloadCSSInPage();
+                                reloadAllCSSResourcesInPage();
+                                editor.focus();
+                            }
+                        },
+                        /* */
+                        {
+                            name: 'beautify',
+                            title: 'Beautify code',
+                            uniqCls: 'magicss-beautify',
+                            onclick: function (evt, editor) {
+                                var textValue = editor.getTextValue();
+                                if (!textValue.trim()) {
+                                    utils.alertNote('Please type some code to be beautified', 5000);
+                                } else {
+                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    if (textValue.trim() !== beautifiedCSS.trim()) {
+                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been beautified :-)', 5000);
+                                    } else {
+                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
+                                    }
+                                }
+                                editor.focus();
+                            }
+                        },
+                        {
+                            name: 'minify',
+                            title: 'Minify code',
+                            uniqCls: 'magicss-minify',
+                            onclick: function (evt, editor) {
+                                var textValue = editor.getTextValue();
+                                if (!textValue.trim()) {
+                                    editor.setTextValue('').reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                    utils.alertNote('Please type some code to be minified', 5000);
+                                } else {
+                                    var minifiedCSS = utils.minifyCSS(textValue);
+                                    if (textValue !== minifiedCSS) {
+                                        editor.setTextValue(minifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been minified' + noteForUndo, 5000);
+                                    } else {
+                                        utils.alertNote('Your code is already minified', 5000);
+                                    }
+                                }
                                 editor.focus();
                             }
                         },
@@ -1597,27 +2400,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         {
-                            name: 'minify',
-                            title: 'Minify',
-                            uniqCls: 'magicss-minify',
-                            onclick: function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    editor.setTextValue('').reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                    utils.alertNote('Please type some code to be minified', 5000);
-                                } else {
-                                    var minifiedCSS = utils.minifyCSS(textValue);
-                                    if (textValue !== minifiedCSS) {
-                                        editor.setTextValue(minifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Your code has been minified' + noteForUndo, 5000);
-                                    } else {
-                                        utils.alertNote('Your code is already minified', 5000);
-                                    }
-                                }
-                                editor.focus();
-                            }
-                        },
-                        {
                             name: 'gist',
                             title: 'Mail code (via Gist)',
                             uniqCls: 'magicss-email',
@@ -1638,16 +2420,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         getMagicCSSForEdge,
                         getMagicCSSForFirefox,
                         {
-                            name: 'github-repo',
-                            title: 'Contribute / Report issue',
-                            uniqCls: 'magicss-github-repo',
-                            href: 'https://github.com/webextensions/live-css-editor'
-                        },
-                        {
                             name: 'share-on-facebook',
                             title: 'Share this extension with friends',
                             uniqCls: 'magicss-share-on-facebook',
                             href: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser)
+                        },
+                        {
+                            name: 'github-repo',
+                            title: 'Contribute / Report issue',
+                            uniqCls: 'magicss-github-repo',
+                            href: 'https://github.com/webextensions/live-css-editor'
                         },
                         {
                             name: 'options',
@@ -1699,6 +2481,62 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         return $footerItems;
                     },
                     events: {
+                        beforeInstantiatingCodeMirror: function (editor) {
+                            // Need to add font-styling before CodeMirror is instantiated
+                            if (editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
+                                var userPrefFontSizeInPx = parseInt(editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                                if (userPrefFontSizeInPx !== 12) {
+                                    var cssLintErrorWarningMarkerSize = 16;
+                                    if (userPrefFontSizeInPx < 12) {
+                                        cssLintErrorWarningMarkerSize = Math.round(userPrefFontSizeInPx * 1.2);
+                                    }
+                                    utils.addStyleTag({
+                                        attributes: [{
+                                            name: 'data-style-created-by',
+                                            value: 'magicss'
+                                        }],
+                                        cssText: [
+                                            '#' + id + ' *,',
+                                            '.alert-note-text,',
+                                            '.tooltipster-base ul li a,',
+                                            '.CodeMirror-hints *,',
+                                            '.CodeMirror-lint-message-error,',
+                                            '.CodeMirror-lint-message-warning {',
+                                            '    font-size: ' + userPrefFontSizeInPx + 'px !important;',
+                                            '}',
+                                            '.CodeMirror-overwrite .CodeMirror-cursor {',
+                                            '    width: ' + Math.round(userPrefFontSizeInPx * 62 / 100) + 'px;',
+                                            '}',
+                                            '.CodeMirror-lint-tooltip {',
+                                            '    max-width: ' + Math.round(600 * userPrefFontSizeInPx / 12) + 'px;',
+                                            '}',
+                                            '.CodeMirror-lint-marker-error,',
+                                            '.CodeMirror-lint-marker-warning {',
+                                            '    padding: ' + Math.round(((userPrefFontSizeInPx * 1.2) - cssLintErrorWarningMarkerSize) / 2) + 'px 0;',
+                                            (function () {
+                                                if (cssLintErrorWarningMarkerSize <= 16) {
+                                                    var size = cssLintErrorWarningMarkerSize;
+                                                    return 'width: ' + size + 'px; height: ' + size + 'px;';
+                                                }
+                                                return '';
+                                            }()),
+                                            '}',
+                                            (function () {
+                                                if (userPrefFontSizeInPx < 12) {
+                                                    return (
+                                                        '.CodeMirror-lint-message-error, .CodeMirror-lint-message-warning {' +
+                                                        '    background-size: contain;' +
+                                                        '}'
+                                                    );
+                                                }
+                                                return '';
+                                            }())
+                                        ].join('\n'),
+                                        parentTag: 'body'
+                                    });
+                                }
+                            }
+                        },
                         launched: function (editor) {
                             utils.addStyleTag({
                                 attributes: [{
@@ -1745,6 +2583,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.indicateEnabledDisabled('disabled');
                             } else {
                                 editor.indicateEnabledDisabled('enabled');
+                            }
+
+                            var watchingCssFiles = editor.userPreference('watching-css-files') === 'yes';
+                            if (watchingCssFiles) {
+                                startWatchingFiles(editor);
                             }
 
                             var applyStylesAutomatically = editor.userPreference('apply-styles-automatically') === 'yes';

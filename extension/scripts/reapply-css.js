@@ -1,6 +1,10 @@
 /* globals utils, amplify */
 
 (function () {
+    var showReapplyingStylesNotification = true;
+    if (window.hideReapplyingStylesNotification === true) {
+        showReapplyingStylesNotification = false;
+    }
     // TODO: Refactor/Reuse the definition of "userPreference"
     var userPreference = function (pref, value) {
         var prefix = 'MagiCSS-bookmarklet-';
@@ -22,12 +26,16 @@
     var cssText = userPreference(localStorageLastAppliedCss).trim();
 
     if (cssText && applyStylesAutomatically && !disableStyles) {
-        utils.alertNote('Activating styles provided in Magic CSS.<br/><span style="font-weight:normal;">Run Magic CSS extension to make any changes.</span>', 500, {
+        var showReapplyingStylesNotificationAt = (window.showReapplyingStylesNotificationAt || 'top-right').split('-');
+        var verticalAlignment = showReapplyingStylesNotificationAt[0] || 'top',
+            horizontalAlignment = showReapplyingStylesNotificationAt[1] || 'right';
+        var alertNoteConfig = {
             unobtrusive: true,
-            alignment: 'right',
-            margin: '0'
-        });
-        setTimeout(function () {
+            verticalAlignment: verticalAlignment,
+            horizontalAlignment: horizontalAlignment
+        };
+
+        try {
             var id = 'MagiCSS-bookmarklet',
                 newStyleTagId = id + '-html-id',
                 newStyleTag = new utils.StyleTag({
@@ -45,11 +53,23 @@
             newStyleTag.disabled = disableStyles;
             newStyleTag.applyTag();
 
-            utils.alertNote('Activated styles provided in Magic CSS.<br/><span style="font-weight:normal;">Run Magic CSS extension to make any changes.</span>', 5000, {
-                unobtrusive: true,
-                alignment: 'right',
-                margin: '0'
-            });
-        }, 500);
+            if (showReapplyingStylesNotification) {
+                utils.alertNote(
+                    'Activated styles provided in Magic CSS.<br/><span style="font-weight:normal;">Run Magic CSS extension to make any changes.</span>',
+                    5000,
+                    alertNoteConfig
+                );
+            }
+        } catch (e) {
+            // The code should never reach here. Just being cautious :-)
+            console.log('An unexpected error was encountered by Magic CSS.');
+            console.log(e);
+            console.log('Kindly report this issue at:\n    https://github.com/webextensions/live-css-editor/issues');
+            utils.alertNote(
+                'Error: Unable to auto-apply Magic CSS styles' +
+                '<br/>Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>',
+                10000
+            );
+        }
     }
 }());

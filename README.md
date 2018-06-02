@@ -87,8 +87,10 @@ Visit https://webextensions.org/ for further details
 **Inspirations:**
 * "Auto-generate CSS selectors with point-and-click" feature is partly inspired by the Chrome extensions SelectorGadget and Stylebot
 
-**Connect to us at:**
+**Author:**
+* Priyank Parashar - [GitHub](https://github.com/paras20xx) | [Twitter](https://twitter.com/paras20xx) | [LinkedIn](https://linkedin.com/in/ParasharPriyank/)
+
+**Connect to us:**
 * https://webextensions.org/
 * [GitHub](https://github.com/webextensions/live-css-editor)
 * [Twitter](https://twitter.com/webextensions)
-* [LinkedIn - Priyank Parashar](https://linkedin.com/in/ParasharPriyank/)

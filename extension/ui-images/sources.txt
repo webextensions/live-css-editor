@@ -5,6 +5,9 @@ ban.svg
 ban_edited.svg
     Slightly edited version of "ban.svg"
 
+ban_edited-yellow.svg
+    Slightly edited version of "ban.svg"
+
 compress.svg
     https://www.iconfinder.com/icons/1608651/compress_icon#size=128
     https://www.iconfinder.com/icons/1608651/download/svg/128
@@ -63,11 +66,25 @@ mail.svg
 mail_edited.svg
     Slightly edited version (using http://vectorpaint.yaks.co.nz/) of "mail.svg"
 
+plus.svg
+    https://www.iconfinder.com/icons/103172/add_plus_icon#size=128
+    https://www.iconfinder.com/icons/103172/download/svg/128
+
+plus_edited.svg
+    Slightly edited version of "plus.svg"
+
 point-and-click.png
     chrome-devtools://devtools/bundled/Images/toolbarButtonGlyphs_2x.png (in Google Chrome browser)
 
 reload.svg
     https://www.iconfinder.com/icons/326543/loop_reload_replay_icon#size=128
+
+reload_edited.svg
+    Slightly edited version of "reload.svg"
+
+smiley.svg
+    https://www.iconfinder.com/icons/1608409/o_smile_icon#size=128
+    https://www.iconfinder.com/icons/1608409/download/svg/128
 
 settings.svg
     https://www.iconfinder.com/icons/326699/settings_icon#size=128
@@ -83,3 +100,17 @@ unordered-list_edited.svg
 warning.svg
     https://www.iconfinder.com/icons/293711/warning_icon#size=128
     https://www.iconfinder.com/icons/293711/download/svg/128
+
+warning-circle.svg
+    https://www.iconfinder.com/icons/183525/error_exclamation_mark_warning_icon#size=128
+    https://www.iconfinder.com/icons/183525/download/svg/128
+
+warning-circle_edited.svg
+    Slightly edited version of "reload.svg"
+
+watch.svg
+    https://www.iconfinder.com/icons/2561502/watch_icon#size=128
+    https://www.iconfinder.com/icons/2561502/download/svg/128
+
+watch_edited.svg
+    Slightly edited version of "watch.svg"

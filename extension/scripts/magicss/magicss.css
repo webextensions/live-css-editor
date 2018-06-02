@@ -3,10 +3,32 @@
 }
 
 #MagiCSS-bookmarklet * {
-    font-size: 12px !important;
     -webkit-box-sizing: content-box !important;
     box-sizing: content-box !important;
 }
+
+/* Begin: CSS changes related to font-size */
+.alert-note-text,
+.tooltipster-base ul li a,
+#MagiCSS-bookmarklet *,
+.CodeMirror-hints *,
+.CodeMirror-lint-message-error,
+.CodeMirror-lint-message-warning {
+    /* Set this value flexibly, to fix https://github.com/webextensions/live-css-editor/issues/12 */
+    font-size: 12px !important;
+}
+
+.CodeMirror-lint-message-error,
+.CodeMirror-lint-message-warning {
+    background-position-y: center;
+}
+.CodeMirror-lint-marker-error,
+.CodeMirror-lint-marker-warning {
+    background-size: contain;
+}
+/* End: CSS changes related to font-size */
+
+/* TODO: Vertical middle aligning of background color shown inside CodeMirror (increase the text font size to see the current effect) */
 
 /* Don't highlight Magic CSS components when the user types a selector which matches them,
    similarly, exclude them from the selector match(es) count */
@@ -17,9 +39,22 @@
     outline: 0 !important;
 }
 
+#MagiCSS-bookmarklet .magic-css-header {
+    display: flex;
+}
+
+#MagiCSS-bookmarklet .magic-css-header .magic-css-header-left-section {
+    margin-right: auto;
+    margin-top: 7px;
+}
+
 #MagiCSS-bookmarklet .editor-icon {
     width: 16px;
     height: 16px;
+
+    /* For vertical middle aligning using flex */
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 #MagiCSS-bookmarklet .editor-icon.editor-icon-close,
@@ -29,7 +64,6 @@
 }
 
 .magicss-title {
-    float: left;
     background-color: #4458ae;
     border-radius: 5px 5px 0 0;
     padding-left: 5px;
@@ -40,7 +74,7 @@
     font-family: Helvetica, "Trebuchet MS", sans-serif;
     overflow: auto;
     font-size: 15px;
-    line-height: 20px;
+    line-height: 1.7;
     cursor: default;
 }
 
@@ -75,35 +109,21 @@
 .magicss-selected-mode-sass .magicss-mode-sass,
 .magicss-selected-mode-css .magicss-mode-css {
     opacity: 1;
-    color: #ffff00;
-}
-
-
-.magicss-gray-out {
-    -webkit-filter: grayscale(1);
-    filter: grayscale(1);
-}
-.magicss-gray-out:hover {
-    -webkit-filter: none;
-    filter: none;
-}
-
-.magicss-opaque-on-hover {
-    opacity: 0.66;
-}
-.magicss-opaque-on-hover:hover {
-    opacity: 1;
+    color: #ff0;
 }
 
 .magicss-disable-css {
-    /* Source: http://findicons.com/icon/download/116499/150/16/png */
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJFSURBVHjapJO/T1pRFMe/Dx7ypEXri4lUGUhsHF40hODSpQ61cTH+2HSoZaF1dHSxpU7+Ca04NE7dyuBiapcuLFokTdD4A01awNdBSkAf8ut5zhUoxq3e5OS+nPv5nnvuyfdJpmniPksSBd68aM1pFDMU4xS+ei5GsUHxmSLRJD9+hcx7rVqFZWwMtc3NIGy2Zam31yX19ABdXTdgNuszdd1nptNBlMtviQ0TC0ujg1LgGWNByelctQ4M4G8qhfN4HLmDA6HvpJzq9eJRXx+qlDPz+deUDrd9+i6KoFouazVg2erx4M/uLn5FItGLk5NX/qUliYO+I2o2C4vLBWaYZQ1rRYFyqTQDVXXl02mcb29HbXb7S+/CwjqKRSAaDXlHRqYwOoqdxUUww6zQNApUSqVxuaMDF8kk2hTlgxYIHMMwaHSxEB2/a4g7u7sjzDDLmn8dXF35ZJsNVWrzycTEOtxuYH//lpjWezqbZoZZ1rQ+AXyj3eEQO7a27oj9s7OhVkZoWjqIFXUdD1QVub29L3fEk5MhXF7y2RwzzLKmdQYb+UwGiqLwO6duiVdWxM2GrvfTfOaZYZY1TScmvE7NKsvf3B6PyzE8jB9ra6DJR2TTnBYXSNIcbfN021Mjl8Pv09OzaqXyXIvnE6LAT00RRlLa21cfk1kesgNpULBab5xITiUHokADzJDJioYhjDSUKNafUKlgaHAwXCCHJQ8Pz1JHRyhQm2RhEfzNOT5jhlnWNJ+w0y/918/kPzbrf+M91rUAAwCuQDz94e2kLwAAAABJRU5ErkJggg==');
-    -webkit-filter: grayscale(1);
-    filter: grayscale(1);
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited-yellow.svg */
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB3aWR0aD0iMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQ0MCA4OTNxMC0xNjEtODctMjk1bC03NTQgNzUzcTEzNyA4OSAyOTcgODkgMTExIDAgMjExLjUtNDMuNXQxNzMuNS0xMTYuNSAxMTYtMTc0LjUgNDMtMjEyLjV6bS05OTkgMjk5bDc1NS03NTRxLTEzNS05MS0zMDAtOTEtMTQ4IDAtMjczIDczdC0xOTggMTk5LTczIDI3NHEwIDE2MiA4OSAyOTl6bTEyMjMtMjk5cTAgMTU3LTYxIDMwMHQtMTYzLjUgMjQ2LTI0NSAxNjQtMjk4LjUgNjEtMjk4LjUtNjEtMjQ1LTE2NC0xNjMuNS0yNDYtNjEtMzAwIDYxLTI5OS41IDE2My41LTI0NS41IDI0NS0xNjQgMjk4LjUtNjEgMjk4LjUgNjEgMjQ1IDE2NCAxNjMuNSAyNDUuNSA2MSAyOTkuNXoiIGZpbGw9IiNGQ0Q2NEQiLz48L3N2Zz4K');
+    background-size: contain;
 }
 .indicate-disabled#MagiCSS-bookmarklet .magicss-disable-css {
-    -webkit-filter: drop-shadow(0px 0px 10px #ff0000);
-    filter: drop-shadow(0px 0px 7px #ff0000);
+    /* In some other scenarios, we use:
+           "drop-shadow(0px 0px 7px #ff0)"
+       But, for this icon, it looks a little calm with:
+           "drop-shadow(0px 0px 10px #ff0)" */
+    -webkit-filter: drop-shadow(0px 0px 10px #ff0);
+    filter: drop-shadow(0px 0px 10px #ff0);
 }
 
 .magicss-point-and-click {
@@ -115,6 +135,34 @@
     opacity: 0.85;
 }
 
+.magicss-watch-and-reload-link-tags,
+.magicss-stop-watch-and-reload-link-tags {
+    background-size: 16px;
+    background-repeat: no-repeat;
+}
+
+.magicss-watch-and-reload-link-tags {
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/watch.svg */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgZmlsbD0ibm9uZSIgaGVpZ2h0PSIyNCIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iNyIvPjxwb2x5bGluZSBwb2ludHM9IjEyIDkgMTIgMTIgMTMuNSAxMy41Ii8+PHBhdGggZD0iTTE2LjUxIDE3LjM1bC0uMzUgMy44M2EyIDIgMCAwIDEtMiAxLjgySDkuODNhMiAyIDAgMCAxLTItMS44MmwtLjM1LTMuODNtLjAxLTEwLjdsLjM1LTMuODNBMiAyIDAgMCAxIDkuODMgMWg0LjM1YTIgMiAwIDAgMSAyIDEuODJsLjM1IDMuODMiLz48L3N2Zz4=");
+}
+.li-magicss-watch-and-reload-link-tags {
+    display: none;
+}
+.tooltipster-watching-css-files-disabled .li-magicss-watch-and-reload-link-tags {
+    display: block;
+}
+
+.magicss-stop-watch-and-reload-link-tags {
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/watch_edited.svg */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgZmlsbD0ibm9uZSIgaGVpZ2h0PSIyNCIgc3Ryb2tlPSIjZmVkMTM4IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iNyIvPjxwb2x5bGluZSBwb2ludHM9IjEyIDkgMTIgMTIgMTMuNSAxMy41Ii8+PHBhdGggZD0iTTE2LjUxIDE3LjM1bC0uMzUgMy44M2EyIDIgMCAwIDEtMiAxLjgySDkuODNhMiAyIDAgMCAxLTItMS44MmwtLjM1LTMuODNtLjAxLTEwLjdsLjM1LTMuODNBMiAyIDAgMCAxIDkuODMgMWg0LjM1YTIgMiAwIDAgMSAyIDEuODJsLjM1IDMuODMiLz48L3N2Zz4=");
+}
+.li-magicss-stop-watch-and-reload-link-tags {
+    display: none;
+}
+.tooltipster-watching-css-files-enabled .li-magicss-stop-watch-and-reload-link-tags {
+    display: block;
+}
+
 .magicss-cache-image-to-prevent-CSP-problem-point-and-click-hover,
 .magicss-point-and-click:hover,
 .magicss-point-and-click-activated .magicss-point-and-click {
@@ -123,8 +171,8 @@
 }
 
 .magicss-point-and-click-activated .magicss-point-and-click {
-    -webkit-filter: drop-shadow(0px 0px 10px #ffff00);
-    filter: drop-shadow(0px 0px 7px #ffff00);
+    -webkit-filter: drop-shadow(0px 0px 10px #ff0);
+    filter: drop-shadow(0px 0px 7px #ff0);
 }
 
 .magicss-reapply-styles {
@@ -133,8 +181,8 @@
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyNCIgdmVyc2lvbj0iMS4xIiB3aWR0aD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6Y2M9Imh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL25zIyIgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgLTEwMjguNCkiPjxnIHRyYW5zZm9ybT0ibWF0cml4KC43MDcxMSAuNzA3MTEgLS43MDcxMSAuNzA3MTEgNzM3LjY4IDI5Ny43MikiPjxwYXRoIGQ9Im0xMSAxMDI4LjR2MTNoMSA2LjQwNmMtMC41OTUtMS4xLTEuNDE2LTIuMS0yLjQwNi0yLjh2LThjMC42MTYtMC42IDEuMTMxLTEuNCAxLjUzMS0yLjJoLTUuNTMxLTF6IiBmaWxsPSIjZmVkMTM4Ii8+PHBhdGggZD0ibTExIDEzdjIgNCAybDEgMnYtMi02LTJoLTF6IiBmaWxsPSIjZmZmIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEwMjguNCkiLz48cGF0aCBkPSJtMTIgMTN2MiA0IDIgMmwxLTJ2LTItNC0yaC0xeiIgZmlsbD0iI2ZmZiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAxMDI4LjQpIi8+PHBhdGggZD0ibTYuNDY4OCAxMDI4LjRjMC40MDA2IDAuOCAwLjkxNSAxLjYgMS41MzEyIDIuMnY4Yy0wLjk4OTcgMC43LTEuODExMyAxLjctMi40MDYyIDIuOGg2LjQwNjJ2LTEzaC01LjUzMTJ6IiBmaWxsPSIjZmVkMTM4Ii8+PC9nPjwvZz48L3N2Zz4=");
 }
 .magic-css-apply-styles-automatically .magicss-reapply-styles {
-    -webkit-filter: drop-shadow(0px 0px 10px #ffff00);
-    filter: drop-shadow(0px 0px 7px #ffff00);
+    -webkit-filter: drop-shadow(0px 0px 10px #ff0);
+    filter: drop-shadow(0px 0px 7px #ff0);
 }
 /* When the styles are disabled, then also Magic CSS doesn't reapply styles */
 .indicate-disabled .magicss-reapply-styles {
@@ -142,8 +190,8 @@
 }
 
 .magicss-beautify {
-    /* Source: http://www.iconfinder.com/icondetails/10227/16/smile_smiley_icon (http://www.iconfinder.com/icons/10227/download/png/16) */
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gsNEzMIhYrOGAAAAmtJREFUOMutk71PU2EUh5/33tIKV9vyoQhC0YYIKvEjQtTEQSOb3XRwMjK46eDGP6CMbi7GUCfR4GQdTIyufsZoUKIRFEQLFAv9uL297b3vcYBUMWx6lpOcnDznl985B/4x1N8Feb9vO6grgnFGCMRFfMQrTyPufdHe9eDhufkNAZK+ZpC9dw78m3g/G/DmQeu1LgNfRfGxSlrk4kq5d6zt+GO9HvCh/wK6OIr7BbS7gTYQAlSkEV8Hhqwj6WQNIJNHd6Dtj7ifLALuancVkD901q3likmpGrW1mD1bji1+NwDwC8P4S1au4JF82MP4kzhl9/fksmsy/iROMtVLvqipUyXLkPIwQABAVDCh/Hkmv23l9uMelFQ4crCRztAbEE0mV8+NB32IVOntjnC0+y2OLQng8ioA1aW00NFis7t9iWhzJ5HtB8B+B2giVoWB3WlW3J10xPvA/IzW5a6aB97EAW06bxUK2NQKkQSUvkLhKbC2iWAYIqehakP+Ecs5Q5pOOsaqAr8ygzJ2gqZaXMDN3mJzPWDU7Ce37FCXv0NDaM1bFZypeYB2Ur6KXjKNLBNTLTx8EePE/kViW3MAzGYsUs9jDPYXGOyfolzwMfBSNYBPaERhDZmSsyKWg11p5urdGG3RDADprMWhvWG6e8NAEbc6Z3seI+sOyXkVu6DEGQ0ZS2QLEV7PDvAjvwuA9m11HN6jaApOkF98QbVSGmo5RXIdIPMsYVjq5TkR72bQKDWYpsI3msEMYxpQKa/g2Esl8d2L03OM9Z9Hb/hM9rPGVtH+Fa31WV8TF61RyptWosfBux49wQL/M34BW2Yaj1Q8PX0AAAAASUVORK5CYII=');
+    /* Source: https://www.iconfinder.com/icons/1608409/o_smile_icon#size=128 (https://www.iconfinder.com/icons/1608409/download/svg/128) */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB3aWR0aD0iMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTI2MiAxMDc1cS0zNyAxMjEtMTM4IDE5NXQtMjI4IDc0LTIyOC03NC0xMzgtMTk1cS04LTI1IDQtNDguNXQzOC0zMS41cTI1LTggNDguNSA0dDMxLjUgMzhxMjUgODAgOTIuNSAxMjkuNXQxNTEuNSA0OS41IDE1MS41LTQ5LjUgOTIuNS0xMjkuNXE4LTI2IDMyLTM4dDQ5LTQgMzcgMzEuNSA0IDQ4LjV6bS00OTQtNDM1cTAgNTMtMzcuNSA5MC41dC05MC41IDM3LjUtOTAuNS0zNy41LTM3LjUtOTAuNSAzNy41LTkwLjUgOTAuNS0zNy41IDkwLjUgMzcuNSAzNy41IDkwLjV6bTUxMiAwcTAgNTMtMzcuNSA5MC41dC05MC41IDM3LjUtOTAuNS0zNy41LTM3LjUtOTAuNSAzNy41LTkwLjUgOTAuNS0zNy41IDkwLjUgMzcuNSAzNy41IDkwLjV6bTI1NiAyNTZxMC0xMzAtNTEtMjQ4LjV0LTEzNi41LTIwNC0yMDQtMTM2LjUtMjQ4LjUtNTEtMjQ4LjUgNTEtMjA0IDEzNi41LTEzNi41IDIwNC01MSAyNDguNSA1MSAyNDguNSAxMzYuNSAyMDQgMjA0IDEzNi41IDI0OC41IDUxIDI0OC41LTUxIDIwNC0xMzYuNSAxMzYuNS0yMDQgNTEtMjQ4LjV6bTEyOCAwcTAgMjA5LTEwMyAzODUuNXQtMjc5LjUgMjc5LjUtMzg1LjUgMTAzLTM4NS41LTEwMy0yNzkuNS0yNzkuNS0xMDMtMzg1LjUgMTAzLTM4NS41IDI3OS41LTI3OS41IDM4NS41LTEwMyAzODUuNSAxMDMgMjc5LjUgMjc5LjUgMTAzIDM4NS41eiIvPjwvc3ZnPg==");
 }
 
 .icon-chrome-web-store,
@@ -168,7 +216,7 @@
 }
 .more-icons.icon-microsoft-store {
     background-size: 14px !important;
-    background-position: 8px 5px !important;
+    background-position: 8px 50% !important;
 }
 
 .icon-firefox-add-ons-store {
@@ -179,7 +227,7 @@
 }
 .more-icons.icon-firefox-add-ons-store {
     background-image: url("data:image/svg+xml;base64,PCEtLSBUaGlzIFNvdXJjZSBDb2RlIEZvcm0gaXMgc3ViamVjdCB0byB0aGUgdGVybXMgb2YgdGhlIE1vemlsbGEgUHVibGljCiAgIC0gTGljZW5zZSwgdi4gMi4wLiBJZiBhIGNvcHkgb2YgdGhlIE1QTCB3YXMgbm90IGRpc3RyaWJ1dGVkIHdpdGggdGhpcwogICAtIGZpbGUsIFlvdSBjYW4gb2J0YWluIG9uZSBhdCBodHRwOi8vbW96aWxsYS5vcmcvTVBMLzIuMC8uIC0tPgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgNjQgNjQiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudC1saW5lYXItcHV6emxlLXBpZWNlIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHBhdGggZmlsbD0idXJsKCcjZ3JhZGllbnQtbGluZWFyLXB1enpsZS1waWVjZScpIiBkPSJNNDIsNjJjMi4yLDAsNC0xLjgsNC00bDAtMTQuMmMwLDAsMC40LTMuNywyLjgtMy43YzIuNCwwLDIuMiwzLjksNi43LDMuOWMyLjMsMCw2LjItMS4yLDYuMi04LjIgYzAtNy0zLjktNy45LTYuMi03LjljLTQuNSwwLTQuMywzLjctNi43LDMuN2MtMi40LDAtMi44LTMuOC0yLjgtMy44VjIyYzAtMi4yLTEuOC00LTQtNEgzMS41YzAsMC0zLjQtMC42LTMuNC0zIGMwLTIuNCwzLjgtMi42LDMuOC03LjFjMC0yLjMtMS4zLTUuOS04LjMtNS45cy04LDMuNi04LDUuOWMwLDQuNSwzLjQsNC43LDMuNCw3LjFjMCwyLjQtMy40LDMtMy40LDNINmMtMi4yLDAtNCwxLjgtNCw0bDAsNy44IGMwLDAtMC40LDYsNC40LDZjMy4xLDAsMy4yLTQuMSw3LjMtNC4xYzIsMCw0LDEuOSw0LDZjMCw0LjItMiw2LjMtNCw2LjNjLTQsMC00LjItNC4xLTcuMy00LjFjLTQuOCwwLTQuNCw1LjgtNC40LDUuOEwyLDU4IGMwLDIuMiwxLjgsNCw0LDRIMTljMCwwLDYuMywwLjQsNi4zLTQuNGMwLTMuMS00LTMuNi00LTcuN2MwLTIsMi4yLTQuNSw2LjQtNC41YzQuMiwwLDYuNiwyLjUsNi42LDQuNWMwLDQtMy45LDQuNi0zLjksNy43IGMwLDQuOSw2LjMsNC40LDYuMyw0LjRINDJ6Ii8+Cjwvc3ZnPgo=");
-    background-position: 8px 4px !important;
+    background-position: 8px 50% !important;
 }
 
 .icon-opera-add-ons-store {
@@ -190,34 +238,39 @@
 }
 
 /* Begin: More icons */
-body .tooltipster-default {
-    z-index: 2147483647;
+.magic-css-tooltipster.tooltipster-default {
+    z-index: 2147483600;
     background-color: #7A89C6;
 }
 
-body .tooltipster-default,
-body .tooltipster-arrow-border {
+.magic-css-tooltipster.tooltipster-default {
     border-color: #475A9B !important;
 }
+.magic-css-tooltipster .tooltipster-arrow-border {
+    border-top-color: #475A9B !important;
+    border-bottom-color: #475A9B !important;
+}
 
-body .tooltipster-default .tooltipster-content {
+.magic-css-tooltipster.tooltipster-default .tooltipster-content {
     padding: 0;
     margin: 0;
+    line-height: 1.4;
 }
-.tooltipster-content ul {
+.magic-css-tooltipster .tooltipster-content ul {
     padding: 0;
     margin: 0;
+    list-style-position: initial;
 }
 
-.tooltipster-content ul li {
+.magic-css-tooltipster .tooltipster-content ul li {
     padding: 0;
 }
 
-.tooltipster-content ul li:hover {
+.magic-css-tooltipster .tooltipster-content ul li:hover {
     background-color: #5A69A6 !important;
 }
 
-.tooltipster-base ul li a {
+.magic-css-tooltipster.tooltipster-base ul li a {
     color: #fff;
     text-decoration: none;
     font-size: 11px;
@@ -226,8 +279,11 @@ body .tooltipster-default .tooltipster-content {
     padding: 3px 10px 1px 25px;
 }
 
+.magic-css-tooltipster .tooltipster-content > ul li a {
+    background-position: 7px 50%;
+}
+
 .more-icons {
-    background-position: 7px 5px !important;
     background-repeat: no-repeat !important;
     padding-left: 30px !important;
     min-height: 20px;
@@ -239,24 +295,47 @@ body .tooltipster-default .tooltipster-content {
 .magicss-less-or-sass-to-css {
     /* Source: https://upload.wikimedia.org/wikipedia/commons/8/81/LESS_Logo.svg */
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxklEQVQ4y53TMWpCQRCA4Q8JasAiRcQjWBixsUiRQPAwOYW9dmIpBMUTSCBtTpDOOoGQQBoru1RPmxUeq+CuA8OyMP8/sDPLcfQxQtMFcYcv7PCCm1zBPMBFOGdo5Ai6+AjwIZe4zpH0sI4kC9RyJH38RJIpqjmSe2wjyRBXOZKHSLDDc7mgckbwj03pXqCd2n2Av1LnAuNU+LG0UIecoJ4Cd/AZwfPUCbTwHcGrnFd/j+C33L/QwW+AXxOmdDKewv7fphTvATvpPMc4jdhXAAAAAElFTkSuQmCC");
-    background-position: 7px 4px !important;
 }
 
-.tooltipster-base ul li a.magicss-less-or-sass-to-css,
-.tooltipster-base ul li a.magicss-css-to-less {
+.magic-css-tooltipster.tooltipster-base ul li a.magicss-less-or-sass-to-css,
+.magic-css-tooltipster.tooltipster-base ul li a.magicss-css-to-less {
     opacity: 0.35;
 }
 
-.tooltipster-selected-mode-less.tooltipster-base ul li a.magicss-less-or-sass-to-css,
-.tooltipster-selected-mode-sass.tooltipster-base ul li a.magicss-less-or-sass-to-css,
-.tooltipster-selected-mode-css.tooltipster-base ul li a.magicss-css-to-less {
+.magic-css-tooltipster.tooltipster-base.tooltipster-selected-mode-less ul li a.magicss-less-or-sass-to-css,
+.magic-css-tooltipster.tooltipster-base.tooltipster-selected-mode-sass ul li a.magicss-less-or-sass-to-css,
+.magic-css-tooltipster.tooltipster-base.tooltipster-selected-mode-css ul li a.magicss-css-to-less {
     opacity: 1;
 }
 
+.magicss-reload-css-resources.editor-icon {
+    background-position: 2px 0px !important;
+}
+
 .magicss-reload-css-resources {
-    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iIzAwMDAwMCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4=");
+    /* background-image:
+        url("chrome-extension://__MSG_@@extension_id__/ui-images/reload_edited.svg"); */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iI2ZlZDEzOCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4=");
     background-size: 12px !important;
-    background-position: 9px 4px !important;
+    background-repeat: no-repeat;
+}
+
+.magicss-reload-css-resources:hover {
+    filter: none;
+}
+
+.watching-css-files .magicss-reload-css-resources {
+    -webkit-filter: drop-shadow(0px 0px 7px #ff0);
+    filter: drop-shadow(0px 0px 7px #ff0);
+}
+
+.magicss-reload-all-css-resources {
+    /* background-image:
+        url("chrome-extension://__MSG_@@extension_id__/ui-images/reload_edited.svg"); */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iIzAwMDAwMCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4="); /* */
+    background-size: 12px !important;
+    background-position: 9px 50% !important;
+    background-repeat: no-repeat;
 }
 
 /* TODO: Cleanup "Autocomplete CSS selectors" related CSS / JS / Images */
@@ -283,7 +362,7 @@ body .tooltipster-default .tooltipster-content {
     background-image:
         url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA2MSA0NyIgaGVpZ2h0PSI0N3B4IiBpZD0iTGF5ZXJfMSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNjEgNDciIHdpZHRoPSI2MXB4IiB4bWw6c3BhY2U9InByZXNlcnZlIiA+PHJlY3QgaWQ9InN2Z0VkaXRvckJhY2tncm91bmQiIHg9IjAiIHk9IjAiIHdpZHRoPSI2MSIgaGVpZ2h0PSI0NyIgc3R5bGU9ImZpbGw6IG5vbmU7IHN0cm9rZTogbm9uZTsiLz48Zz48Y2lyY2xlIGN4PSI0LjUiIGN5PSIyMy41IiBmaWxsPSIjMDAwIiByPSI0LjUiLz48cmVjdCBmaWxsPSIjMDAwIiBoZWlnaHQ9IjUiIHdpZHRoPSI0OCIgeD0iMTMiIHk9IjIiIHRyYW5zZm9ybT0ibWF0cml4KDAuODgzNjQ4IDAgMCAxIDcuMjEyMTMgMCkiLz48Y2lyY2xlIGN4PSI0LjUiIGN5PSI0LjUiIGZpbGw9IiMwMDAiIHI9IjQuNSIvPjxjaXJjbGUgY3g9IjQuNSIgY3k9IjQyLjUiIGZpbGw9IiMwMDAiIHI9IjQuNSIvPjxyZWN0IGZpbGw9IiMwMDAiIGhlaWdodD0iNSIgd2lkdGg9IjQ4IiB4PSIxMi45ODE3NjQ3OTMzOTU5OTYiIHk9IjIxLjAxOTQzMjA2Nzg3MTA5IiB0cmFuc2Zvcm09Im1hdHJpeCgwLjg4MzY0OCAwIDAgMSA3LjIxMjEzIDApIiBpZD0iZTc1X3JlY3QiLz48cmVjdCBmaWxsPSIjMDAwIiBoZWlnaHQ9IjUiIHdpZHRoPSI0OCIgeD0iMTIuOTYzNTI5NTg2NzkxOTkyIiB5PSI0MC4wMzg4MzM2MTgxNjQwNiIgdHJhbnNmb3JtPSJtYXRyaXgoMC44ODM2NDggMCAwIDEgNy4yMTIxMyAwKSIgaWQ9ImUxMzFfcmVjdCIvPjwvZz48L3N2Zz4K");
     background-size: 14px !important;
-    background-position: 8px 7px !important;
+    background-position: 8px 50% !important;
 }
 .li-magicss-enable-autocomplete-selectors {
     display: none;
@@ -300,7 +379,7 @@ body .tooltipster-default .tooltipster-content {
     background-image:
         url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIzMiIgaWQ9Indhcm5pbmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNSAwIEgxNyBMMzIgMjkgTDMxIDMwIEwxIDMwIEwwIDI5IHogTTE5IDggTDEzIDggTDE0IDIwIEwxOCAyMCB6IE0xNiAyMiBBMyAzIDAgMCAwIDE2IDI4IEEzIDMgMCAwIDAgMTYgMjIiLz48L3N2Zz4=");
     background-size: 14px !important;
-    background-position: 8px 5px !important;
+    background-position: 8px 50% !important;
 }
 .li-magicss-enable-css-linting {
     display: none;
@@ -310,14 +389,14 @@ body .tooltipster-default .tooltipster-content {
 }
 
 .magicss-cache-image-to-prevent-CSP-problem-disable-css-linting,
-.magicss-disable-css-linting {
+.magic-css-tooltipster .tooltipster-content > ul li a.magicss-disable-css-linting {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited.svg"),
         url("chrome-extension://__MSG_@@extension_id__/ui-images/warning.svg"); */
     background-image:
         url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB3aWR0aD0iMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQ0MCA4OTNxMC0xNjEtODctMjk1bC03NTQgNzUzcTEzNyA4OSAyOTcgODkgMTExIDAgMjExLjUtNDMuNXQxNzMuNS0xMTYuNSAxMTYtMTc0LjUgNDMtMjEyLjV6bS05OTkgMjk5bDc1NS03NTRxLTEzNS05MS0zMDAtOTEtMTQ4IDAtMjczIDczdC0xOTggMTk5LTczIDI3NHEwIDE2MiA4OSAyOTl6bTEyMjMtMjk5cTAgMTU3LTYxIDMwMHQtMTYzLjUgMjQ2LTI0NSAxNjQtMjk4LjUgNjEtMjk4LjUtNjEtMjQ1LTE2NC0xNjMuNS0yNDYtNjEtMzAwIDYxLTI5OS41IDE2My41LTI0NS41IDI0NS0xNjQgMjk4LjUtNjEgMjk4LjUgNjEgMjQ1IDE2NCAxNjMuNSAyNDUuNSA2MSAyOTkuNXoiIGZpbGw9InJnYmEoMjU1LCA1MCwgMCwgMC45NSkiLz48L3N2Zz4K"),
         url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIzMiIgaWQ9Indhcm5pbmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNSAwIEgxNyBMMzIgMjkgTDMxIDMwIEwxIDMwIEwwIDI5IHogTTE5IDggTDEzIDggTDE0IDIwIEwxOCAyMCB6IE0xNiAyMiBBMyAzIDAgMCAwIDE2IDI4IEEzIDMgMCAwIDAgMTYgMjIiLz48L3N2Zz4=");
-    background-position: 14px 10px, 8px 5px !important;
+    background-position: 14px calc(50% + 5px), 8px 50% !important;
     background-size: 12px, 14px !important;
 }
 .li-magicss-disable-css-linting {
@@ -327,25 +406,25 @@ body .tooltipster-default .tooltipster-content {
     display: block;
 }
 
-.tooltipster-base ul li a.magicss-enable-css-linting,
-.tooltipster-base ul li a.magicss-disable-css-linting {
+.magic-css-tooltipster.tooltipster-base ul li a.magicss-enable-css-linting,
+.magic-css-tooltipster.tooltipster-base ul li a.magicss-disable-css-linting {
     opacity: 0.35;
 }
 
-.tooltipster-selected-mode-css.tooltipster-base ul li a.magicss-enable-css-linting,
-.tooltipster-selected-mode-css.tooltipster-base ul li a.magicss-disable-css-linting {
+.tooltipster-selected-mode-css.magic-css-tooltipster.tooltipster-base ul li a.magicss-enable-css-linting,
+.tooltipster-selected-mode-css.magic-css-tooltipster.tooltipster-base ul li a.magicss-disable-css-linting {
     opacity: 1;
 }
 
 .magicss-cache-image-to-prevent-CSP-problem-hide-line-numbers,
-.magicss-hide-line-numbers {
+.magic-css-tooltipster .tooltipster-content > ul li a.magicss-hide-line-numbers {
     /* background-image:
         url("chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited.svg"),
         url("chrome-extension://__MSG_@@extension_id__/ui-images/hash_edited.svg"); */
     background-image:
         url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB3aWR0aD0iMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQ0MCA4OTNxMC0xNjEtODctMjk1bC03NTQgNzUzcTEzNyA4OSAyOTcgODkgMTExIDAgMjExLjUtNDMuNXQxNzMuNS0xMTYuNSAxMTYtMTc0LjUgNDMtMjEyLjV6bS05OTkgMjk5bDc1NS03NTRxLTEzNS05MS0zMDAtOTEtMTQ4IDAtMjczIDczdC0xOTggMTk5LTczIDI3NHEwIDE2MiA4OSAyOTl6bTEyMjMtMjk5cTAgMTU3LTYxIDMwMHQtMTYzLjUgMjQ2LTI0NSAxNjQtMjk4LjUgNjEtMjk4LjUtNjEtMjQ1LTE2NC0xNjMuNS0yNDYtNjEtMzAwIDYxLTI5OS41IDE2My41LTI0NS41IDI0NS0xNjQgMjk4LjUtNjEgMjk4LjUgNjEgMjQ1IDE2NCAxNjMuNSAyNDUuNSA2MSAyOTkuNXoiIGZpbGw9InJnYmEoMjU1LCA1MCwgMCwgMC45NSkiLz48L3N2Zz4K"),
         url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iMzJweCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMjggMzI7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyOCAzMiIgd2lkdGg9IjI4cHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnIGlkPSJMYXllcl8xIi8+PGcgaWQ9Imhhc2giPjxwYXRoIGQ9Ik0yOCwxMlY4aC01LjAwNGwxLThoLTRsLTEsOGgtNy45OThsMS04aC00bC0xLDhIMHY0aDYuNDk4TDUuNSwyMEgwdjRoNWwtMSw4aDRsMS04aDhsLTEuMDAyLDhIMjAgICBsMS04aDd2LTRoLTYuNWwwLjk5Ni04SDI4eiBNMTcuNSwyMGgtOGwwLjk5OC04aDcuOTk4TDE3LjUsMjB6IiBzdHlsZT0iZmlsbDojMDAwOyIvPjwvZz48L3N2Zz4=");
-    background-position: 14px 10px, 9px 5px !important;
+    background-position: 14px calc(50% + 5px), 9px 50% !important;
     background-size: 12px, 12px !important;
 }
 .li-magicss-hide-line-numbers {
@@ -361,7 +440,7 @@ body .tooltipster-default .tooltipster-content {
         url("chrome-extension://__MSG_@@extension_id__/ui-images/hash_edited.svg"); */
     background-image:
         url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iMzJweCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMjggMzI7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyOCAzMiIgd2lkdGg9IjI4cHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnIGlkPSJMYXllcl8xIi8+PGcgaWQ9Imhhc2giPjxwYXRoIGQ9Ik0yOCwxMlY4aC01LjAwNGwxLThoLTRsLTEsOGgtNy45OThsMS04aC00bC0xLDhIMHY0aDYuNDk4TDUuNSwyMEgwdjRoNWwtMSw4aDRsMS04aDhsLTEuMDAyLDhIMjAgICBsMS04aDd2LTRoLTYuNWwwLjk5Ni04SDI4eiBNMTcuNSwyMGgtOGwwLjk5OC04aDcuOTk4TDE3LjUsMjB6IiBzdHlsZT0iZmlsbDojMDAwOyIvPjwvZz48L3N2Zz4=");
-    background-position: 9px 5px !important;
+    background-position: 9px 50% !important;
     background-size: 12px !important;
 }
 .li-magicss-show-line-numbers {
@@ -376,13 +455,11 @@ body .tooltipster-default .tooltipster-content {
         chrome-extension://__MSG_@@extension_id__/ui-images/compress.svg
         https://www.iconfinder.com/icons/1608651/download/svg/128 */
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB3aWR0aD0iMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNODk2IDk2MHY0NDhxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTE0NC0xNDQtMzMyIDMzMnEtMTAgMTAtMjMgMTB0LTIzLTEwbC0xMTQtMTE0cS0xMC0xMC0xMC0yM3QxMC0yM2wzMzItMzMyLTE0NC0xNDRxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDQ0OHEyNiAwIDQ1IDE5dDE5IDQ1em03NTUtNjcycTAgMTMtMTAgMjNsLTMzMiAzMzIgMTQ0IDE0NHExOSAxOSAxOSA0NXQtMTkgNDUtNDUgMTloLTQ0OHEtMjYgMC00NS0xOXQtMTktNDV2LTQ0OHEwLTI2IDE5LTQ1dDQ1LTE5IDQ1IDE5bDE0NCAxNDQgMzMyLTMzMnExMC0xMCAyMy0xMHQyMyAxMGwxMTQgMTE0cTEwIDEwIDEwIDIzeiIvPjwvc3ZnPg==");
-    background-position: 7px 4px !important;
 }
 
 .magicss-tweet {
     /* Source: https://dev.twitter.com/sites/default/files/images_documentation/bird_black_16_0.png */
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAALCAYAAABPhbxiAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYxIDY0LjE0MDk0OSwgMjAxMC8xMi8wNy0xMDo1NzowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNS4xIE1hY2ludG9zaCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo5NDVFMTUwREE0MzgxMUUxOEQxMTgzNjBDNjQ4QTVBMiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo5NDVFMTUwRUE0MzgxMUUxOEQxMTgzNjBDNjQ4QTVBMiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjk0NUUxNTBCQTQzODExRTE4RDExODM2MEM2NDhBNUEyIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjk0NUUxNTBDQTQzODExRTE4RDExODM2MEM2NDhBNUEyIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+pNEn9gAAAKhJREFUeNpi/P//PwMjI6MAkP7AgAZA4kAqAYhB9AOgmgVQMQYGkEYgWA9SAGIjYyA4D1KChPcD8X2wYVAF+6ES80GmQ8UM0DTB8HuwHFRRApoEyIB+HBoDwHrQbCSI4d5ActZ7IjSeR9EI1dxAhOYEbBodsIQiVttQNCI5eT02TbDQRlILjtz5eJw5H10TONHAdANTBMi2AKSE8wCIDwDlHzBgAQABBgDSj8Y9pTSceAAAAABJRU5ErkJggg==");
-    background-position: 7px 6px !important;
 }
 
 .magicss-share-on-facebook {
@@ -390,7 +467,6 @@ body .tooltipster-default .tooltipster-content {
         chrome-extension://__MSG_@@extension_id__/ui-images/logo-facebook_edited.svg
         (slightly edited version of https://upload.wikimedia.org/wikipedia/commons/c/c2/F_icon.svg) */
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNi4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iMjY2Ljg5M3B4IiBoZWlnaHQ9IjI2Ni44OTVweCIgdmlld0JveD0iMCAwIDI2Ni44OTMgMjY2Ljg5NSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMjY2Ljg5MyAyNjYuODk1Ig0KCSB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxwYXRoIGlkPSJCbHVlXzFfIiBmaWxsPSIjMDAwMDAwIiBkPSJNMjQ4LjA4MiwyNjIuMzA3YzcuODU0LDAsMTQuMjIzLTYuMzY5LDE0LjIyMy0xNC4yMjVWMTguODEyCgljMC03Ljg1Ny02LjM2OC0xNC4yMjQtMTQuMjIzLTE0LjIyNEgxOC44MTJjLTcuODU3LDAtMTQuMjI0LDYuMzY3LTE0LjIyNCwxNC4yMjR2MjI5LjI3YzAsNy44NTUsNi4zNjYsMTQuMjI1LDE0LjIyNCwxNC4yMjUNCglIMjQ4LjA4MnoiLz4NCjxwYXRoIGlkPSJmIiBmaWxsPSIjRkZGRkZGIiBkPSJNMTgyLjQwOSwyNjIuMzA3di05OS44MDNoMzMuNDk5bDUuMDE2LTM4Ljg5NWgtMzguNTE1Vjk4Ljc3N2MwLTExLjI2MSwzLjEyNy0xOC45MzUsMTkuMjc1LTE4LjkzNQ0KCWwyMC41OTYtMC4wMDlWNDUuMDQ1Yy0zLjU2Mi0wLjQ3NC0xNS43ODgtMS41MzMtMzAuMDEyLTEuNTMzYy0yOS42OTUsMC01MC4wMjUsMTguMTI2LTUwLjAyNSw1MS40MTN2MjguNjg0aC0zMy41ODV2MzguODk1aDMzLjU4NQ0KCXY5OS44MDNIMTgyLjQwOXoiLz4NCjwvc3ZnPg0K");
-    background-position: 7px 4px !important;
 }
 
 .magicss-email {
@@ -398,23 +474,17 @@ body .tooltipster-default .tooltipster-content {
         chrome-extension://__MSG_@@extension_id__/ui-images/mail_edited.svg
         (slightly edited version of https://www.iconfinder.com/icons/1814108/download/svg/128) */
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSI0OCIgaGVpZ2h0PSIzNyI+PHJlY3QgaWQ9ImJhY2tncm91bmRyZWN0IiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4PSIwIiB5PSIwIiBmaWxsPSJub25lIiBzdHJva2U9Im5vbmUiLz48c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOiMwMDAwMDA7fQo8L3N0eWxlPjxnIGNsYXNzPSJjdXJyZW50TGF5ZXIiPjx0aXRsZT5MYXllciAxPC90aXRsZT48ZyBpZD0ic3ZnXzEiIGNsYXNzPSIiPjxnIGlkPSJJY29uLUVudmVsb3BlIj48cGF0aCBjbGFzcz0ic3QwIiBkPSJNNDcuNDAwMDAwNTcyMjA0NTksNC45OTk5OTk4MDkyNjUxNDggbC0xLjksLTEuOSBsLTE3LjYsMTcuNiBjLTIuMiwyLjIgLTUuOSwyLjIgLTguMSwwIEwyLjIwMDAwMDU3MjIwNDU4NywzLjE5OTk5OTgwOTI2NTEzNjcgbC0xLjksMS45IGwxMy4xLDEzLjEgbC0xMy4xLDEzLjEgbDEuOSwxLjkgbDEzLjEsLTEzLjEgbDIuNiwyLjYgYzEuNiwxLjYgMy43LDIuNSA1LjksMi41IHM0LjMsLTAuOSA1LjksLTIuNSBsMi42LC0yLjYgbDEzLjEsMTMuMSBsMS45LC0xLjkgbC0xMy4xLC0xMy4xIEw0Ny40MDAwMDA1NzIyMDQ1OSw0Ljk5OTk5OTgwOTI2NTE0OCAiIGlkPSJGaWxsLTMiLz48cGF0aCBjbGFzcz0ic3QwIiBkPSJNNDMuNzAwMDAwNTcyMjA0NTksMzYuNTk5OTk5ODA5MjY1MTQgaC0zOS41IGMtMi4zLDAgLTQuMiwtMS45IC00LjIsLTQuMiB2LTI4LjIgYzAsLTIuMyAxLjksLTQuMiA0LjIsLTQuMiBoMzkuNSBjMi4zLDAgNC4yLDEuOSA0LjIsNC4yIHYyOC4yIEM0Ny45MDAwMDA1NzIyMDQ1OSwzNC42OTk5OTk4MDkyNjUxNCA0Ni4wMDAwMDA1NzIyMDQ1OSwzNi41OTk5OTk4MDkyNjUxNCA0My43MDAwMDA1NzIyMDQ1OSwzNi41OTk5OTk4MDkyNjUxNCBMNDMuNzAwMDAwNTcyMjA0NTksMzYuNTk5OTk5ODA5MjY1MTQgek00LjEwMDAwMDU3MjIwNDU5MywyLjY5OTk5OTgwOTI2NTEzNjcgYy0wLjgsMCAtMS40LDAuNjAwMDAwMDAwMDAwMDAwMiAtMS40LDEuNCB2MjguMiBjMCwwLjggMC42MDAwMDAwMDAwMDAwMDAyLDEuNCAxLjQsMS40IGgzOS41IGMwLjgsMCAxLjQsLTAuNjAwMDAwMDAwMDAwMDAwMiAxLjQsLTEuNCB2LTI4LjIgYzAsLTAuOCAtMC42MDAwMDAwMDAwMDAwMDAyLC0xLjQgLTEuNCwtMS40IEg0LjEwMDAwMDU3MjIwNDU5MyBMNC4xMDAwMDA1NzIyMDQ1OTMsMi42OTk5OTk4MDkyNjUxMzY3IHoiIGlkPSJGaWxsLTQiLz48L2c+PC9nPjwvZz48L3N2Zz4K");
-    background-position: 7px 6px !important;
-}
-
-.more-icons.magicss-rate-on-webstore {
-    background-position: 7px 4px !important;
+    background-position: 7px calc(50% + 1px) !important;
 }
 
 .get-magic-css-for-chrome {
     /* Source: https://upload.wikimedia.org/wikipedia/commons/e/e2/Google_Chrome_icon_%282011%29.svg */
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1LjUgMTUuNSAyMjQuNSAyMjQuNSI+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgY3k9IjAiIGN4PSIwLjUiIGlkPSJyIj4KICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjZjA2YjU5Ii8+CiAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZGYyMjI3Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IHI9IjAuNzYiIGN5PSIwLjMiIGN4PSIwLjY1IiBpZD0iZyI+CiAgICAgPHN0b3Agb2Zmc2V0PSIwLjY1IiBzdG9wLWNvbG9yPSIjNGNiNzQ5Ii8+CiAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMzg4YjQxIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IHI9IjAuOCIgY3k9IjAuMjUiIGN4PSIwLjM2IiBpZD0ieSI+CiAgICAgPHN0b3Agb2Zmc2V0PSIwLjYiIHN0b3AtY29sb3I9IiNGQ0QyMDkiLz4KICAgICA8c3RvcCBvZmZzZXQ9IjAuNyIgc3RvcC1jb2xvcj0iI2Y3YzYxNiIvPgogICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2JjODIxZSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCByPSIxIiBjeT0iMCIgY3g9IjAuNSIgc3ByZWFkTWV0aG9kPSJwYWQiIGlkPSJjZiI+CiAgICAgPHN0b3Agb2Zmc2V0PSIwLjEiIHN0b3AtY29sb3I9IiM3RkIzREYiLz4KICAgICA8c3RvcCBvZmZzZXQ9IjAuOSIgc3RvcC1jb2xvcj0iIzBGNUI5NCIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iY2IiIHI9IjEiIGN5PSIwIiBjeD0iMC41Ij4KICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGNkYwRUUiLz4KICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNkZGQiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxwYXRoIGQ9Im0xOTgsMTQ4YTcwLDcwIDAgMCAwIC0xNDAsMGwyMCwwYTUwLDUwIDAgMCAxIDEwMCwwIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgogIDxjaXJjbGUgcj0iNDUiIGN4PSIxMjcuNSIgY3k9IjEyNy42IiBmaWxsPSJ1cmwoI2NmKSIgc3Ryb2tlPSJ1cmwoI2NiKSIgc3Ryb2tlLXdpZHRoPSI5IiAvPgogIDxwYXRoIGQ9Im0yMjgsNzhhMTEyLDExMiAwIDAgMCAtMTkzLC0xM2w0NSw3OGE1MCw1MCAwIDAgMSA0NywtNjUiIGZpbGw9InVybCgjcikiLz4KICA8cGF0aCBkPSJtMzUsNjVhMTEyLDExMiAwIDAgMCA4NCwxNzRsNDcsLTgwYTUwLDUwIDAgMCAxIC04NiwtMTYiIGZpbGw9InVybCgjZykiLz4KICA8cGF0aCBkPSJtMTE5LDIzOWExMTIsMTEyIDAgMCAwIDEwOSwtMTYxbC0xMDEsMGE1MCw1MCAwIDAgMSAzOSw4MSIgZmlsbD0idXJsKCN5KSIvPgogIDxwYXRoIGQ9Im0zNSw2NWw0NSw3OGE1MCw1MCAwIDAgMSAyLC0zNGwtNDUsLTQ3IiBvcGFjaXR5PSIwLjA3NSIvPgogIDxwYXRoIGQ9Im0xMTksMjM5bDQ3LC04MGE1MCw1MCAwIDAgMSAtMjksMTdsLTIwLDYzIiBvcGFjaXR5PSIwLjA1Ii8+CiAgPHBhdGggZD0ibTIyOCw3OGwtMTAxLDBhNTAsNTAgMCAwIDEgMzksMTlsNjQsLTE2IiBvcGFjaXR5PSIwLjA1Ii8+Cjwvc3ZnPg==");
-    background-position: 7px 4px !important;
 }
 
 .get-magic-css-for-edge {
     /* Source: https://upload.wikimedia.org/wikipedia/commons/d/d6/Microsoft_Edge_logo.svg */
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDYwIDY0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xOC44NyAzOGMwIDEuNTQgMC4yMyAyLjk0IDAuNyA0LjIgMC41IDEuMjQgMS4xNSAyLjM1IDEuOTggMy4zMnMxLjggMS44IDIuOTQgMi41YzEuMSAwLjcgMi4zIDEuMjggMy41OCAxLjczIDEuMjcgMC40NiAyLjYgMC44IDMuOTUgMS4wMiAxLjM3IDAuMjIgMi43IDAuMzMgNC4wNSAwLjMzIDEuNyAwIDMuMjgtMC4xMyA0Ljc4LTAuNCAxLjUtMC4yOCAyLjk2LTAuNjUgNC40LTEuMTJzMi44My0xLjAzIDQuMjItMS42N2MxLjQtMC42NCAyLjgyLTEuMzQgNC4yOC0yLjEydjEzLjU2Yy0xLjYzIDAuOC0zLjIzIDEuNDctNC44MyAyLjA1LTEuNiAwLjU2LTMuMiAxLjA1LTQuODMgMS40NC0xLjYzIDAuNC0zLjI4IDAuNy00Ljk3IDAuODhzLTMuNDIgMC4yOC01LjIyIDAuMjhjLTIuNCAwLTQuNzItMC4yOC02Ljk1LTAuODNzLTQuMzItMS4zNC02LjI4LTIuMzgtMy43NS0yLjMtNS4zOC0zLjc4Yy0xLjY0LTEuNDgtMy4wMy0zLjE1LTQuMi01cy0yLjA3LTMuODgtMi43Mi02LjA2Yy0wLjYzLTIuMTgtMC45NS00LjUtMC45NS02Ljk2IDAtMi42MyAwLjM2LTUuMTMgMS4wOC03LjUyIDAuNzMtMi40IDEuNzYtNC41OCAzLjEyLTYuNTggMS4zNS0yIDMtMy43OCA0Ljk1LTUuMzNzNC4xNC0yLjgyIDYuNTgtMy44Yy0xLjMzIDEuMzMtMi4zNyAyLjktMy4xIDQuNzMtMC43NSAxLjgyLTEuMjIgMy42NS0xLjQzIDUuNDhoMjIuNzhjMC0yLjMtMC4yMy00LjMtMC43LTYuMDJzLTEuMjItMy4xNS0yLjI3LTQuMjhjLTEuMDQtMS4xNC0yLjM4LTItNC4wMy0yLjU2LTEuNjUtMC41Ny0zLjY0LTAuODYtNS45Ny0wLjg2LTIuNzUgMC01LjUgMC40LTguMjUgMS4yMy0yLjc1IDAuOC01LjM2IDEuOTUtNy44NCAzLjQtMi40OCAxLjQ3LTQuNzYgMy4yLTYuODQgNS4xOC0yLjA4IDItMy44MyA0LjE1LTUuMjUgNi40OCAwLjMtMi43IDAuOS01LjMgMS43My03Ljc3czEuOTMtNC43NyAzLjI1LTYuOWMxLjMyLTIuMSAyLjg3LTQuMDIgNC42NC01Ljc0czMuNzMtMy4yIDUuOS00LjQgNC40Ny0yLjE3IDYuOTctMi44MmMyLjUtMC41NyA1LjE2LTAuOTEgNy45Ni0wLjkxIDEuNjQgMCAzLjI3IDAuMTUgNC45IDAuNDQgMS42MyAwLjMgMy4yMiAwLjcgNC43NyAxLjIyIDMuMDggMS4wNiA1LjgzIDIuNTQgOC4yNSA0LjQyIDIuNDIgMS45IDQuNDUgNC4wNiA2LjEgNi41M3MyLjkgNS4yIDMuNzYgOC4xNyAxLjMgNi4wNiAxLjMgOS4yN3Y3Ljk1aC00MC45MXoiIGZpbGw9IiMwMDAwMDAiLz48L3N2Zz4K");
-    background-position: 7px 4px !important;
 }
 
 .get-magic-css-for-firefox {
@@ -425,13 +495,11 @@ body .tooltipster-default .tooltipster-content {
 .magicss-github-repo {
     /* Source: https://github.com/logos */
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QoHDzQH6Llj9gAAAkhJREFUWMPFl79rFEEUxz97Bs5A5M6gITaKnZWQX6AgihZiZx0QIokSOwsVxCJ/gE3KFJL0iRi0ClaiprE0xRVJuBBtRG0umgTuQtbmuzCu8zZ7e3P4YJp5732/35mdmfc2Ir+dAm4D14GLwHmgT77fwBawBrwD3gA/CWRDwCLQAuKco6WcoU6IK8AL4LAN4vQ4FEalyKrrHRCnR72d3bgBNAKSJ6Mh7Ewb6RK5K2LEIj+pk+wm1IBXBUU1lFtLzW+J6x9b8IDcka8MTAHfNP9LV+69xprmYsVMKQdhpHEX0uSjxiqGPTfjAlDyLKAkX/rEDxvYo27QshE0FuAdGTOwl5OAQeDACJoIIGDCwD4QN9NGwFegP4CAfuCLwTGNnkyfc5JwNmlwLOK5Jsn2VAIKqBifuQaw53FsE962PTx7JaDXE9zsgoCWZ64X49vsdEHAjsFlOgYCkg9YCy2pVPrsVkABFlYdYN5Q9xnoCUDeIywfxzzAeEZFmw0gYDYDfxzgBLCbEfQyeTLbtDPKtXB3xQ3AnON4DlwDPjhzTWAJuK8qdszY6svAAxWa5hH9wpybfBbYdxrJR6rnn4wqFnkERMDrnM3Kvjj/splU0CX1/ulCciVj26/mFDBjndZVJ+it5qvqcJ4BN43tT+x0DvLVrNs1CGw6wQ/bPHjVI8g38xzoc8CGk/QReALcBZ4CxwsK2BB27iZixQCqFhCwUqS5iYB7wPcOBPzQ1Y06ecn6dC3X9cdbzogtK2YdeOz8PdurjOOY/2l/AMMZppu+RZ43AAAAAElFTkSuQmCC");
-    background-position: 7px 4px !important;
 }
 
 .magicss-options {
     /* Source: https://www.iconfinder.com/icons/326699/settings_icon#size=128 (https://www.iconfinder.com/icons/326699/download/svg/128) */
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMHB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjIwcHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iIzAwMDAwMCIgaWQ9IkNvcmUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NjQuMDAwMDAwLCAtMzgwLjAwMDAwMCkiPjxnIGlkPSJzZXR0aW5ncyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDY0LjAwMDAwMCwgMzgwLjAwMDAwMCkiPjxwYXRoIGQ9Ik0xNy40LDExIEMxNy40LDEwLjcgMTcuNSwxMC40IDE3LjUsMTAgQzE3LjUsOS42IDE3LjUsOS4zIDE3LjQsOSBMMTkuNSw3LjMgQzE5LjcsNy4xIDE5LjcsNi45IDE5LjYsNi43IEwxNy42LDMuMiBDMTcuNSwzLjEgMTcuMywzIDE3LDMuMSBMMTQuNSw0LjEgQzE0LDMuNyAxMy40LDMuNCAxMi44LDMuMSBMMTIuNCwwLjUgQzEyLjUsMC4yIDEyLjIsMCAxMiwwIEw4LDAgQzcuOCwwIDcuNSwwLjIgNy41LDAuNCBMNy4xLDMuMSBDNi41LDMuMyA2LDMuNyA1LjQsNC4xIEwzLDMuMSBDMi43LDMgMi41LDMuMSAyLjMsMy4zIEwwLjMsNi44IEMwLjIsNi45IDAuMyw3LjIgMC41LDcuNCBMMi42LDkgQzIuNiw5LjMgMi41LDkuNiAyLjUsMTAgQzIuNSwxMC40IDIuNSwxMC43IDIuNiwxMSBMMC41LDEyLjcgQzAuMywxMi45IDAuMywxMy4xIDAuNCwxMy4zIEwyLjQsMTYuOCBDMi41LDE2LjkgMi43LDE3IDMsMTYuOSBMNS41LDE1LjkgQzYsMTYuMyA2LjYsMTYuNiA3LjIsMTYuOSBMNy42LDE5LjUgQzcuNiwxOS43IDcuOCwxOS45IDguMSwxOS45IEwxMi4xLDE5LjkgQzEyLjMsMTkuOSAxMi42LDE5LjcgMTIuNiwxOS41IEwxMywxNi45IEMxMy42LDE2LjYgMTQuMiwxNi4zIDE0LjcsMTUuOSBMMTcuMiwxNi45IEMxNy40LDE3IDE3LjcsMTYuOSAxNy44LDE2LjcgTDE5LjgsMTMuMiBDMTkuOSwxMyAxOS45LDEyLjcgMTkuNywxMi42IEwxNy40LDExIEwxNy40LDExIFogTTEwLDEzLjUgQzguMSwxMy41IDYuNSwxMS45IDYuNSwxMCBDNi41LDguMSA4LjEsNi41IDEwLDYuNSBDMTEuOSw2LjUgMTMuNSw4LjEgMTMuNSwxMCBDMTMuNSwxMS45IDExLjksMTMuNSAxMCwxMy41IEwxMCwxMy41IFoiIGlkPSJTaGFwZSIvPjwvZz48L2c+PC9nPjwvc3ZnPg==");
-    background-position: 7px 4px !important;
 }
 /* End: More icons */
 
@@ -451,8 +519,13 @@ body .tooltipster-default .tooltipster-content {
     color: #aaa;
 }
 
-.indicate-disabled#MagiCSS-bookmarklet .CodeMirror,
-.indicate-disabled#MagiCSS-bookmarklet .CodeMirror-scrollbar-filler {
+#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se {
+    width: 15px !important;     /* !important is useful to avoid FOUC kind of effect when re-initializing Magic CSS */
+    height: 15px !important;    /* !important is useful to avoid FOUC kind of effect when re-initializing Magic CSS */
+    background-color: #fff;
+}
+.indicate-disabled#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,
+.indicate-disabled#MagiCSS-bookmarklet .CodeMirror {
     background-color: #bbb;
 }
 
@@ -467,11 +540,12 @@ body .tooltipster-default .tooltipster-content {
 
 /* CodeMirror colorpicker */
 .codemirror-colorpicker {
-    z-index: 2147483647 !important;
+    z-index: 2147483600 !important;
 }
 
 #MagiCSS-bookmarklet .codemirror-colorview {
-    top: 1px;
+    top: -1px;  /* It looks better with top: -1px; */
+    vertical-align: middle;
 }
 
 html.magicss-mouse-over-dom-element,
@@ -484,17 +558,309 @@ html .magicss-mouse-over-dom-element {
     fill: red !important;   /* Helps in highlighting SVG elements */
 }
 
+
+/* Begin: Server connectivity UI */
+.magic-css-full-page-overlay {
+    background-color: rgba(0,0,0,0.5);
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2147483647;
+    /*
+        Useful while debugging. Comment it out before publishing.
+        z-index: 10;
+    */
+}
+
+.magic-css-full-page-contents {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2147483647;
+}
+
+.magic-css-back-end-connectivity-options {
+    width: 410px;
+    position: fixed !important; /* Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;" */
+    z-index: 2147483647;
+    box-sizing: border-box;
+    background-color: #eee;
+    border-radius: 10px;
+    font-family: Helvetica, "Trebuchet MS", sans-serif;
+    font-size: 12px;
+    box-shadow: #555 0px 0px 20px 3px;
+}
+
+.magic-css-back-end-connectivity-options {
+    box-sizing: border-box;
+}
+
+.magic-css-back-end-connectivity-options * {
+    box-sizing: inherit;
+}
+
+.magic-css-server-config-field-header {
+    color: #777;
+    margin-bottom: 2px;
+}
+
+.live-css-connectivity-error-message {
+    margin-left: 50px;
+    font-weight: bold;
+    color: brown;
+}
+.live-css-server-client-general-error .live-css-server-client-general-error-message,
+.live-css-server-client-incompatible-error .live-css-server-client-incompatible-error-message {
+    display: block !important;
+}
+.live-css-server-client-incompatible-error .live-css-highlight-if-server-client-incompatible {
+    font-weight: bold;
+    background-color: #fe5;
+}
+
+.magic-css-server-config-item {
+    background-color: #ddd;
+    border-bottom: 1px solid #999;
+    margin-bottom: 0;
+    padding: 15px;
+
+    border: 1px solid #999;
+    border-bottom-width: 0;
+}
+
+.magic-css-server-config-item:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.magic-css-server-config-item:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.magic-css-server-config-item:last-child {
+    border-bottom: 1px solid #999;
+}
+
+.magic-css-server-config-item input[type="number"],
+.magic-css-server-config-item input[type="text"],
+.magic-css-server-config-item select {
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 100%;
+    height: 21px;
+}
+
+.magic-css-server-config-item select {
+    background-color: #fff;
+}
+
+.magic-css-server-config-item input[type="number"],
+.magic-css-server-config-item input[type="text"],
+.magic-css-server-config-item select {
+    width: 20%
+}
+
+.magic-css-back-end-connectivity-options .ms-res-ctn.dropdown-menu {
+    height: 58px;
+    position: absolute;
+    border: 1px solid #777;
+    width: calc(100% - 2px);
+    z-index: 10000;
+    background-color: #fff;
+    left: 0px;
+    bottom: 30px;
+}
+.magic-css-back-end-connectivity-options .ms-ctn {
+    padding-left: 7px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.magic-css-back-end-connectivity-options .ms-ctn .ms-trigger .ms-trigger-ico {
+    margin-top: 9px;
+}
+.magic-css-back-end-connectivity-options .ms-ctn-focus {
+    box-shadow: none;
+    outline: -webkit-focus-ring-color auto 5px
+}
+.magic-css-back-end-connectivity-options .ms-ctn .ms-helper {
+    display: none !important;
+}
+.magic-css-back-end-connectivity-options .ms-ctn.form-control {
+    border: 1px solid #aaa;
+}
+
+.magic-css-server-connectivity-status {
+    width: 16px;
+    height: 16px;
+    background-size: 16px;
+    background-repeat: no-repeat;
+}
+@keyframes magic-css-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.magic-css-server-connectivity-status.connecting {
+    border: 3px solid rgba(150,150,150,1);
+    border-radius: 50%;
+    border-left: 3px solid rgba(0,0,0,1);
+    animation: magic-css-rotate 1s infinite linear;
+}
+.magic-css-server-connectivity-status.connected {
+    /* https://www.iconfinder.com/icons/282474/check_done_ok_icon#size=128 */
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAuMDA3OTk1NjEwMTI1MzYyODcgMTM2Ljc2MTAwMTU4NjkxNCAxMDcuOTkyMDA0Mzg5ODc1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImRlZjAiIHgxPSIwLjUwMDAwNSIgeDI9IjAuNTAwMDA1IiB5MT0iMS42NDI0NiIgeTI9Ii0wLjEzOTQ5MyI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDA0NDAwIi8+PHN0b3Agb2Zmc2V0PSIwLjUxMDk4OSIgc3RvcC1jb2xvcj0iIzAxOEMwMSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzkxQ0Q5MSIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJkZWYxIiB4MT0iLTUuMzc0MjZFLTA2IiB4Mj0iMC45OTk5OTciIHkxPSIwLjQ5OTk5NiIgeTI9IjAuNDk5OTk2Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0eWxlPSJzdG9wLW9wYWNpdHk6MC4zMDE5NjA3ODQzMTM3MjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNGRkZGRkYiIHN0eWxlPSJzdG9wLW9wYWNpdHk6MC4yIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PGc+PHBhdGggZD0iTTUyLjk4NCwxMDhMMCw1NS4wMDggMjMuMjczMywzMS43MzIgNTIuOTg1Myw2MS40NDI3IDExNC40MzIsMC4wMDc5OTU2MSAxMzYuNzYxLDIyLjM0MTMgMTM0Ljg3NSwyNC4yMjY3IDExNC40MzIsMy43Nzg2NiA1Mi45ODUzLDY1LjIxMzMgMjMuMjczMywzNS41MDI3IDMuNzcwNjcsNTUuMDA4IDU0Ljg2OTMsMTA2LjExNSA1Mi45ODQsMTA4eiIgZmlsbD0iIzAwNjYwMCIvPjxwYXRoIGQ9Ik0xMzUuODE4LDIzLjI4NDVMMTE0LjQzMywxLjg5Mzg2IDUyLjk4NjQsNjMuMzI4NSAyMy4yNzMxLDMzLjYxNzkgMS44ODUwNyw1NS4wMDg1IDIxLjE3MzEsNzQuMjk2NSAzNC41MjI0LDg3LjY1MjUgNTMuOTI2NCwxMDcuMDU4IiBmaWxsPSJ1cmwoI2RlZjApIi8+PHBhdGggZD0iTTUyLjk4NjQsNjMuMzI3MkwyMy4yNzQ0LDMzLjYxNzkgMS44ODY0LDU1LjAwODUgMjEuMTczMSw3NC4yOTY1IDMyLjE4NzcsODUuMzE3OUM0Ny4zNDc3LDc1Ljk3MzksNzIuNTkxNyw2Mi45ODcyLDEwMS41MTcsNTguMzczOUwxMzUuODE4LDIzLjI4NDUgMTE0LjQzMywxLjg5Mzg2IDUyLjk4NjQsNjMuMzI3MnoiIGZpbGw9InVybCgjZGVmMSkiLz48L2c+PC9zdmc+');
+}
+
+.magic-css-server-connectivity-status.disconnected {
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/warning-circle_edited.svg */
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAxNiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZWZzLz48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGlkPSJJY29ucyB3aXRoIG51bWJlcnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIj48ZyBmaWxsPSIjMTU3RUZCIiBpZD0iR3JvdXAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC05Ni4wMDAwMDAsIC00MzIuMDAwMDAwKSI+PHBhdGggZD0iTTEwMyw0NDMgTDEwMyw0NDUgTDEwNSw0NDUgTDEwNSw0NDMgWiBNMTA0LDQ0OCBDOTkuNTgxNzIxOCw0NDggOTYsNDQ0LjQxODI3OCA5Niw0NDAgQzk2LDQzNS41ODE3MjIgOTkuNTgxNzIxOCw0MzIgMTA0LDQzMiBDMTA4LjQxODI3OCw0MzIgMTEyLDQzNS41ODE3MjIgMTEyLDQ0MCBDMTEyLDQ0NC40MTgyNzggMTA4LjQxODI3OCw0NDggMTA0LDQ0OCBaIE0xMDMsNDM1IEwxMDMsNDQyIEwxMDUsNDQyIEwxMDUsNDM1IFogTTEwMyw0MzUiIGlkPSJPdmFsIDIwOCBjb3B5Ii8+PC9nPjwvZz48L3N2Zz4=");
+}
+
+/* Begin: General purpose CSS */
+.magic-css-ui {
+    word-wrap: break-word;
+}
+.magic-css-ui input:invalid {
+    border-color: rgba(255, 0, 0, 0.7);
+    outline-color: rgba(255, 0, 0, 0.5);
+}
+
+.magic-css-tooltipster {
+    box-sizing: content-box;
+}
+.magic-css-tooltipster * {
+    box-sizing: inherit;
+}
+/* End */
+
+
+/* Begin: Fix some general styles which might be overridden in some sites */
+.magic-css-ui,
+.magic-css-ui input,
+.magic-css-ui input[type],
+.magic-css-ui button {
+    margin: 0;
+    display: initial;
+    line-height: initial;
+    letter-spacing: initial;
+    text-shadow: initial;
+    text-align: left;
+    font-family: sans-serif;
+    font-weight: initial;
+}
+.magic-css-ui input[type] {
+    box-sizing: inherit;
+}
+
+.magic-css-ui a {
+    font-size: inherit;
+}
+
+.magic-css-ui span {
+    font-size: inherit;
+}
+
+.magic-css-ui * {
+    text-transform: initial;
+}
+/* End */
+
+.magic-css-ui button {
+    padding: 7px 12px;
+
+    background-color: #2e8bcc;
+    border: 1px solid #0c619e;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 #3af;
+    color: rgba(255, 255, 255, 0.95);
+
+    font-size: 12px;
+    cursor: pointer;
+}
+.magic-css-ui button:hover {
+    background-color: rgba(68, 88, 174, 0.85);
+    border-color: rgb(0, 110, 200);
+    box-shadow: rgb(70, 151, 255) 0px 1px 0px 0px inset;
+    color: #fff;
+}
+.magic-css-ui button[disabled] {
+    pointer-events: none;
+    background-color: #b1cbe4;
+    border-color: #bcd;
+    box-shadow: none;
+}
+
+.magic-css-toastr#toast-container {
+    z-index: 2147483610;
+    font-family: Helvetica, "Trebuchet MS", sans-serif;
+    font-size: 12px;
+}
+
+.magic-css-toastr#toast-container > div {
+    opacity: 1;
+    padding: 10px 20px 10px 50px;
+    background-position: 15px 10px;
+    width: auto;
+    max-width: 400px;
+}
+.magic-css-toastr#toast-container > div:hover {
+    cursor: initial;
+}
+
+/* Begin: These styles would be useful when close button is enabled for the toastr */
+/* Positioning */
+.magic-css-toastr .toast-close-button {
+    top: -4px;
+    right: -10px;
+}
+/* Without this, the last word in the title may wrap to next line when close button is there */
+.magic-css-toastr#toast-container .toast-title {
+    float: left;
+}
+/* Since we are using float for .toast-title , we need to "clear" it for displaying long contents in ".toast-message" */
+.magic-css-toastr#toast-container .toast-message {
+    clear: both;
+}
+/* End */
+
+/* End: Server connectivity UI */
+
+
 /*
     Begin: Site-specific / CSS-style-specific fixes
     (where sites over-ride some default styles in an unexpected manner)
     (these styles would be non-essential for most of the sites)
 */
 
-/* Use left-to-right direction for all sites */
+#topCenterAlertNote {
+    line-height: initial;
+}
+
+.magic-css-container {
+    text-shadow: none;
+}
+
 #topCenterAlertNote,
-#MagiCSS-bookmarklet .CodeMirror,
-.CodeMirror-hints {
-    direction: ltr;
+#MagiCSS-bookmarklet,
+.CodeMirror-hints,
+.magic-css-tooltipster,
+.magic-css-ui {
+    direction: ltr;                 /* Use left-to-right direction for all sites */
+    -webkit-text-stroke-width: 0;   /* https://www.digit.in */
+}
+
+
+/* https://www.accuweather.com */
+.CodeMirror span {
+    font-family: monospace;
 }
 
 /* Show cursors if the CSS contains style like: div { overflow: hidden } */
@@ -528,14 +894,26 @@ html .magicss-mouse-over-dom-element {
 }
 
 #MagiCSS-bookmarklet .CodeMirror {
-    line-height: 16px !important;
+    line-height: 1.34 !important;
 }
 
-.CodeMirror-hints * {
-    font-size: 12px !important;
-}
 .CodeMirror-hints .CodeMirror-hint:hover {
     background-color: #ccc;
+}
+
+/* https://jsfiddle.net */
+#MagiCSS-bookmarklet .CodeMirror {
+    margin: 0;
+    background-color: #fff;
+}
+#MagiCSS-bookmarklet .CodeMirror-selected {
+    background-color: #d9d9d9;
+}
+.indicate-disabled#MagiCSS-bookmarklet .CodeMirror-selected {
+    background-color: #eee;
+}
+#MagiCSS-bookmarklet .CodeMirror-cursor {
+    border-left-color: #000;
 }
 
 /* http://stackoverflow.com/ */
@@ -543,4 +921,63 @@ html .magicss-mouse-over-dom-element {
     position: relative !important;
 }
 
-/* End: Site-specific fixes */
+/* http://koimoi.com/ */
+.magic-css-tooltipster .tooltipster-content ul li {
+    margin: 0;
+}
+
+.magic-css-tooltipster.tooltipster-base a,
+.magic-css-tooltipster.tooltipster-base a:link,
+.magic-css-tooltipster.tooltipster-base a:hover {
+    background-color: initial;
+    margin: 0;                  /* https://www.thesnookergym.com */
+}
+
+/* http://susanhefuna.com */
+.magic-css-ui,
+#MagiCSS-bookmarklet .CodeMirror,
+.magic-css-tooltipster.tooltipster-base {
+    letter-spacing: initial;
+}
+
+/* https://www.instagram.com */
+.magic-css-header,
+.magic-css-header div {
+    display: block;
+    flex-direction: initial;
+}
+.magic-css-ui div {
+    display: block;
+}
+#topCenterAlertNote > div > div {   /* For proper width and center-aligning of alertNote */
+    -webkit-flex-direction: initial;
+    flex-direction: initial;
+}
+
+/* http://xtremezerowaste.org.nz */
+.magic-css-ui button,
+.magic-css-ui button:hover,
+.magic-css-ui button[disabled] {
+    padding: 7px 12px;
+    margin: 0;
+}
+
+/* Some other sites */
+.magic-css-back-end-connectivity-options {
+    color: #000;
+}
+.magic-css-back-end-connectivity-options a,
+.magic-css-back-end-connectivity-options a:link,
+.magic-css-back-end-connectivity-options a:visited {
+    color: #777;
+    font-weight: normal;
+    text-decoration: none;
+}
+.magic-css-back-end-connectivity-options a:hover,
+.magic-css-back-end-connectivity-options a:active {
+    color: #000;
+    text-decoration: underline;
+    font-weight: normal;
+}
+
+/* End */

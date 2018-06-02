@@ -1,0 +1,35 @@
+{
+  "name": "live-css",
+  "version": "6.2.36",
+  "description": "live-css is a development server meant to be used along with browser extension \"Live editor for CSS, Less & Sass - Magic CSS\" for Chrome/Edge/Firefox/Opera",
+  "repository": "https://github.com/webextensions/live-css-editor.git",
+  "homepage": "https://webextensions.org/",
+  "main": "index.js",
+  "bin": {
+    "live-css": "./index.js",
+    "live-css-editor": "./index.js"
+  },
+  "scripts": {
+    "nodemon": "nodemon ./index.js",
+    "nodemon-verbose": "nodemon ./index.js -- --verbose",
+    "test": "echo \"Warning: no test specified\""
+  },
+  "author": "Priyank Parashar",
+  "license": "MIT",
+  "dependencies": {
+    "anymatch": "2.0.0",
+    "boxen": "1.3.0",
+    "chokidar-webextensions": "2.0.4",
+    "express": "4.16.3",
+    "find-free-port": "1.2.0",
+    "local-ip-addresses-and-hostnames": "0.1.0",
+    "lodash": "4.17.10",
+    "nocache": "2.0.0",
+    "note-down": "0.1.1",
+    "socket.io": "2.1.1",
+    "tiny-emitter": "2.0.2",
+    "unused-filename": "1.0.0",
+    "update-notifier": "2.5.0",
+    "yargs": "11.0.0"
+  }
+}

@@ -7,6 +7,7 @@ var utils = window.utils || {};
 if (!utils.defined) {
     utils.defined = true;
 
+    /* eslint-disable no-undef */
     // https://github.com/hydiak/a-sync-waterfall/blob/master/index.js
     // MIT license (by Elan Shanker).
     (function(globals) {
@@ -91,6 +92,7 @@ if (!utils.defined) {
             globals.waterfall = waterfall; // <script>
         }
     })(this);
+    /* eslint-enable no-undef */
     utils.waterfall = this.waterfall;
 
     utils.attachPublishSubscribe = function (attachToObject) {
@@ -344,11 +346,11 @@ if (!utils.defined) {
 
         var alertNote = function (msg, hideDelay, options) {
             options = options || {};
-            var alignment = options.alignment || 'center',
-                textAlignment = options.textAlignment || alignment,
+            var verticalAlignment = options.verticalAlignment || 'top',
+                horizontalAlignment = options.horizontalAlignment || 'center',
+                textAlignment = options.textAlignment || horizontalAlignment,
                 backgroundColor = options.backgroundColor || '#f9edbe',
                 borderColor = options.borderColor || '#eb7',
-                margin = options.margin || '0 10px',
                 opacity = options.opacity || '1',
                 unobtrusive = options.unobtrusive || false;
             // TODO:
@@ -357,39 +359,77 @@ if (!utils.defined) {
 
             /*eslint-disable indent */
             div.innerHTML = [
-                '<div style="position:fixed;left:0;top:0;width:100%;text-align:' + alignment + ';height:0;z-index:2147483647;opacity:' + opacity + ';">',
-                                                                                         // margin:0 is useful for some sites (eg: https://developer.chrome.com/home)
-                    '<table style="display:inline-table;border-collapse:collapse;width:auto;margin:0"><tr><td style="padding:0px;border:0">',
-                                                        // background-color:#feb;
-                        '<div style="border:1px solid ' + borderColor + ';background-color:' + backgroundColor + ';margin:' + margin + ';padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font:bold 13px Arial">',
-                            '<div style="clear:both">',
-                                '<div style="float:left;color:#000;text-align:' + textAlignment + ';">',
-                                    msg,
-                                '</div>',
-                                // '<div style="float:right;margin-left:10px;font-weight:normal;text-decoration:underline;cursor:pointer">',
-                                //     'OK',
-                                // '</div>',
+                '<div ' +
+                    'style="' +
+                        'pointer-events:none;' +    // To avoid it from stealing hover (the pointer-events will be enabled for a child element)
+                        'position:fixed;width:100%;z-index:2147483600;' +
+                        (verticalAlignment === 'bottom' ? 'bottom:0;' : 'top:0;') +
+                        (function () {
+                            if (horizontalAlignment === 'left') {
+                                return 'left:0;';
+                            } else if (horizontalAlignment === 'right') {
+                                return 'right:0;';
+                            } else {
+                                /* Even for center aligning, we need to set left or right as 0, without that
+                                    it would try to center align whithout considering the width taken by vertical scrollbar */
+                                return 'left:0;';
+                            }
+                        }()) +
+                        'text-align:' + horizontalAlignment + ';' +     // TODO: Check if we need this
+                        'opacity:' + opacity + ';' +
+                        '"' +
+                    '>',
+                    '<div ' +
+                        'style="' +
+                            'display:flex;width:auto;margin:0;padding:0;border:0;' +
+                            (function () {
+                                if (horizontalAlignment === 'left') {
+                                    return 'justify-content:flex-start;';
+                                } else if (horizontalAlignment === 'right') {
+                                    return 'justify-content:flex-end;';
+                                } else {
+                                    return 'justify-content:center;';
+                                }
+                            }()) +
+                                    // margin:0 is useful for some sites (eg: https://developer.chrome.com/home)
+                            '"' +
+                        '>',
+                        '<div ' +
+                            'style="' +
+                                'pointer-events:initial;' +    // To gain back the pointer-events which were disabled in one of the parent elements
+                                'border:1px solid ' + borderColor + ';' +
+                                'background-color:' + backgroundColor + ';' +   // background-color:#feb;
+                                                                                // TODO: Check if we need "text-align: left". Maybe it helps to set the default style.
+                                'padding:2px 10px;max-width:980px;overflow:hidden;text-align:left;font-family:Arial,sans-serif;font-weight:bold;font-size:12px' +
+                            '"' +
+                        '>',
+                            '<div class="alert-note-text" style="color:#000;text-align:' + textAlignment + ';word-wrap:break-word;">',
+                                msg,
                             '</div>',
                         '</div>',
-                    '</td></tr></table>',
+                    '</div>',
                 '</div>'
             ].join('');
             /*eslint-enable indent */
 
             if (unobtrusive) {
-                var firstChild = div.firstChild;
-                firstChild.addEventListener('mouseenter', function () {
-                    // Note:
-                    //      If we wish to directly apply the opacity changes to the parent "div",
-                    //      which is currently a direct child of <html> tag, then, on some sites (eg:
-                    //      gmail.com) somehow, as soon as we reduce its opacity to a value less than
-                    //      1 (eg: 0.99), it gets hidden immediately. The fact that it is appended to
-                    //      <html> tag and not to <body> is somehow causing this behavior. Since we
-                    //      are using that parent div's firstChild, the opacity transition works fine.
-                    firstChild.style.transition = 'opacity 0.3s ease-out';
-                    firstChild.style.opacity = '0';
-                    firstChild.style.pointerEvents = 'none';
-                }, false);
+                try {
+                    var firstChild = div.firstChild.firstChild.firstChild;
+                    firstChild.addEventListener('mouseenter', function () {
+                        // Note:
+                        //      If we wish to directly apply the opacity changes to the parent "div",
+                        //      which is currently a direct child of <html> tag, then, on some sites (eg:
+                        //      gmail.com) somehow, as soon as we reduce its opacity to a value less than
+                        //      1 (eg: 0.99), it gets hidden immediately. The fact that it is appended to
+                        //      <html> tag and not to <body> is somehow causing this behavior. Since we
+                        //      are using that parent div's inner child, the opacity transition works fine.
+                        firstChild.style.transition = 'opacity 0.3s ease-out';
+                        firstChild.style.opacity = '0';
+                        firstChild.style.pointerEvents = 'none';
+                    }, false);
+                } catch (e) {
+                    // do nothing
+                }
             }
 
             div.style.display = '';     // Required when the same div element is being reused
