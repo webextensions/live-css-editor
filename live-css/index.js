@@ -606,26 +606,6 @@ var handleLiveCss = function (options) {
 };
 
 if (module.parent) {    // If being loaded via require()
-    /*
-        // Sample usage in a Node JS project using require('live-css')
-
-        var express = require('express');
-        var app = express();
-        var httpServer = app.listen(3000, function () {
-            console.log('Server started');
-        });
-
-        if (codeIsRunningInDevelopmentMode) {
-            var liveCssServer = require('live-css');
-            liveCssServer({
-                // Optional - Useful for binding live-css server with your current HTTP server, otherwise, live-css server would run on a separate port
-                httpServer: httpServer,
-
-                // Optional - Useful for providing some common configuration options ; This example assumes that the path of the config file is same as that of server code file initiating live-css server
-                configFilePath: require('path').resolve(__dirname, '.live-css.config.js')
-            });
-        }
-    */
     (function () {
         var liveCss = function (options) {
             options = options || {};

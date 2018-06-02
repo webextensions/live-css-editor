@@ -7,13 +7,42 @@ This is a development server for use with the browser extension **Live editor fo
 For availability of the latest version of Magic CSS extension on Microsoft Edge, Mozilla Firefox and Opera, follow:
 > https://github.com/webextensions/live-css-editor
 
-## Global Installation and Usage
+## Global installation and usage
 ```
 $ npm install --global live-css
 ```
 
 ```
 $ live-css
+```
+
+## Local installation and usage (for Node JS based projects)
+```
+$ npm install --save-dev live-css
+```
+
+```
+var express = require('express');
+var app = express();
+var httpServer = app.listen(3000, function () {
+    console.log('Server started');
+});
+
+if (codeIsRunningInDevelopmentMode) {
+    var liveCssServer = require('live-css');
+
+    // Start live-css server
+    liveCssServer({
+        // Optional - If provided, the live-css server will reuse your current HTTP server port.
+        //            Otherwise, live-css server would run on a separate port.
+        httpServer: httpServer,
+
+        // Optional - Useful for providing some common configuration options.
+        //            This example assumes that the path of the config file is same as that of
+        //            server code file initiating live-css server
+        configFilePath: require('path').resolve(__dirname, '.live-css.config.js')
+    });
+}
 ```
 
 ## How to use
@@ -46,8 +75,7 @@ The configuration file can be generated using ```$ live-css --init```
 ## TODO
 * Ability to edit files within the extension "Live editor for CSS, Less & Sass - Magic CSS"
 * Ability to auto-connect live-css server without launching the browser extension
-* Ability to integrate with live-css server without the browser extension
-* Ability to integrate live-css server into a Node JS based project
+* Ability to integrate webpage front-end and live-css server without the browser extension
 
 ## Created by
 * Priyank Parashar
