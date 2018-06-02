@@ -651,7 +651,7 @@ html .magicss-mouse-over-dom-element {
     box-sizing: inherit;
 }
 
-.magic-css-file-field-header {
+.magic-css-server-config-field-header {
     color: #777;
     margin-bottom: 2px;
 }
@@ -675,7 +675,7 @@ html .magicss-mouse-over-dom-element {
 
 
 
-.magic-css-file-config-item {
+.magic-css-server-config-item {
     background-color: #ddd;
     border-bottom: 1px solid #999;
     margin-bottom: 0;
@@ -685,28 +685,28 @@ html .magicss-mouse-over-dom-element {
     border-bottom-width: 0;
 }
 
-.magic-css-file-config-item:first-child {
+.magic-css-server-config-item:first-child {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
-.magic-css-file-config-item:last-child {
+.magic-css-server-config-item:last-child {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-.magic-css-file-config-item:last-child {
+.magic-css-server-config-item:last-child {
     border-bottom: 1px solid #999;
 }
 
-.magic-css-file-config-item input[type="number"],
-.magic-css-file-config-item input[type="text"],
-.magic-css-file-config-item select {
+.magic-css-server-config-item input[type="number"],
+.magic-css-server-config-item input[type="text"],
+.magic-css-server-config-item select {
     padding-left: 5px;
     padding-right: 5px;
     width: 100%;
     height: 21px;
 }
 
-.magic-css-file-config-item select {
+.magic-css-server-config-item select {
     background-color: #fff;
 }
 
@@ -1007,9 +1007,9 @@ html .magicss-mouse-over-dom-element {
 }
 /* End */
 
-.magic-css-file-config-item input[type="number"],
-.magic-css-file-config-item input[type="text"],
-.magic-css-file-config-item select {
+.magic-css-server-config-item input[type="number"],
+.magic-css-server-config-item input[type="text"],
+.magic-css-server-config-item select {
     width: 20%
 }
 
