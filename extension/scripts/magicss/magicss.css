@@ -670,6 +670,8 @@ html .magicss-mouse-over-dom-element {
     width: 20%
 }
 
+/* TODO: Clean up this section */
+/* Begin: The following code belongs to styling related to edit file feature */
 .magic-css-back-end-connectivity-options .ms-res-ctn.dropdown-menu {
     height: 58px;
     position: absolute;
@@ -698,6 +700,7 @@ html .magicss-mouse-over-dom-element {
 .magic-css-back-end-connectivity-options .ms-ctn.form-control {
     border: 1px solid #aaa;
 }
+/* End */
 
 .magic-css-server-connectivity-status {
     width: 16px;

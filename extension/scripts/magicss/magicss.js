@@ -1654,6 +1654,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
                                 }
                                 setTimeout(function () {
+                                    // TODO: Fix this code (it is not in a consistent state after the rebase operation)
                                     reloadCSSInPage();
                                 }, delay);
                             },
@@ -2057,6 +2058,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             setCodeMirrorCSSLinting(editor, 'disable');
                             $('.footer-for-file-mode').show();
 
+                            // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
                             // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user clicks on the footer in file mode
                             $('.footer-for-file-mode .name-of-file-being-edited')
                                 .html(htmlEscape(getFileNameFromPath(file.path)))
@@ -2890,6 +2892,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                         $fileToEdit.on('click', function () {
                             getDataForFileToEdit(editor, {showUi: true} ,function (file) {
+                                // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
                                 // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user switches the editing mode
                                 $('.footer-for-file-mode .name-of-file-being-edited')
                                     .html(htmlEscape(getFileNameFromPath(file.path)))
