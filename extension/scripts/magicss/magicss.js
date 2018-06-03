@@ -159,7 +159,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return linkTags;
     };
 
-    var getFilenameFromPath = function (path) {
+    var getFileNameFromPath = function (path) {
         path = path.split('?')[0];
         path = path.split('#')[0];
         path = path.split('/').pop();
@@ -167,12 +167,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     };
 
     var findProbableMatchElementIndexes = function (arr, useOnlyFileNamesForMatch, itemToMatch) {
-        var fileNameOfItemToMatch = getFilenameFromPath(itemToMatch);
+        var fileNameOfItemToMatch = getFileNameFromPath(itemToMatch);
         var matchedIndexes = [];
         arr.forEach(function (item, index) {
             item = item.replace(/[?&]reloadedAt=[\d-_:.]+/, '');
             if (useOnlyFileNamesForMatch) {
-                if (getFilenameFromPath(item) === fileNameOfItemToMatch) {
+                if (getFileNameFromPath(item) === fileNameOfItemToMatch) {
                     matchedIndexes.push(index);
                 }
             } else {
@@ -1745,7 +1745,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 }
                                 setTimeout(function () {
                                     // TODO: Fix this code (it is not in a consistent state after the rebase operation)
-                                    reloadCSSInPage();
+                                    // reloadCSSInPage();
+                                    reloadCSSResourceInPage({
+                                        useOnlyFileNamesForMatch: true,
+                                        fileName: getFileNameFromPath(filePath),
+                                        fullPath: editor.userPreference('magic-css-server-path') + '/magic-css/' + filePath
+                                    });
                                 }, delay);
                             },
                             error: function (jqXHR, textStatus, errorThrown) {  // eslint-disable-line no-unused-vars
