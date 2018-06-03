@@ -1635,7 +1635,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var filePath = editor.userPreference('file-to-edit');
                         $.ajax({
                             method: 'PUT',
-                            url: editor.userPreference('magic-css-server-path') + '/magic-css/' + filePath,
+                            _: (function () {
+                                console.log('TODO: Remove hard-coding');
+                            }()),
+                            // TODO: Remove hard-coding
+                            url: 'http://localhost:3777/' + 'magic-css/' + filePath,
+
                             data: {
                                 targetFileContents: targetFileContents
                             },
@@ -1649,19 +1654,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         $fileEditStatus.html('');
                                     }
                                 }, 2500);
-                                var delay = editor.userPreference('link-refresh-delay-on-file-update');
-                                if (delay > 500) {
-                                    utils.alertNote('Magic CSS will reload link tag(s) after ' + delay + ' ms', delay);
-                                }
-                                setTimeout(function () {
-                                    // TODO: Fix this code (it is not in a consistent state after the rebase operation)
-                                    // reloadCSSInPage();
-                                    reloadCSSResourceInPage({
-                                        useOnlyFileNamesForMatch: true,
-                                        fileName: getFileNameFromPath(filePath),
-                                        fullPath: editor.userPreference('magic-css-server-path') + '/magic-css/' + filePath
-                                    });
-                                }, delay);
                             },
                             error: function (jqXHR, textStatus, errorThrown) {  // eslint-disable-line no-unused-vars
                                 saveInProgress = false;
@@ -1808,41 +1800,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
-                var generateLinkTagsList = function () {
-                    var links = [];
-                    $('link[rel~=stylesheet]:not([disabled])').each(function (index, link) {
-                        if ($(link).attr('href')) {     // The href attribute might have been blank, hence this condition wasn't added to the main jQuery selector itself
-                            links.push({
-                                link: link,
-                                href: $(link).attr('href')
-                            });
-                        }
-                    });
-
-                    var $dom;
-                    // TODO: If links.length is 0, then show a warning/error message
-                    if (links.length) {
-                        $dom = $(
-                            '<select>' +
-                            (function () {
-                                var str = '<option value="0">Refresh all &lt;link&gt; tags</option>';
-                                for (var i = 0; i < links.length; i++) {
-                                    str +=
-                                        '<option value="' + (i + 1) + '">' +
-                                            // links[i].href
-                                            links[i].href.split('?reloadedAt=')[0].split('&reloadedAt=')[0] +
-                                        '</option>';
-                                }
-                                return str;
-                            }()) +
-                            '</select>'
-                        );
-                    } else {
-                        $dom = $('<span>No &lt;link&gt; tags in the page</span>');
-                    }
-                    return $dom;
-                };
-
                 var showFileEditOptions = function (editor, cb) {
                     /* eslint-disable indent */
                     var $fileEditOptions = $(
@@ -1854,26 +1811,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
                                         '<div class="magic-css-edit-file-options" style="pointer-events:initial;">',
                                             '<div class="magic-css-row magic-css-file-config-item">',
-                                                '<div class="magic-css-row-item-1 magic-css-file-field-header">Server path <span style="color:#888;font-size:12px">(eg: http://localhost:3777)</span></div>',
-                                                '<div class="magic-css-row-item-2">',
-                                                    '<input type="text" spellcheck="false" class="magic-css-server-path" />',
-                                                    // '<div class="magic-css-row-item-2"><input type="button" value="Check connectivity" /></div>',
-                                                '</div>',
-                                            '</div>',
-                                            // '<div class="magic-css-row magic-css-file-config-item">',
-                                            //     '<div class="magic-css-row-item-1 magic-css-file-field-header">&nbsp;</div>',
-                                            // '</div>',
-                                            '<div class="magic-css-row magic-css-file-config-item">',
                                                 '<div class="magic-css-row-item-1 magic-css-file-field-header">File to edit</div>',
                                                 '<div class="magic-css-row-item-2"><input class="magicss-file-to-edit" /></div>',
-                                            '</div>',
-                                            '<div class="magic-css-row magic-css-file-config-item">',
-                                                '<div class="magic-css-row-item-1 magic-css-file-field-header">Link tag to refresh</div>',
-                                                '<div class="magic-css-row-item-2 link-tag-to-refresh"></div>',
-                                            '</div>',
-                                            '<div class="magic-css-row magic-css-file-config-item">',
-                                                '<div class="magic-css-row-item-1 magic-css-file-field-header">Refresh delay (in milliseconds)</div>',
-                                                '<div class="magic-css-row-item-2"><input type="number" class="magic-css-link-refresh-delay" value="750" min="0" max="60000" step="50" /></div>',
                                             '</div>',
                                             '<div class="magic-css-row magic-css-file-config-item">',
                                                 '<input type="button" class="magicss-start-file-editing" value="Start Editing" />',
@@ -1902,7 +1841,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             return ob;
                         }()),
                         maxSelection: 1,
-                        data: editor.userPreference('magic-css-server-path') + '/magic-css?query=asdf'
+
+                        _: (function () {
+                            console.log('TODO: Remove hard-coding');
+                        }()),
+                        // TODO: Remove hard-coding
+                        data: 'http://localhost:3777/' + 'magic-css?query=asdf'
                         // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                         // data: 'random.json',
                         // renderer: function(data){
@@ -1924,33 +1868,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         editor.userPreference('file-to-edit', fileToEdit);
                     });
 
-                    var $serverPath = $fileEditOptions.find('.magic-css-server-path'),
-                        serverPathValue = editor.userPreference('magic-css-server-path');
-                    $serverPath.val(serverPathValue);
-                    $serverPath.on('change', function () {
-                        var serverPathValue = $(this).val().trim().replace(/\/$/, '');
-                        editor.userPreference('magic-css-server-path', serverPathValue);
-                    });
-
-                    var $linkRefreshDelay = $fileEditOptions.find('.magic-css-link-refresh-delay'),
-                        linkRefreshDelayValue = editor.userPreference('link-refresh-delay-on-file-update');
-                    $linkRefreshDelay.val(linkRefreshDelayValue);
-                    $linkRefreshDelay.on('change', function () {
-                        editor.userPreference('link-refresh-delay-on-file-update', $(this).val());
-                    });
-
-                    var $linkTagToRefresh = $fileEditOptions.find('.link-tag-to-refresh');
-                    var generatedLinkTagsList = generateLinkTagsList();
-                    $linkTagToRefresh.append(generatedLinkTagsList);
-                    var $selectLinkTagToRefresh = $linkTagToRefresh.find('select');
-                    $selectLinkTagToRefresh.on('change', function (a, b, c) {
-                    // $linkTagToRefresh.on('change', function (a, b, c) {
-                        console.log(123);
-                        $selectLinkTagToRefresh;
-                        generatedLinkTagsList;
-                        debugger;
-                    });
-
                     $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
                     $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
@@ -1967,7 +1884,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 var loadFile = function (editor, options, cb) {
                     var filePath = options.filePath;
                     $.ajax({
-                        url: editor.userPreference('magic-css-server-path') + '/' + filePath,
+                        _: (function () {
+                            console.log('TODO: Remove hard-coding');
+                        }()),
+                        // TODO: Remove hard-coding
+                        url: 'http://localhost:3777/' + filePath,
+
                         success: function (data, textStatus) {
                             if (textStatus === 'success') {
                                 cb({
@@ -2008,7 +1930,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             );
                             /*
                             $.ajax({
-                                url: editor.userPreference('magic-css-server-path') + '/' + filePath,
+                                _: (function () {
+                                    console.log('TODO: Remove hard-coding');
+                                }()),
+                                // TODO: Remove hard-coding
+                                url: 'http://localhost:3777/' + filePath,
+
                                 success: function (data, textStatus) {
                                     if (textStatus === 'success') {
                                         editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
