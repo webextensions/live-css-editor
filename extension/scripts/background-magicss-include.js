@@ -243,7 +243,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
                 sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
             },
             {
-                src: path3rdparty + 'jquery-3.2.1.js',
+                src: path3rdparty + 'jquery.js',
                 skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
             },
             {
