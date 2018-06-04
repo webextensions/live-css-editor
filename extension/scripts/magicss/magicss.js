@@ -1729,7 +1729,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 console.log('TODO: Remove hard-coding');
                             }()),
                             // TODO: Remove hard-coding
-                            url: 'http://localhost:3777/' + 'magic-css/' + filePath,
+                            url: 'http://localhost:3456/' + 'magic-css/' + filePath,
 
                             data: {
                                 targetFileContents: targetFileContents
@@ -1937,7 +1937,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             console.log('TODO: Remove hard-coding');
                         }()),
                         // TODO: Remove hard-coding
-                        data: 'http://localhost:3777/' + 'magic-css?query=asdf'
+                        data: 'http://localhost:3456/' + 'magic-css?query=asdf'
                         // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                         // data: 'random.json',
                         // renderer: function(data){
@@ -1979,7 +1979,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             console.log('TODO: Remove hard-coding');
                         }()),
                         // TODO: Remove hard-coding
-                        url: 'http://localhost:3777/' + filePath,
+                        url: 'http://localhost:3456/' + filePath,
 
                         success: function (data, textStatus) {
                             if (textStatus === 'success') {
@@ -2025,7 +2025,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     console.log('TODO: Remove hard-coding');
                                 }()),
                                 // TODO: Remove hard-coding
-                                url: 'http://localhost:3777/' + filePath,
+                                url: 'http://localhost:3456/' + filePath,
 
                                 success: function (data, textStatus) {
                                     if (textStatus === 'success') {
@@ -2320,10 +2320,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             setLanguageMode('file', editor);
                             // $.ajax({
                             //     method: 'PUT',
-                            //     url: 'http://localhost:3777/magic-css/asdf.txt',
-                            //     // url: 'http://localhost:3777/magic-css/asdf.txt'
-                            //     // url: 'http://localhost:3777/asdf.txt'
-                            //     // url: 'http://localhost:3777/asdf.txt'
+                            //     url: 'http://localhost:3456/magic-css/asdf.txt',
+                            //     // url: 'http://localhost:3456/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3456/asdf.txt'
+                            //     // url: 'http://localhost:3456/asdf.txt'
                             //     success: function () {
                             //         debugger;
                             //     }
@@ -2886,14 +2886,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         setTimeout(function () {
                             // $.ajax({
                             //     method: 'PUT',
-                            //     url: 'http://localhost:3777/magic-css/asdf.txt'
-                            //     // url: 'http://localhost:3777/magic-css/asdf.txt'
-                            //     // url: 'http://localhost:3777/asdf.txt'
-                            //     // url: 'http://localhost:3777/asdf.txt'
+                            //     url: 'http://localhost:3456/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3456/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3456/asdf.txt'
+                            //     // url: 'http://localhost:3456/asdf.txt'
                             // });
                             var fileSuggestions = $('#magicss-file-to-edit').magicSuggest({
                                 method: 'GET',
-                                data: 'http://localhost:3777/magic-css?query=asdf'
+                                data: 'http://localhost:3456/magic-css?query=asdf'
                                 // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                                 // data: 'random.json',
                                 // renderer: function(data){
@@ -2911,7 +2911,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             // fileSuggestions.expand();
                             $(fileSuggestions).on('selectionchange', function(e, m){
                                 $.ajax({
-                                    url: 'http://localhost:3777/' + this.getValue()[0],
+                                    url: 'http://localhost:3456/' + this.getValue()[0],
                                     success: function (data, textStatus) {
                                         if (textStatus === 'success') {
                                             editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
