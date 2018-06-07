@@ -22,7 +22,7 @@
   "devDependencies": {
     "archiver": "2.1.1",
     "chalk": "2.4.1",
-    "copy-files-from-to": "0.2.2",
+    "copy-files-from-to": "0.2.3",
     "cp-file": "5.0.0",
     "del": "3.0.0",
     "eslint": "4.19.1",
