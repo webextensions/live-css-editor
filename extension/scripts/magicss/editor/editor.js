@@ -102,6 +102,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
         }
 
+        // Passing null as "value" would effectively delete the value from the store
+        // Reference: http://amplifyjs.com/api/store/
         userPreference(pref, value) {
             var prefix = this.options.localDataKeyPrefix;
             if (value === undefined) {

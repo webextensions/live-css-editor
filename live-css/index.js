@@ -395,7 +395,7 @@ var handleLiveCss = function (options) {
                 var arrFiles = [];
                 var paramQuery = req.query.query;
                 Object.keys(obFilesForEditing).forEach(function (filePath) {
-                    if (filePath.indexOf(paramQuery) >= 0) {
+                    if (!paramQuery || filePath.indexOf(paramQuery) >= 0) {
                         arrFiles.push({
                             id: filePath,
                             name: filePath
