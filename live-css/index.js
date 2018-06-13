@@ -351,14 +351,19 @@ var handleLiveCss = function (options) {
 
     var connectedSessions = 0;
 
-    console.log('TODO: nocache() should work only for the live-css apis');
     if (expressApp) {
-        expressApp.use(nocache());
+        expressApp.use(function (req, res, next) {
+            if (req.originalUrl.indexOf('/live-css/') === 0) {
+                (nocache())(req, res, next);
+            } else {
+                next();
+            }
+        });
 
         expressApp.use(bodyParser.urlencoded({ extended: false }));
 
-        expressApp.put('/magic-css/*', function (req, res, next) { // eslint-disable-line no-unused-vars
-            var relativeFilePath = req.originalUrl.substr('/magic-css/'.length);
+        expressApp.put('/live-css/edit-file/*', function (req, res, next) { // eslint-disable-line no-unused-vars
+            var relativeFilePath = req.originalUrl.substr('/live-css/edit-file/'.length);
             fs.writeFileSync(
                 // __dirname + '/' + relativeFilePath,
                 relativeFilePath,
@@ -386,13 +391,16 @@ var handleLiveCss = function (options) {
             delete obFilesForEditing[filePath];
         });
         editFileWatcher.on('ready', function () {
-            expressApp.get('/magic-css', function (req, res, next) { // eslint-disable-line no-unused-vars
+            expressApp.get('/live-css/list-of-editable-files', function (req, res, next) { // eslint-disable-line no-unused-vars
                 var arrFiles = [];
+                var paramQuery = req.query.query;
                 Object.keys(obFilesForEditing).forEach(function (filePath) {
-                    arrFiles.push({
-                        id: filePath,
-                        name: filePath
-                    });
+                    if (filePath.indexOf(paramQuery) >= 0) {
+                        arrFiles.push({
+                            id: filePath,
+                            name: filePath
+                        });
+                    }
                 });
                 res.send(arrFiles);
             });
@@ -480,7 +488,6 @@ var handleLiveCss = function (options) {
     );
 
     var versionNamespace = io.of('/api/v' + parseInt(pkg.version, 10));
-    var flagFileWatchReady = false;
     var filesBeingWatched = [];
     var fileModifiedHandler = function (changeObj) {
         versionNamespace.emit('file-modified', changeObj);
@@ -518,6 +525,7 @@ var handleLiveCss = function (options) {
     };
     /* */
 
+    var flagFileWatchReady = false;
     emitter.on('file-watch-ready', function () {
         flagFileWatchReady = true;
 
