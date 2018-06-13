@@ -1639,7 +1639,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 console.log('TODO: Remove hard-coding');
                             }()),
                             // TODO: Remove hard-coding
-                            url: 'http://localhost:3456/' + 'magic-css/' + filePath,
+                            url: 'http://localhost:3456/' + 'live-css/edit-file/' + filePath,
 
                             data: {
                                 targetFileContents: targetFileContents
@@ -1841,12 +1841,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             return ob;
                         }()),
                         maxSelection: 1,
+                        typeDelay: 50,
 
                         _: (function () {
                             console.log('TODO: Remove hard-coding');
                         }()),
                         // TODO: Remove hard-coding
-                        data: 'http://localhost:3456/' + 'magic-css?query=asdf'
+                        data: 'http://localhost:3456/' + 'live-css/list-of-editable-files'
+
                         // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                         // data: 'random.json',
                         // renderer: function(data){
