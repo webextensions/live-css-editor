@@ -1974,8 +1974,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $('body').append($fileEditOptions);
                 };
 
-                var loadFile = function (editor, options, cb) {
-                    var filePath = options.filePath;
+                var loadFile = function (options) {
+                    var filePath = options.filePath,
+                        successCallback = options.successCallback,
+                        errorCallback = options.errorCallback;
                     $.ajax({
                         _: (function () {
                             console.log('TODO: Remove hard-coding');
@@ -1986,7 +1988,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                         success: function (data, textStatus) {
                             if (textStatus === 'success') {
-                                cb({
+                                successCallback({
                                     path: filePath,
                                     contents: data
                                 });
@@ -1995,7 +1997,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         error: function () {
-                            console.log('TODO');
+                            errorCallback();
                         }
                     });
                 };
@@ -2013,15 +2015,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         showFileEditOptions(editor, function (filePath) {
                             // var fileSuggestions = window.fileSuggestions;
                             // var filePath = fileSuggestions.getValue()[0];
-                            loadFile(
-                                editor,
-                                {
-                                    filePath: filePath
-                                },
-                                function (file) {
+                            loadFile({
+                                filePath: filePath,
+                                successCallback: function (file) {
                                     cb(file);
+                                },
+                                errorCallback: function () {
+                                    editor.userPreference('file-to-edit', null);
+                                    getDataForFileToEdit(editor, options, cb);
                                 }
-                            );
+                            });
                             /*
                             $.ajax({
                                 _: (function () {
@@ -2046,15 +2049,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             /* */
                         });
                     } else {
-                        loadFile(
-                            editor,
-                            {
-                                filePath: pathOfFileToEdit
-                            },
-                            function (file) {
+                        loadFile({
+                            filePath: pathOfFileToEdit,
+                            successCallback: function (file) {
                                 cb(file);
+                            },
+                            errorCallback: function () {
+                                editor.userPreference('file-to-edit', null);
+                                getDataForFileToEdit(editor, options, cb);
                             }
-                        );
+                        });
                     }
                 };
 
