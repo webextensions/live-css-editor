@@ -22,7 +22,6 @@
     "chokidar-webextensions": "2.0.4",
     "express": "^4.16.3",
     "find-free-port": "1.2.0",
-    "glob-all": "3.1.0",
     "local-ip-addresses-and-hostnames": "0.1.0",
     "lodash.uniq": "^4.5.0",
     "nocache": "~2.0.0",

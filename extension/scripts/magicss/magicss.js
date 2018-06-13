@@ -1889,6 +1889,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }()),
                         // TODO: Remove hard-coding
                         url: 'http://localhost:3456/' + filePath,
+                        dataType: 'text',
 
                         success: function (data, textStatus) {
                             if (textStatus === 'success') {
