@@ -52,8 +52,7 @@ var chokidar = require('chokidar-webextensions'),
 
 var express = require('express'),
     serveIndex = require('serve-index'),
-    bodyParser = require('body-parser'),
-    glob = require('glob-all');
+    bodyParser = require('body-parser');
 
 var nocache = require('nocache');
 
@@ -184,7 +183,9 @@ var getLiveCssParams = function (configFilePath, argv) {
         );
     }
 
-    var paramWatchPatterns = configuration['watch-patterns'] || defaultConfig['watch-patterns'],
+    var paramEditFilePatterns = configuration['edit-file-patterns'] || defaultConfig['edit-file-patterns'],
+        paramEditFileIgnorePatterns = configuration['edit-file-ignore-patterns'] || defaultConfig['edit-file-ignore-patterns'],
+        paramWatchPatterns = configuration['watch-patterns'] || defaultConfig['watch-patterns'],
         paramWatchIgnorePatterns = configuration['watch-ignore-patterns'] || defaultConfig['watch-ignore-patterns'],
         paramAllowSymlinks = argv.allowSymlinks || configuration['allow-symlinks'] || defaultConfig['allow-symlinks'],
         paramListFiles = argv.listFiles || configuration['list-files'] || defaultConfig['list-files'];
@@ -194,6 +195,8 @@ var getLiveCssParams = function (configFilePath, argv) {
         logger.log({
             'port': paramPort,
             'root': paramRoot,
+            'edit-file-patterns': paramEditFilePatterns,
+            'edit-file-ignore-patterns': paramEditFileIgnorePatterns,
             'watch-patterns': paramWatchPatterns,
             'watch-ignore-patterns': paramWatchIgnorePatterns,
             'allow-symlinks': paramAllowSymlinks,
@@ -208,6 +211,8 @@ var getLiveCssParams = function (configFilePath, argv) {
         flagConfigurationLoaded: flagConfigurationLoaded,
         configuration: configuration,
         paramAllowSymlinks: paramAllowSymlinks,
+        paramEditFilePatterns: paramEditFilePatterns,
+        paramEditFileIgnorePatterns: paramEditFileIgnorePatterns,
         paramWatchPatterns: paramWatchPatterns,
         paramWatchIgnorePatterns: paramWatchIgnorePatterns,
         paramListFiles: paramListFiles,
@@ -335,6 +340,8 @@ var handleLiveCss = function (options) {
     var processedParams = options.processedParams,
         configFilePath = processedParams.configFilePath,
         paramAllowSymlinks = processedParams.paramAllowSymlinks,
+        paramEditFilePatterns = processedParams.paramEditFilePatterns,
+        paramEditFileIgnorePatterns = processedParams.paramEditFileIgnorePatterns,
         paramWatchPatterns = processedParams.paramWatchPatterns,
         paramWatchIgnorePatterns = processedParams.paramWatchIgnorePatterns,
         paramListFiles = processedParams.paramListFiles,
@@ -360,22 +367,33 @@ var handleLiveCss = function (options) {
             res.send({ status: 'File updated successfully' });
         });
 
-        expressApp.get('/magic-css', function (req, res, next) { // eslint-disable-line no-unused-vars
-            var arrFiles = [];
-            glob([
-                '**/*.css',
-                '**/*.scss',
-                '**/*.less',
-                '!**/node_modules/**/*'
-            ], function (err, files) {
-                logger.verbose(files);
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
+        var editFileWatcherCwd = process.cwd();
+        var editFileWatcher = chokidar.watch(
+            paramEditFilePatterns,
+            {
+                cwd: editFileWatcherCwd,
+
+                ignored: paramEditFileIgnorePatterns,
+
+                followSymlinks: paramAllowSymlinks
+            }
+        );
+        var obFilesForEditing = {};
+        editFileWatcher.on('add', function (filePath) {
+            obFilesForEditing[filePath] = true;
+        });
+        editFileWatcher.on('unlink', function (filePath) {
+            delete obFilesForEditing[filePath];
+        });
+        editFileWatcher.on('ready', function () {
+            expressApp.get('/magic-css', function (req, res, next) { // eslint-disable-line no-unused-vars
+                var arrFiles = [];
+                Object.keys(obFilesForEditing).forEach(function (filePath) {
                     arrFiles.push({
-                        id: file,
-                        name: file
+                        id: filePath,
+                        name: filePath
                     });
-                }
+                });
                 res.send(arrFiles);
             });
         });

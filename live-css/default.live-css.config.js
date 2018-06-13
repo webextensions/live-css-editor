@@ -40,6 +40,30 @@ module.exports = {                          // Learn more about "module.exports"
                                             //     https://computer.howstuffworks.com/web-server8.htm
                                             //     https://en.wikipedia.org/wiki/Registered_port
 
+    "edit-file-patterns": [
+        "**/*.css",
+        "**/*.less",
+        "**/*.sass",
+        "**/*.scss",
+        "**/*.styl",
+        "**/*.stylus"
+    ],
+
+
+    "edit-file-ignore-patterns": [
+        // Some of the common folders in various projects which you may wish to exclude
+        /(^|[/\\])\../,                     // This regular expression ignores the files/directories having name beginning with "." character
+                                            // Learn more about regular expressions:
+                                            //     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+        "node_modules",
+        ".npm",
+        "logs",
+        "temp",
+        "tmp",
+
+        "!node_modules/package/do-not-ignore.css"
+    ],
+
 
     // IMPORTANT NOTE: Setting "root" to an incorrect value may result in failure to auto-refresh styles in the browser.
     //                 If you are in doubt, don't use the "root" configuration option, live-css would still work fine.
