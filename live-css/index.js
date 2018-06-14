@@ -363,15 +363,17 @@ var handleLiveCss = function (options) {
         expressApp.use(bodyParser.urlencoded({ extended: false }));
 
         expressApp.put('/live-css/edit-file/*', function (req, res, next) { // eslint-disable-line no-unused-vars
+            var relativeFilePath = req.originalUrl.substr('/live-css/edit-file/'.length);
             try {
-                var relativeFilePath = req.originalUrl.substr('/live-css/edit-file/'.length);
                 fs.writeFileSync(
                     // __dirname + '/' + relativeFilePath,
                     relativeFilePath,
                     req.body.targetFileContents
                 );
+                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Saved changes: ' + relativeFilePath));
                 res.send({ status: 'File updated successfully' });
             } catch (e) {
+                logger.warn(getLocalISOTime() + logger.chalk.dim(' Failed to save changes: ' + relativeFilePath));
                 res.status(500);
                 res.send({ status: 'Failed to update the file' });
             }
