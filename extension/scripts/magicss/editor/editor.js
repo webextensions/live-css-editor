@@ -1080,8 +1080,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // For example, one (or more) of the lists in uBlock Origin and Adblock Plus
         // was applying a style like the above for the page:
         //     https://www.msn.com/en-ae/
-        // Now, we use 301x249 as the default size to avoid that
-        'ui-size-width': 301,
+        // Now, we use 326x249 as the default size which avoids that
+        'ui-size-width': 326,
         'ui-size-height': 249
     };
 

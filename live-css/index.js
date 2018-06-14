@@ -406,9 +406,11 @@ var handleLiveCss = function (options) {
             });
         }
 
+        /*
         // https://expressjs.com/en/starter/static-files.html
         // https://expressjs.com/en/resources/middleware/serve-index.html
         expressApp.use('/', express.static('.'), serveIndex('.', {'icons': true}));
+        /* */
     }
 
     var watcherCwd = (function () {
@@ -665,7 +667,19 @@ var handleLiveCss = function (options) {
                 logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Saved changes: ' + relativeFilePath));
                 cb('success');
             } catch (e) {
-                logger.warn(getLocalISOTime() + logger.chalk.dim(' ✘ Failed to save changes: ' + relativeFilePath));
+                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.red(' ✘ Failed to save changes: ' + relativeFilePath));
+                cb('error');
+            }
+        });
+
+        socket.on('GET', function (dataOb, cb) {
+            var relativeFilePath = dataOb.url;
+            try {
+                var fileContents = fs.readFileSync(relativeFilePath, 'utf8');
+                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Read file: ' + relativeFilePath));
+                cb('success', { fileContents: fileContents });
+            } catch (e) {
+                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.red(' ✘ Failed to read file: ' + relativeFilePath));
                 cb('error');
             }
         });
