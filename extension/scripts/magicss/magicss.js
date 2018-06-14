@@ -8,6 +8,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
+console.log(
+    'TODO:' +
+    '\nIf we add some styles from CSS/Less/Sass scratchpad' +
+    ' then load a "file" and then if we reload the webpage and start Magic CSS,' +
+    ' in that case, the scratchpad styles do not get applied'
+);
+
 (function($){
     var chromeStorage;
     try {
@@ -1993,6 +2000,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     var filePath = options.filePath,
                         successCallback = options.successCallback,
                         errorCallback = options.errorCallback;
+                    // Using a timeout of 0ms so that the "socket" gets initiated if it is required
+                    setTimeout(function () {
+                        socket.emit(
+                            'GET',
+                            {
+                                url: filePath
+                            },
+                            function (status, data) {
+                                if (status === 'success') {
+                                    successCallback({
+                                        path: filePath,
+                                        contents: data.fileContents
+                                    });
+                                } else {
+                                    errorCallback();
+                                }
+                            }
+                        );
+                    }, 0);
+                    /*
                     $.ajax({
                         _: (function () {
                             console.log('TODO: Remove hard-coding');
@@ -2015,6 +2042,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             errorCallback();
                         }
                     });
+                    /* */
                 };
 
                 var getDataForFileToEdit = function (editor, options, cb) {
@@ -2108,7 +2136,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             $('.footer-for-file-mode .name-of-file-being-edited')
                                 .html(htmlEscape(getFileNameFromPath(file.path)))
                                 .attr('title', file.path)
-                                .css({marginRight: 75, fontWeight: 'bold'})
+                                .css({marginRight: 75})
                                 .animate({marginRight: 0}, 1000)
                                 .fadeOut(100)
                                 .fadeIn(750);
@@ -2425,7 +2453,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             return options;
                         }
                     },
-                    bgColor: '68,88,174,0.85',
+                    // bgColor: '68,88,174,0.85',
+                    bgColor: '99,113,186,1',
                     headerIcons: [
                         (function () {
                             if (executionCounter < 25 || 50 <= executionCounter) {
@@ -2898,7 +2927,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                         var $fileToEdit = $(
                             '<div class="file-to-edit">' +
-                                '<div class="name-of-file-being-edited" style="color:yellow"></div>' +
+                                '<div class="name-of-file-being-edited" style="color:#fff"></div>' +
                             '</div>'
                         );
                         var $fileEditStatus = $('<div class="file-edit-status" style="color:#fff"></div>');
@@ -2970,7 +2999,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 $('.footer-for-file-mode .name-of-file-being-edited')
                                     .html(htmlEscape(getFileNameFromPath(file.path)))
                                     .attr('title', file.path)
-                                    .css({marginRight: 75, fontWeight: 'bold'})
+                                    .css({marginRight: 75})
                                     .animate({marginRight: 0}, 1000)
                                     .fadeOut(100)
                                     .fadeIn(750);
