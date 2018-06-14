@@ -233,7 +233,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         var successCount = 0,
             errorCount = 0;
         var checkCompletion = function () {
-            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + linkTags.length);
+            utils.alertNote(
+                '<span style="font-weight:normal;">' +
+                    htmlEscape('Reloading active CSS <link> tags.') +
+                '</span>' +
+                ' Success: ' + successCount + '/' + linkTags.length
+            );
             if (linkTags.length === successCount + errorCount) {
                 setTimeout(function () {
                     if (errorCount) {
@@ -2764,7 +2769,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                         var $fileToEdit = $(
                             '<div class="file-to-edit">' +
-                                '<span class="name-of-file-being-edited" style="color:yellow"></span>' +
+                                '<div class="name-of-file-being-edited" style="color:yellow"></div>' +
                             '</div>'
                         );
                         var $fileEditStatus = $('<div class="file-edit-status" style="color:#fff"></div>');

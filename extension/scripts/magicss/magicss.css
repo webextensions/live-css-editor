@@ -842,7 +842,6 @@ html .magicss-mouse-over-dom-element {
 /* End: Server connectivity UI */
 
 
-#MagiCSS-bookmarklet .link-tag-to-edit,
 #MagiCSS-bookmarklet .file-to-edit {
     color: #fff;
     display: inline-block;
@@ -852,8 +851,11 @@ html .magicss-mouse-over-dom-element {
     float: right;
 }
 
-#MagiCSS-bookmarklet .link-tag-to-edit {
-    float: right;
+#MagiCSS-bookmarklet .name-of-file-being-edited {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .magic-css-full-page-overlay {
