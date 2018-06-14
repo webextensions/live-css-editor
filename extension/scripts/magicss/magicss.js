@@ -1715,7 +1715,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         overwriteExistingStyleTagWithSameId: true
                     });
 
-                var anySavePending = false;
+                var saveStatusUpdateTimeout;
                 var fnApplyTextAsCSS = function (editor) {
                     var disabled = false;
                     if (editor.userPreference('disable-styles') === 'yes') {
@@ -1727,7 +1727,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                         var $fileEditStatus = $('.footer-for-file-mode .file-edit-status');
                         var saveInProgress = true;
-                        anySavePending = true;
                         setTimeout(function () {
                             if (saveInProgress) {
                                 $fileEditStatus.html('◔ Saving');
@@ -1746,13 +1745,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 saveInProgress = false;
 
                                 if (status === 'success') {
-                                    anySavePending = false;
-
                                     $fileEditStatus.html('✔ Saved');
-                                    setTimeout(function () {
-                                        if (!anySavePending) {
-                                            $fileEditStatus.html('');
-                                        }
+
+                                    clearTimeout(saveStatusUpdateTimeout);
+                                    saveStatusUpdateTimeout = setTimeout(function () {
+                                        $fileEditStatus.html('');
                                     }, 2500);
                                 } else {
                                     $fileEditStatus.html('✘ Save failed');
