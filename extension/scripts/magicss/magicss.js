@@ -280,7 +280,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             msg = htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.');
                         }
                         msg += '<br/><span style="font-weight:normal;">Please check availability of the CSS resources included in this page.</span>';
-                        utils.alertNote(msg);
+                        utils.alertNote(
+                            msg,
+                            undefined,
+                            {
+                                backgroundColor: '#f5bcae',
+                                borderColor: '#e87457'
+                            }
+                        );
                     } else {
                         if (successCount === 1) {
                             utils.alertNote(htmlEscape(successCount + ' active CSS <link> tag got reloaded successfully :-)'));
@@ -1758,13 +1765,21 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     utils.alertNote(
                                         '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
                                         '<br/>Probable cause: <span style="font-weight:normal">live-css server is not running</span>',
-                                        7500
+                                        7500,
+                                        {
+                                            backgroundColor: '#f5bcae',
+                                            borderColor: '#e87457'
+                                        }
                                     );
                                 } else {
                                     utils.alertNote(
                                         '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
                                         '<br/>Probable cause: <span style="font-weight:normal">live-css server failed to save the file</span>',
-                                        7500
+                                        7500,
+                                        {
+                                            backgroundColor: '#f5bcae',
+                                            borderColor: '#e87457'
+                                        }
                                     );
                                 }
                             }
