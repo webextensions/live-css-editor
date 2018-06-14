@@ -1716,56 +1716,61 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     });
 
                 var saveStatusUpdateTimeout;
-                var fnApplyTextAsCSS = function (editor) {
+                var fnApplyTextAsCSS = function (editor, options) {
+                    options = options || {};
                     var disabled = false;
                     if (editor.userPreference('disable-styles') === 'yes') {
                         disabled = true;
                     }
 
                     if (getLanguageMode() === 'file') {
-                        var targetFileContents = editor.getTextValue();
+                        if (options.skipSavingFile) {
+                            // do nothing
+                        } else {
+                            var targetFileContents = editor.getTextValue();
 
-                        var $fileEditStatus = $('.footer-for-file-mode .file-edit-status');
-                        var saveInProgress = true;
-                        setTimeout(function () {
-                            if (saveInProgress) {
-                                $fileEditStatus.html('◔ Saving');
-                            }
-                        }, 300);
-
-                        var filePath = editor.userPreference('file-to-edit');
-
-                        socket.emit(
-                            'PUT',
-                            {
-                                url: '/live-css/edit-file/' + filePath,
-                                targetFileContents: targetFileContents
-                            },
-                            function (status) {
-                                saveInProgress = false;
-
-                                if (status === 'success') {
-                                    $fileEditStatus.html('✔ Saved');
-
-                                    clearTimeout(saveStatusUpdateTimeout);
-                                    saveStatusUpdateTimeout = setTimeout(function () {
-                                        $fileEditStatus.html('');
-                                    }, 2500);
-                                } else {
-                                    $fileEditStatus.html('✘ Save failed');
-
-                                    utils.alertNote(
-                                        '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
-                                        '<br/>Probable cause: <span style="font-weight:normal">live-css server encountered an unexpected error in saving the file</span>',
-                                        7500,
-                                        {
-                                            backgroundColor: '#f5bcae',
-                                            borderColor: '#e87457'
-                                        }
-                                    );
+                            var $fileEditStatus = $('.footer-for-file-mode .file-edit-status');
+                            var saveInProgress = true;
+                            setTimeout(function () {
+                                if (saveInProgress) {
+                                    $fileEditStatus.html('◔ Saving');
                                 }
-                            }
-                        );
+                            }, 300);
+
+                            var filePath = editor.userPreference('file-to-edit');
+
+                            socket.emit(
+                                'PUT',
+                                {
+                                    url: '/live-css/edit-file/' + filePath,
+                                    targetFileContents: targetFileContents
+                                },
+                                function (status) {
+                                    saveInProgress = false;
+
+                                    if (status === 'success') {
+                                        $fileEditStatus.html('✔ Saved');
+
+                                        clearTimeout(saveStatusUpdateTimeout);
+                                        saveStatusUpdateTimeout = setTimeout(function () {
+                                            $fileEditStatus.html('');
+                                        }, 2500);
+                                    } else {
+                                        $fileEditStatus.html('✘ Save failed');
+
+                                        utils.alertNote(
+                                            '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
+                                            '<br/>Probable cause: <span style="font-weight:normal">live-css server encountered an unexpected error in saving the file</span>',
+                                            7500,
+                                            {
+                                                backgroundColor: '#f5bcae',
+                                                borderColor: '#e87457'
+                                            }
+                                        );
+                                    }
+                                }
+                            );
+                        }
                     } else if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
@@ -3135,7 +3140,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
 
                             window.setTimeout(function () {
-                                fnApplyTextAsCSS(editor);
+                                fnApplyTextAsCSS(editor, {
+                                    skipSavingFile: true    // Skip saving file since it is first launch
+                                });
                             }, 100);
 
                             var autocompleteSelectors = editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
