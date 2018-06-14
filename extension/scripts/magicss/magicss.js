@@ -1645,46 +1645,31 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }, 300);
 
                         var filePath = editor.userPreference('file-to-edit');
-                        $.ajax({
-                            method: 'PUT',
-                            _: (function () {
-                                console.log('TODO: Remove hard-coding');
-                            }()),
-                            // TODO: Remove hard-coding
-                            url: 'http://localhost:3456/' + 'live-css/edit-file/' + filePath,
 
-                            data: {
+                        socket.emit(
+                            'PUT',
+                            {
+                                url: '/live-css/edit-file/' + filePath,
                                 targetFileContents: targetFileContents
                             },
-                            success: function (data, textStatus, jqXHR) {   // eslint-disable-line no-unused-vars
+                            function (status) {
                                 saveInProgress = false;
-                                anySavePending = false;
 
-                                $fileEditStatus.html('✔ Saved');
-                                setTimeout(function () {
-                                    if (!anySavePending) {
-                                        $fileEditStatus.html('');
-                                    }
-                                }, 2500);
-                            },
-                            error: function (jqXHR, textStatus, errorThrown) {  // eslint-disable-line no-unused-vars
-                                saveInProgress = false;
-                                $fileEditStatus.html('✘ Save failed');
+                                if (status === 'success') {
+                                    anySavePending = false;
 
-                                if (jqXHR.status === 0) {
-                                    utils.alertNote(
-                                        '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
-                                        '<br/>Probable cause: <span style="font-weight:normal">live-css server is not running</span>',
-                                        7500,
-                                        {
-                                            backgroundColor: '#f5bcae',
-                                            borderColor: '#e87457'
+                                    $fileEditStatus.html('✔ Saved');
+                                    setTimeout(function () {
+                                        if (!anySavePending) {
+                                            $fileEditStatus.html('');
                                         }
-                                    );
+                                    }, 2500);
                                 } else {
+                                    $fileEditStatus.html('✘ Save failed');
+
                                     utils.alertNote(
                                         '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
-                                        '<br/>Probable cause: <span style="font-weight:normal">live-css server failed to save the file</span>',
+                                        '<br/>Probable cause: <span style="font-weight:normal">live-css server encountered an unexpected error in saving the file</span>',
                                         7500,
                                         {
                                             backgroundColor: '#f5bcae',
@@ -1693,7 +1678,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     );
                                 }
                             }
-                        });
+                        );
                     } else if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
