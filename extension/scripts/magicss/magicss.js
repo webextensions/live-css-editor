@@ -1909,6 +1909,7 @@ console.log(
                     var filePath = options.filePath,
                         successCallback = options.successCallback,
                         errorCallback = options.errorCallback;
+
                     // Using a timeout of 0ms so that the "socket" gets initiated if it is required
                     setTimeout(function () {
                         socket.emit(
