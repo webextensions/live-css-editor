@@ -2023,15 +2023,22 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 .setTextValue(file.contents)
                                 .reInitTextComponent({pleaseIgnoreCursorActivity: true})
                                 .focus();
+
+                            // Clear the undo-redo hstory
+                            editor.cm.clearHistory();
                         });
                     } else {
                         editor.options.rememberText = true;
 
-                        // If previous mode was 'file', then we restore the saved code
+                        // If previous mode was 'file'
                         if (getLanguageMode() === 'file') {
+                            // Restore the saved code
                             editor
                                 .setTextValue(editor.userPreference('textarea-value'))
                                 .reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                            // Clear the undo-redo hstory
+                            editor.cm.clearHistory();
                         }
 
                         $('.footer-for-file-mode').hide();
@@ -2855,6 +2862,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     .setTextValue(file.contents)
                                     .reInitTextComponent({pleaseIgnoreCursorActivity: true})
                                     .focus();
+
+                                // Clear the undo-redo hstory
+                                editor.cm.clearHistory();
                             });
                         });
 
