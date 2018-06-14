@@ -362,23 +362,6 @@ var handleLiveCss = function (options) {
 
         expressApp.use(bodyParser.urlencoded({ extended: false }));
 
-        expressApp.put('/live-css/edit-file/*', function (req, res, next) { // eslint-disable-line no-unused-vars
-            var relativeFilePath = req.originalUrl.substr('/live-css/edit-file/'.length);
-            try {
-                fs.writeFileSync(
-                    // __dirname + '/' + relativeFilePath,
-                    relativeFilePath,
-                    req.body.targetFileContents
-                );
-                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Saved changes: ' + relativeFilePath));
-                res.send({ status: 'File updated successfully' });
-            } catch (e) {
-                logger.warn(getLocalISOTime() + logger.chalk.dim(' Failed to save changes: ' + relativeFilePath));
-                res.status(500);
-                res.send({ status: 'Failed to update the file' });
-            }
-        });
-
         var editFileWatcherCwd = process.cwd();
         var editFileWatcher = chokidar.watch(
             paramEditFilePatterns,
@@ -669,6 +652,22 @@ var handleLiveCss = function (options) {
 
         socket.on('disconnect', function () {
             emitter.emit('disconnected-socket');
+        });
+
+        socket.on('PUT', function (dataOb, cb) {
+            var relativeFilePath = dataOb.url.substr('/live-css/edit-file/'.length);
+            try {
+                fs.writeFileSync(
+                    // __dirname + '/' + relativeFilePath,
+                    relativeFilePath,
+                    dataOb.targetFileContents
+                );
+                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Saved changes: ' + relativeFilePath));
+                cb('success');
+            } catch (e) {
+                logger.warn(getLocalISOTime() + logger.chalk.dim(' ✘ Failed to save changes: ' + relativeFilePath));
+                cb('error');
+            }
         });
     });
 
