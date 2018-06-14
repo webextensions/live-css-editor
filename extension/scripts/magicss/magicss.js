@@ -1752,13 +1752,21 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             },
                             error: function (jqXHR, textStatus, errorThrown) {  // eslint-disable-line no-unused-vars
                                 saveInProgress = false;
-
                                 $fileEditStatus.html('✘ Save failed');
-                                utils.alertNote(
-                                    '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
-                                    '<br/>Probable cause: <span style="font-weight:bold">magic-css server</span> is not running',
-                                    7500
-                                );
+
+                                if (jqXHR.status === 0) {
+                                    utils.alertNote(
+                                        '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
+                                        '<br/>Probable cause: <span style="font-weight:normal">live-css server is not running</span>',
+                                        7500
+                                    );
+                                } else {
+                                    utils.alertNote(
+                                        '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
+                                        '<br/>Probable cause: <span style="font-weight:normal">live-css server failed to save the file</span>',
+                                        7500
+                                    );
+                                }
                             }
                         });
                     } else if (getLanguageMode() === 'less') {
