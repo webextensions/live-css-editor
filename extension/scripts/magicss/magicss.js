@@ -130,6 +130,37 @@ console.log(
         editor.userPreference('last-applied-css', css);
     };
 
+    var applyLastAppliedCss = function (editor) {
+        // TODO: Some of the code related to this function may be reused
+
+        var userPreference = editor.userPreference.bind(editor);
+
+        var localStorageDisableStyles = 'disable-styles';
+        var disableStyles = userPreference(localStorageDisableStyles) === 'yes';
+
+        var localStorageLastAppliedCss = 'last-applied-css';
+        var cssText = userPreference(localStorageLastAppliedCss).trim();
+
+        if (cssText) {
+            var id = 'MagiCSS-bookmarklet',
+                newStyleTagId = id + '-html-id',
+                newStyleTag = new utils.StyleTag({
+                    id: newStyleTagId,
+                    parentTag: 'body',
+                    attributes: [{
+                        name: 'data-style-created-by',
+                        value: 'magicss'
+                    }],
+                    overwriteExistingStyleTagWithSameId: true
+                });
+
+            newStyleTag.cssText = cssText;
+
+            newStyleTag.disabled = disableStyles;
+            newStyleTag.applyTag();
+        }
+    };
+
     var ellipsis = function (str, limit) {
         limit = limit || 12;
         return (str.length <= limit) ? str : (str.substring(0, limit - 3) + '...');
@@ -628,7 +659,7 @@ console.log(
             };
 
             var cssSelectorToShow = htmlEscape(trunc(cssSelectorString, 100));
-            var sourcesToShow = (cssSelector && cssSelector.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(cssSelector.sources) + '</span></span>') : '';
+            var sourcesToShow = (cssSelector && cssSelector.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(decodeURIComponent(cssSelector.sources)) + '</span></span>') : '';
             if (count) {
                 utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
             } else {
@@ -757,60 +788,68 @@ console.log(
     var flagWatchingCssFiles = false;
     var socket = null;
 
-    var startWatchingFiles = function (editor) {
-        var getConnected = function () {
-            getConnectedWithBackEnd(
-                editor,
-                function callback (err, socket) {
-                    if (err) {
-                        // The user cancelled watching files
-                        utils.alertNote('You cancelled watching CSS files for changes');
-                        editor.userPreference('watching-css-files', 'no');
-                    } else {
-                        socket.on('file-modified', function(changeDetails) {
-                            if (changeDetails.useOnlyFileNamesForMatch) {
-                                reloadCSSResourceInPage({
-                                    fullPath: changeDetails.fullPath,
-                                    useOnlyFileNamesForMatch: true,
-                                    fileName: changeDetails.fileName
-                                });
-                            } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                                var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                                reloadCSSResourceInPage({
-                                    fullPath: changeDetails.fullPath,
-                                    url: resolveUrl(pathWrtRoot)
-                                });
-                            } else {
-                                // The code should never reach here
-                                utils.alertNote(
-                                    'Unexpected scenario occurred in reloading some CSS resources.' +
-                                    '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                                    10000
-                                );
-                            }
-                        });
-                        if (!flagWatchingCssFiles) {
-                            flagWatchingCssFiles = true;
+    var getConnected = function (editor, cb) {
+        var socketIfAlreadyConnected = getConnectedWithBackEnd(
+            editor,
+            function callback (err, socket) {
+                if (err) {
+                    // The user cancelled watching files
+                    utils.alertNote('You cancelled watching CSS files for changes');
+                    editor.userPreference('watching-css-files', 'no');
+                } else {
+                    socket.on('file-modified', function(changeDetails) {
+                        if (changeDetails.useOnlyFileNamesForMatch) {
+                            reloadCSSResourceInPage({
+                                fullPath: changeDetails.fullPath,
+                                useOnlyFileNamesForMatch: true,
+                                fileName: changeDetails.fileName
+                            });
+                        } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                            var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                            reloadCSSResourceInPage({
+                                fullPath: changeDetails.fullPath,
+                                url: resolveUrl(pathWrtRoot)
+                            });
+                        } else {
+                            // The code should never reach here
                             utils.alertNote(
-                                'Watching CSS files for changes.' +
-                                '<br />' +
-                                '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
-                                20000,
-                                {
-                                    unobtrusive: true
-                                }
+                                'Unexpected scenario occurred in reloading some CSS resources.' +
+                                '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                                10000
                             );
-                            $(editor.container).addClass('watching-css-files');
-                            editor.userPreference('watching-css-files', 'yes');
                         }
+                    });
+                    if (!flagWatchingCssFiles) {
+                        flagWatchingCssFiles = true;
+                        utils.alertNote(
+                            'Watching CSS files for changes.' +
+                            '<br />' +
+                            '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                            20000,
+                            {
+                                unobtrusive: true
+                            }
+                        );
+                        $(editor.container).addClass('watching-css-files');
+                        editor.userPreference('watching-css-files', 'yes');
                     }
-                },
-                function callbackForReconfiguration () {
-                    getConnected();
+
+                    if (!socketIfAlreadyConnected && cb) {
+                        cb();
+                    }
                 }
-            );
-        };
-        getConnected();
+            },
+            function callbackForReconfiguration () {
+                getConnected(editor);
+            }
+        );
+        if (socketIfAlreadyConnected && cb) {
+            cb();
+        }
+    };
+
+    var startWatchingFiles = function (editor) {
+        getConnected(editor);
     };
 
     // A pretty basic OS detection logic based on:
@@ -1091,11 +1130,14 @@ console.log(
         if (socket) {
             var socketOpts = (socket.io || {}).opts || {};
             if (
-                socket.connected &&
                 socketOpts.hostname === serverHostnameValue &&
-                socketOpts.port === serverPortValue
+                socketOpts.port === serverPortValue &&
+                (
+                    socket.connected ||
+                    (socket.io || {}).readyState === 'opening'
+                )
             ) {
-                return;
+                return socket;
             } else {
                 socket.close();
                 socket = null;
@@ -1865,11 +1907,14 @@ console.log(
                         maxSelection: 1,
                         typeDelay: 50,
 
-                        _: (function () {
-                            console.log('TODO: Remove hard-coding');
-                        }()),
-                        // TODO: Remove hard-coding
-                        data: 'http://localhost:3456/' + 'live-css/list-of-editable-files'
+                        data: (function () {
+                            var protocolValue = (window.location.protocol === 'https:') ? 'https:' : 'http:',
+                                serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+                                serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort,
+                                backEndPath = serverHostnameValue + ':' + serverPortValue + '/',
+                                url = protocolValue + '//' + backEndPath + 'live-css/list-of-editable-files';
+                            return url;
+                        }())
 
                         // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
                         // data: 'random.json',
@@ -1964,10 +2009,37 @@ console.log(
                         needInputThroughUi = false;
                     }
 
+                    console.log('TODO: The following piece of code needs to be refactored');
+                    getConnected(editor, function () {
+                        if (needInputThroughUi || options.showUi) {
+                            showFileEditOptions(editor, function (filePath) {
+                                loadFile({
+                                    filePath: filePath,
+                                    successCallback: function (file) {
+                                        cb(file);
+                                    },
+                                    errorCallback: function () {
+                                        editor.userPreference('file-to-edit', null);
+                                        getDataForFileToEdit(editor, options, cb);
+                                    }
+                                });
+                            });
+                        } else {
+                            loadFile({
+                                filePath: pathOfFileToEdit,
+                                successCallback: function (file) {
+                                    cb(file);
+                                },
+                                errorCallback: function () {
+                                    editor.userPreference('file-to-edit', null);
+                                    getDataForFileToEdit(editor, options, cb);
+                                }
+                            });
+                        }
+                    });
+                    /*
                     if (needInputThroughUi || options.showUi) {
                         showFileEditOptions(editor, function (filePath) {
-                            // var fileSuggestions = window.fileSuggestions;
-                            // var filePath = fileSuggestions.getValue()[0];
                             loadFile({
                                 filePath: filePath,
                                 successCallback: function (file) {
@@ -1978,28 +2050,6 @@ console.log(
                                     getDataForFileToEdit(editor, options, cb);
                                 }
                             });
-                            /*
-                            $.ajax({
-                                _: (function () {
-                                    console.log('TODO: Remove hard-coding');
-                                }()),
-                                // TODO: Remove hard-coding
-                                url: 'http://localhost:3456/' + filePath,
-
-                                success: function (data, textStatus) {
-                                    if (textStatus === 'success') {
-                                        editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        var fileToEdit = filePath;
-                                        cb(fileToEdit);
-                                    } else {
-                                        console.log('TODO');
-                                    }
-                                },
-                                error: function () {
-                                    console.log('TODO');
-                                }
-                            });
-                            /* */
                         });
                     } else {
                         loadFile({
@@ -2013,6 +2063,7 @@ console.log(
                             }
                         });
                     }
+                    /* */
                 };
 
                 var setLanguageModeClass = function (editor, cls) {
@@ -2285,16 +2336,6 @@ console.log(
                         });
                         $(document).on('click', '.magicss-mode-file', function () {
                             setLanguageMode('file', editor);
-                            // $.ajax({
-                            //     method: 'PUT',
-                            //     url: 'http://localhost:3456/magic-css/asdf.txt',
-                            //     // url: 'http://localhost:3456/magic-css/asdf.txt'
-                            //     // url: 'http://localhost:3456/asdf.txt'
-                            //     // url: 'http://localhost:3456/asdf.txt'
-                            //     success: function () {
-                            //         debugger;
-                            //     }
-                            // });
                             editor.focus();
                         });
 
@@ -3031,6 +3072,7 @@ console.log(
                             }
 
                             if (languageMode === 'file') {
+                                applyLastAppliedCss(editor);
                                 setLanguageMode('file', editor, {skipNotifications: true});
                             } else {
                                 window.setTimeout(function () {
@@ -3057,11 +3099,11 @@ console.log(
                                 editor.applyStylesAutomatically(false);
                             }
 
-                            window.setTimeout(function () {
-                                fnApplyTextAsCSS(editor, {
-                                    skipSavingFile: true    // Skip saving file since it is first launch
-                                });
-                            }, 100);
+                            // window.setTimeout(function () {
+                            //     fnApplyTextAsCSS(editor, {
+                            //         skipSavingFile: true    // Skip saving file since it is first launch
+                            //     });
+                            // }, 100);
 
                             var autocompleteSelectors = editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
                             if (autocompleteSelectors === 'no') {

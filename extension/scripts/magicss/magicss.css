@@ -857,6 +857,8 @@ html .magicss-mouse-over-dom-element {
     overflow: hidden;
     text-overflow: ellipsis;
 
+    text-align: right;
+
     /* The following styles help in avoiding some flickering when this text/element is animated */
     background-color: rgba(99,113,186,1);
     -webkit-backface-visibility: hidden;
