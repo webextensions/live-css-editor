@@ -196,6 +196,11 @@ var main = function (tabId) {
             pathCodeMirror + 'addons/edit/closebrackets.js',
             pathCodeMirror + 'addons/edit/matchbrackets.js',
 
+            // This is required for some cases in multi-selection (using Ctrl+D)
+            pathCodeMirror + 'addons/search/searchcursor.js',
+
+            pathCodeMirror + 'addons/comment/comment.js',
+
             path3rdparty + 'csslint/csslint.js',
             path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
             pathCodeMirror + 'addons/lint/lint.css',
@@ -213,6 +218,8 @@ var main = function (tabId) {
             pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
             pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
+
+            pathCodeMirror + 'keymap/sublime.js',
 
             path3rdparty + 'jquery-ui_customized.css',
             path3rdparty + 'jquery-ui.js',

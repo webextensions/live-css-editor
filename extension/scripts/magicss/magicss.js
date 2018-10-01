@@ -1993,10 +1993,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 var editor = window.MagiCSSEditor;
                                 createGistAndEmail(editor.getTextValue(), getLanguageMode());
                                 editor.focus();
-                            },
-                            'Ctrl-D': function () {
-                                // TODO: Implement select-next-occurrence-of-current-selection
-                                //       This link might be of some help: https://codereview.chromium.org/219583002/
                             }
                         },
                         optionsBasedOnUserPreference: function (userPreference) {

@@ -327,6 +327,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                 matchBrackets: true,
 
+                keyMap: "sublime",
+                showCursorWhenSelecting: true,
+
                 indentWithTabs: indentWithTabs,
                 indentUnit: (!indentWithTabs && parseInt(thisOb.userPreference('indentation-spaces-count'), 10)) || 4,
                 undoDepth: 1000,
@@ -349,8 +352,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     },
                     Esc: function () {
-                        if (closeOnEscapeKey) {
-                            thisOb.hide();
+                        // If there is some selection
+                        if (thisOb.cm.getSelection()) {
+                            // Clear selection
+                            thisOb.setCursorPosition(
+                                thisOb.getCursorPosition()
+                            );
+                        } else {
+                            if (closeOnEscapeKey) {
+                                thisOb.hide();
+                            }
                         }
                     }
                 }
@@ -886,6 +897,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
         getCursorPosition() {
             return this.cm.getCursor('start');
+        }
+
+        setCursorPosition(position) {
+            return this.cm.setCursor(position);
         }
 
         cmInputFieldHasFocus () {

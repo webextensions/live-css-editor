@@ -19,6 +19,11 @@
             "latestVersion": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorview.js"
         },
         {
+            "to": "extension/scripts/3rdparty/codemirror/addons/comment/comment.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/comment/comment.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/comment/comment.js"
+        },
+        {
             "to": "extension/scripts/3rdparty/codemirror/addons/display/placeholder.js",
             "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/display/placeholder.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/display/placeholder.js"
@@ -71,9 +76,19 @@
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/lint/lint.js"
         },
         {
+            "to": "extension/scripts/3rdparty/codemirror/addons/search/searchcursor.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/search/searchcursor.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/search/searchcursor.js"
+        },
+        {
             "to": "extension/scripts/3rdparty/codemirror/addons/selection/active-line.js",
             "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/selection/active-line.js" } },
             "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/addon/selection/active-line.js"
+        },
+        {
+            "to": "extension/scripts/3rdparty/codemirror/keymap/sublime.js",
+            "from": { "default": { "src": "https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/keymap/sublime.js" } },
+            "latestVersion": "https://raw.githubusercontent.com/codemirror/CodeMirror/master/keymap/sublime.js"
         },
         {
             "to": "extension/scripts/3rdparty/codemirror/mode/css.js",
