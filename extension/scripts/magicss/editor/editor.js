@@ -33,6 +33,94 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return false;
     };
 
+    var getRoundedBoundingClientRect = function (el) {
+        var rect = el.getBoundingClientRect();
+        var ob = {};
+        for (var key in rect) {
+            if (typeof rect[key] === 'number') {
+                ob[key] = Math.round(rect[key]);
+            }
+        }
+        return ob;
+    };
+
+    /*
+    // Slightly modified version of https://gist.github.com/davidtheclark/5515733
+    function isElementInViewport(el) {
+        var rect = getRoundedBoundingClientRect(el);
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= Math.min(window.innerHeight, document.documentElement.clientHeight) &&
+            rect.right <= Math.min(window.innerWidth, document.documentElement.clientWidth)
+        );
+    }
+    /* */
+    function isElementYInViewport(el) {
+        var rect = getRoundedBoundingClientRect(el);
+        return (
+            rect.top >= 0 &&
+            rect.bottom <= Math.min(window.innerHeight, document.documentElement.clientHeight)
+        );
+    }
+    function isElementXInViewport(el) {
+        var rect = getRoundedBoundingClientRect(el);
+        return (
+            rect.left >= 0 &&
+            rect.right <= Math.min(window.innerWidth, document.documentElement.clientWidth)
+        );
+    }
+
+    var autoPositionEditor = function (thisOb) {
+        // Just a block
+        {
+            let appliedTop = parseInt(thisOb.container.style.top, 10);
+            let userPreferredTop = thisOb.userPreference('ui-position-top');
+            if (!isElementYInViewport(thisOb.container)) {
+                let rect = getRoundedBoundingClientRect(thisOb.container);
+                if (rect.top < 0) {
+                    // do nothing
+                } else {
+                    let deltaY = rect.bottom - Math.min(window.innerHeight, document.documentElement.clientHeight);
+                    if (deltaY > rect.top) {
+                        deltaY = rect.top;
+                    }
+                    thisOb.container.style.top = (appliedTop - deltaY) + 'px';
+                }
+            } else {
+                if (appliedTop < userPreferredTop) {
+                    let rect = getRoundedBoundingClientRect(thisOb.container);
+                    let deltaY = Math.min(window.innerHeight, document.documentElement.clientHeight) - rect.bottom;
+                    thisOb.container.style.top = Math.min((appliedTop + deltaY), userPreferredTop) + 'px';
+                }
+            }
+        }
+
+        // Just a block
+        {
+            let appliedLeft = parseInt(thisOb.container.style.left, 10);
+            let userPreferredLeft = thisOb.userPreference('ui-position-left');
+            if (!isElementXInViewport(thisOb.container)) {
+                let rect = getRoundedBoundingClientRect(thisOb.container);
+                if (rect.left < 0) {
+                    // do nothing
+                } else {
+                    let deltaX = rect.right - Math.min(window.innerWidth, document.documentElement.clientWidth);
+                    if (deltaX > rect.left) {
+                        deltaX = rect.left;
+                    }
+                    thisOb.container.style.left = (appliedLeft - deltaX) + 'px';
+                }
+            } else {
+                if (appliedLeft < userPreferredLeft) {
+                    let rect = getRoundedBoundingClientRect(thisOb.container);
+                    let deltaX = Math.min(window.innerWidth, document.documentElement.clientWidth) - rect.right;
+                    thisOb.container.style.left = Math.min((appliedLeft + deltaX), userPreferredLeft) + 'px';
+                }
+            }
+        }
+    };
+
     class Editor {
         /**
          * Constructor
@@ -256,6 +344,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
             thisOb._addChildComponents();
             thisOb.initialize(options);
+
+            window.onresize = function (e) {
+                if (e.target !== window) {
+                    return;
+                }
+                autoPositionEditor(thisOb);
+            };
+            autoPositionEditor(thisOb);
         }
 
         _makeDraggable() {
@@ -436,7 +532,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             $(cm.getWrapperElement()).resizable({
                 handles: 'se',
                 minHeight: 40,
-                minWidth: 200,
+                minWidth: 300,
+                start: function () {
+                    // Save editor's position.
+                    // It is useful when the user is resizing, but the position
+                    // is out of sync with the value in userPreference (this
+                    // out-of-sync is deliberate and useful for auto-positioning
+                    // on window resize)
+                    thisOb.savePosition({
+                        top: parseInt(thisOb.container.style.top, 10),
+                        left: parseInt(thisOb.container.style.left, 10)
+                    });
+                },
                 stop: function (event, ui) {
                     thisOb.setTextContainerDimensions(
                         {
