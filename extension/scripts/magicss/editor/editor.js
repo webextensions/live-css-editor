@@ -11,6 +11,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 (function ($) {
     'use strict';
 
+    var CONSTANTS = {
+        EDITOR_MIN_WIDTH: 301,
+        EDITOR_MIN_HEIGHT: 40,
+        EDITOR_DEFAULT_WIDTH: 301,
+        EDITOR_DEFAULT_HEIGHT: 249
+    };
+
     var chromeStorage;
     try {
         chromeStorage = chrome.storage.sync || chrome.storage.local;
@@ -34,8 +41,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     };
 
     var getRoundedBoundingClientRect = function (el) {
-        var rect = el.getBoundingClientRect();
-        var ob = {};
+        var rect = el.getBoundingClientRect(),
+            ob = {};
         for (var key in rect) {
             if (typeof rect[key] === 'number') {
                 ob[key] = Math.round(rect[key]);
@@ -45,7 +52,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     };
 
     /*
-    // Slightly modified version of https://gist.github.com/davidtheclark/5515733
+    // Modified version of https://gist.github.com/davidtheclark/5515733
+    // This modified version seems to work well with scrollbars based positioning for the floating editor
     function isElementInViewport(el) {
         var rect = getRoundedBoundingClientRect(el);
         return (
@@ -56,13 +64,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         );
     }
     /* */
-    function isElementYInViewport(el) {
-        var rect = getRoundedBoundingClientRect(el);
-        return (
-            rect.top >= 0 &&
-            rect.bottom <= Math.min(window.innerHeight, document.documentElement.clientHeight)
-        );
-    }
     function isElementXInViewport(el) {
         var rect = getRoundedBoundingClientRect(el);
         return (
@@ -70,53 +71,144 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             rect.right <= Math.min(window.innerWidth, document.documentElement.clientWidth)
         );
     }
+    function isElementYInViewport(el) {
+        var rect = getRoundedBoundingClientRect(el);
+        return (
+            rect.top >= 0 &&
+            rect.bottom <= Math.min(window.innerHeight, document.documentElement.clientHeight)
+        );
+    }
 
     var autoPositionEditor = function (thisOb) {
-        // Just a block
-        {
-            let appliedTop = parseInt(thisOb.container.style.top, 10);
-            let userPreferredTop = thisOb.userPreference('ui-position-top');
-            if (!isElementYInViewport(thisOb.container)) {
-                let rect = getRoundedBoundingClientRect(thisOb.container);
-                if (rect.top < 0) {
-                    // do nothing
-                } else {
-                    let deltaY = rect.bottom - Math.min(window.innerHeight, document.documentElement.clientHeight);
-                    if (deltaY > rect.top) {
-                        deltaY = rect.top;
-                    }
-                    thisOb.container.style.top = (appliedTop - deltaY) + 'px';
-                }
-            } else {
-                if (appliedTop < userPreferredTop) {
-                    let rect = getRoundedBoundingClientRect(thisOb.container);
-                    let deltaY = Math.min(window.innerHeight, document.documentElement.clientHeight) - rect.bottom;
-                    thisOb.container.style.top = Math.min((appliedTop + deltaY), userPreferredTop) + 'px';
-                }
+        if (autoPositionEditor.raf) {
+            window.cancelAnimationFrame(autoPositionEditor.raf);
+        }
+
+        autoPositionEditor.raf = window.requestAnimationFrame(function () {
+            mainAutoPositionEditor(thisOb);
+        });
+    };
+
+    var mainAutoPositionEditor = function (thisOb) {
+        /*
+            // The approach to be used in this function
+
+            if (negative positioning is set) {
+                clear negative positioning
+            }
+            if (element is not in viewport) {
+                adjust positioning if possible
+                decrease width and height if possible
+            }
+
+            if (element is in viewport) {
+                increase width and height if possible
+                adjust positioning if possible
+            }
+        /* */
+
+        let minWidth = CONSTANTS.EDITOR_MIN_WIDTH,
+            minHeight = CONSTANTS.EDITOR_MIN_HEIGHT;
+
+        let mainElement = thisOb.container,
+            $cmWrapperElement = $(thisOb.cm.getWrapperElement());
+
+        let rect,
+            updateRect = function () {
+                rect = getRoundedBoundingClientRect(mainElement);
+            };
+
+        updateRect();
+        // Remove negative X positioning
+        if (rect.left < 0) {
+            mainElement.style.left = '0px';
+        }
+        // Remove negative Y positioning
+        if (rect.top < 0) {
+            mainElement.style.top = '0px';
+        }
+
+        updateRect();
+        // Adjust X positioning (when x-axis is not in viewport)
+        if (rect.left >= 0 && !isElementXInViewport(mainElement)) {
+            let appliedLeft = parseInt(mainElement.style.left, 10),
+                deltaX = rect.right - Math.min(window.innerWidth, document.documentElement.clientWidth);
+            if (deltaX > rect.left) {
+                deltaX = rect.left;
+            }
+            mainElement.style.left = (appliedLeft - deltaX) + 'px';
+        }
+        // Adjust Y positioning (when y-axis is not in viewport)
+        if (rect.top >= 0 && !isElementYInViewport(mainElement)) {
+            let appliedTop = parseInt(mainElement.style.top, 10),
+                deltaY = rect.bottom - Math.min(window.innerHeight, document.documentElement.clientHeight);
+            if (deltaY > rect.top) {
+                deltaY = rect.top;
+            }
+            mainElement.style.top = (appliedTop - deltaY) + 'px';
+        }
+
+        updateRect();
+        // Adjust editor's width (when x-axis is not in viewport)
+        if (rect.left >= 0 && !isElementXInViewport(mainElement)) {
+            let appliedWidth = parseInt($cmWrapperElement.css('width'), 10),
+                deltaX = rect.right - Math.min(window.innerWidth, document.documentElement.clientWidth),
+                useWidth = Math.max(minWidth, appliedWidth - deltaX);
+            $cmWrapperElement.css('width', useWidth);
+        }
+        // Adjust editor's height (when y-axis is not in viewport)
+        if (rect.top >= 0 && !isElementYInViewport(mainElement)) {
+            let appliedHeight = parseInt($cmWrapperElement.css('height'), 10),
+                deltaY = rect.bottom - Math.min(window.innerHeight, document.documentElement.clientHeight),
+                useHeight = Math.max(minHeight, appliedHeight - deltaY);
+            $cmWrapperElement.css('height', useHeight);
+        }
+
+        updateRect();
+        // Adjust editor's width (when x-axis is in viewport)
+        if (rect.left >= 0 && isElementXInViewport(mainElement)) {
+            let appliedWidth = parseInt($cmWrapperElement.css('width'), 10),
+                userPreferredWidth = thisOb.getDimensions().width;
+            if (appliedWidth < userPreferredWidth) {
+                let deltaX = Math.min(window.innerWidth, document.documentElement.clientWidth) - rect.right,
+                    useWidth = Math.min(
+                        Math.max(minWidth, appliedWidth + deltaX),
+                        userPreferredWidth
+                    );
+                $cmWrapperElement.css('width', useWidth);
+            }
+        }
+        // Adjust editor's height (when y-axis is in viewport)
+        if (rect.top >= 0 && isElementYInViewport(mainElement)) {
+            let appliedHeight = parseInt($cmWrapperElement.css('height'), 10),
+                userPreferredHeight = thisOb.getDimensions().height;
+            if (appliedHeight < userPreferredHeight) {
+                let deltaY = Math.min(window.innerHeight, document.documentElement.clientHeight) - rect.bottom,
+                    useHeight = Math.min(
+                        Math.max(minHeight, appliedHeight + deltaY),
+                        userPreferredHeight
+                    );
+                $cmWrapperElement.css('height', useHeight);
             }
         }
 
-        // Just a block
-        {
-            let appliedLeft = parseInt(thisOb.container.style.left, 10);
-            let userPreferredLeft = thisOb.userPreference('ui-position-left');
-            if (!isElementXInViewport(thisOb.container)) {
-                let rect = getRoundedBoundingClientRect(thisOb.container);
-                if (rect.left < 0) {
-                    // do nothing
-                } else {
-                    let deltaX = rect.right - Math.min(window.innerWidth, document.documentElement.clientWidth);
-                    if (deltaX > rect.left) {
-                        deltaX = rect.left;
-                    }
-                    thisOb.container.style.left = (appliedLeft - deltaX) + 'px';
-                }
-            } else {
-                if (appliedLeft < userPreferredLeft) {
-                    let rect = getRoundedBoundingClientRect(thisOb.container);
-                    let deltaX = Math.min(window.innerWidth, document.documentElement.clientWidth) - rect.right;
-                    thisOb.container.style.left = Math.min((appliedLeft + deltaX), userPreferredLeft) + 'px';
-                }
+        updateRect();
+        // Adjust X positioning (when x-axis is in viewport)
+        if (rect.left >= 0 && isElementXInViewport(mainElement)) {
+            let appliedLeft = parseInt(mainElement.style.left, 10),
+                userPreferredLeft = thisOb.userPreference('ui-position-left');
+            if (appliedLeft < userPreferredLeft) {
+                let deltaX = Math.min(window.innerWidth, document.documentElement.clientWidth) - rect.right;
+                mainElement.style.left = Math.min((appliedLeft + deltaX), userPreferredLeft) + 'px';
+            }
+        }
+        // Adjust Y positioning (when y-axis is in viewport)
+        if (rect.top >= 0 && isElementYInViewport(mainElement)) {
+            let appliedTop = parseInt(mainElement.style.top, 10),
+                userPreferredTop = thisOb.userPreference('ui-position-top');
+            if (appliedTop < userPreferredTop) {
+                let deltaY = Math.min(window.innerHeight, document.documentElement.clientHeight) - rect.bottom;
+                mainElement.style.top = Math.min((appliedTop + deltaY), userPreferredTop) + 'px';
             }
         }
     };
@@ -531,19 +623,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             $(cm.getWrapperElement()).addClass('cancelDragHandle');
             $(cm.getWrapperElement()).resizable({
                 handles: 'se',
-                minHeight: 40,
-                minWidth: 300,
-                start: function () {
-                    // Save editor's position.
-                    // It is useful when the user is resizing, but the position
-                    // is out of sync with the value in userPreference (this
-                    // out-of-sync is deliberate and useful for auto-positioning
-                    // on window resize)
-                    thisOb.savePosition({
-                        top: parseInt(thisOb.container.style.top, 10),
-                        left: parseInt(thisOb.container.style.left, 10)
-                    });
-                },
+                minWidth: CONSTANTS.EDITOR_MIN_WIDTH,
+                minHeight: CONSTANTS.EDITOR_MIN_HEIGHT,
                 stop: function (event, ui) {
                     thisOb.setTextContainerDimensions(
                         {
@@ -1193,8 +1274,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // was applying a style like the above for the page:
         //     https://www.msn.com/en-ae/
         // Now, we use 301x249 as the default size to avoid that
-        'ui-size-width': 301,
-        'ui-size-height': 249
+        'ui-size-width': CONSTANTS.EDITOR_DEFAULT_WIDTH,
+        'ui-size-height': CONSTANTS.EDITOR_DEFAULT_HEIGHT
     };
 
     window.Editor = Editor;
