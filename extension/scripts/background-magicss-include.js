@@ -144,7 +144,9 @@ var reapplyCss = function (tabId) {
                 arrScripts.push(path3rdparty + 'amplify-store.js');
                 arrScripts.push(pathScripts + 'utils.js');
                 arrScripts.push(pathScripts + 'reapply-css.js');
+                console.log('About to load ' + +new Date());
                 extLib.loadJSCSS(arrScripts, allFrames, tabId);
+                console.log('Initiated load ' + +new Date());
             });
         });
     });
@@ -359,9 +361,52 @@ var generatePermissionPattern = function (url) {
 };
 
 var onDOMContentLoadedHandler = function () {
+    console.log(1234);
     if (!window.onDOMContentLoadedListenerAdded) {
+        chrome.tabs.onUpdated.addListener(function (tabId, currentStatus, details) {
+            var {url, status} = details;
+            console.log('outside if');
+            if (status === 'loading') {
+                console.log('inside if');
+                var t1 = +new Date();
+                console.log('tabs.onUpdated' + t1);
+                // addToTab(tabId, scripts);
+                var permissionsPattern = generatePermissionPattern(url);
+                chrome.tabs.get(tabId, function (tab) {
+                    console.log('inside cb');
+                    // This check (accessing chrome.runtime.lastError) is required to avoid an unnecessary error log in Chrome when the tab doesn't exist
+                    // Reference: https://stackoverflow.com/questions/16571393/the-best-way-to-check-if-tab-with-exact-id-exists-in-chrome/27532535#27532535
+                    if (chrome.runtime.lastError) {
+                        // do nothing
+                    } else {
+                        // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
+                        if (tab && tab.url) {
+                            if (permissionsPattern) {
+                            // details.frameId === 0 means the top most frame (the webpage)
+                            // if (permissionsPattern && details.frameId === 0) {
+                                chrome.permissions.contains({
+                                    origins: [permissionsPattern]
+                                }, function (result) {
+                                    if (result) {
+                                        reapplyCss(tabId);
+                                    } else {
+                                        // do nothing because we don't have enough permissions
+                                    }
+                                    var t2 = +new Date();
+                                    console.log('Total time: ' + (t2 - t1));
+                                    console.log('Done at extension context: ' + t2);
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        /*
         if (chrome.webNavigation) {
             chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
+                console.log(5678);
                 var tabId = details.tabId,
                     url = details.url;
 
@@ -392,6 +437,7 @@ var onDOMContentLoadedHandler = function () {
             });
             window.onDOMContentLoadedListenerAdded = true;
         }
+        /* */
     }
 };
 

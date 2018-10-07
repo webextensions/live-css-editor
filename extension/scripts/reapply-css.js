@@ -53,6 +53,8 @@
             newStyleTag.disabled = disableStyles;
             newStyleTag.applyTag();
 
+            console.log('mostly done' + +new Date());
+
             if (showReapplyingStylesNotification) {
                 utils.alertNote(
                     'Activated styles provided in Magic CSS.<br/><span style="font-weight:normal;">Run Magic CSS extension to make any changes.</span>',

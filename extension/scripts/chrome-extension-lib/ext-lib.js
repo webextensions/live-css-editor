@@ -109,7 +109,7 @@ var extLib = {
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null;
         if (typeof chrome !== "undefined" && chrome && chrome.tabs) {
-            chrome.tabs.executeScript(tabId, {file: file, code: code, allFrames: allFrames}, function () {
+            chrome.tabs.executeScript(tabId, {file: file, code: code, allFrames: allFrames, runAt: 'document_start'}, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {
