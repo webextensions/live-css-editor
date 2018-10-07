@@ -144,7 +144,9 @@ var reapplyCss = function (tabId) {
                 arrScripts.push(path3rdparty + 'amplify-store.js');
                 arrScripts.push(pathScripts + 'utils.js');
                 arrScripts.push(pathScripts + 'reapply-css.js');
-                extLib.loadJSCSS(arrScripts, allFrames, tabId);
+                extLib.loadJSCSS(arrScripts, allFrames, tabId, {
+                    runAt: 'document_start'
+                });
             });
         });
     });
@@ -361,7 +363,7 @@ var generatePermissionPattern = function (url) {
 var onDOMContentLoadedHandler = function () {
     if (!window.onDOMContentLoadedListenerAdded) {
         if (chrome.webNavigation) {
-            chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
+            chrome.webNavigation.onCommitted.addListener(function(details) {
                 var tabId = details.tabId,
                     url = details.url;
 

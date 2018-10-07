@@ -51,7 +51,12 @@
             newStyleTag.cssText = cssText;
 
             newStyleTag.disabled = disableStyles;
+            // When reapplying styles, try to load them ASAP
             newStyleTag.applyTag();
+            // When reapplying styles, ensure that the style tag gets moved towards the bottom of the page (DOM structure) once the page load is complete
+            document.addEventListener("DOMContentLoaded", function() {
+                newStyleTag.applyTag();
+            });
 
             if (showReapplyingStylesNotification) {
                 utils.alertNote(
