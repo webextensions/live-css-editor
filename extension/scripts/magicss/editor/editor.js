@@ -455,6 +455,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 distance: 5,
                 cancel: '.cancelDragHandle, textarea',
                 opacity: 0.35,
+                scroll: false,      // Do not auto scroll when dragging near the edges of the page
                 start: function (evt, ui) {
                     // When a matching/non-matching bracket was highlighted, and the user tried to select some other piece
                     // of text, dragging was starting. This happened because the node was being removed from DOM, but jQuery UI's
