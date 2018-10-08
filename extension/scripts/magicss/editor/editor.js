@@ -716,6 +716,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 handles: 'se',
                 minWidth: CONSTANTS.EDITOR_MIN_WIDTH,
                 minHeight: CONSTANTS.EDITOR_MIN_HEIGHT,
+                start: function () {
+                    // Save editor's position.
+                    // It is useful when the user is resizing, but the position
+                    // is out of sync with the value in userPreference (this
+                    // out-of-sync is deliberate and useful for auto-positioning
+                    // on window resize)
+                    thisOb.savePosition({
+                        top: parseInt(thisOb.container.style.top, 10),
+                        left: parseInt(thisOb.container.style.left, 10)
+                    });
+                },
                 stop: function (event, ui) {
                     thisOb.setTextContainerDimensions(
                         {
