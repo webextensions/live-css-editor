@@ -40,17 +40,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return false;
     };
 
-    var getRoundedBoundingClientRect = function (el) {
-        var rect = el.getBoundingClientRect(),
-            ob = {};
-        for (var key in rect) {
-            if (typeof rect[key] === 'number') {
-                ob[key] = Math.round(rect[key]);
-            }
-        }
-        return ob;
-    };
-
+    /*
     // https://stackoverflow.com/questions/13382516/getting-scroll-bar-width-using-javascript/13382873#13382873
     var getScrollbarWidth = function () {
         var outer = document.createElement("div");
@@ -89,20 +79,63 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         }
         return result;
     };
+    /* */
 
+    var flagUsingQuirksMode = (function () {
+        // https://developer.mozilla.org/en-US/docs/Web/API/Document/compatMode
+        // https://stackoverflow.com/questions/627097/how-to-tell-if-a-browser-is-in-quirks-mode/627124#627124
+        // http://help.dottoro.com/ljteklnx.php
+        var inQuirksMode = (document.compatMode === "BackCompat") ? true : false;
+        return inQuirksMode;
+    }());
+
+    // References:
+    //     Why we need to use document.body.clientHeight in quirks mode - https://stackoverflow.com/questions/8052178/difference-between-document-documentelement-clientheight-and-document-body-clien/8053110#8053110
+    //     General logic to get the viewport dimensions - https://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript/36132694#36132694
     var getViewportHeightExcludingScroll = function () {
-        var height = window.innerHeight;
-        if (hasScroll(document.body, 'horizontal')) {
-            height -= scrollbarWidth;
+        var height;
+        if (flagUsingQuirksMode) {
+            // "(document.body || {})" and "|| Infinity" may not be required. Just using that for robustness.
+            height = Math.min((document.body || {}).clientHeight || Infinity, window.innerHeight || Infinity);
+        } else {
+            // "|| window.innerHeight || 0" may not be required. Just using that for robustness.
+            height = document.documentElement.clientHeight || window.innerHeight || 0;
         }
+
+        // Alternative approach
+        // height = window.innerHeight;
+        // if (hasScroll(document.body, 'horizontal')) {
+        //     height -= scrollbarWidth;
+        // }
         return height;
     };
     var getViewportWidthExcludingScroll = function () {
-        var width = window.innerWidth;
-        if (hasScroll(document.body, 'vertical')) {
-            width -= scrollbarWidth;
+        var width;
+        if (flagUsingQuirksMode) {
+            // "(document.body || {})" and "|| Infinity" may not be required. Just using that for robustness.
+            width = Math.min((document.body || {}).clientWidth || Infinity, window.innerWidth || Infinity);
+        } else {
+            // "|| window.innerWidth || 0" may not be required. Just using that for robustness.
+            width = document.documentElement.clientWidth || window.innerWidth || 0;
         }
+
+        // Alternative approach
+        // width = window.innerWidth;
+        // if (hasScroll(document.body, 'vertical')) {
+        //     width -= scrollbarWidth;
+        // }
         return width;
+    };
+
+    var getRoundedBoundingClientRect = function (el) {
+        var rect = el.getBoundingClientRect(),
+            ob = {};
+        for (var key in rect) {
+            if (typeof rect[key] === 'number') {
+                ob[key] = Math.round(rect[key]);
+            }
+        }
+        return ob;
     };
 
     /*
