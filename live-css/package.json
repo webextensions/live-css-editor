@@ -1,6 +1,6 @@
 {
   "name": "@webextensions/live-css",
-  "version": "7.0.3",
+  "version": "7.0.4",
   "description": "live-css is a Node JS based development server for use with the browser extension \"Live editor for CSS, Less & Sass - Magic CSS\" for Chrome/Edge/Firefox/Opera",
   "repository": "https://github.com/webextensions/live-css-editor.git",
   "homepage": "https://webextensions.org/",
