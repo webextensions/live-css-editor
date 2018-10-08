@@ -51,16 +51,70 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return ob;
     };
 
+    // https://stackoverflow.com/questions/13382516/getting-scroll-bar-width-using-javascript/13382873#13382873
+    var getScrollbarWidth = function () {
+        var outer = document.createElement("div");
+        outer.style.visibility = "hidden";
+        outer.style.width = "100px";
+        outer.style.msOverflowStyle = "scrollbar"; // needed for WinJS apps
+
+        document.body.appendChild(outer);
+
+        var widthNoScroll = outer.offsetWidth;
+        // force scrollbars
+        outer.style.overflow = "scroll";
+
+        // add innerdiv
+        var inner = document.createElement("div");
+        inner.style.width = "100%";
+        outer.appendChild(inner);
+
+        var widthWithScroll = inner.offsetWidth;
+
+        // remove divs
+        outer.parentNode.removeChild(outer);
+
+        return widthNoScroll - widthWithScroll;
+    };
+    var scrollbarWidth = getScrollbarWidth();
+
+    // https://www.sitepoint.com/jquery-check-horizontal-scroll-present/
+    var hasScroll = function (el, direction) {
+        direction = (direction === 'vertical') ? 'scrollTop' : 'scrollLeft';
+        var result = !! el[direction];
+        if (!result) {
+            el[direction] = 1;
+            result = !!el[direction];
+            el[direction] = 0;
+        }
+        return result;
+    };
+
+    var getViewportHeightExcludingScroll = function () {
+        var height = window.innerHeight;
+        if (hasScroll(document.body, 'horizontal')) {
+            height -= scrollbarWidth;
+        }
+        return height;
+    };
+    var getViewportWidthExcludingScroll = function () {
+        var width = window.innerWidth;
+        if (hasScroll(document.body, 'vertical')) {
+            width -= scrollbarWidth;
+        }
+        return width;
+    };
+
     /*
     // Modified version of https://gist.github.com/davidtheclark/5515733
     // This modified version seems to work well with scrollbars based positioning for the floating editor
     function isElementInViewport(el) {
         var rect = getRoundedBoundingClientRect(el);
         return (
-            rect.top >= 0 &&
             rect.left >= 0 &&
-            rect.bottom <= Math.min(window.innerHeight, document.documentElement.clientHeight) &&
-            rect.right <= Math.min(window.innerWidth, document.documentElement.clientWidth)
+            rect.top >= 0 &&
+            rect.right <= getViewportWidthExcludingScroll() &&
+            rect.bottom <= getViewportHeightExcludingScroll()
         );
     }
     /* */
@@ -68,14 +122,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         var rect = getRoundedBoundingClientRect(el);
         return (
             rect.left >= 0 &&
-            rect.right <= Math.min(window.innerWidth, document.documentElement.clientWidth)
+            rect.right <= getViewportWidthExcludingScroll()
         );
     }
     function isElementYInViewport(el) {
         var rect = getRoundedBoundingClientRect(el);
         return (
             rect.top >= 0 &&
-            rect.bottom <= Math.min(window.innerHeight, document.documentElement.clientHeight)
+            rect.bottom <= getViewportHeightExcludingScroll()
         );
     }
 
@@ -100,6 +154,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         let minWidth = CONSTANTS.EDITOR_MIN_WIDTH,
             minHeight = CONSTANTS.EDITOR_MIN_HEIGHT;
 
+        let viewportHeightExcludingScroll = getViewportHeightExcludingScroll(),
+            viewportWidthExcludingScroll = getViewportWidthExcludingScroll();
+
         let mainElement = thisOb.container,
             $cmWrapperElement = $(thisOb.cm.getWrapperElement());
 
@@ -122,7 +179,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // Adjust X positioning (when x-axis is not in viewport)
         if (rect.left >= 0 && !isElementXInViewport(mainElement)) {
             let appliedLeft = parseInt(mainElement.style.left, 10),
-                deltaX = rect.right - Math.min(window.innerWidth, document.documentElement.clientWidth);
+                deltaX = rect.right - viewportWidthExcludingScroll;
             if (deltaX > rect.left) {
                 deltaX = rect.left;
             }
@@ -131,7 +188,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // Adjust Y positioning (when y-axis is not in viewport)
         if (rect.top >= 0 && !isElementYInViewport(mainElement)) {
             let appliedTop = parseInt(mainElement.style.top, 10),
-                deltaY = rect.bottom - Math.min(window.innerHeight, document.documentElement.clientHeight);
+                deltaY = rect.bottom - viewportHeightExcludingScroll;
             if (deltaY > rect.top) {
                 deltaY = rect.top;
             }
@@ -142,14 +199,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // Adjust editor's width (when x-axis is not in viewport)
         if (rect.left >= 0 && !isElementXInViewport(mainElement)) {
             let appliedWidth = parseInt($cmWrapperElement.css('width'), 10),
-                deltaX = rect.right - Math.min(window.innerWidth, document.documentElement.clientWidth),
+                deltaX = rect.right - viewportWidthExcludingScroll,
                 useWidth = Math.max(minWidth, appliedWidth - deltaX);
             $cmWrapperElement.css('width', useWidth);
         }
         // Adjust editor's height (when y-axis is not in viewport)
         if (rect.top >= 0 && !isElementYInViewport(mainElement)) {
             let appliedHeight = parseInt($cmWrapperElement.css('height'), 10),
-                deltaY = rect.bottom - Math.min(window.innerHeight, document.documentElement.clientHeight),
+                deltaY = rect.bottom - viewportHeightExcludingScroll,
                 useHeight = Math.max(minHeight, appliedHeight - deltaY);
             $cmWrapperElement.css('height', useHeight);
         }
@@ -160,7 +217,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             let appliedWidth = parseInt($cmWrapperElement.css('width'), 10),
                 userPreferredWidth = thisOb.getDimensions().width;
             if (appliedWidth < userPreferredWidth) {
-                let deltaX = Math.min(window.innerWidth, document.documentElement.clientWidth) - rect.right,
+                let deltaX = viewportWidthExcludingScroll - rect.right,
                     useWidth = Math.min(
                         Math.max(minWidth, appliedWidth + deltaX),
                         userPreferredWidth
@@ -173,7 +230,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             let appliedHeight = parseInt($cmWrapperElement.css('height'), 10),
                 userPreferredHeight = thisOb.getDimensions().height;
             if (appliedHeight < userPreferredHeight) {
-                let deltaY = Math.min(window.innerHeight, document.documentElement.clientHeight) - rect.bottom,
+                let deltaY = viewportHeightExcludingScroll - rect.bottom,
                     useHeight = Math.min(
                         Math.max(minHeight, appliedHeight + deltaY),
                         userPreferredHeight
@@ -188,7 +245,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             let appliedLeft = parseInt(mainElement.style.left, 10),
                 userPreferredLeft = thisOb.userPreference('ui-position-left');
             if (appliedLeft < userPreferredLeft) {
-                let deltaX = Math.min(window.innerWidth, document.documentElement.clientWidth) - rect.right;
+                let deltaX = viewportWidthExcludingScroll - rect.right;
                 mainElement.style.left = Math.min((appliedLeft + deltaX), userPreferredLeft) + 'px';
             }
         }
@@ -197,7 +254,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             let appliedTop = parseInt(mainElement.style.top, 10),
                 userPreferredTop = thisOb.userPreference('ui-position-top');
             if (appliedTop < userPreferredTop) {
-                let deltaY = Math.min(window.innerHeight, document.documentElement.clientHeight) - rect.bottom;
+                let deltaY = viewportHeightExcludingScroll - rect.bottom;
                 mainElement.style.top = Math.min((appliedTop + deltaY), userPreferredTop) + 'px';
             }
         }
