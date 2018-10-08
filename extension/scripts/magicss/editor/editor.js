@@ -79,16 +79,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         );
     }
 
-    var autoPositionEditor = function (thisOb) {
-        if (autoPositionEditor.raf) {
-            window.cancelAnimationFrame(autoPositionEditor.raf);
-        }
-
-        autoPositionEditor.raf = window.requestAnimationFrame(function () {
-            mainAutoPositionEditor(thisOb);
-        });
-    };
-
     var mainAutoPositionEditor = function (thisOb) {
         /*
             // The approach to be used in this function
@@ -211,6 +201,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 mainElement.style.top = Math.min((appliedTop + deltaY), userPreferredTop) + 'px';
             }
         }
+    };
+
+    var autoPositionEditor = function (thisOb) {
+        if (autoPositionEditor.raf) {
+            window.cancelAnimationFrame(autoPositionEditor.raf);
+        }
+
+        autoPositionEditor.raf = window.requestAnimationFrame(function () {
+            mainAutoPositionEditor(thisOb);
+        });
     };
 
     class Editor {
