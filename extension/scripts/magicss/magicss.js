@@ -2025,46 +2025,53 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 return iconForRateUs({addOpaqueOnHoverClass: true});
                             }
                         }()),
-                        {
-                            name: 'reapply',
-                            title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
-                            cls: 'magicss-reapply-styles editor-gray-out',
-                            onclick: function (evt, editor, divIcon) {
-                                if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
-                                    markAsPinnedOrNotPinned(editor, 'not-pinned');
-                                    utils.alertNote(
-                                        '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
-                                        5000
-                                    );
-                                } else {
-                                    chrome.runtime.sendMessage(
-                                        {
-                                            requestPermissions: true,
-                                            url: window.location.href
-                                        },
-                                        function (status) {
-                                            if (chrome.runtime.lastError) {
-                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                utils.alertNote(
-                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                    10000
-                                                );
-                                            }
-                                            if (status === 'request-granted') {
-                                                markAsPinnedOrNotPinned(editor, 'pinned');
-                                                utils.alertNote(
-                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
-                                                    10000
-                                                );
-                                            } else if (status === 'request-not-granted') {
-                                                utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
-                                            }
+                        (function () {
+                            // Currently, this feature has been tested only in Chrome browser
+                            if (isChrome) {
+                                return {
+                                    name: 'reapply',
+                                    title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
+                                    cls: 'magicss-reapply-styles editor-gray-out',
+                                    onclick: function (evt, editor, divIcon) {
+                                        if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
+                                            markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                            utils.alertNote(
+                                                '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                5000
+                                            );
+                                        } else {
+                                            chrome.runtime.sendMessage(
+                                                {
+                                                    requestPermissions: true,
+                                                    url: window.location.href
+                                                },
+                                                function (status) {
+                                                    if (chrome.runtime.lastError) {
+                                                        console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                        utils.alertNote(
+                                                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                            10000
+                                                        );
+                                                    }
+                                                    if (status === 'request-granted') {
+                                                        markAsPinnedOrNotPinned(editor, 'pinned');
+                                                        utils.alertNote(
+                                                            '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                            10000
+                                                        );
+                                                    } else if (status === 'request-not-granted') {
+                                                        utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                    }
+                                                }
+                                            );
                                         }
-                                    );
-                                }
-                                editor.focus();
+                                        editor.focus();
+                                    }
+                                };
+                            } else {
+                                return null;
                             }
-                        },
+                        }()),
                         {
                             name: 'disable',
                             title: 'Deactivate code',
