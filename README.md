@@ -1,13 +1,17 @@
 # Live editor for CSS, Less & Sass (Magic CSS)
 Extension **Live editor for CSS, Less & Sass** *(Magic CSS)* for Google Chrome, Microsoft Edge, Mozilla Firefox and Opera.
 
-<img width="32" alt="Google Chrome Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-google-chrome.svg"> &nbsp; https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
+<!--
+    Reference: https://stackoverflow.com/questions/13808020/include-an-svg-hosted-on-github-in-markdown/16462143#16462143
+-->
 
-<img width="32" alt="Microsoft Edge Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-microsoft-edge.svg"> &nbsp; https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1
+<img width="32" alt="Google Chrome Logo" src="extension/ui-images/logo-google-chrome.svg"> &nbsp; https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
+
+<img width="32" alt="Microsoft Edge Logo" src="extension/ui-images/logo-microsoft-edge.svg"> &nbsp; https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1
 
 <img width="32" alt="Mozilla Firefox Logo" src="extension/ui-images/logo-firefox_edited.png"> &nbsp; https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/
 
-<img width="32" alt="Opera Logo" src="https://cdn.rawgit.com/webextensions/live-css-editor/master/extension/ui-images/logo-opera.svg"> &nbsp; https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/
+<img width="32" alt="Opera Logo" src="extension/ui-images/logo-opera.svg"> &nbsp; https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/
 
 **Live preview of CSS/Less/Sass code with an in-page editor. Autocomplete, convert Less/Sass to CSS, beautify, minify, CSS reloader, linter, ...**
 
