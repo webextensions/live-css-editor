@@ -2135,39 +2135,51 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             title: 'CSS reloader and watch file changes',
                             cls: 'magicss-reload-css-resources editor-gray-out cancelDragHandle',
                             icons: [
-                                {
-                                    name: 'stopWatchingCssFiles',
-                                    title: 'Stop watching CSS files',
-                                    // cls: 'magicss-watch-resources',
-                                    uniqCls: 'magicss-stop-watch-and-reload-link-tags',
-                                    onclick: function (evt, editor) {
-                                        if (flagWatchingCssFiles) {
-                                            getDisconnectedWithBackEnd(
-                                                editor,
-                                                {},
-                                                function () {
-                                                    updateUiMentioningNotWatchingCssFiles(editor);
+                                (function () {
+                                    if (isChrome || isOpera) {
+                                        return {
+                                            name: 'stopWatchingCssFiles',
+                                            title: 'Stop watching CSS files',
+                                            // cls: 'magicss-watch-resources',
+                                            uniqCls: 'magicss-stop-watch-and-reload-link-tags',
+                                            onclick: function (evt, editor) {
+                                                if (flagWatchingCssFiles) {
+                                                    getDisconnectedWithBackEnd(
+                                                        editor,
+                                                        {},
+                                                        function () {
+                                                            updateUiMentioningNotWatchingCssFiles(editor);
+                                                        }
+                                                    );
                                                 }
-                                            );
-                                        }
-                                        editor.focus();
+                                                editor.focus();
+                                            }
+                                        };
+                                    } else {
+                                        return null;
                                     }
-                                },
-                                {
-                                    name: 'watchCssFiles',
-                                    title: 'Watch CSS files to apply changes automatically',
-                                    // cls: 'magicss-watch-resources',
-                                    uniqCls: 'magicss-watch-and-reload-link-tags',
-                                    onclick: function (evt, editor) {
-                                        if (!flagWatchingCssFiles) {
-                                            startWatchingFiles(editor);
-                                        }
-                                        editor.focus();
-                                    },
-                                    beforeShow: function (origin, tooltip) {
-                                        tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
+                                }()),
+                                (function () {
+                                    if (isChrome || isOpera) {
+                                        return {
+                                            name: 'watchCssFiles',
+                                            title: 'Watch CSS files to apply changes automatically',
+                                            // cls: 'magicss-watch-resources',
+                                            uniqCls: 'magicss-watch-and-reload-link-tags',
+                                            onclick: function (evt, editor) {
+                                                if (!flagWatchingCssFiles) {
+                                                    startWatchingFiles(editor);
+                                                }
+                                                editor.focus();
+                                            },
+                                            beforeShow: function (origin, tooltip) {
+                                                tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
+                                            }
+                                        };
+                                    } else {
+                                        return null;
                                     }
-                                },
+                                }()),
                                 {
                                     name: 'reload-css-resources',
                                     title: 'Reload all CSS resources',

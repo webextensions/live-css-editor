@@ -851,6 +851,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             var $divIcon = $(divIcon),
                                 tooltipContent = ['<ul>'];
 
+                            iconOptions.icons = (iconOptions.icons || []).filter(function (item) { return !!item; });
                             iconOptions.icons.forEach(function (iconOptions) {
                                 tooltipContent.push(
                                     '<li class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '">' +
