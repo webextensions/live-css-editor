@@ -132,7 +132,7 @@ var extLib = {
         }
     },
 
-    loadJSCSS: function (arrSources, allFrames, tabId, advancedConfig) {
+    loadJSCSS: function (arrSources, allFrames, tabId, advancedConfig, done) {
         asyncEachSeries(
             arrSources,
             function (source, cb) {
@@ -168,6 +168,11 @@ var extLib = {
                     }
                 } else {
                     cb();
+                }
+            },
+            function () {
+                if (done) {
+                    done();
                 }
             }
         );
