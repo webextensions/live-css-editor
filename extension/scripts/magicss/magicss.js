@@ -227,6 +227,37 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         });
     };
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames
+    // Polyfill required for Microsoft Edge (eg: Microsoft Edge version 38.14393.0.0 needs the polyfill)
+    if (Element.prototype.getAttributeNames == undefined) {
+        Element.prototype.getAttributeNames = function () {
+            var attributes = this.attributes;
+            var length = attributes.length;
+            var result = new Array(length);
+            for (var i = 0; i < length; i++) {
+                result[i] = attributes[i].name;
+            }
+            return result;
+        };
+    }
+
+    var recreateNodeCustomized = function (node, options) {
+        options = options || {};
+        var skipAttributes = options.skipAttributes || [];
+
+        var nodeName = node.nodeName;
+        var recreatedNode = document.createElement(nodeName);
+
+        node.getAttributeNames().forEach(function (attributeName) {
+            if (options.skipAttributes.indexOf(attributeName) === -1) {
+                var attributeValue = node.getAttribute(attributeName);
+                recreatedNode.setAttribute(attributeName, attributeValue);
+            }
+        });
+
+        return recreatedNode;
+    };
+
     var reloadPassedLinkTags = function (linkTags, extraInfo) {
         var localISOTime = getLocalISOTime();
 
@@ -274,16 +305,67 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     newHref = href + '?reloadedAt=' + localISOTime;
                 }
 
-                var $newLink = $link.clone(),
-                    newLink = $newLink.get(0);
-                newLink.onload = function () {
-                    delete newLink.reloadingActiveWithMagicCSS;
-                    delete link.reloadingActiveWithMagicCSS;
-                    $link.remove();
-                    successCount++;
-                    checkCompletion();
+                // For Edge extension, cloning the element seems to result in some form of CORS request which wouldn't work.
+                // Hence, we recreate the element without the 'href' attribute and assign the 'href' later after inserting
+                // that element in the DOM.
+                var newLink = recreateNodeCustomized(link, { skipAttributes: ['href'] }),
+                    $newLink = $(newLink);
+
+                newLink.reloadingActiveWithMagicCSS = true;
+                link.reloadingActiveWithMagicCSS = true;
+
+                $link.after($newLink);
+
+                // Note:
+                //     Apparently, in Microsoft Edge, onload gets fired even if the CSS resource end with a 404 page.
+                //     The failure seems to be undetectable.
+                //     A workaround can be attempted (reference: https://stackoverflow.com/questions/30171270/link-onerror-do-not-work-in-ie/43357862#43357862).
+                //     Note that this workaround would not work perfectly for all possible scenarios (for example if the stylesheet contains no CSS styles).
+                var didLinkTagLoadSuccessfully = function (linkTag) {
+                    var cssRules;
+                    try {
+                        cssRules = linkTag.sheet && linkTag.sheet.cssRules;
+                    } catch (e) {
+                        cssRules = { length: 0 };
+                    }
+
+                    if (cssRules && cssRules.length) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 };
-                newLink.onerror = function () {
+
+                newLink.onload = function (evt) {
+                    // There seems to be a bug in Microsoft Edge which makes a CSS file load twice in some scenarios.
+                    // Considering that it would be safe to assume that if the first load worked fine,
+                    // the second load would also go on to be fine (similarly, if the first load failed, the second one too would fail).
+                    // See: https://github.com/filamentgroup/loadCSS/issues/222#issuecomment-306622674
+                    if (newLink.onloadAlreadyCalled) {
+                        return;
+                    } else {
+                        newLink.onloadAlreadyCalled = true;
+
+                        delete newLink.reloadingActiveWithMagicCSS;
+                        delete link.reloadingActiveWithMagicCSS;
+
+                        var wasSuccessful = true;
+                        if (isEdge && !didLinkTagLoadSuccessfully(newLink)) {
+                            wasSuccessful = false;
+                            console.log(newHref);
+                        }
+
+                        if (wasSuccessful) {
+                            successCount++;
+                            $link.remove();
+                        } else {
+                            errorCount++;
+                            $newLink.remove();
+                        }
+                        checkCompletion();
+                    }
+                };
+                newLink.onerror = function (evt) {
                     delete newLink.reloadingActiveWithMagicCSS;
                     delete link.reloadingActiveWithMagicCSS;
                     $newLink.remove();
@@ -291,11 +373,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     checkCompletion();
                 };
 
-                newLink.reloadingActiveWithMagicCSS = true;
-                link.reloadingActiveWithMagicCSS = true;
-
                 $newLink.attr('href', newHref);
-                $link.after($newLink);
             });
         } else {
             utils.alertNote(
