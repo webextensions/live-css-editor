@@ -2111,8 +2111,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         }()),
                         (function () {
-                            // Currently, this feature has been tested only in Chrome and Opera browsers
-                            if (isChrome || isOpera) {
+                            // Currently, this feature has been tested only in Chrome, Opera and Edge browsers
+                            if (isChrome || isOpera || isEdge) {
                                 return {
                                     name: 'reapply',
                                     title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',

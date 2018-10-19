@@ -24,6 +24,14 @@ var runningInFirefoxLikeEnvironment = function () {
     }
 };
 
+var runningInEdgeLikeEnvironment = function () {
+    if (window.location.href.indexOf('ms-browser-extension://') === 0) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
 var informUser = function (config) {
     var message = config.message,
         tab = config.tab || {},
@@ -108,26 +116,31 @@ if (!window.loadRemoteJsListenerAdded) {
                     // Need to return true from the event listener to indicate that we wish to send a response asynchronously
                     return true;
                 } else if (request.requestPermissions) {
-                    var url = request.url;
-                    chrome.permissions.request(
-                        {
-                            permissions: ['webNavigation'],
-                            origins: [url]
-                        },
-                        function (granted) {
-                            if (granted) {
-                                sendResponse('request-granted');
-
-                                onDOMContentLoadedHandler();
-                            } else {
-                                sendResponse('request-not-granted');
+                    if (runningInEdgeLikeEnvironment()) {
+                        // We are using full permissions on Microsoft Edge
+                        sendResponse('request-granted');
+                        onDOMContentLoadedHandler();
+                    } else {
+                        var url = request.url;
+                        chrome.permissions.request(
+                            {
+                                permissions: ['webNavigation'],
+                                origins: [url]
+                            },
+                            function (granted) {
+                                if (granted) {
+                                    sendResponse('request-granted');
+                                    onDOMContentLoadedHandler();
+                                } else {
+                                    sendResponse('request-not-granted');
+                                }
                             }
-                        }
-                    );
+                        );
 
-                    // https://developer.chrome.com/extensions/messaging
-                    // Need to return true from the event listener to indicate that we wish to send a response asynchronously
-                    return true;
+                        // https://developer.chrome.com/extensions/messaging
+                        // Need to return true from the event listener to indicate that we wish to send a response asynchronously
+                        return true;
+                    }
                 }
             }
         );
@@ -500,7 +513,15 @@ var generatePermissionPattern = function (url) {
 var onDOMContentLoadedHandler = function () {
     if (!window.onDOMContentLoadedListenerAdded) {
         if (chrome.webNavigation) {
-            chrome.webNavigation.onCommitted.addListener(function(details) {
+            (function () {
+                if (runningInEdgeLikeEnvironment()) {
+                    // .onDOMContentLoaded() appears to work better for Microsoft Edge
+                    // .onCommitted() on Microsoft Edge seems to be not loading the styles under some situations
+                    return chrome.webNavigation.onDOMContentLoaded;
+                } else {
+                    return chrome.webNavigation.onCommitted;
+                }
+            }()).addListener(function(details) {
                 var tabId = details.tabId,
                     url = details.url;
 
@@ -512,7 +533,9 @@ var onDOMContentLoadedHandler = function () {
                         // do nothing
                     } else {
                         // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
-                        if (tab && tab.url) {
+                        if (runningInEdgeLikeEnvironment()) {
+                            reapplyCss(tabId);
+                        } else if (tab && tab.url) {
                             // details.frameId === 0 means the top most frame (the webpage)
                             if (permissionsPattern && details.frameId === 0) {
                                 chrome.permissions.contains({
