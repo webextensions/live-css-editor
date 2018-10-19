@@ -1,3 +1,22 @@
+# How to load the extension in development mode
+
+## For Chrome / Chromium / Opera
+
+- Load the unpacked extension via ```manifest.json``` from the ```extension/``` folder
+
+## For Edge / Firefox
+
+- Temporarily, copy ```extension/manifest-edge.json``` or ```extension/manifest-firefox.json``` to ```extension/manifest.json```
+- Load the unpacked extension via ```manifest.json``` from the ```extension/``` folder
+- Once you are done, before committing any changes, revert ```extension/manifest.json``` to its original state
+
+
+# Enable extension developer features in Microsoft Edge
+
+Follow the steps mentioned at:
+> https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/adding-and-removing-extensions
+
+
 # Steps to create the ".appx" package for Edge extension
 
 - [Install Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
