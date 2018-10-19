@@ -249,7 +249,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         var recreatedNode = document.createElement(nodeName);
 
         node.getAttributeNames().forEach(function (attributeName) {
-            if (options.skipAttributes.indexOf(attributeName) === -1) {
+            if (skipAttributes.indexOf(attributeName) === -1) {
                 var attributeValue = node.getAttribute(attributeName);
                 recreatedNode.setAttribute(attributeName, attributeValue);
             }
@@ -336,7 +336,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
-                newLink.onload = function (evt) {
+                newLink.onload = function (evt) {   // eslint-disable-line no-unused-vars
                     // There seems to be a bug in Microsoft Edge which makes a CSS file load twice in some scenarios.
                     // Considering that it would be safe to assume that if the first load worked fine,
                     // the second load would also go on to be fine (similarly, if the first load failed, the second one too would fail).
@@ -365,7 +365,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         checkCompletion();
                     }
                 };
-                newLink.onerror = function (evt) {
+                newLink.onerror = function (evt) {  // eslint-disable-line no-unused-vars
                     delete newLink.reloadingActiveWithMagicCSS;
                     delete link.reloadingActiveWithMagicCSS;
                     $newLink.remove();
