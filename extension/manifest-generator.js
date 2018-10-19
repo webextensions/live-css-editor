@@ -55,10 +55,6 @@ var generateManifest = function (whichBrowser) {
             "persistent": false,
             "page": "background-magicss.html"
         },
-        "options_ui": {
-            "page": "options.html",
-            "chrome_style": true
-        },
         "commands": {
             "_execute_browser_action": {
                 "suggested_key": {
@@ -75,6 +71,15 @@ var generateManifest = function (whichBrowser) {
         /* */
     };
 
+    if (whichBrowser === "edge") {
+        manifest["options_page"] = "options.html";
+    } else {
+        manifest["options_ui"] = {
+            "page": "options.html",
+            "chrome_style": true
+        };
+    }
+
     if (whichBrowser !== "firefox") {
         manifest["offline_enabled"] = true;
     }
@@ -87,6 +92,7 @@ var generateManifest = function (whichBrowser) {
             }
         };
     }
+
     if (whichBrowser === "edge") {
         manifest["-ms-preload"] = {
             "backgroundScript": "backgroundScriptsAPIBridge.js",

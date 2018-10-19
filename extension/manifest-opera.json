@@ -38,16 +38,16 @@
         "persistent": false,
         "page": "background-magicss.html"
     },
-    "options_ui": {
-        "page": "options.html",
-        "chrome_style": true
-    },
     "commands": {
         "_execute_browser_action": {
             "suggested_key": {
                 "default": "Alt+Shift+C"
             }
         }
+    },
+    "options_ui": {
+        "page": "options.html",
+        "chrome_style": true
     },
     "offline_enabled": true
 }
