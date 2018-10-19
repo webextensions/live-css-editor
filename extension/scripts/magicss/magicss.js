@@ -1352,6 +1352,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
     var noteForUndo = '<br />Note: You may press ' + (isMac ? 'Cmd' : 'Ctrl') + ' + Z to undo the change';
 
+    // Seems to be required to unblock Ctrl-T in Microsoft Edge
+    delete CodeMirror.keyMap.emacsy['Ctrl-T'];
+    delete CodeMirror.keyMap.sublime['Ctrl-T'];
+
+    // Use Alt-Up/Down to move lines up/down
+    CodeMirror.keyMap.sublime['Alt-Down'] = 'swapLineDown';
+    CodeMirror.keyMap.sublime['Alt-Up'] = 'swapLineUp';
+
     var main = function () {
         utils.delayFunctionUntilTestFunction({
             tryLimit: 100,
