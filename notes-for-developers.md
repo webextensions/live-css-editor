@@ -17,6 +17,18 @@ Follow the steps mentioned at:
 > https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/adding-and-removing-extensions
 
 
+# Steps to get Microsoft Edge Extension Toolkit
+
+- Go to https://www.microsoft.com/en-us/p/microsoft-edge-extension-toolkit/9nblggh4txvb
+- Click on Get / Install button
+- It would ask you to "Open Store", go ahead
+- Click on Install for the application in "Store"
+- If you get an error in installation, you may need to enable updates
+    - Run ```services.msc```
+    - Ensure that the "Windows Update" service is running
+- Launch the application
+
+
 # Steps to create the ".appx" package for Edge extension
 
 - [Install Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
