@@ -2221,7 +2221,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             cls: 'magicss-reload-css-resources editor-gray-out cancelDragHandle',
                             icons: [
                                 (function () {
-                                    if (isChrome || isOpera) {
+                                    if (isChrome || isOpera || isEdge) {
                                         return {
                                             name: 'stopWatchingCssFiles',
                                             title: 'Stop watching CSS files',
@@ -2245,7 +2245,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     }
                                 }()),
                                 (function () {
-                                    if (isChrome || isOpera) {
+                                    if (isChrome || isOpera || isEdge) {
                                         return {
                                             name: 'watchCssFiles',
                                             title: 'Watch CSS files to apply changes automatically',
