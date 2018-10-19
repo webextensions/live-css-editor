@@ -4,6 +4,7 @@
 * Add link in the suggested selectors list, so that the user can directly edit the file containing the suggested selector.
 * Add a "copy-to-clipboard" button
 * Add support for running JavaScript code as well
+* Anonymous GiHub gists do not work anymore (https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/). Hence, "Mail code (via Gist)" feature has been disabled. Analyze if that feature can/should be brought back in some form.
 * Provide a way to share CSS across computers. Approach 1 (would work for same person): Make the code reusable via "sync". Approach 2 (would work for multiple users): Make the code reusable+shareable via "GitHub Gist".
 
 #### Improvements

@@ -30,7 +30,6 @@ Run this extension and start writing your CSS/Less/Sass code which gets applied 
 * Highlight DOM elements matching the CSS selectors
 * CSS reloader
 * Lint CSS code
-* Create GitHub Gist & E-mail
 
 **Open source:**
 * https://github.com/webextensions/live-css-editor
@@ -72,7 +71,7 @@ Visit https://webextensions.org/ for further details
 * You might find it useful in creating your custom themes for websites based on Stylish / Stylist
 * This extension was previously known as "MagiCSS - Live CSS Editor"
 
-**Credits for open source code and services used by this extension:**
+**Credits for open source code used by this extension:**
 * Amplify JS
 * Browserify
 * Code Mirror
@@ -80,7 +79,6 @@ Visit https://webextensions.org/ for further details
 * [emmetio/codemirror-plugin](https://github.com/emmetio/codemirror-plugin)
 * CSS Pretty
 * CSSLint
-* GitHub Gist
 * jQuery
 * jQuery UI
 * Less

@@ -547,6 +547,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         else                { return extensionUrl.chrome;  }
     }());
 
+    /*
+    // https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/
+
     var strCreatedVia = 'Created via Magic CSS extension';
     if (isChrome) {
         strCreatedVia += ' for Chrome - ' + extensionUrl.chrome;
@@ -570,7 +573,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 }
             }())
         ] = {
-            "content": text + '\r\n\r\n/* ' + strCreatedVia + ' */\r\n'
+            "content": text + '\r\n\r\n/* ' + strCreatedVia + ' *' + '/\r\n'
         };
         $.ajax({
             url: 'https://api.github.com/gists',
@@ -633,6 +636,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
         };
     }());
+    /* */
 
     var htmlEscape = function (str) {
         return str
@@ -2067,11 +2071,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         extraKeys: {
+                            /*
+                            // https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/
                             'Ctrl-S': function () {
                                 var editor = window.MagiCSSEditor;
                                 createGistAndEmail(editor.getTextValue(), getLanguageMode());
                                 editor.focus();
                             }
+                            /* */
                         },
                         optionsBasedOnUserPreference: function (userPreference) {
                             var options = {};
@@ -2492,6 +2499,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.focus();
                             }
                         },
+                        /*
+                        // https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/
                         {
                             name: 'gist',
                             title: 'Mail code (via Gist)',
@@ -2501,6 +2510,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.focus();
                             }
                         },
+                        /* */
                         /*
                         {
                             name: 'tweet',
