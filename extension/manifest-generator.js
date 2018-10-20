@@ -32,6 +32,7 @@ var generateManifest = function (whichBrowser) {
                 "storage"
             ];
             if (whichBrowser === "edge") {
+                permissions.push("webNavigation");
                 permissions.push("<all_urls>");
             }
             return permissions;
