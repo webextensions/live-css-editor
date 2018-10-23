@@ -17,7 +17,13 @@ Follow the steps mentioned at:
 > https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/adding-and-removing-extensions
 
 
-# Steps to get Microsoft Edge Extension Toolkit
+# Porting an extension from Chrome to Microsoft Edge
+
+Follow the steps mentioned at:
+> https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/porting-chrome-extensions OR https://github.com/MicrosoftDocs/edge-developer/blob/master/microsoft-edge/extensions/guides/porting-chrome-extensions.md
+
+
+# How to get Microsoft Edge Extension Toolkit
 
 - Go to https://www.microsoft.com/en-us/p/microsoft-edge-extension-toolkit/9nblggh4txvb
 - Click on Get / Install button
@@ -29,7 +35,7 @@ Follow the steps mentioned at:
 - Launch the application
 
 
-# Steps to create the ".appx" package for Edge extension
+# Create the ".appx" package for Edge extension
 
 - [Install Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
 
@@ -96,9 +102,9 @@ Follow the steps mentioned at:
 
 - https://github.com/manifoldjs/manifoldjs-edgeextension
 
-- https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/packaging/using-manifoldjs-to-package-extensions
+- https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/packaging OR https://github.com/MicrosoftDocs/edge-developer/blob/master/microsoft-edge/extensions/guides/packaging.md
 
-- https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/packaging
+- https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/packaging/using-manifoldjs-to-package-extensions
 
 - https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/packaging/creating-and-testing-extension-packages
 
