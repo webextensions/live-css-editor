@@ -147,6 +147,10 @@
             "latestVersion": "https://raw.githubusercontent.com/webextensions/less.js/build-less-for-magic-css/dist/basic-less-with-sourcemap-support.browserified.uglified.js"
         },
         {
+            "to": "extension/scripts/3rdparty/sass/sass.sync.min.js",
+            "from": { "default": { "src": "https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js" } }
+        },
+        {
             "to": "extension/scripts/3rdparty/css.escape.js",
             "from": { "default": { "src": "https://raw.githubusercontent.com/mathiasbynens/CSS.escape/v1.5.1/css.escape.js" } },
             "latestVersion": "https://raw.githubusercontent.com/mathiasbynens/CSS.escape/master/css.escape.js"

@@ -37,12 +37,19 @@ Please note that:
 ---------------------------------------------------------------------------------------------------------------------
 The file, `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js`, has been fetched from https://github.com/webextensions/less.js which is a fork of a popular open-source library (https://github.com/less/less.js/). More details about those minor changes can be found in `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js.source.description.txt`
 
-3rdparty code which is used "as-is" from https://cdnjs.cloudflare.com/ajax/libs/
---------------------------------------------------------------------------------
-- For parsing Sass, during runtime, we load:  
-  https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js  
-  The GitHub page for this library is at:  
-  https://github.com/medialize/sass.js
+3rdparty code which is used "as-is" from other sources
+------------------------------------------------------
+
+Loading Sass in extension for Opera browser:
+  - It is loaded from the "scripts/3rdparty/sass/sass.sync.min.js". For more details, refer to section "Notes about usage of 3rdparty code".
+
+Loading Sass in extension for all other browsers:
+  - For parsing Sass, during runtime, we load:  
+    https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js  
+    The GitHub page for this library is at:  
+    https://github.com/medialize/sass.js  
+    More information available at:  
+    https://cdnjs.com/libraries/sass.js
 
 3rdparty code which is customized
 ---------------------------------

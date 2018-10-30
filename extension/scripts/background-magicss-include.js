@@ -211,6 +211,20 @@ var reapplyCss = function (tabId) {
 };
 
 var main = function (tab) {     // eslint-disable-line no-unused-vars
+    var isChrome = false,       // eslint-disable-line no-unused-vars
+        isEdge = false,         // eslint-disable-line no-unused-vars
+        isFirefox = false,      // eslint-disable-line no-unused-vars
+        isOpera = false;
+    if (/Edge/.test(navigator.appVersion)) {            // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
+        isEdge = true;
+    } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
+        isOpera = true;
+    } else if (/Chrome/.test(navigator.appVersion)) {
+        isChrome = true;
+    } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
+        isFirefox = true;
+    }
+
     getAllFrames(function (allFrames) {
         var pathScripts = 'scripts/',
             path3rdparty = pathScripts + '3rdparty/',
@@ -304,6 +318,11 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
             // path3rdparty + 'less.js',
             path3rdparty + 'basic-less-with-sourcemap-support.browserified.uglified.js',
+
+            {
+                src: path3rdparty + 'sass/sass.sync.min.js',
+                skip: (runningInBrowserExtension && isOpera) ? false : true
+            },
 
             path3rdparty + 'source-map.js',
 

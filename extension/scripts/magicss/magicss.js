@@ -1786,6 +1786,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             if (!window.isActiveLoadSassRequest) {
                                 window.isActiveLoadSassRequest = true;
                                                 // https://github.com/medialize/sass.js
+                                                // https://cdnjs.com/libraries/sass.js
                                 var sassJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js',
                                     preRunReplace = [{oldText: 'this,function', newText: 'window,function'}];   // Required for making Sass load in Firefox - Reference: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Xray_vision
                                 utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);

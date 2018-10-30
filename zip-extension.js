@@ -87,7 +87,7 @@ try {
     archive.glob('**/*', {
         cwd: __dirname + '/extension',
         ignore: (function () {
-            var filesToIgnore = [
+            var pathsToIgnore = [
                 'manifest-generator.js',
                 'manifest-chrome.json',
                 'manifest-edge.json',
@@ -97,10 +97,13 @@ try {
                 'ui-images'             // Avoid "ui-images" folder from getting created
             ];
             if (whichBrowser !== 'edge') {
-                filesToIgnore.push('backgroundScriptsAPIBridge.js');
-                filesToIgnore.push('contentScriptsAPIBridge.js');
+                pathsToIgnore.push('backgroundScriptsAPIBridge.js');
+                pathsToIgnore.push('contentScriptsAPIBridge.js');
             }
-            return filesToIgnore;
+            if (whichBrowser !== 'opera') {
+                pathsToIgnore.push('scripts/3rdparty/sass/**');
+            }
+            return pathsToIgnore;
         }())
     }, {});
 
