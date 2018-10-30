@@ -68,6 +68,6 @@ If you wish to build a ZIP package of the extension on your own from the Git rep
 $ git clone https://github.com/webextensions/live-css-editor.git
 $ cd live-css-editor
 $ nvm use
-$ npm install
+$ npm install --ignore-scripts
 $ npm run zip-extension     # Now, the zip versions of the extension would be created for all the supported browsers (Chrome/Edge/Firefox/Opera)
 ```
