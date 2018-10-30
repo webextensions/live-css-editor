@@ -1779,7 +1779,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 }
                             });
                         };
-                        if (window.Sass) {
+                        if (isOpera || window.Sass) {
                             fn();
                         } else {
                             // Ensure that we don't send multiple load requests at once, by not sending request if previous one is still pending for succeess/failure
