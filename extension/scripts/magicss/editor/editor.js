@@ -1,4 +1,4 @@
-/*global amplify: false, console: false, utils, CodeMirror, jQuery, chrome */
+/* global amplify: false, utils, CodeMirror, jQuery, chrome */
 
 // TODO: If remember text option is on, detect text change in another instance of this extension in some different tab
 

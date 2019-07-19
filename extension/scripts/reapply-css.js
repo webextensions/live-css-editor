@@ -1,4 +1,4 @@
-/* globals utils, amplify */
+/* global utils, amplify */
 
 (function () {
     var showReapplyingStylesNotification = true;

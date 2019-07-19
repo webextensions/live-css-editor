@@ -1,4 +1,4 @@
-/*globals utils */
+/* global utils */
 
 // Here goes the functional code
 (function(){

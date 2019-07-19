@@ -1,4 +1,4 @@
-/*globals jQuery, utils, chrome */
+/* global jQuery, utils, chrome */
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',

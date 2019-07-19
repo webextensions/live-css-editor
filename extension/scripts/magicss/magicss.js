@@ -1,4 +1,4 @@
-/*globals jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr */
+/* global jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr */
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 

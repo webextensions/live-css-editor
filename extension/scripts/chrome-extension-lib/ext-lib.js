@@ -1,4 +1,4 @@
-/*globals chrome */
+/* global chrome */
 
 // https://github.com/coderaiser/itchy/blob/master/lib/itchy.js
 var asyncEachSeries = (array, iterator, done) => {

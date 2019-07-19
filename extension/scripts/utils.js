@@ -1,4 +1,4 @@
-/*globals jQuery, less, Sass, csspretty */
+/* global jQuery, less, Sass, csspretty */
 
 'use strict';
 

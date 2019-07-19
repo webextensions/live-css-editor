@@ -1,4 +1,4 @@
-/*globals chrome, alert, extLib, jQuery */
+/* global chrome, extLib, jQuery */
 
 var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
