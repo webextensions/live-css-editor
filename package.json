@@ -22,14 +22,14 @@
     "toastr": "^2.1.4"
   },
   "devDependencies": {
-    "archiver": "^2.1.1",
+    "archiver": "^3.0.0",
     "chalk": "^2.4.2",
     "copy-files-from-to": "~2.0.3",
-    "cp-file": "^6.0.0",
-    "del": "^3.0.0",
+    "cp-file": "^7.0.0",
+    "del": "^5.0.0",
     "eslint": "^6.0.1",
     "git-hooks": "^1.1.10",
-    "jsonfile": "^4.0.0",
+    "jsonfile": "^5.0.0",
     "note-down": "~0.2.3"
   }
 }
