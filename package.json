@@ -4,8 +4,8 @@
   "scripts": {
     "lint": "eslint .",
     "manifest-generator": "node ./extension/manifest-generator.js",
-    "copy-files-from-to": "copy-files-from-to --config copy-third-party-front-end-scripts.cjson",
-    "copy-files-from-to-outdated": "copy-files-from-to --config copy-third-party-front-end-scripts.cjson --outdated",
+    "copy-files-from-to": "copy-files-from-to",
+    "copy-files-from-to-outdated": "copy-files-from-to --outdated",
     "postinstall": "npm run copy-files-from-to",
     "zip-chrome-extension": "node ./zip-extension.js chrome",
     "zip-edge-extension": "node ./zip-extension.js edge",
