@@ -1,5 +1,5 @@
 {
-    "settings": {
+    "copyFilesSettings": {
         "whenFileExists": "notify-about-available-change",
         "addReferenceToSourceOfOrigin": true
     },
