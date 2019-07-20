@@ -2166,9 +2166,9 @@ console.log(
                         .addClass(cls);
                 };
 
-                var setLanguageMode = function (languageMode, editor, options) {
+                var setLanguageMode = function (newLanguageMode, editor, options) {
                     options = options || {};
-                    if (languageMode === 'file') {
+                    if (newLanguageMode === 'file') {
                         var fileEditingOptions = {};
                         // If previous mode was also 'file' (meaning the user clicked again), then we prompt the user for selecting file (or related options)
                         if (getLanguageMode() === 'file') {
@@ -2218,7 +2218,7 @@ console.log(
                         }
 
                         $('.footer-for-file-mode').hide();
-                        if (languageMode === 'less') {
+                        if (newLanguageMode === 'less') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-less');
                             editor.userPreference('language-mode', 'less');
                             editor.cm.setOption('mode', 'text/x-less');
@@ -2226,7 +2226,7 @@ console.log(
                             if (!options.skipNotifications) {
                                 utils.alertNote('Now editing code in LESS mode', 5000);
                             }
-                        } else if (languageMode === 'sass') {
+                        } else if (newLanguageMode === 'sass') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-sass');
                             editor.userPreference('language-mode', 'sass');
                             editor.cm.setOption('mode', 'text/x-scss');
