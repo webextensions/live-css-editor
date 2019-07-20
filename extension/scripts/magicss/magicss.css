@@ -524,8 +524,12 @@
     height: 15px !important;    /* !important is useful to avoid FOUC kind of effect when re-initializing Magic CSS */
     background-color: #fff;
 }
-.indicate-disabled#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,
-.indicate-disabled#MagiCSS-bookmarklet .CodeMirror {
+.indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .CodeMirror,
+.indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .CodeMirror,
+.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .CodeMirror,
+.indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,
+.indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,
+.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se {
     background-color: #bbb;
 }
 .indicate-disabled#MagiCSS-bookmarklet .magicss-mode-css,
@@ -1080,7 +1084,9 @@ html .magicss-mouse-over-dom-element {
 #MagiCSS-bookmarklet .CodeMirror-selected {
     background-color: #d9d9d9;
 }
-.indicate-disabled#MagiCSS-bookmarklet .CodeMirror-selected {
+.indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .CodeMirror-selected,
+.indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .CodeMirror-selected,
+.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .CodeMirror-selected {
     background-color: #eee;
 }
 #MagiCSS-bookmarklet .CodeMirror-cursor {
