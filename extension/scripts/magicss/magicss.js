@@ -1071,10 +1071,9 @@ console.log(
                                         '</div>',
                                     '</div>',
                                 '</div>',
-                                '<div class="magic-css-server-config-item">',
+                                '<div class="magic-css-server-config-item" style="text-align:right">',
                                     '<div>',
-                                        '<button type="button" class="magicss-save-server-path-changes" style="float:right">Save & Apply</button>',
-                                        '<button type="button" class="magicss-cancel-server-path-changes">Cancel</button>',
+                                        '<button type="button" class="magicss-done-server-path-changes">Done</button>',
                                     '</div>',
                                 '</div>',
                             '</div>',
@@ -1091,12 +1090,17 @@ console.log(
         var $serverPort = $backEndConnectivityOptions.find('.magic-css-server-port'),
             serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
-        var connectionTestingSocket = null;
+        // TODO: Remove this variable
+        // var connectionTestingSocket = null;
         var refreshConnectivityUi = function () {
             var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
-            if (connectionTestingSocket) {
-                connectionTestingSocket.close();
-                connectionTestingSocket = null;
+            // if (connectionTestingSocket) {
+            //     connectionTestingSocket.close();
+            //     connectionTestingSocket = null;
+            // }
+            if (socket) {
+                socket.close();
+                socket = null;
             }
             $backEndConnectivityOptions
                 .removeClass('live-css-server-client-general-error')
@@ -1105,10 +1109,12 @@ console.log(
                 .removeClass('connected')
                 .removeClass('disconnected')
                 .addClass('connecting');
-            $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
+            // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
 
-            connectionTestingSocket = io(backEndPath);
-            connectionTestingSocket.on('connect', function () {
+            // connectionTestingSocket = io(backEndPath);
+            socket = io(backEndPath);
+            socket.on('connect', function () {
+            // connectionTestingSocket.on('connect', function () {
                 $backEndConnectivityOptions
                     .removeClass('live-css-server-client-general-error')
                     .removeClass('live-css-server-client-incompatible-error')
@@ -1116,7 +1122,7 @@ console.log(
                     .removeClass('disconnected')
                     .removeClass('connecting')
                     .addClass('connected');
-                $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', false);
+                // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', false);
             });
             var errorHandler = function (err) {
                 $backEndConnectivityOptions
@@ -1134,10 +1140,14 @@ console.log(
                     $backEndConnectivityOptions
                         .addClass('live-css-server-client-general-error');
                 }
-                $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
+                // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
             };
-            connectionTestingSocket.on('connect_error', errorHandler);
-            connectionTestingSocket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
+
+            // connectionTestingSocket.on('connect_error', errorHandler);
+            // connectionTestingSocket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
+
+            socket.on('connect_error', errorHandler);
+            socket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
         };
 
         $serverHostname.val(serverHostnameValue);
@@ -1156,17 +1166,21 @@ console.log(
         // $backEndConnectivityOptions.find('.magic-css-back-end-connectivity-options').draggable();   // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
         var disconnectConnectionTestingSocket = function () {
-            if (connectionTestingSocket) {
-                connectionTestingSocket.close();
-                connectionTestingSocket = null;
+            // if (connectionTestingSocket) {
+            //     connectionTestingSocket.close();
+            //     connectionTestingSocket = null;
+            // }
+            if (socket) {
+                socket.close();
+                socket = null;
             }
         };
-        $backEndConnectivityOptions.find('.magic-css-full-page-overlay, .magicss-cancel-server-path-changes').on('click', function () {
+        $backEndConnectivityOptions.find('.magic-css-full-page-overlay').on('click', function () {
             disconnectConnectionTestingSocket();
             $backEndConnectivityOptions.remove();
             getServerDetailsFromUserAlreadyOpen = false;
         });
-        $backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', function () {
+        $backEndConnectivityOptions.find('.magicss-done-server-path-changes').on('click', function () {
             editor.userPreference('live-css-server-hostname', serverHostnameValue);
             editor.userPreference('live-css-server-port', serverPortValue);
 
