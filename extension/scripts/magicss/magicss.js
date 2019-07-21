@@ -1099,6 +1099,8 @@ console.log(
             //     connectionTestingSocket = null;
             // }
             if (socket) {
+                editor.markLiveCssServerConnectionStatus(false);
+
                 socket.close();
                 socket = null;
             }
@@ -1115,6 +1117,8 @@ console.log(
             socket = io(backEndPath);
             socket.on('connect', function () {
             // connectionTestingSocket.on('connect', function () {
+                editor.markLiveCssServerConnectionStatus(true);
+
                 $backEndConnectivityOptions
                     .removeClass('live-css-server-client-general-error')
                     .removeClass('live-css-server-client-incompatible-error')
@@ -1125,6 +1129,8 @@ console.log(
                 // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', false);
             });
             var errorHandler = function (err) {
+                editor.markLiveCssServerConnectionStatus(false);
+
                 $backEndConnectivityOptions
                     .removeClass('live-css-server-client-general-error')
                     .removeClass('live-css-server-client-incompatible-error')
@@ -1171,6 +1177,8 @@ console.log(
             //     connectionTestingSocket = null;
             // }
             if (socket) {
+                editor.markLiveCssServerConnectionStatus(false);
+
                 socket.close();
                 socket = null;
             }
@@ -1235,6 +1243,8 @@ console.log(
             ) {
                 return socket;
             } else {
+                editor.markLiveCssServerConnectionStatus(false);
+
                 socket.close();
                 socket = null;
             }
@@ -1272,6 +1282,8 @@ console.log(
                         });
                     } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
                         if (socket) {
+                            editor.markLiveCssServerConnectionStatus(false);
+
                             socket.close();
                             socket = null;
                         }
@@ -1305,6 +1317,8 @@ console.log(
             // reconnectionAttempts: 100
         });
         socket.on('error', function (err) {
+            editor.markLiveCssServerConnectionStatus(false);
+
             // In case of "Invalid namespace", we open the UI for details to inform that they are using
             // incompatible version of the live-css server
             if (err === 'Invalid namespace') {
@@ -1316,6 +1330,8 @@ console.log(
             }
         });
         socket.on('connect', function () {
+            editor.markLiveCssServerConnectionStatus(true);
+
             flagConnectedAtLeastOnce = true;
 
             if (!flagCallbackCalledOnce) {
@@ -1360,6 +1376,8 @@ console.log(
         });
 
         socket.on('reconnect_attempt', function () {
+            editor.markLiveCssServerConnectionStatus(false);
+
             if (flagConnectedAtLeastOnce) {
                 if ($toastrReconnectAttempt) {
                     // do nothing
@@ -1387,6 +1405,8 @@ console.log(
                                     });
                                 } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
                                     if (socket) {
+                                        editor.markLiveCssServerConnectionStatus(false);
+
                                         socket.close();
                                         socket = null;
                                     }
@@ -1403,6 +1423,8 @@ console.log(
 
     var getDisconnectedWithBackEnd = function (editor, options, cb) {
         if (socket) {
+            editor.markLiveCssServerConnectionStatus(false);
+
             socket.close();
             socket = null;
         }
@@ -3457,6 +3479,19 @@ console.log(
                         }
                     }
 
+                    markLiveCssServerConnectionStatus(connected) {
+                        console.log('markLiveCssServerConnectionStatus', connected);
+                        if (connected) {
+                            $(this.container)
+                                .removeClass('magic-css-live-css-server-is-not-connected')
+                                .addClass('magic-css-live-css-server-is-connected');
+                        } else {
+                            $(this.container)
+                                .removeClass('magic-css-live-css-server-is-connected')
+                                .addClass('magic-css-live-css-server-is-not-connected');
+                        }
+                    }
+
                     disableEnableCSS(doWhat) {
                         var disabled;
                         if (doWhat === 'disable') {
@@ -3490,6 +3525,8 @@ console.log(
                 window.MagiCSSEditor = new StylesEditor(options);
 
                 checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+
+                window.MagiCSSEditor.markLiveCssServerConnectionStatus(false);
 
                 try {
                     chromeStorage.get('use-autocomplete-for-css-selectors', function (values) {

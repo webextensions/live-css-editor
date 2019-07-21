@@ -527,11 +527,14 @@
 .indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .CodeMirror,
 .indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .CodeMirror,
 .indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .CodeMirror,
+.magic-css-live-css-server-is-not-connected.magicss-selected-mode-file#MagiCSS-bookmarklet .CodeMirror,
 .indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,
 .indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,
-.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se {
+.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,
+.magic-css-live-css-server-is-not-connected.magicss-selected-mode-file#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se {
     background-color: #bbb;
 }
+
 .indicate-disabled#MagiCSS-bookmarklet .magicss-mode-css,
 .indicate-disabled#MagiCSS-bookmarklet .magicss-mode-less,
 .indicate-disabled#MagiCSS-bookmarklet .magicss-mode-sass {
@@ -1086,7 +1089,8 @@ html .magicss-mouse-over-dom-element {
 }
 .indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .CodeMirror-selected,
 .indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .CodeMirror-selected,
-.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .CodeMirror-selected {
+.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .CodeMirror-selected,
+.magic-css-live-css-server-is-not-connected.magicss-selected-mode-file#MagiCSS-bookmarklet .CodeMirror-selected {
     background-color: #eee;
 }
 #MagiCSS-bookmarklet .CodeMirror-cursor {
