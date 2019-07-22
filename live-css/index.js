@@ -51,7 +51,7 @@ var chokidar = require('chokidar-webextensions'),
     unusedFilename = require('unused-filename');
 
 var express = require('express'),
-    serveIndex = require('serve-index'),
+    // serveIndex = require('serve-index'),
     bodyParser = require('body-parser');
 
 var nocache = require('nocache');

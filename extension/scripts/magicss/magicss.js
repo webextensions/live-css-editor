@@ -16,6 +16,223 @@ console.log(
 );
 
 (function($){
+
+    var flagConnectedAtLeastOnce = false;
+    window.currentlyConnected = false;
+    var setCurrentlyConnected = function (value) {
+        window.currentlyConnected = value;
+        console.log('window.currentlyConnected', window.currentlyConnected);
+    };
+
+    var socketOb = {};
+    socketOb.socket = null;
+
+    socketOb.setup = function () {
+        var $backEndConnectivityOptions = window.$backEndConnectivityOptions;
+        var editor = window.MagiCSSEditor;
+
+        var serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+            serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+
+
+
+
+        // var $serverHostname = window.$backEndConnectivityOptions.find('.magic-css-server-hostname'),
+        //     serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
+
+        // var $serverPort = window.$backEndConnectivityOptions.find('.magic-css-server-port'),
+        //     serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+
+
+
+
+        var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
+        var backEndPathToShowToUser = serverHostnameValue + ':' + serverPortValue;
+
+        socketOb.socket = io(backEndPath);
+        var socket = socketOb.socket;
+
+        // debugger;
+
+        socket.on('connect', function () {
+            console.log('inside on connect');
+            editor.markLiveCssServerConnectionStatus(true);
+
+            setCurrentlyConnected(true);
+
+            $backEndConnectivityOptions
+                .removeClass('live-css-server-client-general-error')
+                .removeClass('live-css-server-client-incompatible-error')
+                .find('.magic-css-server-connectivity-status')
+                .removeClass('disconnected')
+                .removeClass('connecting')
+                .addClass('connected');
+
+            flagConnectedAtLeastOnce = true;
+
+            // if (!flagCallbackCalledOnce) {
+            //     flagCallbackCalledOnce = true;
+            //     callback(null, socket);
+            // }
+
+            if ($toastrReconnectAttempt) {
+                $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                $toastrReconnectAttempt = null;
+            }
+
+            $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+            $toastrConnected = toastr.success(
+                '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                    backEndPathToShowToUser +
+                '</div>' +
+                '<div>' +
+                '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
+                    '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
+                '</div>',
+                'Connected with live-css server at:',
+                {
+                    onclick: function (evt) {
+                        if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                            toastr.clear($toastrConnected, {force: true});
+                            getServerDetailsFromUser(editor, function (err) {
+                            // getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                if (!err) {
+                                    console.log('TODO');
+                                    debugger;
+                                    // callbackForReconfiguration(serverDetails);
+                                }
+                            });
+                        } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
+                            toastr.clear($toastrConnected, {force: true});
+                        }
+                    }
+                }
+            );
+            var $toastrToHide = $toastrConnected;
+            setTimeout(function () {
+                toastr.clear($toastrToHide);
+            }, 4000);
+        });
+
+        var errorHandler = function (err) {
+            setCurrentlyConnected(false);
+
+            editor.markLiveCssServerConnectionStatus(false);
+
+            $backEndConnectivityOptions
+                .removeClass('live-css-server-client-general-error')
+                .removeClass('live-css-server-client-incompatible-error')
+                .find('.magic-css-server-connectivity-status')
+                .removeClass('connected')
+                .removeClass('connecting')
+                .addClass('disconnected');
+
+            if (err === 'Invalid namespace') {
+                $backEndConnectivityOptions
+                    .addClass('live-css-server-client-incompatible-error');
+            } else {
+                $backEndConnectivityOptions
+                    .addClass('live-css-server-client-general-error');
+            }
+            // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
+        };
+
+        // connectionTestingSocket.on('connect_error', errorHandler);
+        // connectionTestingSocket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
+
+        socket.on('connect_error', errorHandler);
+        socket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
+
+        socket.on('reconnect_attempt', function () {
+            console.log('inside on reconnect_attempt');
+
+            setCurrentlyConnected(false);
+
+            editor.markLiveCssServerConnectionStatus(false);
+
+            if (flagConnectedAtLeastOnce) {
+                if ($toastrReconnectAttempt) {
+                    // do nothing
+                } else {
+                    if ($toastrConnected) {
+                        $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                    }
+                    $toastrReconnectAttempt = toastr.warning(
+                        '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                            backEndPathToShowToUser +
+                        '</div>' +
+                        '<div>' +
+                            '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right">Cancel</button>' +
+                            '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
+                        '</div>',
+                        'Reconnecting with live-css server at:',
+                        {
+                            timeOut: 0,
+                            onclick: function (evt) {
+                                if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                                    getServerDetailsFromUser(editor, function (err) {
+                                    // getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                        if (!err) {
+                                            console.log('TODO');
+                                            debugger;
+                                            // callbackForReconfiguration(serverDetails);
+                                        }
+                                    });
+                                } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
+                                    if (socket) {
+                                        editor.markLiveCssServerConnectionStatus(false);
+
+                                        debugger;
+                                        socket.close();
+                                        socket = null;
+                                    }
+                                    toastr.clear($toastrReconnectAttempt, {force: true});
+                                    liveCssServerSessionClosedByUser(editor);
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        });
+
+        socket.on('file-modified', function(changeDetails) {
+            if (changeDetails.useOnlyFileNamesForMatch) {
+                reloadCSSResourceInPage({
+                    fullPath: changeDetails.fullPath,
+                    useOnlyFileNamesForMatch: true,
+                    fileName: changeDetails.fileName
+                });
+            } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                reloadCSSResourceInPage({
+                    fullPath: changeDetails.fullPath,
+                    url: resolveUrl(pathWrtRoot)
+                });
+            } else {
+                // The code should never reach here
+                utils.alertNote(
+                    'Unexpected scenario occurred in reloading some CSS resources.' +
+                    '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                    10000
+                );
+            }
+        });
+    };
+
+    socketOb.close = function () {
+        if (socketOb.socket) {
+            // debugger;
+            socketOb.socket.close();
+            socketOb.socket = null;
+        }
+    };
+
+    socketOb.reset = function () {
+        socketOb.close();
+        socketOb.setup();
+    };
+
     var chromeStorage;
     try {
         chromeStorage = chrome.storage.sync || chrome.storage.local;
@@ -873,34 +1090,35 @@ console.log(
     var getConnected = function (editor, cb) {
         var socketIfAlreadyConnected = getConnectedWithBackEnd(
             editor,
-            function callback (err, socket) {
+            function callback (err) {
+            // function callback (err, socket) {
                 if (err) {
                     // The user cancelled watching files
                     utils.alertNote('You cancelled watching CSS files for changes');
                     editor.userPreference('watching-css-files', 'no');
                 } else {
-                    socket.on('file-modified', function(changeDetails) {
-                        if (changeDetails.useOnlyFileNamesForMatch) {
-                            reloadCSSResourceInPage({
-                                fullPath: changeDetails.fullPath,
-                                useOnlyFileNamesForMatch: true,
-                                fileName: changeDetails.fileName
-                            });
-                        } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                            var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                            reloadCSSResourceInPage({
-                                fullPath: changeDetails.fullPath,
-                                url: resolveUrl(pathWrtRoot)
-                            });
-                        } else {
-                            // The code should never reach here
-                            utils.alertNote(
-                                'Unexpected scenario occurred in reloading some CSS resources.' +
-                                '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                                10000
-                            );
-                        }
-                    });
+                    // socket.on('file-modified', function(changeDetails) {
+                    //     if (changeDetails.useOnlyFileNamesForMatch) {
+                    //         reloadCSSResourceInPage({
+                    //             fullPath: changeDetails.fullPath,
+                    //             useOnlyFileNamesForMatch: true,
+                    //             fileName: changeDetails.fileName
+                    //         });
+                    //     } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                    //         var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                    //         reloadCSSResourceInPage({
+                    //             fullPath: changeDetails.fullPath,
+                    //             url: resolveUrl(pathWrtRoot)
+                    //         });
+                    //     } else {
+                    //         // The code should never reach here
+                    //         utils.alertNote(
+                    //             'Unexpected scenario occurred in reloading some CSS resources.' +
+                    //             '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                    //             10000
+                    //         );
+                    //     }
+                    // });
                     if (!flagWatchingCssFiles) {
                         flagWatchingCssFiles = true;
                         utils.alertNote(
@@ -953,13 +1171,18 @@ console.log(
 
 
     var getServerDetailsFromUserAlreadyOpen = false;
-    var getServerDetailsFromUser = function (editor, callback) {
+    var getServerDetailsFromUser = function (editor) {
+    // var getServerDetailsFromUser = function (editor, callback) {
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
         getServerDetailsFromUserAlreadyOpen = true;
+
+
+        // debugger;
         /* eslint-disable indent */
-        var $backEndConnectivityOptions = $(
+        window.$backEndConnectivityOptions = $(
+        // var $backEndConnectivityOptions = $(
             [
                 '<div>',
                     '<div class="magic-css-full-page-overlay">',
@@ -1084,12 +1307,15 @@ console.log(
         );
         /* eslint-enable indent */
 
-        var $serverHostname = $backEndConnectivityOptions.find('.magic-css-server-hostname'),
+        // debugger;
+
+        var $serverHostname = window.$backEndConnectivityOptions.find('.magic-css-server-hostname'),
             serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
 
-        var $serverPort = $backEndConnectivityOptions.find('.magic-css-server-port'),
+        var $serverPort = window.$backEndConnectivityOptions.find('.magic-css-server-port'),
             serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
+        /*
         // TODO: Remove this variable
         // var connectionTestingSocket = null;
         var refreshConnectivityUi = function () {
@@ -1155,22 +1381,31 @@ console.log(
             socket.on('connect_error', errorHandler);
             socket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
         };
+        /* */
 
         $serverHostname.val(serverHostnameValue);
         $serverHostname.on('input', function () {
+            debugger;
             serverHostnameValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultHostname;
-            refreshConnectivityUi();
+            editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            // refreshConnectivityUi();
+            socketOb.reset();
         });
 
+        console.log('Haha 1');
         $serverPort.val(serverPortValue);
         $serverPort.on('input', function () {
+            console.log('inside input');
             serverPortValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultPort;
-            refreshConnectivityUi();
+            // refreshConnectivityUi();
+            editor.userPreference('live-css-server-port', serverPortValue);
+            socketOb.reset();
         });
 
         // Useful when developing/debugging
         // $backEndConnectivityOptions.find('.magic-css-back-end-connectivity-options').draggable();   // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
+        /*
         var disconnectConnectionTestingSocket = function () {
             // if (connectionTestingSocket) {
             //     connectionTestingSocket.close();
@@ -1183,26 +1418,27 @@ console.log(
                 socket = null;
             }
         };
-        $backEndConnectivityOptions.find('.magic-css-full-page-overlay').on('click', function () {
-            disconnectConnectionTestingSocket();
-            $backEndConnectivityOptions.remove();
-            getServerDetailsFromUserAlreadyOpen = false;
-        });
-        $backEndConnectivityOptions.find('.magicss-done-server-path-changes').on('click', function () {
-            editor.userPreference('live-css-server-hostname', serverHostnameValue);
-            editor.userPreference('live-css-server-port', serverPortValue);
+        // $backEndConnectivityOptions.find('.magic-css-full-page-overlay').on('click', function () {
+        //     disconnectConnectionTestingSocket();
+        //     $backEndConnectivityOptions.remove();
+        //     getServerDetailsFromUserAlreadyOpen = false;
+        // });
+        /* */
+        window.$backEndConnectivityOptions.find('.magicss-done-server-path-changes').on('click', function () {
+            // editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            // editor.userPreference('live-css-server-port', serverPortValue);
 
-            disconnectConnectionTestingSocket();
-            $backEndConnectivityOptions.remove();
+            // disconnectConnectionTestingSocket();
+            window.$backEndConnectivityOptions.remove();
             getServerDetailsFromUserAlreadyOpen = false;
 
-            callback(null, {
-                serverHostname: serverHostnameValue,
-                serverPort: serverPortValue
-            });
+            // callback(null, {
+            //     serverHostname: serverHostnameValue,
+            //     serverPort: serverPortValue
+            // });
         });
-        $('body').append($backEndConnectivityOptions);
-        refreshConnectivityUi();
+        $('body').append(window.$backEndConnectivityOptions);
+        // refreshConnectivityUi();
     };
 
     var updateUiMentioningNotWatchingCssFiles = function (editor) {
@@ -1227,7 +1463,7 @@ console.log(
         $toastrConnected,
         $toastrReconnectAttempt;
     var getConnectedWithBackEnd = function (editor, callback, callbackForReconfiguration) {
-        var flagCallbackCalledOnce = false;
+        // var flagCallbackCalledOnce = false;
         var serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
             serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
@@ -1245,12 +1481,13 @@ console.log(
             } else {
                 editor.markLiveCssServerConnectionStatus(false);
 
+                debugger;
                 socket.close();
                 socket = null;
             }
         }
 
-        var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
+        // var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
         var backEndPathToShowToUser = serverHostnameValue + ':' + serverPortValue;
         if ($toastrConnecting) {
             $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
@@ -1267,7 +1504,7 @@ console.log(
                 backEndPathToShowToUser +
             '</div>' +
             '<div>' +
-                '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right;">Cancel</button>' +
+                // '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right;">Cancel</button>' +
                 '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
             '</div>',
             'Connecting with live-css server at: ',
@@ -1280,18 +1517,18 @@ console.log(
                                 callbackForReconfiguration(serverDetails);
                             }
                         });
-                    } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
-                        if (socket) {
-                            editor.markLiveCssServerConnectionStatus(false);
+                    // } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
+                    //     if (socket) {
+                    //         editor.markLiveCssServerConnectionStatus(false);
 
-                            socket.close();
-                            socket = null;
-                        }
-                        toastr.clear($toastrConnecting, {force: true});
-                        if (!flagCallbackCalledOnce) {
-                            flagCallbackCalledOnce = true;
-                            callback('cancelled-by-user', socket);
-                        }
+                    //         socket.close();
+                    //         socket = null;
+                    //     }
+                    //     toastr.clear($toastrConnecting, {force: true});
+                    //     if (!flagCallbackCalledOnce) {
+                    //         flagCallbackCalledOnce = true;
+                    //         callback('cancelled-by-user', socket);
+                    //     }
                     }
                 }
             }
@@ -1311,7 +1548,8 @@ console.log(
             });
         }
 
-        var flagConnectedAtLeastOnce = false;
+        /*
+        // var flagConnectedAtLeastOnce = false;
         socket = io(backEndPath, {
             // timeout: 5000
             // reconnectionAttempts: 100
@@ -1329,52 +1567,56 @@ console.log(
                 });
             }
         });
+        /* */
+        /*
         socket.on('connect', function () {
             editor.markLiveCssServerConnectionStatus(true);
 
-            flagConnectedAtLeastOnce = true;
+            // flagConnectedAtLeastOnce = true;
 
-            if (!flagCallbackCalledOnce) {
-                flagCallbackCalledOnce = true;
-                callback(null, socket);
-            }
+            // if (!flagCallbackCalledOnce) {
+            //     flagCallbackCalledOnce = true;
+            //     callback(null, socket);
+            // }
 
-            if ($toastrReconnectAttempt) {
-                $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-                $toastrReconnectAttempt = null;
-            }
+            // if ($toastrReconnectAttempt) {
+            //     $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+            //     $toastrReconnectAttempt = null;
+            // }
 
-            $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-            $toastrConnected = toastr.success(
-                '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
-                    backEndPathToShowToUser +
-                '</div>' +
-                '<div>' +
-                '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
-                    '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
-                '</div>',
-                'Connected with live-css server at:',
-                {
-                    onclick: function (evt) {
-                        if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                            toastr.clear($toastrConnected, {force: true});
-                            getServerDetailsFromUser(editor, function (err, serverDetails) {
-                                if (!err) {
-                                    callbackForReconfiguration(serverDetails);
-                                }
-                            });
-                        } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
-                            toastr.clear($toastrConnected, {force: true});
-                        }
-                    }
-                }
-            );
-            var $toastrToHide = $toastrConnected;
-            setTimeout(function () {
-                toastr.clear($toastrToHide);
-            }, 4000);
+            // $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+            // $toastrConnected = toastr.success(
+            //     '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+            //         backEndPathToShowToUser +
+            //     '</div>' +
+            //     '<div>' +
+            //     '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
+            //         '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
+            //     '</div>',
+            //     'Connected with live-css server at:',
+            //     {
+            //         onclick: function (evt) {
+            //             if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+            //                 toastr.clear($toastrConnected, {force: true});
+            //                 getServerDetailsFromUser(editor, function (err, serverDetails) {
+            //                     if (!err) {
+            //                         callbackForReconfiguration(serverDetails);
+            //                     }
+            //                 });
+            //             } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
+            //                 toastr.clear($toastrConnected, {force: true});
+            //             }
+            //         }
+            //     }
+            // );
+            // var $toastrToHide = $toastrConnected;
+            // setTimeout(function () {
+            //     toastr.clear($toastrToHide);
+            // }, 4000);
         });
+        /* */
 
+        /*
         socket.on('reconnect_attempt', function () {
             editor.markLiveCssServerConnectionStatus(false);
 
@@ -1418,16 +1660,19 @@ console.log(
                     );
                 }
             }
-        });
+        }); /* */
     };
 
     var getDisconnectedWithBackEnd = function (editor, options, cb) {
+        /*
         if (socket) {
             editor.markLiveCssServerConnectionStatus(false);
 
             socket.close();
             socket = null;
         }
+        /* */
+        socketOb.close();
         if ($toastrConnected) {
             toastr.clear($toastrConnected, {force: true});
         }
@@ -1824,7 +2069,7 @@ console.log(
 
                             var filePath = editor.userPreference('file-to-edit');
 
-                            socket.emit(
+                            socketOb.socket.emit(
                                 'PUT',
                                 {
                                     url: '/live-css/edit-file/' + filePath,
@@ -2084,7 +2329,7 @@ console.log(
 
                     // Using a timeout of 0ms so that the "socket" gets initiated if it is required
                     setTimeout(function () {
-                        socket.emit(
+                        socketOb.socket.emit(
                             'GET',
                             {
                                 url: filePath
@@ -2205,6 +2450,7 @@ console.log(
                 var setLanguageMode = function (newLanguageMode, editor, options) {
                     options = options || {};
                     if (newLanguageMode === 'file') {
+                        debugger;
                         var fileEditingOptions = {};
                         // If previous mode was also 'file' (meaning the user clicked again), then we prompt the user for selecting file (or related options)
                         if (getLanguageMode() === 'file') {
@@ -3480,6 +3726,13 @@ console.log(
                     }
 
                     markLiveCssServerConnectionStatus(connected) {
+                        if (
+                            $(this.container)
+                                .hasClass('magic-css-live-css-server-is-connected')
+                            && !connected
+                        ) {
+                            // debugger;
+                        }
                         console.log('markLiveCssServerConnectionStatus', connected);
                         if (connected) {
                             $(this.container)
