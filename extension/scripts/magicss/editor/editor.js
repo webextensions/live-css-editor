@@ -12,6 +12,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
+var whichStoreToUse = 'chrome.storage.local';
+/*
+    Allowed values:
+        'chrome.storage.local'
+        'localStorage'
+*/
+
 (function ($) {
     'use strict';
 
@@ -384,15 +391,41 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
         async userPreference(pref, value) {
             var _this = this;
-            return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-                var prefix = _this.options.localDataKeyPrefix;
-                if (value === undefined) {
-                    resolve(amplify.store(prefix + pref) || _this.defaultPreference(pref));
-                } else {
-                    amplify.store(prefix + pref, value);
-                    resolve(_this);
-                }
-            });
+            var prefix = _this.options.localDataKeyPrefix;
+            if (whichStoreToUse === 'chrome.storage.local') {
+                return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+                    var propertyName = `(${window.location.origin}) ${prefix}${pref}`;
+                    // console.log(`propertyName: ${propertyName}`);
+                    if (value === undefined) {
+                        chromeStorage.get(propertyName, function (values) {
+                            // console.log(`get values: ${JSON.stringify(values, null, '    ')}`);
+                            resolve(
+                                values[propertyName] ||
+                                _this.defaultPreference(pref)
+                            );
+                        });
+                    } else {
+                        chromeStorage.set(
+                            {
+                                [propertyName]: value
+                            },
+                            function () {
+                                resolve();
+                            }
+                        );
+                    }
+                });
+            } else {
+                return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+                    var propertyName = `${prefix}${pref}`;
+                    if (value === undefined) {
+                        resolve(amplify.store(propertyName) || _this.defaultPreference(pref));
+                    } else {
+                        amplify.store(propertyName, value);
+                        resolve(_this);
+                    }
+                });
+            }
         }
 
         bringCursorToView(options) {
@@ -539,8 +572,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 thisOb._makeDraggable();
             }
 
-            await thisOb._addChildComponents();
             await thisOb.initialize(options);
+            thisOb.container.style.visibility = 'hidden';
+            await thisOb._addChildComponents();
+            thisOb.container.style.visibility = '';
+
+            // Set focus on editor
+            thisOb.focus();
+
+            await thisOb.triggerEvent('launched');
 
             window.onresize = function (e) {
                 if (e.target !== window) {
@@ -1071,15 +1111,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 }
             });
-
-            // Set focus on textarea
-            // ## Currently setting the focus on textarea after a delay, because at
-            // this moment its parent container element's CSS position is not fixed.
-            // It is set as fixed just a small bit later and hence the timeout here.
-            // Ideally (not necessarily practically), the code should be (without timeout).
-            thisOb.focus();
-
-            await thisOb.triggerEvent('launched');
         }
 
         async initialize(options) {
@@ -1244,6 +1275,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
         focus() {
             var cm = this.cm;
+            // TODO:
+            // Previously, we were setting the focus on textarea after a delay, because
+            // of the order of rendering and positioning of the container element.
+            // Ideally (not necessarily practically), the code should be (without timeout).
+            // Review and clear the setTimeout
             setTimeout(function() {
                 cm.focus();
             }, 0);
