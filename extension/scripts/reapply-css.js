@@ -1,29 +1,32 @@
 /* global utils, amplify */
 
-(function () {
+(async function () {
     var showReapplyingStylesNotification = true;
     if (window.hideReapplyingStylesNotification === true) {
         showReapplyingStylesNotification = false;
     }
     // TODO: Refactor/Reuse the definition of "userPreference"
     var userPreference = function (pref, value) {
-        var prefix = 'MagiCSS-bookmarklet-';
-        if (value === undefined) {
-            return amplify.store(prefix + pref) || '';
-        } else {
-            amplify.store(prefix + pref, value);
-            return this;
-        }
+        var _this = this;
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            var prefix = 'MagiCSS-bookmarklet-';
+            if (value === undefined) {
+                resolve(amplify.store(prefix + pref) || '');
+            } else {
+                amplify.store(prefix + pref, value);
+                resolve(_this);
+            }
+        });
     };
 
     var localStorageDisableStyles = 'disable-styles';
-    var disableStyles = userPreference(localStorageDisableStyles) === 'yes';
+    var disableStyles = await userPreference(localStorageDisableStyles) === 'yes';
 
     var localStorageApplyStylesAutomatically = 'apply-styles-automatically';
-    var applyStylesAutomatically = userPreference(localStorageApplyStylesAutomatically) === 'yes';
+    var applyStylesAutomatically = await userPreference(localStorageApplyStylesAutomatically) === 'yes';
 
     var localStorageLastAppliedCss = 'last-applied-css';
-    var cssText = userPreference(localStorageLastAppliedCss).trim();
+    var cssText = (await userPreference(localStorageLastAppliedCss)).trim();
 
     if (cssText && applyStylesAutomatically && !disableStyles) {
         var showReapplyingStylesNotificationAt = (window.showReapplyingStylesNotificationAt || 'top-right').split('-');

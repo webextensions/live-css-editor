@@ -16,6 +16,9 @@
         "node": false,
         "browser": true
     },
+    "parserOptions": {
+        "ecmaVersion": 2017
+    },
     "extends": "eslint:recommended",
     "plugins": []
 }

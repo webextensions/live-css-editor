@@ -222,7 +222,7 @@ if (!utils.defined) {
         if (typeof proto.firstExecution == 'undefined') {
             proto.firstExecution = true;
 
-            proto.applyTag = function (cb) {
+            proto.applyTag = function () {
                 utils.addStyleTag({
                     attributes: config.attributes,
                     cssText: this.cssText,
@@ -232,7 +232,8 @@ if (!utils.defined) {
                     removeExistingStyleTagWithSameId: this.removeExistingStyleTagWithSameId,
                     disabled: this.disabled
                 });
-                cb && cb(this.cssText);
+                var appliedCssText = this.cssText;
+                return appliedCssText;
             };
 
             proto.disable = function () {
@@ -290,7 +291,7 @@ if (!utils.defined) {
         );
     };
 
-    utils.delayFunctionUntilTestFunction = function(config) {
+    utils.delayFunctionUntilTestFunction = async function(config) {
         var fnSuccess = config.fnSuccess,
             fnTest = config.fnTest,
             fnFirstFailure = config.fnFirstFailure,
@@ -304,7 +305,7 @@ if (!utils.defined) {
             waitFor = config.waitFor || 750;
 
         if(fnTest()) {
-            return fnSuccess() === false ? false : true;
+            return (await fnSuccess()) === false ? false : true;
         } else {
             if(tryLimitRunningCycleNumber === 0 && typeof fnFirstFailure === 'function') {
                 fnFirstFailure();
@@ -315,8 +316,8 @@ if (!utils.defined) {
             }
 
             if(tryLimitRunningCycleNumber < (tryLimit-1)) {
-                window.setTimeout((function(){
-                    utils.delayFunctionUntilTestFunction(config);
+                window.setTimeout((async function(){
+                    await utils.delayFunctionUntilTestFunction(config);
                 }),waitFor);
             } else {
                 if (typeof fnFailure === 'function') {

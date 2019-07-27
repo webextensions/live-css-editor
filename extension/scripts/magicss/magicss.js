@@ -1,5 +1,8 @@
 /* global jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr */
 
+// TODO: Remove turning off of this rule (require-atomic-updates)
+/* eslint require-atomic-updates: "off" */
+
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
@@ -36,9 +39,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         } else {
             utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
 
-            // 'Magic CSS window is already there. Repositioning it.'
-            window.MagiCSSEditor.reposition(function () {
-                checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+            setTimeout(async function () {
+                // 'Magic CSS window is already there. Repositioning it.'
+                await window.MagiCSSEditor.reposition(function () {
+                    checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+                });
             });
         }
         return;
@@ -118,9 +123,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     // toastr.options.tapToDismiss = false;
 
 
-    var rememberLastAppliedCss = function (css) {
+    var rememberLastAppliedCss = async function (css) {
         var editor = window.MagiCSSEditor;
-        editor.userPreference('last-applied-css', css);
+        await editor.userPreference('last-applied-css', css);
     };
 
     var ellipsis = function (str, limit) {
@@ -700,33 +705,33 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         }
     };
 
-    var setCodeMirrorCSSLinting = function (editor, enableOrDisable) {
+    var setCodeMirrorCSSLinting = async function (editor, enableOrDisable) {
         var cm = editor.cm,
             lint,
             gutters = [].concat(cm.getOption('gutters') || []);
         if (enableOrDisable === 'enable') {
             lint = true;
             gutters.unshift('CodeMirror-lint-markers');     // Using ".unshift()" rather than ".push()" to ensure that the "gutter" for "line-number" always comes after gutter for "linting"
-            editor.userPreference('use-css-linting', 'yes');
+            await editor.userPreference('use-css-linting', 'yes');
         } else {
             lint = false;
             var index = gutters.indexOf('CodeMirror-lint-markers');
             if (index > -1) {
                 gutters.splice(index, 1);
             }
-            editor.userPreference('use-css-linting', 'no');
+            await editor.userPreference('use-css-linting', 'no');
         }
         cm.setOption('gutters', gutters);
         cm.setOption('lint', lint);
     };
 
-    var markAsPinnedOrNotPinned = function (editor, pinnedOrNotPinned) {
+    var markAsPinnedOrNotPinned = async function (editor, pinnedOrNotPinned) {
         if (pinnedOrNotPinned === 'pinned') {
             editor.applyStylesAutomatically(true);
-            editor.userPreference('apply-styles-automatically', 'yes');
+            await editor.userPreference('apply-styles-automatically', 'yes');
         } else {
             editor.applyStylesAutomatically(false);
-            editor.userPreference('apply-styles-automatically', 'no');
+            await editor.userPreference('apply-styles-automatically', 'no');
         }
     };
 
@@ -820,15 +825,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     var flagWatchingCssFiles = false;
     var socket = null;
 
-    var startWatchingFiles = function (editor) {
-        var getConnected = function () {
-            getConnectedWithBackEnd(
+    var startWatchingFiles = async function (editor) {
+        var getConnected = async function () {
+            await getConnectedWithBackEnd(
                 editor,
-                function callback (err, socket) {
+                async function (err, socket) {
                     if (err) {
                         // The user cancelled watching files
                         utils.alertNote('You cancelled watching CSS files for changes');
-                        editor.userPreference('watching-css-files', 'no');
+                        await editor.userPreference('watching-css-files', 'no');
                     } else {
                         socket.on('file-modified', function(changeDetails) {
                             if (changeDetails.useOnlyFileNamesForMatch) {
@@ -864,16 +869,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 }
                             );
                             $(editor.container).addClass('watching-css-files');
-                            editor.userPreference('watching-css-files', 'yes');
+                            await editor.userPreference('watching-css-files', 'yes');
                         }
                     }
                 },
-                function callbackForReconfiguration () {
-                    getConnected();
+                async function callbackForReconfiguration () {
+                    await getConnected();
                 }
             );
         };
-        getConnected();
+        await getConnected();
     };
 
     // A pretty basic OS detection logic based on:
@@ -895,7 +900,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
 
     var getServerDetailsFromUserAlreadyOpen = false;
-    var getServerDetailsFromUser = function (editor, callback) {
+    var getServerDetailsFromUser = async function (editor, callback) {
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
@@ -1028,10 +1033,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         /* eslint-enable indent */
 
         var $serverHostname = $backEndConnectivityOptions.find('.magic-css-server-hostname'),
-            serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
+            serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
 
         var $serverPort = $backEndConnectivityOptions.find('.magic-css-server-port'),
-            serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+            serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
         var connectionTestingSocket = null;
         var refreshConnectivityUi = function () {
@@ -1108,9 +1113,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             $backEndConnectivityOptions.remove();
             getServerDetailsFromUserAlreadyOpen = false;
         });
-        $backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', function () {
-            editor.userPreference('live-css-server-hostname', serverHostnameValue);
-            editor.userPreference('live-css-server-port', serverPortValue);
+        $backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', async function () {
+            await editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            await editor.userPreference('live-css-server-port', serverPortValue);
 
             disconnectConnectionTestingSocket();
             $backEndConnectivityOptions.remove();
@@ -1125,31 +1130,31 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         refreshConnectivityUi();
     };
 
-    var updateUiMentioningNotWatchingCssFiles = function (editor) {
+    var updateUiMentioningNotWatchingCssFiles = async function (editor) {
         if (flagWatchingCssFiles) {
             flagWatchingCssFiles = false;
             utils.alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
-            editor.userPreference('watching-css-files', 'no');
+            await editor.userPreference('watching-css-files', 'no');
         }
     };
 
-    var liveCssServerSessionClosedByUser = function (editor) {
+    var liveCssServerSessionClosedByUser = async function (editor) {
         // TODO:
         //     When file editing feature is available,
         //     disable editing file / notify user when
         //     the server session is disconnected
 
-        updateUiMentioningNotWatchingCssFiles(editor);
+        await updateUiMentioningNotWatchingCssFiles(editor);
     };
 
     var $toastrConnecting,
         $toastrConnected,
         $toastrReconnectAttempt;
-    var getConnectedWithBackEnd = function (editor, callback, callbackForReconfiguration) {
+    var getConnectedWithBackEnd = async function (editor, mainAsyncCallback, asyncCallbackForReconfiguration) {
         var flagCallbackCalledOnce = false;
-        var serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
-            serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+        var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+            serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
         if (socket) {
             var socketOpts = (socket.io || {}).opts || {};
@@ -1188,11 +1193,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             'Connecting with live-css server at: ',
             {
                 timeOut: 0,
-                onclick: function (evt) {
+                onclick: async function (evt) {
                     if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                        getServerDetailsFromUser(editor, function (err, serverDetails) {
+                        await getServerDetailsFromUser(editor, function (err, serverDetails) {
                             if (!err) {
-                                callbackForReconfiguration(serverDetails);
+                                setTimeout(async function () {
+                                    await asyncCallbackForReconfiguration(serverDetails);
+                                });
                             }
                         });
                     } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
@@ -1203,7 +1210,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         toastr.clear($toastrConnecting, {force: true});
                         if (!flagCallbackCalledOnce) {
                             flagCallbackCalledOnce = true;
-                            callback('cancelled-by-user', socket);
+                            await mainAsyncCallback('cancelled-by-user', socket);
                         }
                     }
                 }
@@ -1214,12 +1221,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // show them the configuration options along with the guide/help
         // about the live-css server
         if (
-            !editor.userPreference('live-css-server-hostname') &&
-            !editor.userPreference('live-css-server-port')
+            !(await editor.userPreference('live-css-server-hostname')) &&
+            !(await editor.userPreference('live-css-server-port'))
         ) {
-            getServerDetailsFromUser(editor, function (err, serverDetails) {
+            await getServerDetailsFromUser(editor, function (err, serverDetails) {
                 if (!err) {
-                    callbackForReconfiguration(serverDetails);
+                    setTimeout(async function () {
+                        await asyncCallbackForReconfiguration(serverDetails);
+                    });
                 }
             });
         }
@@ -1229,23 +1238,26 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             // timeout: 5000
             // reconnectionAttempts: 100
         });
-        socket.on('error', function (err) {
+
+        socket.on('error', async function asyncCallback(err) {
             // In case of "Invalid namespace", we open the UI for details to inform that they are using
             // incompatible version of the live-css server
             if (err === 'Invalid namespace') {
-                getServerDetailsFromUser(editor, function (err, serverDetails) {
+                await getServerDetailsFromUser(editor, function (err, serverDetails) {
                     if (!err) {
-                        callbackForReconfiguration(serverDetails);
+                        setTimeout(async function () {
+                            await asyncCallbackForReconfiguration(serverDetails);
+                        });
                     }
                 });
             }
         });
-        socket.on('connect', function () {
+        socket.on('connect', async function () {
             flagConnectedAtLeastOnce = true;
 
             if (!flagCallbackCalledOnce) {
                 flagCallbackCalledOnce = true;
-                callback(null, socket);
+                await mainAsyncCallback(null, socket);
             }
 
             if ($toastrReconnectAttempt) {
@@ -1264,12 +1276,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 '</div>',
                 'Connected with live-css server at:',
                 {
-                    onclick: function (evt) {
+                    onclick: async function (evt) {
                         if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
                             toastr.clear($toastrConnected, {force: true});
-                            getServerDetailsFromUser(editor, function (err, serverDetails) {
+                            await getServerDetailsFromUser(editor, function (err, serverDetails) {
                                 if (!err) {
-                                    callbackForReconfiguration(serverDetails);
+                                    setTimeout(async function () {
+                                        await asyncCallbackForReconfiguration(serverDetails);
+                                    });
                                 }
                             });
                         } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
@@ -1303,11 +1317,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         'Reconnecting with live-css server at:',
                         {
                             timeOut: 0,
-                            onclick: function (evt) {
+                            onclick: async function (evt) {
                                 if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                    getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                    await getServerDetailsFromUser(editor, function (err, serverDetails) {
                                         if (!err) {
-                                            callbackForReconfiguration(serverDetails);
+                                            setTimeout(async function () {
+                                                await asyncCallbackForReconfiguration(serverDetails);
+                                            });
                                         }
                                     });
                                 } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
@@ -1316,7 +1332,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         socket = null;
                                     }
                                     toastr.clear($toastrReconnectAttempt, {force: true});
-                                    liveCssServerSessionClosedByUser(editor);
+                                    await liveCssServerSessionClosedByUser(editor);
                                 }
                             }
                         }
@@ -1326,7 +1342,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         });
     };
 
-    var getDisconnectedWithBackEnd = function (editor, options, cb) {
+    var getDisconnectedWithBackEnd = async function (editor, options, asyncCallback) {
         if (socket) {
             socket.close();
             socket = null;
@@ -1340,7 +1356,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         if ($toastrReconnectAttempt) {
             toastr.clear($toastrReconnectAttempt, {force: true});
         }
-        cb();
+        await asyncCallback();
     };
 
     var isMac = false;
@@ -1360,8 +1376,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     CodeMirror.keyMap.sublime['Alt-Down'] = 'swapLineDown';
     CodeMirror.keyMap.sublime['Alt-Up'] = 'swapLineUp';
 
-    var main = function () {
-        utils.delayFunctionUntilTestFunction({
+    var main = async function () {
+        await utils.delayFunctionUntilTestFunction({
             tryLimit: 100,
             waitFor: 500,
             fnTest: function () {
@@ -1376,13 +1392,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             fnFailure: function () {
                 // do nothing
             },
-            fnSuccess: function () {
-                var beautifyCSS = function (cssCode) {
+            fnSuccess: async function () {
+                var beautifyCSS = async function (cssCode) {
                     var options = {};
-                    if (window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes') {
+                    if (await window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes') {
                         options.useTabs = true;
                     } else {
-                        options.useSpaceCount = parseInt(window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10) || 4;
+                        options.useSpaceCount = parseInt(await window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10) || 4;
                     }
                     return utils.beautifyCSS(cssCode, options);
                 };
@@ -1538,7 +1554,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     });
 
                     var targetElement = evt.target;
-                    setTimeout(function () {
+                    setTimeout(async function () {
                         var selectorsOb = getMatchingAndSuggestedSelectors(targetElement);
                         // TODO: Fix variable naming
                         var matchingSelectors = selectorsOb.matchingAndSuggestedSelectors,
@@ -1561,12 +1577,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             anyCharacterAfterCurrentCursorPosition = false;
                         }
 
-                        var useTabs = window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes';
+                        var useTabs = (await window.MagiCSSEditor.userPreference('use-tab-for-indentation')) === 'yes';
                         var whitespaceToAdd;
                         if (useTabs) {
                             whitespaceToAdd = '\t';
                         } else {
-                            var indentationSpacesCount = parseInt(window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10);
+                            var indentationSpacesCount = parseInt(await window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10);
                             whitespaceToAdd = ' '.repeat(indentationSpacesCount || 4);
                         }
 
@@ -1703,9 +1719,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         overwriteExistingStyleTagWithSameId: true
                     });
 
-                var fnApplyTextAsCSS = function (editor) {
+                var fnApplyTextAsCSS = async function (editor) {
                     var disabled = false;
-                    if (editor.userPreference('disable-styles') === 'yes') {
+                    if ((await editor.userPreference('disable-styles')) === 'yes') {
                         disabled = true;
                     }
 
@@ -1713,7 +1729,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
 
-                        less.render(lessCode, lessOptions, function(err, output) {
+                        less.render(lessCode, lessOptions, async function asyncCallback(err, output) {
                             smc = null;     // Unset old SourceMapConsumer
 
                             if (err) {
@@ -1731,7 +1747,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 var strCssCode = output.css;
                                 newStyleTag.cssText = strCssCode;
                                 newStyleTag.disabled = disabled;
-                                newStyleTag.applyTag(rememberLastAppliedCss);
+                                let appliedCssText = newStyleTag.applyTag();
+                                await rememberLastAppliedCss(appliedCssText);
+
                                 var rawSourceMap = output.map;
                                 if (rawSourceMap) {
                                     smc = new sourceMap.SourceMapConsumer(rawSourceMap);
@@ -1739,18 +1757,19 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         });
                     } else if (getLanguageMode() === 'sass') {
-                        var fn = function () {
+                        var fnSassToCssAndApply = function () {
                             var Sass = window.Sass,
                                 sassCode = editor.getTextValue() || ' ';    // Sass compiler throws an error for empty code string
 
-                            Sass.compile(sassCode, function (result) {
+                            Sass.compile(sassCode, async function asyncCallback(result) {
                                 smc = null;     // Unset old SourceMapConsumer
 
                                 if (result.status === 0) {
                                     var strCssCode = result.text || '';
                                     newStyleTag.cssText = strCssCode;
                                     newStyleTag.disabled = disabled;
-                                    newStyleTag.applyTag(rememberLastAppliedCss);
+                                    let appliedCssText = newStyleTag.applyTag();
+                                    await rememberLastAppliedCss(appliedCssText);
                                     var rawSourceMap = result.map;
                                     if (rawSourceMap) {
                                         smc = new sourceMap.SourceMapConsumer(rawSourceMap);
@@ -1780,7 +1799,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             });
                         };
                         if (isOpera || window.Sass) {
-                            fn();
+                            fnSassToCssAndApply();
                         } else {
                             // Ensure that we don't send multiple load requests at once, by not sending request if previous one is still pending for succeess/failure
                             if (!window.isActiveLoadSassRequest) {
@@ -1815,7 +1834,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 setTimeout(function () {
                                                     // Ensure that getLanguageMode() is still 'sass'
                                                     if (getLanguageMode() === 'sass') {
-                                                        fn();
+                                                        fnSassToCssAndApply();
                                                     }
                                                 }, 300);
                                             }
@@ -1840,34 +1859,35 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         var cssCode = editor.getTextValue();
                         newStyleTag.cssText = cssCode;
                         newStyleTag.disabled = disabled;
-                        newStyleTag.applyTag(rememberLastAppliedCss);
+                        let appliedCssText = newStyleTag.applyTag();
+                        await rememberLastAppliedCss(appliedCssText);
                     }
                 };
 
-                var setLanguageMode = function (languageMode, editor) {
+                var setLanguageMode = async function (languageMode, editor) {
                     $(editor.container)
                         .removeClass('magicss-selected-mode-sass')
                         .removeClass('magicss-selected-mode-less')
                         .removeClass('magicss-selected-mode-css');
                     if (languageMode === 'less') {
                         $(editor.container).addClass('magicss-selected-mode-less');
-                        editor.userPreference('language-mode', 'less');
+                        await editor.userPreference('language-mode', 'less');
                         editor.cm.setOption('mode', 'text/x-less');
-                        setCodeMirrorCSSLinting(editor, 'disable');
+                        await setCodeMirrorCSSLinting(editor, 'disable');
                         utils.alertNote('Now editing code in LESS mode', 5000);
                     } else if (languageMode === 'sass') {
                         $(editor.container).addClass('magicss-selected-mode-sass');
-                        editor.userPreference('language-mode', 'sass');
+                        await editor.userPreference('language-mode', 'sass');
                         editor.cm.setOption('mode', 'text/x-scss');
-                        setCodeMirrorCSSLinting(editor, 'disable');
+                        await setCodeMirrorCSSLinting(editor, 'disable');
                         utils.alertNote('Now editing code in SASS mode', 5000);
                     } else {
                         $(editor.container).addClass('magicss-selected-mode-css');
-                        editor.userPreference('language-mode', 'css');
+                        await editor.userPreference('language-mode', 'css');
                         editor.cm.setOption('mode', 'text/css');
                         utils.alertNote('Now editing code in CSS mode', 5000);
                     }
-                    fnApplyTextAsCSS(editor);
+                    await fnApplyTextAsCSS(editor);
                 };
 
                 var getLanguageMode = function () {
@@ -2032,16 +2052,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>'
                         );
 
-                        $(document).on('click', '.magicss-mode-css', function () {
-                            setLanguageMode('css', editor);
+                        $(document).on('click', '.magicss-mode-css', async function () {
+                            await setLanguageMode('css', editor);
                             editor.focus();
                         });
-                        $(document).on('click', '.magicss-mode-less', function () {
-                            setLanguageMode('less', editor);
+                        $(document).on('click', '.magicss-mode-less', async function () {
+                            await setLanguageMode('less', editor);
                             editor.focus();
                         });
-                        $(document).on('click', '.magicss-mode-sass', function () {
-                            setLanguageMode('sass', editor);
+                        $(document).on('click', '.magicss-mode-sass', async function () {
+                            await setLanguageMode('sass', editor);
                             editor.focus();
                         });
 
@@ -2053,19 +2073,23 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             mode: 'edit'
                         },
                         autoCloseBrackets: true,
+                        /*
                         hintOptions: {
                             completeSingle: false,
                             // closeCharacters: /[\s()\[\]{};:>,]/,     // This is the default value defined in show-hint.js
                             closeCharacters: /[(){};:,]/,               // Custom override
-                            onAddingAutoCompleteOptionsForSelector: function (add) {
-                                var editor = window.MagiCSSEditor;
-                                if (editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS) === 'no') {
-                                    return;
-                                }
-                                if (existingCSSSelectorsWithAutocompleteObjects) {
-                                    add(existingCSSSelectorsWithAutocompleteObjects, true);
-                                }
-                            },
+                            onAddingAutoCompleteOptionsForSelector: (
+                                // FIXME: This would not work since window.MagiCSSEditor is not available yet
+                                (await window.MagiCSSEditor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS)) === 'no'
+                                    ? null
+                                    : (
+                                        function (add) {
+                                            if (existingCSSSelectorsWithAutocompleteObjects) {
+                                                add(existingCSSSelectorsWithAutocompleteObjects, true);
+                                            }
+                                        }
+                                    )
+                            ),
                             onAddingAutoCompleteOptionsForCSSProperty: function (add) {
                                 add(cssPropertyKeywordsAutocompleteObject, true);
                             },
@@ -2073,12 +2097,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 var editor = window.MagiCSSEditor;
                                 showCSSSelectorMatches(selectedText, editor);
                             },
-                            onCssHintShownForSelector: function () {    /* As per current CodeMirror/css-hint architecture,
-                                                                           "select" is called before "shown".
-                                                                           The "select" operation would also show the number  e are hiding the alertNote */
+                            onCssHintShownForSelector: function () {    // As per current CodeMirror/css-hint architecture,
+                                                                        // "select" is called before "shown".
+                                                                        // The "select" operation would also show the number  e are hiding the alertNote
                                 utils.alertNote.hide();
                             }
                         },
+                        /* */
                         extraKeys: {
                             /*
                             // https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/
@@ -2089,24 +2114,54 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                             /* */
                         },
-                        optionsBasedOnUserPreference: function (userPreference) {
+                        optionsBasedOnUserPreference: async function (userPreference) {
                             var options = {};
-                            if (userPreference('use-css-linting') === 'yes' && userPreference('language-mode') === 'css') {
+
+                            if ((await userPreference('use-css-linting')) === 'yes' && (await userPreference('language-mode')) === 'css') {
                                 options.gutters = ['CodeMirror-lint-markers'];
                                 options.lint = true;
                             } else {
                                 options.gutters = [];
                                 options.lint = false;
                             }
-                            options.mode = (function () {
-                                if (userPreference('language-mode') === 'sass') {
-                                    return 'text/x-scss';
-                                } else if (userPreference('language-mode') === 'less') {
-                                    return 'text/x-less';
-                                } else {
-                                    return 'text/css';
+
+                            if ((await userPreference('language-mode')) === 'sass') {
+                                options.mode = 'text/x-scss';
+                            } else if ((await userPreference('language-mode')) === 'less') {
+                                options.mode = 'text/x-less';
+                            } else {
+                                options.mode = 'text/css';
+                            }
+
+                            options.hintOptions = {
+                                completeSingle: false,
+                                // closeCharacters: /[\s()\[\]{};:>,]/,     // This is the default value defined in show-hint.js
+                                closeCharacters: /[(){};:,]/,               // Custom override
+                                onAddingAutoCompleteOptionsForSelector: (
+                                    (await userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS)) === 'no'
+                                        ? null
+                                        : (
+                                            function (add) {
+                                                if (existingCSSSelectorsWithAutocompleteObjects) {
+                                                    add(existingCSSSelectorsWithAutocompleteObjects, true);
+                                                }
+                                            }
+                                        )
+                                ),
+                                onAddingAutoCompleteOptionsForCSSProperty: function (add) {
+                                    add(cssPropertyKeywordsAutocompleteObject, true);
+                                },
+                                onCssHintSelectForSelector: function (selectedText) {
+                                    var editor = window.MagiCSSEditor;
+                                    showCSSSelectorMatches(selectedText, editor);
+                                },
+                                onCssHintShownForSelector: function () {    /* As per current CodeMirror/css-hint architecture,
+                                                                               "select" is called before "shown".
+                                                                               The "select" operation would also show the number  e are hiding the alertNote */
+                                    utils.alertNote.hide();
                                 }
-                            }());
+                            };
+
                             return options;
                         }
                     },
@@ -2126,9 +2181,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     name: 'reapply',
                                     title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
                                     cls: 'magicss-reapply-styles editor-gray-out',
-                                    onclick: function (evt, editor, divIcon) {
+                                    onclick: async function (evt, editor, divIcon) {
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
-                                            markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                            await markAsPinnedOrNotPinned(editor, 'not-pinned');
                                             utils.alertNote(
                                                 '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
                                                 5000
@@ -2139,7 +2194,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                     requestPermissions: true,
                                                     url: window.location.href
                                                 },
-                                                function (status) {
+                                                async function asyncCallback(status) {
                                                     if (chrome.runtime.lastError) {
                                                         console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
                                                         utils.alertNote(
@@ -2148,7 +2203,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                         );
                                                     }
                                                     if (status === 'request-granted') {
-                                                        markAsPinnedOrNotPinned(editor, 'pinned');
+                                                        await markAsPinnedOrNotPinned(editor, 'pinned');
                                                         utils.alertNote(
                                                             '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
                                                             10000
@@ -2170,11 +2225,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'disable',
                             title: 'Deactivate code',
                             cls: 'magicss-disable-css editor-gray-out',
-                            onclick: function (evt, editor, divIcon) {
+                            onclick: async function (evt, editor, divIcon) {
                                 if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
-                                    editor.disableEnableCSS('enable');
+                                    await editor.disableEnableCSS('enable');
                                 } else {
-                                    editor.disableEnableCSS('disable');
+                                    await editor.disableEnableCSS('disable');
                                 }
                                 editor.focus();
                             },
@@ -2191,8 +2246,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 /* HACK: Remove this hack which is being used to handle "divIcon.title" change
                                          for the case of "editor.disableEnableCSS('disable')" under "reInitialized()" */
                                 editor.originalDisableEnableCSS = editor.disableEnableCSS;
-                                editor.disableEnableCSS = function (doWhat) {
-                                    var state = editor.originalDisableEnableCSS(doWhat);
+                                editor.disableEnableCSS = async function (doWhat) {
+                                    var state = await editor.originalDisableEnableCSS(doWhat);
                                     if (state === 'disabled') {
                                         divIcon.title = 'Activate code';
                                     } else {
@@ -2207,14 +2262,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'beautify',
                             title: 'Beautify code',
                             cls: 'magicss-beautify editor-gray-out',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
                                     utils.alertNote('Please type some code to be beautified', 5000);
                                 } else {
-                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    var beautifiedCSS = await beautifyCSS(textValue);
                                     if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.setTextValue(beautifiedCSS);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Your code has been beautified :-)', 5000);
                                     } else {
                                         utils.alertNote('Your code already looks beautiful :-)', 5000);
@@ -2236,13 +2292,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             title: 'Stop watching CSS files',
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-stop-watch-and-reload-link-tags',
-                                            onclick: function (evt, editor) {
+                                            onclick: async function (evt, editor) {
                                                 if (flagWatchingCssFiles) {
-                                                    getDisconnectedWithBackEnd(
+                                                    await getDisconnectedWithBackEnd(
                                                         editor,
                                                         {},
-                                                        function () {
-                                                            updateUiMentioningNotWatchingCssFiles(editor);
+                                                        async function asyncCallback () {
+                                                            await updateUiMentioningNotWatchingCssFiles(editor);
                                                         }
                                                     );
                                                 }
@@ -2260,9 +2316,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             title: 'Watch CSS files to apply changes automatically',
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-watch-and-reload-link-tags',
-                                            onclick: function (evt, editor) {
+                                            onclick: async function (evt, editor) {
                                                 if (!flagWatchingCssFiles) {
-                                                    startWatchingFiles(editor);
+                                                    await startWatchingFiles(editor);
                                                 }
                                                 editor.focus();
                                             },
@@ -2308,15 +2364,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'less-or-sass-to-css',
                             title: 'Convert this code from Less/Sass to CSS',
                             uniqCls: 'magicss-less-or-sass-to-css',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'less') {
                                     var lessCode = editor.getTextValue();
                                     if (!lessCode.trim()) {
-                                        editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Please type some LESS code to use this feature', 5000);
                                         editor.focus();
                                     } else {
-                                        utils.lessToCSS(lessCode, function (err, cssCode) {
+                                        utils.lessToCSS(lessCode, async function asyncCallback(err, cssCode) {
                                             if (err) {
                                                 utils.alertNote(
                                                     'Invalid LESS syntax.' +
@@ -2327,13 +2383,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 highlightErroneousLineTemporarily(editor, err.line - 1);
                                                 editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                             } else {
-                                                var beautifiedLessCode = beautifyCSS(utils.minifyCSS(lessCode));
-                                                cssCode = beautifyCSS(utils.minifyCSS(cssCode));
+                                                var beautifiedLessCode = await beautifyCSS(utils.minifyCSS(lessCode));
+                                                cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
 
                                                 if (cssCode === beautifiedLessCode) {
                                                     utils.alertNote('Your code is already CSS compatible', 5000);
                                                 } else {
-                                                    editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                    await editor.setTextValue(cssCode);
+                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                                     utils.alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
                                                 }
                                             }
@@ -2343,11 +2400,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 } else if (getLanguageMode() === 'sass') {
                                     var sassCode = editor.getTextValue();
                                     if (!sassCode.trim()) {
-                                        editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Please type some SASS code to use this feature', 5000);
                                         editor.focus();
                                     } else {
-                                        utils.sassToCSS(sassCode, function (err, cssCode) {
+                                        utils.sassToCSS(sassCode, async function asyncCallback(err, cssCode) {
                                             if (err) {
                                                 utils.alertNote(
                                                     'Invalid SASS syntax.' +
@@ -2358,13 +2415,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 highlightErroneousLineTemporarily(editor, err.line - 1);
                                                 editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                             } else {
-                                                var beautifiedSassCode = beautifyCSS(utils.minifyCSS(sassCode));
-                                                cssCode = beautifyCSS(utils.minifyCSS(cssCode));
+                                                var beautifiedSassCode = await beautifyCSS(utils.minifyCSS(sassCode));
+                                                cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
 
                                                 if (cssCode === beautifiedSassCode) {
                                                     utils.alertNote('Your code is already CSS compatible', 5000);
                                                 } else {
-                                                    editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                    await editor.setTextValue(cssCode);
+                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                                     utils.alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
                                                 }
                                             }
@@ -2376,7 +2434,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     editor.focus();
                                 }
                             },
-                            beforeShow: function (origin, tooltip, editor) {
+                            beforeShow: async function (origin, tooltip, editor) {
                                 // TODO: Move the .addClass() calls to their corresponding .beforeShow()
                                 tooltip
                                     .addClass(
@@ -2388,7 +2446,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     )
                                     .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
                                     .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
-                                    .addClass(editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS) === 'no' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
+                                    .addClass((await editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS)) === 'no' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
                             }
                         },
                         /*
@@ -2425,14 +2483,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'beautify',
                             title: 'Beautify code',
                             uniqCls: 'magicss-beautify',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
                                     utils.alertNote('Please type some code to be beautified', 5000);
                                 } else {
-                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    var beautifiedCSS = await beautifyCSS(textValue);
                                     if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.setTextValue(beautifiedCSS);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Your code has been beautified :-)', 5000);
                                     } else {
                                         utils.alertNote('Your code already looks beautiful :-)', 5000);
@@ -2445,15 +2504,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'minify',
                             title: 'Minify code',
                             uniqCls: 'magicss-minify',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
-                                    editor.setTextValue('').reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                    await editor.setTextValue('');
+                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                     utils.alertNote('Please type some code to be minified', 5000);
                                 } else {
                                     var minifiedCSS = utils.minifyCSS(textValue);
                                     if (textValue !== minifiedCSS) {
-                                        editor.setTextValue(minifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.setTextValue(minifiedCSS);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Your code has been minified' + noteForUndo, 5000);
                                     } else {
                                         utils.alertNote('Your code is already minified', 5000);
@@ -2466,9 +2527,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'showLineNumbers',
                             title: 'Show line numbers',
                             uniqCls: 'magicss-show-line-numbers',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', true);
-                                editor.userPreference('show-line-numbers', 'yes');
+                                await editor.userPreference('show-line-numbers', 'yes');
                                 editor.focus();
                             }
                         },
@@ -2476,9 +2537,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'hideLineNumbers',
                             title: 'Hide line numbers',
                             uniqCls: 'magicss-hide-line-numbers',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', false);
-                                editor.userPreference('show-line-numbers', 'no');
+                                await editor.userPreference('show-line-numbers', 'no');
                                 editor.focus();
                             }
                         },
@@ -2486,9 +2547,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'enableCSSLinting',
                             title: 'Enable CSS linting',
                             uniqCls: 'magicss-enable-css-linting',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
-                                    setCodeMirrorCSSLinting(editor, 'enable');
+                                    await setCodeMirrorCSSLinting(editor, 'enable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
@@ -2499,9 +2560,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             name: 'disableCSSLinting',
                             title: 'Disable CSS linting',
                             uniqCls: 'magicss-disable-css-linting',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
-                                    setCodeMirrorCSSLinting(editor, 'disable');
+                                    await setCodeMirrorCSSLinting(editor, 'disable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
@@ -2593,10 +2654,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         return $footerItems;
                     },
                     events: {
-                        beforeInstantiatingCodeMirror: function (editor) {
+                        beforeInstantiatingCodeMirror: async function (editor) {
                             // Need to add font-styling before CodeMirror is instantiated
-                            if (editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
-                                var userPrefFontSizeInPx = parseInt(editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                            if (await editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
+                                var userPrefFontSizeInPx = parseInt(await editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
                                 if (userPrefFontSizeInPx !== 12) {
                                     var cssLintErrorWarningMarkerSize = 16;
                                     if (userPrefFontSizeInPx < 12) {
@@ -2649,7 +2710,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 }
                             }
                         },
-                        launched: function (editor) {
+                        launched: async function (editor) {
                             utils.addStyleTag({
                                 attributes: [{
                                     name: 'data-style-created-by',
@@ -2681,7 +2742,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 parentTag: 'body'
                             });
 
-                            var languageMode = editor.userPreference('language-mode');
+                            var languageMode = await editor.userPreference('language-mode');
                             if (languageMode === 'less') {
                                 $(editor.container).addClass('magicss-selected-mode-less');
                             } else if (languageMode === 'sass') {
@@ -2690,38 +2751,38 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 $(editor.container).addClass('magicss-selected-mode-css');
                             }
 
-                            var disableStyles = editor.userPreference('disable-styles') === 'yes';
+                            var disableStyles = await editor.userPreference('disable-styles') === 'yes';
                             if (disableStyles) {
                                 editor.indicateEnabledDisabled('disabled');
                             } else {
                                 editor.indicateEnabledDisabled('enabled');
                             }
 
-                            var watchingCssFiles = editor.userPreference('watching-css-files') === 'yes';
+                            var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
                             if (watchingCssFiles) {
-                                startWatchingFiles(editor);
+                                await startWatchingFiles(editor);
                             }
 
-                            var applyStylesAutomatically = editor.userPreference('apply-styles-automatically') === 'yes';
+                            var applyStylesAutomatically = await editor.userPreference('apply-styles-automatically') === 'yes';
                             if (applyStylesAutomatically) {
                                 editor.applyStylesAutomatically(true);
                             } else {
                                 editor.applyStylesAutomatically(false);
                             }
 
-                            window.setTimeout(function () {
-                                fnApplyTextAsCSS(editor);
+                            window.setTimeout(async function () {
+                                await fnApplyTextAsCSS(editor);
                             }, 100);
 
-                            var autocompleteSelectors = editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
+                            var autocompleteSelectors = await editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
                             if (autocompleteSelectors === 'no') {
                                 $(editor.container).addClass('magicss-autocomplete-selectors-disabled');
                             } else {
                                 $(editor.container).addClass('magicss-autocomplete-selectors-enabled');
                             }
                         },
-                        reInitialized: function (editor, cfg) {
-                            editor.disableEnableCSS('toggle');
+                        reInitialized: async function (editor, cfg) {
+                            await editor.disableEnableCSS('toggle');
 
                             cfg = cfg || {};
                             var duration = cfg.animDuration,
@@ -2733,8 +2794,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     'height': targetHeight
                                 },
                                 duration,
-                                function () {
-                                    editor.saveDimensions({width: targetWidth, height: targetHeight});
+                                async function () {
+                                    await editor.saveDimensions({width: targetWidth, height: targetHeight});
                                     editor.bringCursorToView({pleaseIgnoreCursorActivity: true});
                                 }
                             );
@@ -2777,8 +2838,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         keyup: function () {
                             // Currently doing nothing
                         },
-                        delayedtextchange: function (editor) {
-                            fnApplyTextAsCSS(editor);
+                        delayedtextchange: async function (editor) {
+                            await fnApplyTextAsCSS(editor);
                         },
                         problematicFocusDetected: function (editor) {
                             // There is a chance that something is problematic in focus behavior
@@ -2800,8 +2861,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 }
                             }, 1500);
                         },
-                        clear: function (editor) {
-                            fnApplyTextAsCSS(editor);
+                        clear: async function (editor) {
+                            await fnApplyTextAsCSS(editor);
                         }
                     }
                 };
@@ -2939,7 +3000,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     }
 
-                    disableEnableCSS(doWhat) {
+                    async disableEnableCSS(doWhat) {
                         var disabled;
                         if (doWhat === 'disable') {
                             disabled = true;
@@ -2954,7 +3015,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                         newStyleTag.disabled = disabled;
                         newStyleTag.applyTag();
-                        this.userPreference('disable-styles', disabled ? 'yes' : 'no');
+                        await this.userPreference('disable-styles', disabled ? 'yes' : 'no');
 
                         if (disabled) {
                             this.indicateEnabledDisabled('disabled');
@@ -2970,6 +3031,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                 utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
+                await window.MagiCSSEditor.create();
 
                 checkIfMagicCssLoadedFine(window.MagiCSSEditor);
 
@@ -3003,7 +3065,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 }, false);
 
-                if (window.MagiCSSEditor.userPreference(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT) === 'yes') {
+                if ((await (window.MagiCSSEditor.userPreference(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT))) === 'yes') {
                     var opacityCssAdded = false,
                         opacityStyleTagId = id + '-opacity-id';
 
@@ -3054,9 +3116,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             } catch (e) {
                 // do nothing
             }
-            main();
+            setTimeout(async function () {
+                await main();
+            });
         });
     } catch (e) {
-        main();
+        setTimeout(async function () {
+            await main();
+        });
     }
 }(jQuery));
