@@ -2794,9 +2794,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     'height': targetHeight
                                 },
                                 duration,
-                                async function () {
-                                    await editor.saveDimensions({width: targetWidth, height: targetHeight});
-                                    editor.bringCursorToView({pleaseIgnoreCursorActivity: true});
+                                function () {
+                                    setTimeout(async function () {
+                                        await editor.saveDimensions({width: targetWidth, height: targetHeight});
+                                        editor.bringCursorToView({pleaseIgnoreCursorActivity: true});
+                                    });
                                 }
                             );
                         },

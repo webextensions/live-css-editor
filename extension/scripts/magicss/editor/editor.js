@@ -481,10 +481,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $(containerEl).animate({
                         top: defaultTop,
                         left: defaultLeft
-                    }, duration, async function () {
-                        await thisOb.savePosition({ top: defaultTop, left: defaultLeft });
-                        thisOb.focus();
-                        cb();
+                    }, duration, function () {
+                        setTimeout(async function () {
+                            await thisOb.savePosition({ top: defaultTop, left: defaultLeft });
+                            thisOb.focus();
+                            cb();
+                        });
                     });
 
                     // TODO: Implement 'resizable' option
