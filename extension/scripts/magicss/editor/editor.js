@@ -7,6 +7,7 @@
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
@@ -1384,6 +1385,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         'use-tab-for-indentation': 'no',
         'indentation-spaces-count': '4',
         [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',
+        [USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES]: 'yes',
         [USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: 'no',
         [USER_PREFERENCE_USE_CUSTOM_FONT_SIZE]: 'no',
         [USER_PREFERENCE_FONT_SIZE_IN_PX]: '12',
@@ -1431,6 +1433,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
                     if (values && values[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] === 'no') {
                         Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] = 'no';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES, function (values) {
+                    if (values && values[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES] === 'no') {
+                        Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES] = 'no';
                     }
                     callback(null);
                 });

@@ -2,6 +2,7 @@
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
     USER_PREFERENCE_ALL_FRAMES = 'all-frames',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT = 'show-reapplying-styles-notification-at',
@@ -34,6 +35,23 @@ jQuery(function ($) {
             valueToSet = 'yes';
         }
         chromeStorage.set({[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: valueToSet});
+        notifyUser();
+    });
+
+    chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES, function (values) {
+        var $useAutocompleteForCssPropertyAndValue = $('#autocomplete-css-properties-and-values'),
+            markChecked = true;
+        if (values && values[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES] === 'no') {
+            markChecked = false;
+        }
+        $useAutocompleteForCssPropertyAndValue.prop('checked', markChecked);
+    });
+    $('#autocomplete-css-properties-and-values').on('click', function () {
+        var valueToSet = 'no';
+        if($(this).is(':checked')) {
+            valueToSet = 'yes';
+        }
+        chromeStorage.set({[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES]: valueToSet});
         notifyUser();
     });
 

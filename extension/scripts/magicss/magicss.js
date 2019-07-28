@@ -7,6 +7,7 @@
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
@@ -2148,9 +2149,19 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             }
                                         )
                                 ),
-                                onAddingAutoCompleteOptionsForCSSProperty: function (add) {
-                                    add(cssPropertyKeywordsAutocompleteObject, true);
-                                },
+                                onAddingAutoCompleteOptionsForCSSProperty: (
+                                    (await userPreference(USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES)) === 'no'
+                                        ? (
+                                            function noop() {
+                                                // do nothing
+                                            }
+                                        )
+                                        : (
+                                            function (add) {
+                                                add(cssPropertyKeywordsAutocompleteObject, true);
+                                            }
+                                        )
+                                ),
                                 onCssHintSelectForSelector: function (selectedText) {
                                     var editor = window.MagiCSSEditor;
                                     showCSSSelectorMatches(selectedText, editor);
@@ -2446,6 +2457,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     )
                                     .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
                                     .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
+                                    // FIXME: Probably tooltipster-autocomplete-selectors-disabled/enabled is not used anymore
                                     .addClass((await editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS)) === 'no' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
                             }
                         },
@@ -2774,6 +2786,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 await fnApplyTextAsCSS(editor);
                             }, 100);
 
+                            // FIXME: Probably this piece of code is not used anymore
                             var autocompleteSelectors = await editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
                             if (autocompleteSelectors === 'no') {
                                 $(editor.container).addClass('magicss-autocomplete-selectors-disabled');
