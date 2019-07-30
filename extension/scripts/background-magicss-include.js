@@ -555,8 +555,13 @@ var onDOMContentLoadedHandler = function () {
                         if (runningInEdgeLikeEnvironment()) {
                             reapplyCss(tabId);
                         } else if (tab && tab.url) {
-                            // details.frameId === 0 means the top most frame (the webpage)
-                            if (permissionsPattern && details.frameId === 0) {
+                            // Old logic:
+                            //     "if (permissionsPattern && details.frameId === 0) {"
+                            //     details.frameId === 0 means the top most frame (the webpage)
+                            if (
+                                permissionsPattern &&
+                                !isRestrictedUrl(url) // url (details.url) points to the frame URL
+                            ) {
                                 chrome.permissions.contains({
                                     origins: [permissionsPattern]
                                 }, function (result) {
