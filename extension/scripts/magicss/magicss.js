@@ -2014,7 +2014,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 lastIndexOfOpeningBraceBeforeCursor >= 0 &&
                                 lastIndexOfClosingBraceBeforeCursor < lastIndexOfOpeningBraceBeforeCursor
                             ) {
-                                adjustCursorPosition(firstIndexOfClosingBraceAfterCursor + 1);
+                                if (firstIndexOfClosingBraceAfterCursor >= 0) {
+                                    adjustCursorPosition(firstIndexOfClosingBraceAfterCursor + 1);
+                                } else {
+                                    moveCursorToEndOfLineIfRequired();
+                                }
                             } else {
                                 var anyNonWhitespaceCharacterBetweenLastClosingBracketAndCurrentCursorPosition = !!(splitText.strBeforeCursor.substring(lastIndexOfClosingBraceBeforeCursor + 1).trim());
                                 if (anyNonWhitespaceCharacterBetweenLastClosingBracketAndCurrentCursorPosition) {
