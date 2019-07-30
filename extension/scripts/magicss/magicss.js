@@ -1980,17 +1980,53 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     if (enablePointAndClick) {
                         disablePointAndClickFunctionality(editor);
                     } else {
-                        // If currently, there is no text selection
-                        if (!editor.cm.getSelection()) {
+                        var currentSelection = editor.cm.getSelection();
+                        if (currentSelection) {
+                            var currentCursorPosition = editor.cm.getCursor();
+                            editor.setCursor(currentCursorPosition, {pleaseIgnoreCursorActivity: true});
+                        }
+
+                        // Just a logical block
+                        {
                             var cursorPosition = editor.cm.getCursor();
-                            // If there is any non-whitespace character before the cursor in the current line
-                            if (editor.cm.getLine(cursorPosition.line).substr(0, cursorPosition.ch).trim()) {
-                                // Move the cursor to the end of the current line
-                                // Which helps in avoiding the scenario that when the user does point-and-click,
-                                // the text insertion does not happen in the middle of the text
-                                editor.setCursor({line: cursorPosition.line}, {pleaseIgnoreCursorActivity: true});
+                            var splitText = editor.splitTextByCursor();
+                            var lastIndexOfClosingBraceBeforeCursor = splitText.strBeforeCursor.lastIndexOf('}');
+                            var lastIndexOfOpeningBraceBeforeCursor = splitText.strBeforeCursor.lastIndexOf('{');
+
+                            var firstIndexOfClosingBraceAfterCursor = splitText.strAfterCursor.indexOf('}');
+
+                            var adjustCursorPosition = function (delta) {
+                                var targetPosition = editor.cm.findPosH(cursorPosition, delta, 'char', false);
+                                editor.setCursor(targetPosition, {pleaseIgnoreCursorActivity: true});
+                            };
+
+                            var moveCursorToEndOfLineIfRequired = function () {
+                                // If there is any non-whitespace character before the cursor in the current line
+                                if (editor.cm.getLine(cursorPosition.line).substr(0, cursorPosition.ch).trim()) {
+                                    // Move the cursor to the end of the current line
+                                    // Which helps in avoiding the scenario that when the user does point-and-click,
+                                    // the text insertion does not happen in the middle of the text
+                                    editor.setCursor({line: cursorPosition.line}, {pleaseIgnoreCursorActivity: true});
+                                }
+                            };
+
+                            if (
+                                lastIndexOfOpeningBraceBeforeCursor >= 0 &&
+                                lastIndexOfClosingBraceBeforeCursor < lastIndexOfOpeningBraceBeforeCursor
+                            ) {
+                                adjustCursorPosition(firstIndexOfClosingBraceAfterCursor + 1);
+                            } else {
+                                var anyNonWhitespaceCharacterBetweenLastClosingBracketAndCurrentCursorPosition = !!(splitText.strBeforeCursor.substring(lastIndexOfClosingBraceBeforeCursor + 1).trim());
+                                if (anyNonWhitespaceCharacterBetweenLastClosingBracketAndCurrentCursorPosition) {
+                                    if (firstIndexOfClosingBraceAfterCursor >= 0) {
+                                        adjustCursorPosition(firstIndexOfClosingBraceAfterCursor + 1);
+                                    } else {
+                                        moveCursorToEndOfLineIfRequired();
+                                    }
+                                }
                             }
                         }
+
                         utils.alertNote('Select an element in the page to generate its CSS selector<br />(Shortcut: Alt + Shift + S)', 5000);
                         enablePointAndClickFunctionality(editor);
                     }
