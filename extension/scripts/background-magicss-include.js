@@ -288,7 +288,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
             // https://github.com/easylogic/codemirror-colorpicker
             pathCodeMirror + 'addons/colorpicker/colorpicker.css',
-            pathCodeMirror + 'addons/colorpicker/colorview.js',
+            pathCodeMirror + 'addons/colorpicker/colorview_customized.js',
             pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
             pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
