@@ -307,13 +307,12 @@
         return lineHandle.text.match(this.color_regexp);
     }
 
-    codemirror_colorpicker.prototype.match = function (lineNo) {
-        var lineHandle = this.cm.getLineHandle(lineNo);
+    codemirror_colorpicker.prototype.submatch = function (lineNo, lineHandle) {
 
         this.empty_marker(lineNo, lineHandle);
-
+        
         var result = this.match_result(lineHandle);
-        if (result)
+        if (result && result.length)
         {
             var obj = { next : 0 };
             for(var i = 0, len = result.length; i < len; i++) {
@@ -327,7 +326,17 @@
                     }
                 }
             }
+
         }
+    }
+
+    codemirror_colorpicker.prototype.match = function (lineNo) {
+        var lineHandle = this.cm.getLineHandle(lineNo);
+
+        var self = this; 
+        this.cm.operation(function () {
+            self.submatch(lineNo, lineHandle);
+        })
     }
 
     codemirror_colorpicker.prototype.make_element = function () {
@@ -396,10 +405,10 @@
     }
 
     codemirror_colorpicker.prototype.is_excluded_token = function (line, ch) {
-        var token = this.cm.getTokenAt({line : line, ch : ch});
+        var type = this.cm.getTokenTypeAt({line : line, ch : ch});
         var count = 0; 
         for(var i = 0, len = excluded_token.length; i < len; i++) {
-            if (token.type === excluded_token[i]) {
+            if (type === excluded_token[i]) {
                 count++;
                 break; 
             }
@@ -430,5 +439,6 @@
         this.update_element(el, nameColor || color);
         this.set_state(lineNo, start, color, nameColor || color);
         this.set_mark(lineNo, start, el);
+
     }
 });

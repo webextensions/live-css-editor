@@ -32,8 +32,9 @@
 
 .codemirror-colorpicker {
   position: relative;
-  width: 226px;
+  width: 224px;
   z-index: 1000;
+  border:1px solid black; 
 }
 .codemirror-colorpicker > .color {
   position: relative;
@@ -63,7 +64,7 @@
 }
 .codemirror-colorpicker > .control {
   position: relative;
-  padding: 18px 0px 14px 0px;
+  padding: 10px 0px 10px 0px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -74,7 +75,7 @@
 .codemirror-colorpicker > .control > .empty {
   position: absolute;
   left: 11px;
-  top: 24px;
+  top: 14px;
   width: 30px;
   height: 30px;
   -webkit-border-radius: 50%;
@@ -86,7 +87,7 @@
 }
 .codemirror-colorpicker > .control > .hue {
   position: relative;
-  padding: 6px 12px;
+  padding: 6px 16px;
   margin: 0px 0px 0px 45px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -103,7 +104,7 @@
 }
 .codemirror-colorpicker > .control > .opacity {
   position: relative;
-  padding: 3px 12px;
+  padding: 3px 16px;
   margin: 0px 0px 0px 45px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -114,7 +115,6 @@
   position: relative;
   width: 100%;
   height: 10px;
-  z-index: 2;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -183,7 +183,7 @@
 .codemirror-colorpicker > .information > .information-item > .input-field {
   display:block;
   flex:1;
-  padding: 5px;
+  padding: 3px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -192,7 +192,7 @@
 .codemirror-colorpicker > .information > .information-item > .input-field > input {
   text-align: center;
   width:100%;
-  padding:3px 5px;
+  padding:3px;
   font-size:11px;
   color: #333;
   -webkit-box-sizing: border-box;
@@ -204,12 +204,14 @@
   -o-user-select: text;
   user-select: text;
   border: 1px solid #cbcbcb;
+  border-radius:2px;
 }
 
 .codemirror-colorpicker > .information > .information-item > .input-field > .title {
   text-align:center;
   font-size:12px;
   color:#a9a9a9;
+  padding-top:2px;
 }
 
 .codemirror-colorpicker > .information > input {
@@ -230,8 +232,9 @@
 
 
 .codemirror-colorpicker {
-  border: 1px solid #ececec;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   background-color: #fff;
+  border-radius: 3px;
   -webkit-box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
   -moz-box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
   box-shadow: 0 0px 10px 0px rgba(0, 0, 0, 0.12);
@@ -293,11 +296,12 @@
 }
 .codemirror-colorpicker > .control .drag-bar,
 .codemirror-colorpicker > .control .drag-bar2 {
-  border: 1px solid rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1);
-  background-color: #FFFFFF;
+  box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.2);
+  background-color: #fefefe;
+
 }
 .codemirror-colorpicker > .information {
   /*border-top: 1px solid #e8e8e8;*/
@@ -307,4 +311,92 @@
 }
 .codemirror-colorpicker > .information > .input {
   color: #333;
+}
+
+.codemirror-colorpicker > .colorsets {
+  border-top: 1px solid #e2e2e2;
+}
+
+.codemirror-colorpicker > .colorsets > .menu {
+  float: right;
+  padding: 4px 6px;
+}
+
+.codemirror-colorpicker > .colorsets > .menu button {
+  border:0px;
+  font-size: 14px;
+  font-weight: 300;
+  font-family: serif, sans-serif;
+  outline:none;
+  cursor: pointer;
+}
+
+.codemirror-colorpicker > .colorsets > .color-list {
+  margin-right: 20px;
+  display:block;
+  padding: 12px;
+  padding-bottom:0px;
+  box-sizing:border-box;
+  line-height: 0;
+}
+
+.codemirror-colorpicker > .colorsets > .color-list .color-item {
+  width: 13px;
+  height: 13px;
+  border-radius:3px;
+  display:inline-block;
+  margin-right:12px;
+  margin-bottom:12px;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJElEQVQYV2NctWrVfwYkEBYWxojMZ6SDAmT7QGx0K1EcRBsFAADeG/3M/HteAAAAAElFTkSuQmCC") no-repeat;
+  background-size: contain;
+  border: 1px solid rgba(221, 221, 221, 0.5);
+  overflow:hidden;
+  box-sizing:border-box;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.codemirror-colorpicker > .colorsets > .color-list .color-item:hover {
+  transform: scale(1.2);
+}
+
+.codemirror-colorpicker > .colorsets > .color-list .color-item .color-view {
+  width: 100%;
+  height: 100%;
+  padding:0px;
+  margin:0px;
+  pointer-events: none;
+}
+
+.codemirror-colorpicker > .colorsets > .color-list .add-color-item {
+  display: inline-block;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+  line-height: 0;
+  font-size: 16px;
+  font-weight: 400;
+  font-family: serif,sans-serif;
+  color: rgb(142, 142, 142);
+  vertical-align: middle;
+}
+
+.codemirror-colorpicker > .color-chooser {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+
+.codemirror-colorpicker > .color-chooser > .colorsets-list {
+  position: absolute;
+  top: 120px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  background-color: white; 
+
 }

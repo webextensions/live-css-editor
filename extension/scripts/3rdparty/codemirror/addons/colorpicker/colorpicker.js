@@ -311,6 +311,9 @@
             $control, $controlPattern, $controlColor, $hueContainer, $opacity, $opacityContainer, $opacityColorBar, $formatChangeButton,
             $opacity_drag_bar, $information, $informationChange;
 
+        var $colorSets, $colorSetsMenu, $colorSetsColorList, $colorChooser, $colorsetsList, $colorSetsChooseButton;
+
+
         var currentA, currentH, currentS, currentV;
         var $hexCode;
         var $rgb_r, $rgb_g, $rgb_b, $rgb_a;
@@ -323,6 +326,12 @@
         var isColorPickerShow = false;
         var isShortCut = false;
         var hideDelay = 2000;
+        var currentColorSets = {};      
+        var colorSetsList = [
+            { name : "Material",  "edit" : true, 'colors': [ '#fff', '#f00', '#0ff', '#f0f', '#fff', '#f00', '#0ff', '#f0f', '#fff', '#f00', '#0ff', '#f0f' ]},
+            { name : "Custom",  "edit" : true, 'colors': [ ]},
+            { name : "Pages",  "edit" : true, 'colors': [ '#fff', '#f00', '#0ff', '#f0f' ]}
+        ]
 
         function dom(tag, className, attr) {
 
@@ -1162,7 +1171,46 @@
             return item;
         }
 
+
+
+        function setCurrentColorSets (name) {
+
+            if (!name) {
+                currentColorSets = colorSetsList[0];
+            } else {
+                currentColorSets = colorSetsList.filter(function (obj) {
+                    return obj.name == name;
+                })[0];
+            }
+
+        }
+
+        function makeCurrentColorSets () {
+            var list = new dom('div', 'current-color-sets');
+
+            for(var i = 0, len = currentColorSets.colors.length; i < len; i++) {
+                var color = currentColorSets.colors[i];
+                var item = new dom('div', 'color-item', { 'data-color' : color});
+                var colorView = new dom('div', 'color-view');
+                colorView.css({ 'background-color': color })
+
+                item.append(colorView);
+
+                list.append(item);
+            }
+
+            if (currentColorSets.edit) {
+                var item = new dom('div', 'add-color-item').html('+');
+
+                list.append(item);
+            }
+
+            return list; 
+        }
+
         function init() {
+            setCurrentColorSets();  
+
             $body = new dom(document.body);
 
             $root = new dom('div', 'codemirror-colorpicker');
@@ -1190,7 +1238,6 @@
             $formatChangeButton = new dom('button', 'format-change-button', { type : 'button'}).html('↔');
             $informationChange.append($formatChangeButton);
 
-
             $information.append(makeInputField('hex'));
             $information.append(makeInputField('rgb'));
             $information.append(makeInputField('hsl'));
@@ -1213,9 +1260,30 @@
             $control.append($controlPattern);
             $control.append($controlColor);
 
+            // make colorsets view 
+            $colorSets = new dom('div', 'colorsets' );
+            $colorSetsMenu = new dom('div', 'menu' );
+            $colorSetsColorList = new dom('div', 'color-list' );
+
+            $colorSets.append($colorSetsMenu);
+            $colorSets.append($colorSetsColorList);
+
+            $colorSetsChooseButton = new dom('button', 'color-sets-choose-btn').html('+');
+
+            $colorSetsMenu.append($colorSetsChooseButton)
+            $colorSetsColorList.append(makeCurrentColorSets())
+
+            // make colorset-chooser 
+            $colorChooser = new dom('div', 'color-chooser' );
+            $colorsetsList = new dom('div', 'colorsets-list' );
+
+            $colorChooser.append($colorsetsList);         
+
             $root.append($color);
             $root.append($control);
             $root.append($information);
+            $root.append($colorSets);
+            $root.append($colorChooser);
 
             initHueColors();
             //initEvent();
@@ -1306,7 +1374,7 @@
             isColorPickerShow = true;
 
             isShortCut = opt.isShortCut || false;
-
+          
             initColor(color);
 
             // define colorpicker callback
@@ -1344,12 +1412,11 @@
 
         function hide () {
             if (isColorPickerShow) {
-                destroy();
-                $root.hide();
-                $root.remove();
-                isColorPickerShow = false;
+                //destroy();
+                //$root.hide();
+                //$root.remove();
+                //isColorPickerShow = false;
             }
-
         }
 
         init();
