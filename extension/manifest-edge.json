@@ -18,6 +18,7 @@
     "permissions": [
         "activeTab",
         "storage",
+        "unlimitedStorage",
         "webNavigation",
         "<all_urls>"
     ],

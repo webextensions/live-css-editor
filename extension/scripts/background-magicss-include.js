@@ -148,11 +148,10 @@ if (!window.loadRemoteJsListenerAdded) {
     }
 }
 
-
 var getFromChromeStorage = function (property, cb) {
-    var chromeStorage = chrome.storage.sync || chrome.storage.local;
+    var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
-    chromeStorage.get(property, function (values) {
+    chromeStorageForExtensionData.get(property, function (values) {
         if (values) {
             cb(values[property]);
         } else {
@@ -201,6 +200,7 @@ var reapplyCss = function (tabId) {
                 }
                 arrScripts.push(path3rdparty + 'amplify-store.js');
                 arrScripts.push(pathScripts + 'utils.js');
+                arrScripts.push(pathScripts + 'migrate-storage.js');
                 arrScripts.push(pathScripts + 'reapply-css.js');
                 extLib.loadJSCSS(arrScripts, allFrames, tabId, {
                     runAt: 'document_start'
@@ -302,6 +302,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             path3rdparty + 'socket.io/socket.io.slim.js',
 
             path3rdparty + 'amplify-store.js',
+            path3rdparty + 'migrate-storage.js',
 
             path3rdparty + 'tooltipster/tooltipster.css',
             path3rdparty + 'tooltipster/jquery.tooltipster.js',
