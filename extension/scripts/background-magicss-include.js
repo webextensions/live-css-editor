@@ -148,11 +148,10 @@ if (!window.loadRemoteJsListenerAdded) {
     }
 }
 
-
 var getFromChromeStorage = function (property, cb) {
-    var chromeStorage = chrome.storage.sync || chrome.storage.local;
+    var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
-    chromeStorage.get(property, function (values) {
+    chromeStorageForExtensionData.get(property, function (values) {
         if (values) {
             cb(values[property]);
         } else {
@@ -201,6 +200,7 @@ var reapplyCss = function (tabId) {
                 }
                 arrScripts.push(path3rdparty + 'amplify-store.js');
                 arrScripts.push(pathScripts + 'utils.js');
+                arrScripts.push(pathScripts + 'migrate-storage.js');
                 arrScripts.push(pathScripts + 'reapply-css.js');
                 extLib.loadJSCSS(arrScripts, allFrames, tabId, {
                     runAt: 'document_start'
@@ -288,7 +288,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
             // https://github.com/easylogic/codemirror-colorpicker
             pathCodeMirror + 'addons/colorpicker/colorpicker.css',
-            pathCodeMirror + 'addons/colorpicker/colorview.js',
+            pathCodeMirror + 'addons/colorpicker/colorview_customized.js',
             pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
             pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
@@ -302,6 +302,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             path3rdparty + 'socket.io/socket.io.slim.js',
 
             path3rdparty + 'amplify-store.js',
+            pathScripts + 'migrate-storage.js',
 
             path3rdparty + 'tooltipster/tooltipster.css',
             path3rdparty + 'tooltipster/jquery.tooltipster.js',
@@ -558,8 +559,13 @@ var onDOMContentLoadedHandler = function () {
                         if (runningInEdgeLikeEnvironment()) {
                             reapplyCss(tabId);
                         } else if (tab && tab.url) {
-                            // details.frameId === 0 means the top most frame (the webpage)
-                            if (permissionsPattern && details.frameId === 0) {
+                            // Old logic:
+                            //     "if (permissionsPattern && details.frameId === 0) {"
+                            //     details.frameId === 0 means the top most frame (the webpage)
+                            if (
+                                permissionsPattern &&
+                                !isRestrictedUrl(url) // url (details.url) points to the frame URL
+                            ) {
                                 chrome.permissions.contains({
                                     origins: [permissionsPattern]
                                 }, function (result) {

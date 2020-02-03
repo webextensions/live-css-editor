@@ -15,7 +15,7 @@
     var colorpicker_background_class = 'codemirror-colorview-background';
 
     // Excluded tokens do not show color views..
-    var excluded_token = ['comment'];
+    var excluded_token = ['comment', 'builtin'];
 
     CodeMirror.defineOption("colorpicker", false, function (cm, val, old) {
 
@@ -405,8 +405,15 @@
     }
 
     codemirror_colorpicker.prototype.is_excluded_token = function (line, ch) {
-        var type = this.cm.getTokenTypeAt({line : line, ch : ch});
-        var count = 0; 
+        var token = this.cm.getTokenAt({line : line, ch : ch}, true);
+        var type = token.type; 
+        var state = token.state.state;
+
+        if (type == null && state == 'block')  return true;
+        if (type == null && state == 'top')  return true;
+        // if (type == null && state == 'prop')  return true;
+
+        var count = 0;
         for(var i = 0, len = excluded_token.length; i < len; i++) {
             if (type === excluded_token[i]) {
                 count++;

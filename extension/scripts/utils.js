@@ -1,4 +1,4 @@
-/* global jQuery, less, Sass, csspretty */
+/* global chrome, jQuery, less, Sass, csspretty */
 
 'use strict';
 
@@ -222,7 +222,7 @@ if (!utils.defined) {
         if (typeof proto.firstExecution == 'undefined') {
             proto.firstExecution = true;
 
-            proto.applyTag = function (cb) {
+            proto.applyTag = function () {
                 utils.addStyleTag({
                     attributes: config.attributes,
                     cssText: this.cssText,
@@ -232,7 +232,8 @@ if (!utils.defined) {
                     removeExistingStyleTagWithSameId: this.removeExistingStyleTagWithSameId,
                     disabled: this.disabled
                 });
-                cb && cb(this.cssText);
+                var appliedCssText = this.cssText;
+                return appliedCssText;
             };
 
             proto.disable = function () {
@@ -290,7 +291,49 @@ if (!utils.defined) {
         );
     };
 
-    utils.delayFunctionUntilTestFunction = function(config) {
+    utils.chromeStorageGet = function (storageObject, prop) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.get(prop, function (values) {
+                resolve(values[prop]);
+            });
+        });
+    };
+
+    utils.chromeStorageSet = function (storageObject, prop, value) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.set(
+                {
+                    [prop]: value
+                },
+                function () {
+                    resolve();
+                }
+            );
+        });
+    };
+
+    utils.chromeStorageRemove = function (storageObject, prop) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.remove(prop, function () {
+                resolve();
+            });
+        });
+    };
+
+    utils.chromeStorageLocalGet = async function (prop) {
+        const value = await utils.chromeStorageGet(chrome.storage.local, prop);
+        return value;
+    };
+
+    utils.chromeStorageLocalSet = async function (prop, value) {
+        await utils.chromeStorageSet(chrome.storage.local, prop, value);
+    };
+
+    utils.chromeStorageLocalRemove = async function (prop, value) {
+        await utils.chromeStorageRemove(chrome.storage.local, prop, value);
+    };
+
+    utils.delayFunctionUntilTestFunction = async function(config) {
         var fnSuccess = config.fnSuccess,
             fnTest = config.fnTest,
             fnFirstFailure = config.fnFirstFailure,
@@ -304,7 +347,7 @@ if (!utils.defined) {
             waitFor = config.waitFor || 750;
 
         if(fnTest()) {
-            return fnSuccess() === false ? false : true;
+            return (await fnSuccess()) === false ? false : true;
         } else {
             if(tryLimitRunningCycleNumber === 0 && typeof fnFirstFailure === 'function') {
                 fnFirstFailure();
@@ -315,8 +358,8 @@ if (!utils.defined) {
             }
 
             if(tryLimitRunningCycleNumber < (tryLimit-1)) {
-                window.setTimeout((function(){
-                    utils.delayFunctionUntilTestFunction(config);
+                window.setTimeout((async function(){
+                    await utils.delayFunctionUntilTestFunction(config);
                 }),waitFor);
             } else {
                 if (typeof fnFailure === 'function') {

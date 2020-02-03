@@ -82,11 +82,54 @@
             </div>
         </div>
 
+        <div class="option" style="margin-top:35px">
+            <div class="option-heading">
+                Storage:
+                <div style="font-size:1.1rem; font-weight:normal">If you change this option, the data would be auto-migrated between these storages per site when used.</div>
+            </div>
+            <div style="margin-left:20px">
+                <div class="option-value">
+                    <label style="display:block;">
+                        <div>
+                            <input type="radio" name="storage-mode" value="chrome.storage.local" />
+                            Extension Storage <span style="color:#aaa;">&nbsp;(chrome.storage.local)</span>
+                        </div>
+                        <div style="margin-left:22px; font-size:1.1rem; font-weight:normal; color:#aaa; margin-bottom:8px">Remember all your changes and keep them accessible only through this extension.</div>
+                    </label>
+                </div>
+
+                <div class="option-value">
+                    <label style="display:block;">
+                        <div>
+                            <input type="radio" name="storage-mode" value="localStorage" />
+                            Web Storage <span style="color:#aaa;">&nbsp;(localStorage)</span>
+                        </div>
+                        <div style="margin-left:22px; font-size:1.1rem; font-weight:normal; color:#aaa;">Your changes might be cleared/overwritten by "Clear History" feature of the browser or by JavaScript on the web page.</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <div class="option" style="margin-top:20px">
             <div class="option-heading">Autocomplete:</div>
             <div style="margin-left:20px">
                 <div class="option-value">
-                    <label><input type="checkbox" id="autocomplete-selectors" /> Use autocomplete for CSS selectors</label>
+                    <label>
+                        <div>
+                            <input type="checkbox" id="autocomplete-selectors" /> CSS selectors
+                            <div style="margin-left:20px; font-size:1.1rem; font-weight:normal; color:#aaa;">If your selectors are pre-processed, you may wish to uncheck it.</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div style="margin-left:20px">
+                <div class="option-value">
+                    <label>
+                        <div>
+                            <input type="checkbox" id="autocomplete-css-properties-and-values" /> CSS properties and values
+                            <div style="margin-left:20px; font-size:1.1rem; font-weight:normal; color:#aaa;">If you mostly use Emmet autocomplete, you may wish to uncheck it.</div>
+                        </div>
+                    </label>
                 </div>
             </div>
         </div>

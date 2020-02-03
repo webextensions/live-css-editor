@@ -1,9 +1,13 @@
 /* global jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr */
 
+// TODO: Remove turning off of this rule (require-atomic-updates)
+/* eslint require-atomic-updates: "off" */
+
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
@@ -16,7 +20,6 @@ console.log(
 );
 
 (function($){
-
     var flagConnectedAtLeastOnce = false;
     window.currentlyConnected = false;
     var setCurrentlyConnected = function (value) {
@@ -27,21 +30,21 @@ console.log(
     var socketOb = {};
     socketOb.socket = null;
 
-    socketOb.setup = function () {
+    socketOb.setup = async function () {
         var $backEndConnectivityOptions = window.$backEndConnectivityOptions;
         var editor = window.MagiCSSEditor;
 
-        var serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
-            serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+        var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+            serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
 
 
 
         // var $serverHostname = window.$backEndConnectivityOptions.find('.magic-css-server-hostname'),
-        //     serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
+        //     serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
 
         // var $serverPort = window.$backEndConnectivityOptions.find('.magic-css-server-port'),
-        //     serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+        //     serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
 
 
@@ -228,17 +231,12 @@ console.log(
         }
     };
 
-    socketOb.reset = function () {
+    socketOb.reset = async function () {
         socketOb.close();
-        socketOb.setup();
+        await socketOb.setup();
     };
 
-    var chromeStorage;
-    try {
-        chromeStorage = chrome.storage.sync || chrome.storage.local;
-    } catch (e) {
-        // do nothing
-    }
+    var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
     var checkIfMagicCssLoadedFine = function (MagiCSSEditor) {
         if (!MagiCSSEditor.container.clientHeight) {
@@ -260,9 +258,11 @@ console.log(
         } else {
             utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
 
-            // 'Magic CSS window is already there. Repositioning it.'
-            window.MagiCSSEditor.reposition(function () {
-                checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+            setTimeout(async function () {
+                // 'Magic CSS window is already there. Repositioning it.'
+                await window.MagiCSSEditor.reposition(function () {
+                    checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+                });
             });
         }
         return;
@@ -342,21 +342,21 @@ console.log(
     // toastr.options.tapToDismiss = false;
 
 
-    var rememberLastAppliedCss = function (css) {
+    var rememberLastAppliedCss = async function (css) {
         var editor = window.MagiCSSEditor;
-        editor.userPreference('last-applied-css', css);
+        await editor.userPreference('last-applied-css', css);
     };
 
-    var applyLastAppliedCss = function (editor) {
+    var applyLastAppliedCss = async function (editor) {
         // TODO: Some of the code related to this function may be reused
 
         var userPreference = editor.userPreference.bind(editor);
 
         var localStorageDisableStyles = 'disable-styles';
-        var disableStyles = userPreference(localStorageDisableStyles) === 'yes';
+        var disableStyles = await userPreference(localStorageDisableStyles) === 'yes';
 
         var localStorageLastAppliedCss = 'last-applied-css';
-        var cssText = userPreference(localStorageLastAppliedCss).trim();
+        var cssText = await userPreference(localStorageLastAppliedCss).trim();
 
         if (cssText) {
             var id = 'MagiCSS-bookmarklet',
@@ -967,33 +967,33 @@ console.log(
         }
     };
 
-    var setCodeMirrorCSSLinting = function (editor, enableOrDisable) {
+    var setCodeMirrorCSSLinting = async function (editor, enableOrDisable) {
         var cm = editor.cm,
             lint,
             gutters = [].concat(cm.getOption('gutters') || []);
         if (enableOrDisable === 'enable') {
             lint = true;
             gutters.unshift('CodeMirror-lint-markers');     // Using ".unshift()" rather than ".push()" to ensure that the "gutter" for "line-number" always comes after gutter for "linting"
-            editor.userPreference('use-css-linting', 'yes');
+            await editor.userPreference('use-css-linting', 'yes');
         } else {
             lint = false;
             var index = gutters.indexOf('CodeMirror-lint-markers');
             if (index > -1) {
                 gutters.splice(index, 1);
             }
-            editor.userPreference('use-css-linting', 'no');
+            await editor.userPreference('use-css-linting', 'no');
         }
         cm.setOption('gutters', gutters);
         cm.setOption('lint', lint);
     };
 
-    var markAsPinnedOrNotPinned = function (editor, pinnedOrNotPinned) {
+    var markAsPinnedOrNotPinned = async function (editor, pinnedOrNotPinned) {
         if (pinnedOrNotPinned === 'pinned') {
             editor.applyStylesAutomatically(true);
-            editor.userPreference('apply-styles-automatically', 'yes');
+            await editor.userPreference('apply-styles-automatically', 'yes');
         } else {
             editor.applyStylesAutomatically(false);
-            editor.userPreference('apply-styles-automatically', 'no');
+            await editor.userPreference('apply-styles-automatically', 'no');
         }
     };
 
@@ -1087,15 +1087,15 @@ console.log(
     var flagWatchingCssFiles = false;
     var socket = null;
 
-    var getConnected = function (editor, cb) {
-        var socketIfAlreadyConnected = getConnectedWithBackEnd(
+    var getConnected = async function (editor, asyncCb) {
+        var socketIfAlreadyConnected = await getConnectedWithBackEnd(
             editor,
-            function callback (err) {
+            async function callback (err) {
             // function callback (err, socket) {
                 if (err) {
                     // The user cancelled watching files
                     utils.alertNote('You cancelled watching CSS files for changes');
-                    editor.userPreference('watching-css-files', 'no');
+                    await editor.userPreference('watching-css-files', 'no');
                 } else {
                     // socket.on('file-modified', function(changeDetails) {
                     //     if (changeDetails.useOnlyFileNamesForMatch) {
@@ -1131,25 +1131,25 @@ console.log(
                             }
                         );
                         $(editor.container).addClass('watching-css-files');
-                        editor.userPreference('watching-css-files', 'yes');
+                        await editor.userPreference('watching-css-files', 'yes');
                     }
 
-                    if (!socketIfAlreadyConnected && cb) {
-                        cb();
+                    if (!socketIfAlreadyConnected && asyncCb) {
+                        await asyncCb();
                     }
                 }
             },
-            function callbackForReconfiguration () {
-                getConnected(editor);
+            async function callbackForReconfiguration () {
+                await getConnected(editor);
             }
         );
-        if (socketIfAlreadyConnected && cb) {
-            cb();
+        if (socketIfAlreadyConnected && asyncCb) {
+            await asyncCb();
         }
     };
 
-    var startWatchingFiles = function (editor) {
-        getConnected(editor);
+    var startWatchingFiles = async function (editor) {
+        await getConnected(editor);
     };
 
     // A pretty basic OS detection logic based on:
@@ -1171,8 +1171,8 @@ console.log(
 
 
     var getServerDetailsFromUserAlreadyOpen = false;
-    var getServerDetailsFromUser = function (editor) {
-    // var getServerDetailsFromUser = function (editor, callback) {
+    var getServerDetailsFromUser = async function (editor) {
+    // var getServerDetailsFromUser = async function (editor, callback) {
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
@@ -1310,10 +1310,10 @@ console.log(
         // debugger;
 
         var $serverHostname = window.$backEndConnectivityOptions.find('.magic-css-server-hostname'),
-            serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
+            serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
 
         var $serverPort = window.$backEndConnectivityOptions.find('.magic-css-server-port'),
-            serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+            serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
         /*
         // TODO: Remove this variable
@@ -1384,22 +1384,22 @@ console.log(
         /* */
 
         $serverHostname.val(serverHostnameValue);
-        $serverHostname.on('input', function () {
+        $serverHostname.on('input', async function () {
             debugger;
             serverHostnameValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultHostname;
-            editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            await editor.userPreference('live-css-server-hostname', serverHostnameValue);
             // refreshConnectivityUi();
-            socketOb.reset();
+            await socketOb.reset();
         });
 
         console.log('Haha 1');
         $serverPort.val(serverPortValue);
-        $serverPort.on('input', function () {
+        $serverPort.on('input', async function () {
             console.log('inside input');
             serverPortValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultPort;
             // refreshConnectivityUi();
-            editor.userPreference('live-css-server-port', serverPortValue);
-            socketOb.reset();
+            await editor.userPreference('live-css-server-port', serverPortValue);
+            await socketOb.reset();
         });
 
         // Useful when developing/debugging
@@ -1425,12 +1425,16 @@ console.log(
         // });
         /* */
         window.$backEndConnectivityOptions.find('.magicss-done-server-path-changes').on('click', function () {
-            // editor.userPreference('live-css-server-hostname', serverHostnameValue);
-            // editor.userPreference('live-css-server-port', serverPortValue);
+            // await editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            // await editor.userPreference('live-css-server-port', serverPortValue);
 
             // disconnectConnectionTestingSocket();
             window.$backEndConnectivityOptions.remove();
             getServerDetailsFromUserAlreadyOpen = false;
+        });
+        window.$backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', async function () {
+            await editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            await editor.userPreference('live-css-server-port', serverPortValue);
 
             // callback(null, {
             //     serverHostname: serverHostnameValue,
@@ -1441,31 +1445,31 @@ console.log(
         // refreshConnectivityUi();
     };
 
-    var updateUiMentioningNotWatchingCssFiles = function (editor) {
+    var updateUiMentioningNotWatchingCssFiles = async function (editor) {
         if (flagWatchingCssFiles) {
             flagWatchingCssFiles = false;
             utils.alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
-            editor.userPreference('watching-css-files', 'no');
+            await editor.userPreference('watching-css-files', 'no');
         }
     };
 
-    var liveCssServerSessionClosedByUser = function (editor) {
+    var liveCssServerSessionClosedByUser = async function (editor) {
         // TODO:
         //     When file editing feature is available,
         //     disable editing file / notify user when
         //     the server session is disconnected
 
-        updateUiMentioningNotWatchingCssFiles(editor);
+        await updateUiMentioningNotWatchingCssFiles(editor);
     };
 
     var $toastrConnecting,
         $toastrConnected,
         $toastrReconnectAttempt;
-    var getConnectedWithBackEnd = function (editor, callback, callbackForReconfiguration) {
+    var getConnectedWithBackEnd = async function (editor, mainAsyncCallback, asyncCallbackForReconfiguration) {
         // var flagCallbackCalledOnce = false;
-        var serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
-            serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+        var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+            serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
         if (socket) {
             var socketOpts = (socket.io || {}).opts || {};
@@ -1510,11 +1514,13 @@ console.log(
             'Connecting with live-css server at: ',
             {
                 timeOut: 0,
-                onclick: function (evt) {
+                onclick: async function (evt) {
                     if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                        getServerDetailsFromUser(editor, function (err, serverDetails) {
+                        await getServerDetailsFromUser(editor, function (err, serverDetails) {
                             if (!err) {
-                                callbackForReconfiguration(serverDetails);
+                                setTimeout(async function () {
+                                    await asyncCallbackForReconfiguration(serverDetails);
+                                });
                             }
                         });
                     // } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
@@ -1527,7 +1533,7 @@ console.log(
                     //     toastr.clear($toastrConnecting, {force: true});
                     //     if (!flagCallbackCalledOnce) {
                     //         flagCallbackCalledOnce = true;
-                    //         callback('cancelled-by-user', socket);
+                    //         await mainAsyncCallback('cancelled-by-user', socket);
                     //     }
                     }
                 }
@@ -1538,12 +1544,14 @@ console.log(
         // show them the configuration options along with the guide/help
         // about the live-css server
         if (
-            !editor.userPreference('live-css-server-hostname') &&
-            !editor.userPreference('live-css-server-port')
+            !(await editor.userPreference('live-css-server-hostname')) &&
+            !(await editor.userPreference('live-css-server-port'))
         ) {
-            getServerDetailsFromUser(editor, function (err, serverDetails) {
+            await getServerDetailsFromUser(editor, function (err, serverDetails) {
                 if (!err) {
-                    callbackForReconfiguration(serverDetails);
+                    setTimeout(async function () {
+                        await asyncCallbackForReconfiguration(serverDetails);
+                    });
                 }
             });
         }
@@ -1554,22 +1562,25 @@ console.log(
             // timeout: 5000
             // reconnectionAttempts: 100
         });
-        socket.on('error', function (err) {
-            editor.markLiveCssServerConnectionStatus(false);
 
+        socket.on('error', async function asyncCallback(err) {
+            editor.markLiveCssServerConnectionStatus(false);
             // In case of "Invalid namespace", we open the UI for details to inform that they are using
             // incompatible version of the live-css server
             if (err === 'Invalid namespace') {
-                getServerDetailsFromUser(editor, function (err, serverDetails) {
+                await getServerDetailsFromUser(editor, function (err, serverDetails) {
                     if (!err) {
-                        callbackForReconfiguration(serverDetails);
+                        setTimeout(async function () {
+                            await asyncCallbackForReconfiguration(serverDetails);
+                        });
                     }
                 });
             }
         });
+
         /* */
         /*
-        socket.on('connect', function () {
+        socket.on('connect', async function () {
             editor.markLiveCssServerConnectionStatus(true);
 
             // flagConnectedAtLeastOnce = true;
@@ -1595,12 +1606,14 @@ console.log(
             //     '</div>',
             //     'Connected with live-css server at:',
             //     {
-            //         onclick: function (evt) {
+            //         onclick: async function (evt) {
             //             if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
             //                 toastr.clear($toastrConnected, {force: true});
-            //                 getServerDetailsFromUser(editor, function (err, serverDetails) {
+            //                 await getServerDetailsFromUser(editor, function (err, serverDetails) {
             //                     if (!err) {
-            //                         callbackForReconfiguration(serverDetails);
+            //                         setTimeout(async function () {
+            //                             await asyncCallbackForReconfiguration(serverDetails);
+            //                         });
             //                     }
             //                 });
             //             } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
@@ -1638,11 +1651,13 @@ console.log(
                         'Reconnecting with live-css server at:',
                         {
                             timeOut: 0,
-                            onclick: function (evt) {
+                            onclick: async function (evt) {
                                 if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                    getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                    await getServerDetailsFromUser(editor, function (err, serverDetails) {
                                         if (!err) {
-                                            callbackForReconfiguration(serverDetails);
+                                            setTimeout(async function () {
+                                                await asyncCallbackForReconfiguration(serverDetails);
+                                            });
                                         }
                                     });
                                 } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
@@ -1653,7 +1668,7 @@ console.log(
                                         socket = null;
                                     }
                                     toastr.clear($toastrReconnectAttempt, {force: true});
-                                    liveCssServerSessionClosedByUser(editor);
+                                    await liveCssServerSessionClosedByUser(editor);
                                 }
                             }
                         }
@@ -1663,7 +1678,7 @@ console.log(
         }); /* */
     };
 
-    var getDisconnectedWithBackEnd = function (editor, options, cb) {
+    var getDisconnectedWithBackEnd = async function (editor, options, asyncCallback) {
         /*
         if (socket) {
             editor.markLiveCssServerConnectionStatus(false);
@@ -1682,7 +1697,7 @@ console.log(
         if ($toastrReconnectAttempt) {
             toastr.clear($toastrReconnectAttempt, {force: true});
         }
-        cb();
+        await asyncCallback();
     };
 
     var isMac = false;
@@ -1702,8 +1717,8 @@ console.log(
     CodeMirror.keyMap.sublime['Alt-Down'] = 'swapLineDown';
     CodeMirror.keyMap.sublime['Alt-Up'] = 'swapLineUp';
 
-    var main = function () {
-        utils.delayFunctionUntilTestFunction({
+    var main = async function () {
+        await utils.delayFunctionUntilTestFunction({
             tryLimit: 100,
             waitFor: 500,
             fnTest: function () {
@@ -1718,13 +1733,13 @@ console.log(
             fnFailure: function () {
                 // do nothing
             },
-            fnSuccess: function () {
-                var beautifyCSS = function (cssCode) {
+            fnSuccess: async function () {
+                var beautifyCSS = async function (cssCode) {
                     var options = {};
-                    if (window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes') {
+                    if (await window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes') {
                         options.useTabs = true;
                     } else {
-                        options.useSpaceCount = parseInt(window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10) || 4;
+                        options.useSpaceCount = parseInt(await window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10) || 4;
                     }
                     return utils.beautifyCSS(cssCode, options);
                 };
@@ -1880,7 +1895,7 @@ console.log(
                     });
 
                     var targetElement = evt.target;
-                    setTimeout(function () {
+                    setTimeout(async function () {
                         var selectorsOb = getMatchingAndSuggestedSelectors(targetElement);
                         // TODO: Fix variable naming
                         var matchingSelectors = selectorsOb.matchingAndSuggestedSelectors,
@@ -1903,12 +1918,12 @@ console.log(
                             anyCharacterAfterCurrentCursorPosition = false;
                         }
 
-                        var useTabs = window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes';
+                        var useTabs = (await window.MagiCSSEditor.userPreference('use-tab-for-indentation')) === 'yes';
                         var whitespaceToAdd;
                         if (useTabs) {
                             whitespaceToAdd = '\t';
                         } else {
-                            var indentationSpacesCount = parseInt(window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10);
+                            var indentationSpacesCount = parseInt(await window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10);
                             whitespaceToAdd = ' '.repeat(indentationSpacesCount || 4);
                         }
 
@@ -2046,10 +2061,10 @@ console.log(
                     });
 
                 var saveStatusUpdateTimeout;
-                var fnApplyTextAsCSS = function (editor, options) {
+                var fnApplyTextAsCSS = async function (editor, options) {
                     options = options || {};
                     var disabled = false;
-                    if (editor.userPreference('disable-styles') === 'yes') {
+                    if ((await editor.userPreference('disable-styles')) === 'yes') {
                         disabled = true;
                     }
 
@@ -2067,7 +2082,7 @@ console.log(
                                 }
                             }, 300);
 
-                            var filePath = editor.userPreference('file-to-edit');
+                            var filePath = await editor.userPreference('file-to-edit');
 
                             socketOb.socket.emit(
                                 'PUT',
@@ -2105,7 +2120,7 @@ console.log(
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
 
-                        less.render(lessCode, lessOptions, function(err, output) {
+                        less.render(lessCode, lessOptions, async function asyncCallback(err, output) {
                             smc = null;     // Unset old SourceMapConsumer
 
                             if (err) {
@@ -2123,7 +2138,9 @@ console.log(
                                 var strCssCode = output.css;
                                 newStyleTag.cssText = strCssCode;
                                 newStyleTag.disabled = disabled;
-                                newStyleTag.applyTag(rememberLastAppliedCss);
+                                let appliedCssText = newStyleTag.applyTag();
+                                await rememberLastAppliedCss(appliedCssText);
+
                                 var rawSourceMap = output.map;
                                 if (rawSourceMap) {
                                     smc = new sourceMap.SourceMapConsumer(rawSourceMap);
@@ -2131,18 +2148,19 @@ console.log(
                             }
                         });
                     } else if (getLanguageMode() === 'sass') {
-                        var fn = function () {
+                        var fnSassToCssAndApply = function () {
                             var Sass = window.Sass,
                                 sassCode = editor.getTextValue() || ' ';    // Sass compiler throws an error for empty code string
 
-                            Sass.compile(sassCode, function (result) {
+                            Sass.compile(sassCode, async function asyncCallback(result) {
                                 smc = null;     // Unset old SourceMapConsumer
 
                                 if (result.status === 0) {
                                     var strCssCode = result.text || '';
                                     newStyleTag.cssText = strCssCode;
                                     newStyleTag.disabled = disabled;
-                                    newStyleTag.applyTag(rememberLastAppliedCss);
+                                    let appliedCssText = newStyleTag.applyTag();
+                                    await rememberLastAppliedCss(appliedCssText);
                                     var rawSourceMap = result.map;
                                     if (rawSourceMap) {
                                         smc = new sourceMap.SourceMapConsumer(rawSourceMap);
@@ -2172,7 +2190,7 @@ console.log(
                             });
                         };
                         if (isOpera || window.Sass) {
-                            fn();
+                            fnSassToCssAndApply();
                         } else {
                             // Ensure that we don't send multiple load requests at once, by not sending request if previous one is still pending for succeess/failure
                             if (!window.isActiveLoadSassRequest) {
@@ -2207,7 +2225,7 @@ console.log(
                                                 setTimeout(function () {
                                                     // Ensure that getLanguageMode() is still 'sass'
                                                     if (getLanguageMode() === 'sass') {
-                                                        fn();
+                                                        fnSassToCssAndApply();
                                                     }
                                                 }, 300);
                                             }
@@ -2232,11 +2250,12 @@ console.log(
                         var cssCode = editor.getTextValue();
                         newStyleTag.cssText = cssCode;
                         newStyleTag.disabled = disabled;
-                        newStyleTag.applyTag(rememberLastAppliedCss);
+                        let appliedCssText = newStyleTag.applyTag();
+                        await rememberLastAppliedCss(appliedCssText);
                     }
                 };
 
-                var showFileEditOptions = function (editor, cb) {
+                var showFileEditOptions = async function (editor, cb) {
                     /* eslint-disable indent */
                     var $fileEditOptions = $(
                         [
@@ -2262,7 +2281,7 @@ console.log(
                     );
                     /* eslint-enable indent */
 
-                    var fileSuggestionValue = editor.userPreference('file-to-edit');
+                    var fileSuggestionValue = await editor.userPreference('file-to-edit');
 
                     var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
                         method: 'GET',
@@ -2279,10 +2298,10 @@ console.log(
                         maxSelection: 1,
                         typeDelay: 50,
 
-                        data: (function () {
+                        data: (async function () {
                             var protocolValue = (window.location.protocol === 'https:') ? 'https:' : 'http:',
-                                serverHostnameValue = editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
-                                serverPortValue = editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort,
+                                serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+                                serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort,
                                 backEndPath = serverHostnameValue + ':' + serverPortValue + '/',
                                 url = protocolValue + '//' + backEndPath + 'live-css/list-of-editable-files';
                             return url;
@@ -2304,9 +2323,9 @@ console.log(
                     window.fileSuggestions = fileSuggestions;
 
                     var $fileSuggestions = $(fileSuggestions);
-                    $fileSuggestions.on('selectionchange', function(e, m){   // eslint-disable-line no-unused-vars
+                    $fileSuggestions.on('selectionchange', async function(e, m){   // eslint-disable-line no-unused-vars
                         var fileToEdit = this.getValue()[0] || '';
-                        editor.userPreference('file-to-edit', fileToEdit);
+                        await editor.userPreference('file-to-edit', fileToEdit);
                     });
 
                     $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
@@ -2325,7 +2344,7 @@ console.log(
                 var loadFile = function (options) {
                     var filePath = options.filePath,
                         successCallback = options.successCallback,
-                        errorCallback = options.errorCallback;
+                        asyncErrorCallback = options.errorCallback;
 
                     // Using a timeout of 0ms so that the "socket" gets initiated if it is required
                     setTimeout(function () {
@@ -2334,14 +2353,14 @@ console.log(
                             {
                                 url: filePath
                             },
-                            function (status, data) {
+                            async function (status, data) {
                                 if (status === 'success') {
                                     successCallback({
                                         path: filePath,
                                         contents: data.fileContents
                                     });
                                 } else {
-                                    errorCallback();
+                                    await asyncErrorCallback();
                                 }
                             }
                         );
@@ -2366,33 +2385,33 @@ console.log(
                             }
                         },
                         error: function () {
-                            errorCallback();
+                            await asyncErrorCallback();
                         }
                     });
                     /* */
                 };
 
-                var getDataForFileToEdit = function (editor, options, cb) {
+                var getDataForFileToEdit = async function (editor, options, cb) {
                     options = options || {};
                     var needInputThroughUi = true;
 
-                    var pathOfFileToEdit = editor.userPreference('file-to-edit');
+                    var pathOfFileToEdit = await editor.userPreference('file-to-edit');
                     if (pathOfFileToEdit) {
                         needInputThroughUi = false;
                     }
 
                     console.log('TODO: The following piece of code needs to be refactored');
-                    getConnected(editor, function () {
+                    getConnected(editor, async function () {
                         if (needInputThroughUi || options.showUi) {
-                            showFileEditOptions(editor, function (filePath) {
+                            await showFileEditOptions(editor, function (filePath) {
                                 loadFile({
                                     filePath: filePath,
                                     successCallback: function (file) {
                                         cb(file);
                                     },
-                                    errorCallback: function () {
-                                        editor.userPreference('file-to-edit', null);
-                                        getDataForFileToEdit(editor, options, cb);
+                                    errorCallback: async function () {
+                                        await editor.userPreference('file-to-edit', null);
+                                        await getDataForFileToEdit(editor, options, cb);
                                     }
                                 });
                             });
@@ -2402,24 +2421,24 @@ console.log(
                                 successCallback: function (file) {
                                     cb(file);
                                 },
-                                errorCallback: function () {
-                                    editor.userPreference('file-to-edit', null);
-                                    getDataForFileToEdit(editor, options, cb);
+                                errorCallback: async function () {
+                                    await editor.userPreference('file-to-edit', null);
+                                    await getDataForFileToEdit(editor, options, cb);
                                 }
                             });
                         }
                     });
                     /*
                     if (needInputThroughUi || options.showUi) {
-                        showFileEditOptions(editor, function (filePath) {
+                        await showFileEditOptions(editor, function (filePath) {
                             loadFile({
                                 filePath: filePath,
                                 successCallback: function (file) {
                                     cb(file);
                                 },
-                                errorCallback: function () {
-                                    editor.userPreference('file-to-edit', null);
-                                    getDataForFileToEdit(editor, options, cb);
+                                errorCallback: async function () {
+                                    await editor.userPreference('file-to-edit', null);
+                                    await getDataForFileToEdit(editor, options, cb);
                                 }
                             });
                         });
@@ -2429,9 +2448,9 @@ console.log(
                             successCallback: function (file) {
                                 cb(file);
                             },
-                            errorCallback: function () {
-                                editor.userPreference('file-to-edit', null);
-                                getDataForFileToEdit(editor, options, cb);
+                            errorCallback: async function () {
+                                await editor.userPreference('file-to-edit', null);
+                                await getDataForFileToEdit(editor, options, cb);
                             }
                         });
                     }
@@ -2447,20 +2466,20 @@ console.log(
                         .addClass(cls);
                 };
 
-                var setLanguageMode = function (newLanguageMode, editor, options) {
+                var setLanguageMode = async function (newLanguageMode, editor, options) {
                     options = options || {};
                     if (newLanguageMode === 'file') {
-                        debugger;
+                        // debugger;
                         var fileEditingOptions = {};
                         // If previous mode was also 'file' (meaning the user clicked again), then we prompt the user for selecting file (or related options)
                         if (getLanguageMode() === 'file') {
                             fileEditingOptions.showUi = true;
                         }
-                        getDataForFileToEdit(editor, fileEditingOptions, function (file) {
+                        await getDataForFileToEdit(editor, fileEditingOptions, async function (file) {
                             editor.options.rememberText = false;
 
                             setLanguageModeClass(editor, 'magicss-selected-mode-file');
-                            editor.userPreference('language-mode', 'file');
+                            await editor.userPreference('language-mode', 'file');
                             editor.cm.setOption('mode', 'text/x-less');
                             setCodeMirrorCSSLinting(editor, 'disable');
                             $('.footer-for-file-mode').show();
@@ -2502,29 +2521,29 @@ console.log(
                         $('.footer-for-file-mode').hide();
                         if (newLanguageMode === 'less') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-less');
-                            editor.userPreference('language-mode', 'less');
+                            await editor.userPreference('language-mode', 'less');
                             editor.cm.setOption('mode', 'text/x-less');
-                            setCodeMirrorCSSLinting(editor, 'disable');
+                            await setCodeMirrorCSSLinting(editor, 'disable');
                             if (!options.skipNotifications) {
                                 utils.alertNote('Now editing code in LESS mode', 5000);
                             }
                         } else if (newLanguageMode === 'sass') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-sass');
-                            editor.userPreference('language-mode', 'sass');
+                            await editor.userPreference('language-mode', 'sass');
                             editor.cm.setOption('mode', 'text/x-scss');
-                            setCodeMirrorCSSLinting(editor, 'disable');
+                            await setCodeMirrorCSSLinting(editor, 'disable');
                             if (!options.skipNotifications) {
                                 utils.alertNote('Now editing code in SASS mode', 5000);
                             }
                         } else {
                             setLanguageModeClass(editor, 'magicss-selected-mode-css');
-                            editor.userPreference('language-mode', 'css');
+                            await editor.userPreference('language-mode', 'css');
                             editor.cm.setOption('mode', 'text/css');
                             if (!options.skipNotifications) {
                                 utils.alertNote('Now editing code in CSS mode', 5000);
                             }
                         }
-                        fnApplyTextAsCSS(editor);
+                        await fnApplyTextAsCSS(editor);
                     }
                 };
 
@@ -2621,17 +2640,57 @@ console.log(
                     if (enablePointAndClick) {
                         disablePointAndClickFunctionality(editor);
                     } else {
-                        // If currently, there is no text selection
-                        if (!editor.cm.getSelection()) {
+                        var currentSelection = editor.cm.getSelection();
+                        if (currentSelection) {
+                            var currentCursorPosition = editor.cm.getCursor();
+                            editor.setCursor(currentCursorPosition, {pleaseIgnoreCursorActivity: true});
+                        }
+
+                        // Just a logical block
+                        {
                             var cursorPosition = editor.cm.getCursor();
-                            // If there is any non-whitespace character before the cursor in the current line
-                            if (editor.cm.getLine(cursorPosition.line).substr(0, cursorPosition.ch).trim()) {
-                                // Move the cursor to the end of the current line
-                                // Which helps in avoiding the scenario that when the user does point-and-click,
-                                // the text insertion does not happen in the middle of the text
-                                editor.setCursor({line: cursorPosition.line}, {pleaseIgnoreCursorActivity: true});
+                            var splitText = editor.splitTextByCursor();
+                            var lastIndexOfClosingBraceBeforeCursor = splitText.strBeforeCursor.lastIndexOf('}');
+                            var lastIndexOfOpeningBraceBeforeCursor = splitText.strBeforeCursor.lastIndexOf('{');
+
+                            var firstIndexOfClosingBraceAfterCursor = splitText.strAfterCursor.indexOf('}');
+
+                            var adjustCursorPosition = function (delta) {
+                                var targetPosition = editor.cm.findPosH(cursorPosition, delta, 'char', false);
+                                editor.setCursor(targetPosition, {pleaseIgnoreCursorActivity: true});
+                            };
+
+                            var moveCursorToEndOfLineIfRequired = function () {
+                                // If there is any non-whitespace character before the cursor in the current line
+                                if (editor.cm.getLine(cursorPosition.line).substr(0, cursorPosition.ch).trim()) {
+                                    // Move the cursor to the end of the current line
+                                    // Which helps in avoiding the scenario that when the user does point-and-click,
+                                    // the text insertion does not happen in the middle of the text
+                                    editor.setCursor({line: cursorPosition.line}, {pleaseIgnoreCursorActivity: true});
+                                }
+                            };
+
+                            if (
+                                lastIndexOfOpeningBraceBeforeCursor >= 0 &&
+                                lastIndexOfClosingBraceBeforeCursor < lastIndexOfOpeningBraceBeforeCursor
+                            ) {
+                                if (firstIndexOfClosingBraceAfterCursor >= 0) {
+                                    adjustCursorPosition(firstIndexOfClosingBraceAfterCursor + 1);
+                                } else {
+                                    moveCursorToEndOfLineIfRequired();
+                                }
+                            } else {
+                                var anyNonWhitespaceCharacterBetweenLastClosingBracketAndCurrentCursorPosition = !!(splitText.strBeforeCursor.substring(lastIndexOfClosingBraceBeforeCursor + 1).trim());
+                                if (anyNonWhitespaceCharacterBetweenLastClosingBracketAndCurrentCursorPosition) {
+                                    if (firstIndexOfClosingBraceAfterCursor >= 0) {
+                                        adjustCursorPosition(firstIndexOfClosingBraceAfterCursor + 1);
+                                    } else {
+                                        moveCursorToEndOfLineIfRequired();
+                                    }
+                                }
                             }
                         }
+
                         utils.alertNote('Select an element in the page to generate its CSS selector<br />(Shortcut: Alt + Shift + S)', 5000);
                         enablePointAndClickFunctionality(editor);
                     }
@@ -2695,20 +2754,20 @@ console.log(
                             '<div class="magicss-mode-button magicss-mode-file" title="File mode">file</div>'
                         );
 
-                        $(document).on('click', '.magicss-mode-css', function () {
-                            setLanguageMode('css', editor);
+                        $(document).on('click', '.magicss-mode-css', async function () {
+                            await setLanguageMode('css', editor);
                             editor.focus();
                         });
-                        $(document).on('click', '.magicss-mode-less', function () {
-                            setLanguageMode('less', editor);
+                        $(document).on('click', '.magicss-mode-less', async function () {
+                            await setLanguageMode('less', editor);
                             editor.focus();
                         });
-                        $(document).on('click', '.magicss-mode-sass', function () {
-                            setLanguageMode('sass', editor);
+                        $(document).on('click', '.magicss-mode-sass', async function () {
+                            await setLanguageMode('sass', editor);
                             editor.focus();
                         });
-                        $(document).on('click', '.magicss-mode-file', function () {
-                            setLanguageMode('file', editor);
+                        $(document).on('click', '.magicss-mode-file', async function () {
+                            await setLanguageMode('file', editor);
                             editor.focus();
                         });
 
@@ -2720,19 +2779,23 @@ console.log(
                             mode: 'edit'
                         },
                         autoCloseBrackets: true,
+                        /*
                         hintOptions: {
                             completeSingle: false,
                             // closeCharacters: /[\s()\[\]{};:>,]/,     // This is the default value defined in show-hint.js
                             closeCharacters: /[(){};:,]/,               // Custom override
-                            onAddingAutoCompleteOptionsForSelector: function (add) {
-                                var editor = window.MagiCSSEditor;
-                                if (editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS) === 'no') {
-                                    return;
-                                }
-                                if (existingCSSSelectorsWithAutocompleteObjects) {
-                                    add(existingCSSSelectorsWithAutocompleteObjects, true);
-                                }
-                            },
+                            onAddingAutoCompleteOptionsForSelector: (
+                                // FIXME: This would not work since window.MagiCSSEditor is not available yet
+                                (await window.MagiCSSEditor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS)) === 'no'
+                                    ? null
+                                    : (
+                                        function (add) {
+                                            if (existingCSSSelectorsWithAutocompleteObjects) {
+                                                add(existingCSSSelectorsWithAutocompleteObjects, true);
+                                            }
+                                        }
+                                    )
+                            ),
                             onAddingAutoCompleteOptionsForCSSProperty: function (add) {
                                 add(cssPropertyKeywordsAutocompleteObject, true);
                             },
@@ -2740,12 +2803,13 @@ console.log(
                                 var editor = window.MagiCSSEditor;
                                 showCSSSelectorMatches(selectedText, editor);
                             },
-                            onCssHintShownForSelector: function () {    /* As per current CodeMirror/css-hint architecture,
-                                                                           "select" is called before "shown".
-                                                                           The "select" operation would also show the number  e are hiding the alertNote */
+                            onCssHintShownForSelector: function () {    // As per current CodeMirror/css-hint architecture,
+                                                                        // "select" is called before "shown".
+                                                                        // The "select" operation would also show the number  e are hiding the alertNote
                                 utils.alertNote.hide();
                             }
                         },
+                        /* */
                         extraKeys: {
                             /*
                             // https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/
@@ -2756,24 +2820,64 @@ console.log(
                             }
                             /* */
                         },
-                        optionsBasedOnUserPreference: function (userPreference) {
+                        optionsBasedOnUserPreference: async function (userPreference) {
                             var options = {};
-                            if (userPreference('use-css-linting') === 'yes' && userPreference('language-mode') === 'css') {
+
+                            if ((await userPreference('use-css-linting')) === 'yes' && (await userPreference('language-mode')) === 'css') {
                                 options.gutters = ['CodeMirror-lint-markers'];
                                 options.lint = true;
                             } else {
                                 options.gutters = [];
                                 options.lint = false;
                             }
-                            options.mode = (function () {
-                                if (userPreference('language-mode') === 'sass') {
-                                    return 'text/x-scss';
-                                } else if (userPreference('language-mode') === 'less') {
-                                    return 'text/x-less';
-                                } else {
-                                    return 'text/css';
+
+                            if ((await userPreference('language-mode')) === 'sass') {
+                                options.mode = 'text/x-scss';
+                            } else if ((await userPreference('language-mode')) === 'less') {
+                                options.mode = 'text/x-less';
+                            } else {
+                                options.mode = 'text/css';
+                            }
+
+                            options.hintOptions = {
+                                completeSingle: false,
+                                // closeCharacters: /[\s()\[\]{};:>,]/,     // This is the default value defined in show-hint.js
+                                closeCharacters: /[(){};:,]/,               // Custom override
+                                onAddingAutoCompleteOptionsForSelector: (
+                                    (await userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS)) === 'no'
+                                        ? null
+                                        : (
+                                            function (add) {
+                                                if (existingCSSSelectorsWithAutocompleteObjects) {
+                                                    add(existingCSSSelectorsWithAutocompleteObjects, true);
+                                                }
+                                            }
+                                        )
+                                ),
+                                onAddingAutoCompleteOptionsForCSSProperty: (
+                                    (await userPreference(USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES)) === 'no'
+                                        ? (
+                                            function noop() {
+                                                // do nothing
+                                            }
+                                        )
+                                        : (
+                                            function (add) {
+                                                add(cssPropertyKeywordsAutocompleteObject, true);
+                                            }
+                                        )
+                                ),
+                                onCssHintSelectForSelector: function (selectedText) {
+                                    var editor = window.MagiCSSEditor;
+                                    showCSSSelectorMatches(selectedText, editor);
+                                },
+                                onCssHintShownForSelector: function () {    /* As per current CodeMirror/css-hint architecture,
+                                                                               "select" is called before "shown".
+                                                                               The "select" operation would also show the number  e are hiding the alertNote */
+                                    utils.alertNote.hide();
                                 }
-                            }());
+                            };
+
                             return options;
                         }
                     },
@@ -2794,9 +2898,9 @@ console.log(
                                     name: 'reapply',
                                     title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
                                     cls: 'magicss-reapply-styles editor-gray-out',
-                                    onclick: function (evt, editor, divIcon) {
+                                    onclick: async function (evt, editor, divIcon) {
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
-                                            markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                            await markAsPinnedOrNotPinned(editor, 'not-pinned');
                                             utils.alertNote(
                                                 '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
                                                 5000
@@ -2807,7 +2911,7 @@ console.log(
                                                     requestPermissions: true,
                                                     url: window.location.href
                                                 },
-                                                function (status) {
+                                                async function asyncCallback(status) {
                                                     if (chrome.runtime.lastError) {
                                                         console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
                                                         utils.alertNote(
@@ -2816,7 +2920,7 @@ console.log(
                                                         );
                                                     }
                                                     if (status === 'request-granted') {
-                                                        markAsPinnedOrNotPinned(editor, 'pinned');
+                                                        await markAsPinnedOrNotPinned(editor, 'pinned');
                                                         utils.alertNote(
                                                             '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
                                                             10000
@@ -2838,11 +2942,11 @@ console.log(
                             name: 'disable',
                             title: 'Deactivate code',
                             cls: 'magicss-disable-css editor-gray-out',
-                            onclick: function (evt, editor, divIcon) {
+                            onclick: async function (evt, editor, divIcon) {
                                 if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
-                                    editor.disableEnableCSS('enable');
+                                    await editor.disableEnableCSS('enable');
                                 } else {
-                                    editor.disableEnableCSS('disable');
+                                    await editor.disableEnableCSS('disable');
                                 }
                                 editor.focus();
                             },
@@ -2859,8 +2963,8 @@ console.log(
                                 /* HACK: Remove this hack which is being used to handle "divIcon.title" change
                                          for the case of "editor.disableEnableCSS('disable')" under "reInitialized()" */
                                 editor.originalDisableEnableCSS = editor.disableEnableCSS;
-                                editor.disableEnableCSS = function (doWhat) {
-                                    var state = editor.originalDisableEnableCSS(doWhat);
+                                editor.disableEnableCSS = async function (doWhat) {
+                                    var state = await editor.originalDisableEnableCSS(doWhat);
                                     if (state === 'disabled') {
                                         divIcon.title = 'Activate code';
                                     } else {
@@ -2875,14 +2979,15 @@ console.log(
                             name: 'beautify',
                             title: 'Beautify code',
                             cls: 'magicss-beautify editor-gray-out',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
                                     utils.alertNote('Please type some code to be beautified', 5000);
                                 } else {
-                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    var beautifiedCSS = await beautifyCSS(textValue);
                                     if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.setTextValue(beautifiedCSS);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Your code has been beautified :-)', 5000);
                                     } else {
                                         utils.alertNote('Your code already looks beautiful :-)', 5000);
@@ -2904,13 +3009,13 @@ console.log(
                                             title: 'Stop watching CSS files',
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-stop-watch-and-reload-link-tags',
-                                            onclick: function (evt, editor) {
+                                            onclick: async function (evt, editor) {
                                                 if (flagWatchingCssFiles) {
-                                                    getDisconnectedWithBackEnd(
+                                                    await getDisconnectedWithBackEnd(
                                                         editor,
                                                         {},
-                                                        function () {
-                                                            updateUiMentioningNotWatchingCssFiles(editor);
+                                                        async function asyncCallback () {
+                                                            await updateUiMentioningNotWatchingCssFiles(editor);
                                                         }
                                                     );
                                                 }
@@ -2928,9 +3033,9 @@ console.log(
                                             title: 'Watch CSS files to apply changes automatically',
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-watch-and-reload-link-tags',
-                                            onclick: function (evt, editor) {
+                                            onclick: async function (evt, editor) {
                                                 if (!flagWatchingCssFiles) {
-                                                    startWatchingFiles(editor);
+                                                    await startWatchingFiles(editor);
                                                 }
                                                 editor.focus();
                                             },
@@ -2976,15 +3081,15 @@ console.log(
                             name: 'less-or-sass-to-css',
                             title: 'Convert this code from Less/Sass to CSS',
                             uniqCls: 'magicss-less-or-sass-to-css',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'less') {
                                     var lessCode = editor.getTextValue();
                                     if (!lessCode.trim()) {
-                                        editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Please type some LESS code to use this feature', 5000);
                                         editor.focus();
                                     } else {
-                                        utils.lessToCSS(lessCode, function (err, cssCode) {
+                                        utils.lessToCSS(lessCode, async function asyncCallback(err, cssCode) {
                                             if (err) {
                                                 utils.alertNote(
                                                     'Invalid LESS syntax.' +
@@ -2995,13 +3100,14 @@ console.log(
                                                 highlightErroneousLineTemporarily(editor, err.line - 1);
                                                 editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                             } else {
-                                                var beautifiedLessCode = beautifyCSS(utils.minifyCSS(lessCode));
-                                                cssCode = beautifyCSS(utils.minifyCSS(cssCode));
+                                                var beautifiedLessCode = await beautifyCSS(utils.minifyCSS(lessCode));
+                                                cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
 
                                                 if (cssCode === beautifiedLessCode) {
                                                     utils.alertNote('Your code is already CSS compatible', 5000);
                                                 } else {
-                                                    editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                    await editor.setTextValue(cssCode);
+                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                                     utils.alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
                                                 }
                                             }
@@ -3011,11 +3117,11 @@ console.log(
                                 } else if (getLanguageMode() === 'sass') {
                                     var sassCode = editor.getTextValue();
                                     if (!sassCode.trim()) {
-                                        editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Please type some SASS code to use this feature', 5000);
                                         editor.focus();
                                     } else {
-                                        utils.sassToCSS(sassCode, function (err, cssCode) {
+                                        utils.sassToCSS(sassCode, async function asyncCallback(err, cssCode) {
                                             if (err) {
                                                 utils.alertNote(
                                                     'Invalid SASS syntax.' +
@@ -3026,13 +3132,14 @@ console.log(
                                                 highlightErroneousLineTemporarily(editor, err.line - 1);
                                                 editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                             } else {
-                                                var beautifiedSassCode = beautifyCSS(utils.minifyCSS(sassCode));
-                                                cssCode = beautifyCSS(utils.minifyCSS(cssCode));
+                                                var beautifiedSassCode = await beautifyCSS(utils.minifyCSS(sassCode));
+                                                cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
 
                                                 if (cssCode === beautifiedSassCode) {
                                                     utils.alertNote('Your code is already CSS compatible', 5000);
                                                 } else {
-                                                    editor.setTextValue(cssCode).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                    await editor.setTextValue(cssCode);
+                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                                     utils.alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
                                                 }
                                             }
@@ -3044,7 +3151,7 @@ console.log(
                                     editor.focus();
                                 }
                             },
-                            beforeShow: function (origin, tooltip, editor) {
+                            beforeShow: async function (origin, tooltip, editor) {
                                 // TODO: Move the .addClass() calls to their corresponding .beforeShow()
                                 tooltip
                                     .addClass(function () {
@@ -3057,7 +3164,8 @@ console.log(
                                     }())
                                     .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
                                     .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
-                                    .addClass(editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS) === 'no' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
+                                    // FIXME: Probably tooltipster-autocomplete-selectors-disabled/enabled is not used anymore
+                                    .addClass((await editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS)) === 'no' ? 'tooltipster-autocomplete-selectors-disabled' : 'tooltipster-autocomplete-selectors-enabled');
                             }
                         },
                         /*
@@ -3094,14 +3202,15 @@ console.log(
                             name: 'beautify',
                             title: 'Beautify code',
                             uniqCls: 'magicss-beautify',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
                                     utils.alertNote('Please type some code to be beautified', 5000);
                                 } else {
-                                    var beautifiedCSS = beautifyCSS(textValue);
+                                    var beautifiedCSS = await beautifyCSS(textValue);
                                     if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        editor.setTextValue(beautifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.setTextValue(beautifiedCSS);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Your code has been beautified :-)', 5000);
                                     } else {
                                         utils.alertNote('Your code already looks beautiful :-)', 5000);
@@ -3114,15 +3223,17 @@ console.log(
                             name: 'minify',
                             title: 'Minify code',
                             uniqCls: 'magicss-minify',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
-                                    editor.setTextValue('').reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                    await editor.setTextValue('');
+                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                     utils.alertNote('Please type some code to be minified', 5000);
                                 } else {
                                     var minifiedCSS = utils.minifyCSS(textValue);
                                     if (textValue !== minifiedCSS) {
-                                        editor.setTextValue(minifiedCSS).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        await editor.setTextValue(minifiedCSS);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         utils.alertNote('Your code has been minified' + noteForUndo, 5000);
                                     } else {
                                         utils.alertNote('Your code is already minified', 5000);
@@ -3135,9 +3246,9 @@ console.log(
                             name: 'showLineNumbers',
                             title: 'Show line numbers',
                             uniqCls: 'magicss-show-line-numbers',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', true);
-                                editor.userPreference('show-line-numbers', 'yes');
+                                await editor.userPreference('show-line-numbers', 'yes');
                                 editor.focus();
                             }
                         },
@@ -3145,9 +3256,9 @@ console.log(
                             name: 'hideLineNumbers',
                             title: 'Hide line numbers',
                             uniqCls: 'magicss-hide-line-numbers',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', false);
-                                editor.userPreference('show-line-numbers', 'no');
+                                await editor.userPreference('show-line-numbers', 'no');
                                 editor.focus();
                             }
                         },
@@ -3155,9 +3266,9 @@ console.log(
                             name: 'enableCSSLinting',
                             title: 'Enable CSS linting',
                             uniqCls: 'magicss-enable-css-linting',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
-                                    setCodeMirrorCSSLinting(editor, 'enable');
+                                    await setCodeMirrorCSSLinting(editor, 'enable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
@@ -3168,9 +3279,9 @@ console.log(
                             name: 'disableCSSLinting',
                             title: 'Disable CSS linting',
                             uniqCls: 'magicss-disable-css-linting',
-                            onclick: function (evt, editor) {
+                            onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
-                                    setCodeMirrorCSSLinting(editor, 'disable');
+                                    await setCodeMirrorCSSLinting(editor, 'disable');
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
@@ -3316,8 +3427,8 @@ console.log(
                         //     evt.stopPropagation();
                         // });
 
-                        $fileToEdit.on('click', function () {
-                            getDataForFileToEdit(editor, {showUi: true} ,function (file) {
+                        $fileToEdit.on('click', async function () {
+                            await getDataForFileToEdit(editor, {showUi: true} ,function (file) {
                                 // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
                                 // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user switches the editing mode
                                 $('.footer-for-file-mode .name-of-file-being-edited')
@@ -3366,10 +3477,10 @@ console.log(
                         return $footerItems;
                     },
                     events: {
-                        beforeInstantiatingCodeMirror: function (editor) {
+                        beforeInstantiatingCodeMirror: async function (editor) {
                             // Need to add font-styling before CodeMirror is instantiated
-                            if (editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
-                                var userPrefFontSizeInPx = parseInt(editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                            if (await editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
+                                var userPrefFontSizeInPx = parseInt(await editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
                                 if (userPrefFontSizeInPx !== 12) {
                                     var cssLintErrorWarningMarkerSize = 16;
                                     if (userPrefFontSizeInPx < 12) {
@@ -3422,7 +3533,7 @@ console.log(
                                 }
                             }
                         },
-                        launched: function (editor) {
+                        launched: async function (editor) {
                             utils.addStyleTag({
                                 attributes: [{
                                     name: 'data-style-created-by',
@@ -3454,7 +3565,7 @@ console.log(
                                 parentTag: 'body'
                             });
 
-                            var languageMode = editor.userPreference('language-mode');
+                            var languageMode = await editor.userPreference('language-mode');
 
                             // Editing mode 'file' is handled outside this if...else block
                             if (languageMode === 'less') {
@@ -3466,48 +3577,49 @@ console.log(
                             }
 
                             if (languageMode === 'file') {
-                                applyLastAppliedCss(editor);
-                                setLanguageMode('file', editor, {skipNotifications: true});
+                                await applyLastAppliedCss(editor);
+                                await setLanguageMode('file', editor, {skipNotifications: true});
                             } else {
                                 window.setTimeout(function () {
                                     fnApplyTextAsCSS(editor);
                                 }, 100);
                             }
 
-                            var disableStyles = editor.userPreference('disable-styles') === 'yes';
+                            var disableStyles = await editor.userPreference('disable-styles') === 'yes';
                             if (disableStyles) {
                                 editor.indicateEnabledDisabled('disabled');
                             } else {
                                 editor.indicateEnabledDisabled('enabled');
                             }
 
-                            var watchingCssFiles = editor.userPreference('watching-css-files') === 'yes';
+                            var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
                             if (watchingCssFiles) {
-                                startWatchingFiles(editor);
+                                await startWatchingFiles(editor);
                             }
 
-                            var applyStylesAutomatically = editor.userPreference('apply-styles-automatically') === 'yes';
+                            var applyStylesAutomatically = await editor.userPreference('apply-styles-automatically') === 'yes';
                             if (applyStylesAutomatically) {
                                 editor.applyStylesAutomatically(true);
                             } else {
                                 editor.applyStylesAutomatically(false);
                             }
 
-                            // window.setTimeout(function () {
-                            //     fnApplyTextAsCSS(editor, {
+                            // window.setTimeout(async function () {
+                            //     await fnApplyTextAsCSS(editor, {
                             //         skipSavingFile: true    // Skip saving file since it is first launch
                             //     });
                             // }, 100);
 
-                            var autocompleteSelectors = editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
+                            // FIXME: Probably this piece of code is not used anymore
+                            var autocompleteSelectors = await editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
                             if (autocompleteSelectors === 'no') {
                                 $(editor.container).addClass('magicss-autocomplete-selectors-disabled');
                             } else {
                                 $(editor.container).addClass('magicss-autocomplete-selectors-enabled');
                             }
                         },
-                        reInitialized: function (editor, cfg) {
-                            editor.disableEnableCSS('toggle');
+                        reInitialized: async function (editor, cfg) {
+                            await editor.disableEnableCSS('toggle');
 
                             cfg = cfg || {};
                             var duration = cfg.animDuration,
@@ -3520,8 +3632,10 @@ console.log(
                                 },
                                 duration,
                                 function () {
-                                    editor.saveDimensions({width: targetWidth, height: targetHeight});
-                                    editor.bringCursorToView({pleaseIgnoreCursorActivity: true});
+                                    setTimeout(async function () {
+                                        await editor.saveDimensions({width: targetWidth, height: targetHeight});
+                                        editor.bringCursorToView({pleaseIgnoreCursorActivity: true});
+                                    });
                                 }
                             );
                         },
@@ -3563,8 +3677,8 @@ console.log(
                         keyup: function () {
                             // Currently doing nothing
                         },
-                        delayedtextchange: function (editor) {
-                            fnApplyTextAsCSS(editor);
+                        delayedtextchange: async function (editor) {
+                            await fnApplyTextAsCSS(editor);
                         },
                         problematicFocusDetected: function (editor) {
                             // There is a chance that something is problematic in focus behavior
@@ -3586,8 +3700,8 @@ console.log(
                                 }
                             }, 1500);
                         },
-                        clear: function (editor) {
-                            fnApplyTextAsCSS(editor);
+                        clear: async function (editor) {
+                            await fnApplyTextAsCSS(editor);
                         }
                     }
                 };
@@ -3745,7 +3859,7 @@ console.log(
                         }
                     }
 
-                    disableEnableCSS(doWhat) {
+                    async disableEnableCSS(doWhat) {
                         var disabled;
                         if (doWhat === 'disable') {
                             disabled = true;
@@ -3760,7 +3874,7 @@ console.log(
                         }
                         newStyleTag.disabled = disabled;
                         newStyleTag.applyTag();
-                        this.userPreference('disable-styles', disabled ? 'yes' : 'no');
+                        await this.userPreference('disable-styles', disabled ? 'yes' : 'no');
 
                         if (disabled) {
                             this.indicateEnabledDisabled('disabled');
@@ -3776,13 +3890,14 @@ console.log(
 
                 utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
+                await window.MagiCSSEditor.create();
 
                 checkIfMagicCssLoadedFine(window.MagiCSSEditor);
 
                 window.MagiCSSEditor.markLiveCssServerConnectionStatus(false);
 
                 try {
-                    chromeStorage.get('use-autocomplete-for-css-selectors', function (values) {
+                    chromeStorageForExtensionData.get('use-autocomplete-for-css-selectors', function (values) {
                         if (values && values['use-autocomplete-for-css-selectors'] === false) {
                             disableAutocompleteSelectors(window.MagiCSSEditor);
                         } else {
@@ -3795,7 +3910,7 @@ console.log(
 
                 if (executionCounter && !isNaN(executionCounter)) {
                     try {
-                        chromeStorage.set({'magicss-execution-counter': executionCounter}, function() {
+                        chromeStorageForExtensionData.set({'magicss-execution-counter': executionCounter}, function() {
                             // do nothing
                         });
                     } catch (e) {
@@ -3811,7 +3926,7 @@ console.log(
                     }
                 }, false);
 
-                if (window.MagiCSSEditor.userPreference(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT) === 'yes') {
+                if ((await (window.MagiCSSEditor.userPreference(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT))) === 'yes') {
                     var opacityCssAdded = false,
                         opacityStyleTagId = id + '-opacity-id';
 
@@ -3853,7 +3968,7 @@ console.log(
 
     var executionCounter = 0;
     try {
-        chromeStorage.get('magicss-execution-counter', function (values) {
+        chromeStorageForExtensionData.get('magicss-execution-counter', function (values) {
             try {
                 executionCounter = parseInt(values && values['magicss-execution-counter'], 10);
                 executionCounter = isNaN(executionCounter) ? 0 : executionCounter;
@@ -3862,9 +3977,13 @@ console.log(
             } catch (e) {
                 // do nothing
             }
-            main();
+            setTimeout(async function () {
+                await main();
+            });
         });
     } catch (e) {
-        main();
+        setTimeout(async function () {
+            await main();
+        });
     }
 }(jQuery));

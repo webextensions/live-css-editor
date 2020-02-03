@@ -1,15 +1,23 @@
-/* global amplify: false, utils, CodeMirror, jQuery, chrome */
+/* global amplify: false, utils, CodeMirror, jQuery, chrome, runMigration */
+
+// TODO: Remove turning off of this rule (require-atomic-updates)
+/* eslint require-atomic-updates: "off" */
 
 // TODO: If remember text option is on, detect text change in another instance of this extension in some different tab
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
+    USER_PREFERENCE_STORAGE_MODE = 'storage-mode',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function ($) {
     'use strict';
+
+    // This value is updated elsewhere in this file (after fetching the user selected option)
+    var whichStoreToUse = 'chrome.storage.local';
 
     var CONSTANTS = {
         EDITOR_MIN_WIDTH: 301,
@@ -18,12 +26,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         EDITOR_DEFAULT_HEIGHT: 249
     };
 
-    var chromeStorage;
-    try {
-        chromeStorage = chrome.storage.sync || chrome.storage.local;
-    } catch (e) {
-        // do nothing
-    }
+    var chromeStorageLocal = chrome.storage.local;
+    var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
     var runOnceFor = function (fn, delay) {
         clearTimeout(fn.timer);
@@ -166,7 +170,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         );
     }
 
-    var mainAutoPositionEditor = function (thisOb) {
+    var mainAutoPositionEditor = async function (thisOb) {
         /*
             // The approach to be used in this function
 
@@ -248,7 +252,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // Adjust editor's width (when x-axis is in viewport)
         if (rect.left >= 0 && isElementXInViewport(mainElement)) {
             let appliedWidth = parseInt($cmWrapperElement.css('width'), 10),
-                userPreferredWidth = thisOb.getDimensions().width;
+                userPreferredWidth = (await thisOb.getDimensions()).width;
             if (appliedWidth < userPreferredWidth) {
                 let deltaX = viewportWidthExcludingScroll - rect.right,
                     useWidth = Math.min(
@@ -261,7 +265,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // Adjust editor's height (when y-axis is in viewport)
         if (rect.top >= 0 && isElementYInViewport(mainElement)) {
             let appliedHeight = parseInt($cmWrapperElement.css('height'), 10),
-                userPreferredHeight = thisOb.getDimensions().height;
+                userPreferredHeight = (await thisOb.getDimensions()).height;
             if (appliedHeight < userPreferredHeight) {
                 let deltaY = viewportHeightExcludingScroll - rect.bottom,
                     useHeight = Math.min(
@@ -276,7 +280,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // Adjust X positioning (when x-axis is in viewport)
         if (rect.left >= 0 && isElementXInViewport(mainElement)) {
             let appliedLeft = parseInt(mainElement.style.left, 10),
-                userPreferredLeft = thisOb.userPreference('ui-position-left');
+                userPreferredLeft = await thisOb.userPreference('ui-position-left');
             if (appliedLeft < userPreferredLeft) {
                 let deltaX = viewportWidthExcludingScroll - rect.right;
                 mainElement.style.left = Math.min((appliedLeft + deltaX), userPreferredLeft) + 'px';
@@ -285,7 +289,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // Adjust Y positioning (when y-axis is in viewport)
         if (rect.top >= 0 && isElementYInViewport(mainElement)) {
             let appliedTop = parseInt(mainElement.style.top, 10),
-                userPreferredTop = thisOb.userPreference('ui-position-top');
+                userPreferredTop = await thisOb.userPreference('ui-position-top');
             if (appliedTop < userPreferredTop) {
                 let deltaY = viewportHeightExcludingScroll - rect.bottom;
                 mainElement.style.top = Math.min((appliedTop + deltaY), userPreferredTop) + 'px';
@@ -298,8 +302,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             window.cancelAnimationFrame(autoPositionEditor.raf);
         }
 
-        autoPositionEditor.raf = window.requestAnimationFrame(function () {
-            mainAutoPositionEditor(thisOb);
+        autoPositionEditor.raf = window.requestAnimationFrame(async function () {
+            await mainAutoPositionEditor(thisOb);
         });
     };
 
@@ -332,10 +336,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             this.options = $.extend({}, defaults, this.passedOptions);
 
             this.normalizeOptions(this.options);     // Normalize the options object
-            this.addDerivedOptions(this.options);    // Add derived options
+            // this.addDerivedOptions(this.options);    // Add derived options
 
             this.events = this.events || {};
-            this.create();
+
+            // We intend to call create() via async/await. It cannot be done from within the constructor due to technical
+            // limitation. So, we need to do that manually when we create the "Editor" object.
+            // var _this = this;
+            // setTimeout(async function () {
+            //     await _this.create();
+            // });
         }
 
         // Normalize the options object
@@ -352,12 +362,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             options.rememberText = !!options.rememberText;
         }
 
-        addDerivedOptions(options) {
-            if (options.rememberText || options.rememberDimensions) {
-                // Add options.localDataKeyPrefix
-                options.localDataKeyPrefix = options.id + '-';
-            }
-        }
+        // addDerivedOptions(options) {
+        //     if (options.rememberText || options.rememberDimensions) {
+        //         // Add options.localDataKeyPrefix
+        //         options.localDataKeyPrefix = options.id + '-';
+        //     }
+        // }
 
         getOption(option) {
             return this.options[option];
@@ -374,13 +384,41 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
         // Passing null as "value" would effectively delete the value from the store
         // Reference: http://amplifyjs.com/api/store/
-        userPreference(pref, value) {
-            var prefix = this.options.localDataKeyPrefix;
-            if (value === undefined) {
-                return amplify.store(prefix + pref) || this.defaultPreference(pref);
+        async userPreference(pref, value) {
+            var _this = this;
+            if (whichStoreToUse === 'chrome.storage.local') {
+                let prefix = 'live-css-';
+                return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+                    var propertyName = `(${window.location.origin}) ${prefix}${pref}`;
+                    if (value === undefined) {
+                        chromeStorageLocal.get(propertyName, function (values) {
+                            resolve(
+                                values[propertyName] ||
+                                _this.defaultPreference(pref)
+                            );
+                        });
+                    } else {
+                        chromeStorageLocal.set(
+                            {
+                                [propertyName]: value
+                            },
+                            function () {
+                                resolve();
+                            }
+                        );
+                    }
+                });
             } else {
-                amplify.store(prefix + pref, value);
-                return this;
+                let prefix = 'MagiCSS-bookmarklet-';
+                return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+                    var propertyName = `${prefix}${pref}`;
+                    if (value === undefined) {
+                        resolve(amplify.store(propertyName) || _this.defaultPreference(pref));
+                    } else {
+                        amplify.store(propertyName, value);
+                        resolve(_this);
+                    }
+                });
             }
         }
 
@@ -407,7 +445,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
         }
 
-        reposition(cb) {
+        async reposition(cb) {
             cb = cb || function () {};
             var thisOb = this,
                 containerEl = thisOb.container;
@@ -417,7 +455,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     && thisOb.container.style.display === 'none'
                     && $(thisOb.container).parent().is(':visible');
             if (isContainerTrulyHidden) {
-                thisOb.options.editorOb.show();
+                await thisOb.options.editorOb.show();
                 cb();
             } else {
                 var defaultLeft = thisOb.defaultPreference('ui-position-left'),
@@ -441,7 +479,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 if (animationRequired === false) {
                     thisOb.focus();     /* This is required if the text editor panel is being opened through some
                                            component which causes the textarea to lose focus. */
-                    thisOb.triggerEvent('reInitialized', {
+                    await thisOb.triggerEvent('reInitialized', {
                         animDuration: 0,
                         targetWidth: defaultWidth,
                         targetHeight: defaultHeight
@@ -472,15 +510,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         top: defaultTop,
                         left: defaultLeft
                     }, duration, function () {
-                        thisOb.savePosition({ top: defaultTop, left: defaultLeft });
-                        thisOb.focus();
-                        cb();
+                        setTimeout(async function () {
+                            await thisOb.savePosition({ top: defaultTop, left: defaultLeft });
+                            thisOb.focus();
+                            cb();
+                        });
                     });
 
                     // TODO: Implement 'resizable' option
 
                     try {
-                        thisOb.triggerEvent('reInitialized', {
+                        await thisOb.triggerEvent('reInitialized', {
                             animDuration: duration,
                             targetWidth: defaultWidth,
                             targetHeight: defaultHeight
@@ -492,7 +532,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
         }
 
-        create() {
+        async create() {
             var thisOb = this,
                 options = thisOb.options;
 
@@ -503,8 +543,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
             var top, left;
             if (options.rememberDimensions) {
-                top = thisOb.userPreference('ui-position-top') + 'px';
-                left = thisOb.userPreference('ui-position-left') + 'px';
+                top = await thisOb.userPreference('ui-position-top') + 'px';
+                left = await thisOb.userPreference('ui-position-left') + 'px';
             } else {
                 top = '20px';
                 left = '20px';
@@ -526,8 +566,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 thisOb._makeDraggable();
             }
 
-            thisOb._addChildComponents();
-            thisOb.initialize(options);
+            await thisOb.initialize(options);
+            thisOb.container.style.visibility = 'hidden';
+            await thisOb._addChildComponents();
+            thisOb.container.style.visibility = '';
+
+            // Set focus on editor
+            thisOb.focus();
+
+            await thisOb.triggerEvent('launched');
 
             window.onresize = function (e) {
                 if (e.target !== window) {
@@ -566,22 +613,24 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     $(thisOb.container).css('bottom','').css('right','');
                 },
                 stop: function (event, ui) {
-                    // Unattach 'noclick' class with an immediate timeout
-                    // so that it executes after event (bubble) cycle is completed
-                    setTimeout(function () {
-                        $(thisOb.container).removeClass('noclick');
-                    }, 0);
+                    setTimeout(async function () {
+                        // Unattach 'noclick' class with an immediate timeout
+                        // so that it executes after event (bubble) cycle is completed
+                        setTimeout(function () {
+                            $(thisOb.container).removeClass('noclick');
+                        }, 0);
 
-                    if (options.rememberDimensions) {
-                        thisOb.savePosition({ top: ui.position.top, left: ui.position.left });
-                    }
+                        if (options.rememberDimensions) {
+                            await thisOb.savePosition({ top: ui.position.top, left: ui.position.left });
+                        }
 
-                    thisOb.focus();
+                        thisOb.focus();
+                    });
                 }
             });
         }
 
-        _createSyntaxHighlighting() {
+        async _createSyntaxHighlighting() {
             var thisOb = this,
                 options = thisOb.options;
 
@@ -593,14 +642,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 closeOnEscapeKey = false;
             }
 
-            var indentWithTabs = thisOb.userPreference('use-tab-for-indentation') === 'yes';
+            var indentWithTabs = await thisOb.userPreference('use-tab-for-indentation') === 'yes';
             var codemirrorOptions = {
                 value: thisOb.textarea.value,
                 placeholder: thisOb.getOption('placeholder'),
 
                 gutters: [],
                 lint: false,
-                lineNumbers: thisOb.userPreference('show-line-numbers') === 'yes' ? true : false,   // Eventually, lineNumbers also adds a value in "gutters" array
+                lineNumbers: await thisOb.userPreference('show-line-numbers') === 'yes' ? true : false,   // Eventually, lineNumbers also adds a value in "gutters" array
 
                 styleActiveLine: {
                     nonEmpty: true
@@ -612,7 +661,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 showCursorWhenSelecting: true,
 
                 indentWithTabs: indentWithTabs,
-                indentUnit: (!indentWithTabs && parseInt(thisOb.userPreference('indentation-spaces-count'), 10)) || 4,
+                indentUnit: (!indentWithTabs && parseInt(await thisOb.userPreference('indentation-spaces-count'), 10)) || 4,
                 undoDepth: 1000,
 
                 extraKeys: {
@@ -632,7 +681,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             cm.replaceSelection(spaces, 'end', '+input');
                         }
                     },
-                    Esc: function () {
+                    Esc: async function () {
                         // If there is some selection
                         if (thisOb.cm.getSelection()) {
                             // Clear selection
@@ -641,7 +690,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             );
                         } else {
                             if (closeOnEscapeKey) {
-                                thisOb.hide();
+                                await thisOb.hide();
                             }
                         }
                     }
@@ -652,23 +701,23 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 true,
                 {},
                 options.codemirrorOptions,
-                options.codemirrorOptions.optionsBasedOnUserPreference(thisOb.userPreference.bind(this))
+                await options.codemirrorOptions.optionsBasedOnUserPreference(await thisOb.userPreference.bind(this))
             );
             delete passedOptionsCombined.optionsBasedOnUserPreference;  // Just cleaning up the object (not a compulsory thing to do)
             codemirrorOptions = $.extend(true, {}, codemirrorOptions, passedOptionsCombined);
 
-            thisOb.triggerEvent('beforeInstantiatingCodeMirror');
+            await thisOb.triggerEvent('beforeInstantiatingCodeMirror');
             var cm = thisOb.cm = CodeMirror(newDiv.get(0), codemirrorOptions);
 
-            cm.on('focus', function (cm, evt) { // eslint-disable-line no-unused-vars
+            cm.on('focus', async function (cm, evt) { // eslint-disable-line no-unused-vars
                 // https://github.com/webextensions/live-css-editor/issues/4
                 if (!thisOb.cmInputFieldHasFocus()) {
                     // Most probably there is something problematic in focus behavior
-                    thisOb.triggerEvent('problematicFocusDetected');
+                    await thisOb.triggerEvent('problematicFocusDetected');
                 }
             });
 
-            var dimWH = thisOb.getDimensions();
+            var dimWH = await thisOb.getDimensions();
             cm.setSize(dimWH.width, dimWH.height);
 
             var t_timer;
@@ -678,9 +727,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 } else {
                     var delay = 500;
                     clearTimeout(t_timer);
-                    t_timer = setTimeout(function () {
-                        thisOb.setTextValue(cm.getValue());
-                        thisOb.triggerEvent('delayedtextchange');
+                    t_timer = setTimeout(async function () {
+                        await thisOb.setTextValue(cm.getValue());
+                        await thisOb.triggerEvent('delayedtextchange');
                     }, delay);
                 }
             });
@@ -706,14 +755,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 }
             });
 
-            var fn = function () {
-                thisOb.triggerEvent('_delayedcursorprobablymoved');
+            var fnOnCursorActivity = async function () {
+                await thisOb.triggerEvent('_delayedcursorprobablymoved');
             };
             cm.on('cursorActivity', function() {
                 if (thisOb.pleaseIgnoreCursorActivity) {
                     // do nothing
                 } else {
-                    runOnceFor(fn, 500);
+                    runOnceFor(fnOnCursorActivity, 500);
                 }
             });
 
@@ -723,31 +772,35 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 minWidth: CONSTANTS.EDITOR_MIN_WIDTH,
                 minHeight: CONSTANTS.EDITOR_MIN_HEIGHT,
                 start: function () {
-                    // Save editor's position.
-                    // It is useful when the user is resizing, but the position
-                    // is out of sync with the value in userPreference (this
-                    // out-of-sync is deliberate and useful for auto-positioning
-                    // on window resize)
-                    thisOb.savePosition({
-                        top: parseInt(thisOb.container.style.top, 10),
-                        left: parseInt(thisOb.container.style.left, 10)
+                    setTimeout(async function () {
+                        // Save editor's position.
+                        // It is useful when the user is resizing, but the position
+                        // is out of sync with the value in userPreference (this
+                        // out-of-sync is deliberate and useful for auto-positioning
+                        // on window resize)
+                        await thisOb.savePosition({
+                            top: parseInt(thisOb.container.style.top, 10),
+                            left: parseInt(thisOb.container.style.left, 10)
+                        });
                     });
                 },
                 stop: function (event, ui) {
-                    thisOb.setTextContainerDimensions(
-                        {
-                            width: ui.size.width,
-                            height: ui.size.height
-                        },
-                        {
-                            propagateTo: 'codemirror'
-                        }
-                    );
+                    setTimeout(async function () {
+                        await thisOb.setTextContainerDimensions(
+                            {
+                                width: ui.size.width,
+                                height: ui.size.height
+                            },
+                            {
+                                propagateTo: 'codemirror'
+                            }
+                        );
+                    });
                 }
             });
         }
 
-        _addChildComponents() {
+        async _addChildComponents() {
             var thisOb = this,
                 options = thisOb.options;
 
@@ -821,14 +874,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             interactive: true,
                             interactiveTolerance: 350,
                             functionReady: function (origin, tooltip) {
-                                options.headerOtherIcons.forEach(function (iconOptions) {
-                                    if (iconOptions && iconOptions.beforeShow) {
-                                        iconOptions.beforeShow(origin, tooltip, editor);
+                                setTimeout(async function () {
+                                    for (var i = 0; i < options.headerOtherIcons.length; i++) {
+                                        var ico = options.headerOtherIcons[i];
+                                        if (ico && ico.beforeShow) {
+                                            await ico.beforeShow(origin, tooltip, editor);
+                                        }
                                     }
+                                    // The tooltip would have rendered in hidden mode, but its width might have changed
+                                    // due to some changes via .beforeShow(), so, we need to reposition it
+                                    $moreIcon.tooltipster('reposition');
                                 });
-                                // The tooltip would have rendered in hidden mode, but its width might have changed
-                                // due to some changes via .beforeShow(), so, we need to reposition it
-                                $moreIcon.tooltipster('reposition');
                             }
                         });
                     }
@@ -844,8 +900,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     name: 'close',
                     title: 'Close',
                     cls: 'editor-close',
-                    onclick: function (evt, editor) {
-                        editor.hide();
+                    onclick: async function (evt, editor) {
+                        await editor.hide();
                     }
                 });
             }
@@ -902,14 +958,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 interactive: true,
                                 interactiveTolerance: 350,
                                 functionReady: function (origin, tooltip) {
-                                    iconOptions.icons.forEach(function (iconOptions) {
-                                        if (iconOptions && iconOptions.beforeShow) {
-                                            iconOptions.beforeShow(origin, tooltip, editor);
+                                    setTimeout(async function () {
+                                        for (var i = 0; i < iconOptions.icons.length; i++) {
+                                            var ico = iconOptions.icons[i];
+                                            if (ico && ico.beforeShow) {
+                                                await ico.beforeShow(origin, tooltip, editor);
+                                            }
                                         }
+                                        // The tooltip would have rendered in hidden mode, but its width might have changed
+                                        // due to some changes via .beforeShow(), so, we need to reposition it
+                                        $divIcon.tooltipster('reposition');
                                     });
-                                    // The tooltip would have rendered in hidden mode, but its width might have changed
-                                    // due to some changes via .beforeShow(), so, we need to reposition it
-                                    $divIcon.tooltipster('reposition');
                                 }
                             });
                         };
@@ -940,7 +999,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
             // Recall text value from local storage
             // It would be done only when rememberText is true
-            thisOb.recallTextValue();
+            await thisOb.recallTextValue();
 
             var divContents = document.createElement('div');
             divContents.style.clear = 'both';
@@ -965,11 +1024,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
 
             if (rememberDimensions) {
-                textarea.style.width = thisOb.userPreference('ui-size-width') + 'px';
-                textarea.style.height = thisOb.userPreference('ui-size-height') + 'px';
+                textarea.style.width = await thisOb.userPreference('ui-size-width') + 'px';
+                textarea.style.height = await thisOb.userPreference('ui-size-height') + 'px';
             } else {
-                textarea.style.width = thisOb.defaultPreference('ui-size-width') + 'px';
-                textarea.style.height = thisOb.defaultPreference('ui-size-height') + 'px';
+                textarea.style.width = await thisOb.defaultPreference('ui-size-width') + 'px';
+                textarea.style.height = await thisOb.defaultPreference('ui-size-height') + 'px';
             }
 
             var textareaWrapAttr = 'off';
@@ -981,8 +1040,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             $textarea.attr('placeholder', thisOb.getOption('placeholder'));
 
             if (rememberText) {
-                $textarea.keyup(function () {
-                    thisOb.setTextValue($textarea.val());
+                $textarea.keyup(async function () {
+                    await thisOb.setTextValue($textarea.val());
                 });
             }
 
@@ -991,11 +1050,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             var disableResize = !!options.disableResize;
             if (!disableResize) {
                 if (rememberDimensions) {
-                    thisOb.initialWidth = thisOb.userPreference('ui-size-width');
-                    thisOb.initialHeight = thisOb.userPreference('ui-size-height');
+                    thisOb.initialWidth = await thisOb.userPreference('ui-size-width');
+                    thisOb.initialHeight = await thisOb.userPreference('ui-size-height');
                 } else {
-                    thisOb.initialWidth = thisOb.defaultPreference('ui-size-width');
-                    thisOb.initialHeight = thisOb.defaultPreference('ui-size-height');
+                    thisOb.initialWidth = await thisOb.defaultPreference('ui-size-width');
+                    thisOb.initialHeight = await thisOb.defaultPreference('ui-size-height');
                 }
             } else {
                 textarea.style.resize = 'none';
@@ -1016,16 +1075,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 }
 
                 if (closeOnEscapeKey) {
-                    $textarea.keydown(function (evt) {
+                    $textarea.keydown(async function (evt) {
                         var keyCode = evt.keyCode || evt.which;
                         if (keyCode === 27) {
-                            thisOb.hide();
+                            await thisOb.hide();
                         }
                     });
                 }
             }());
 
-            thisOb._createSyntaxHighlighting();
+            await thisOb._createSyntaxHighlighting();
 
             // Prevent scrolling on page body when mouse is scrolling '.section.tags .section-contents'
             $(thisOb.container).bind('mousewheel DOMMouseScroll', function (e) {
@@ -1050,18 +1109,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 }
             });
-
-            // Set focus on textarea
-            // ## Currently setting the focus on textarea after a delay, because at
-            // this moment its parent container element's CSS position is not fixed.
-            // It is set as fixed just a small bit later and hence the timeout here.
-            // Ideally (not necessarily practically), the code should be (without timeout).
-            thisOb.focus();
-
-            thisOb.triggerEvent('launched');
         }
 
-        initialize(options) {
+        async initialize(options) {
             var thisOb = this;
 
             if (!thisOb.container) {
@@ -1080,8 +1130,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             $(thisOb.container).addClass('magic-css-container');
             thisOb.container.style.position = 'fixed';
             if (rememberDimensions) {
-                thisOb.container.style.top = thisOb.userPreference('ui-position-top') + 'px';
-                thisOb.container.style.left = thisOb.userPreference('ui-position-left') + 'px';
+                thisOb.container.style.top = await thisOb.userPreference('ui-position-top') + 'px';
+                thisOb.container.style.left = await thisOb.userPreference('ui-position-left') + 'px';
             } else {
                 thisOb.container.style.top = '20px';
                 thisOb.container.style.left = '20px';
@@ -1093,24 +1143,24 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             thisOb.container.style.backgroundColor = 'rgba(' + options.bgColor + ')';
         }
 
-        triggerEvent(eventName, config) {
+        async triggerEvent(eventName, config) {
             var thisOb = this;
             var events = thisOb.options.events;
 
             switch (eventName) {
                 case 'launched':
                     if (events.launched) {
-                        events.launched(thisOb);
+                        await events.launched(thisOb);
                     }
                     break;
                 case 'reInitialized':
                     if (events.reInitialized) {
-                        events.reInitialized(thisOb, config);
+                        await events.reInitialized(thisOb, config);
                     }
                     break;
                 case 'beforeshow':
                     if (events.beforeshow) {
-                        events.beforeshow(thisOb);
+                        await events.beforeshow(thisOb);
                     }
                     break;
                 case 'aftershow':
@@ -1132,13 +1182,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     if (events.clear) {
                         events.clear(thisOb);
                     }
-                    thisOb.triggerEvent('testfortextchange');
+                    await thisOb.triggerEvent('testfortextchange');
                     break;
                 case 'testfortextchange':
-                    thisOb.triggerEvent('textchange');
+                    await thisOb.triggerEvent('textchange');
                     break;
                 case 'delayedtestfortextchange':
-                    thisOb.triggerEvent('delayedtextchange');
+                    await thisOb.triggerEvent('delayedtextchange');
                     break;
                 case 'delayedcursormove':
                     if (events.delayedcursormove) {
@@ -1148,7 +1198,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 case '_delayedcursorprobablymoved':
                     if (thisOb.isVisible()) {
                         if (thisOb.hasCursorMovedFromPreviousPosition()) {
-                            thisOb.triggerEvent('delayedcursormove');
+                            await thisOb.triggerEvent('delayedcursormove');
                         }
                         thisOb.recordCursorPosition();
                     }
@@ -1160,25 +1210,25 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     break;
                 case 'delayedtextchange':
                     if (events.delayedtextchange) {
-                        events.delayedtextchange(thisOb);
+                        await events.delayedtextchange(thisOb);
                     }
                     break;
                 case 'keyup':
                     if (events.keyup) {
                         events.keyup(thisOb);
                     }
-                    thisOb.triggerEvent('testfortextchange');
+                    await thisOb.triggerEvent('testfortextchange');
                     break;
                 case 'delayedkeyup':
                     if (events.delayedkeyup) {
                         events.delayedkeyup(thisOb);
                     }
-                    thisOb.triggerEvent('delayedtestfortextchange');
-                    thisOb.triggerEvent('_delayedcursorprobablymoved');
+                    await thisOb.triggerEvent('delayedtestfortextchange');
+                    await thisOb.triggerEvent('_delayedcursorprobablymoved');
                     break;
                 case 'beforeInstantiatingCodeMirror':
                     if (events.beforeInstantiatingCodeMirror) {
-                        events.beforeInstantiatingCodeMirror(thisOb);
+                        await events.beforeInstantiatingCodeMirror(thisOb);
                     }
                     break;
                 // There is a chance that something is problematic in focus behavior
@@ -1223,6 +1273,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
         focus() {
             var cm = this.cm;
+            // TODO:
+            // Previously, we were setting the focus on textarea after a delay, because
+            // of the order of rendering and positioning of the container element.
+            // Ideally (not necessarily practically), the code should be (without timeout).
+            // Review and clear the setTimeout
             setTimeout(function() {
                 cm.focus();
             }, 0);
@@ -1242,9 +1297,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             });
         }
 
-        recallTextValue() {
+        async recallTextValue() {
             if (this.options.rememberText) {
-                this.textValue = this.userPreference('textarea-value');
+                this.textValue = await this.userPreference('textarea-value');
             }
         }
 
@@ -1252,9 +1307,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             return this.textValue || '';
         }
 
-        setTextValue(val) {
+        async setTextValue(val) {
             if (this.options && this.options.rememberText) {
-                this.userPreference('textarea-value', val);
+                await this.userPreference('textarea-value', val);
             }
             this.textValue = val;
             return this;
@@ -1269,41 +1324,43 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             return result;
         }
 
-        savePosition(options) {
-            this.userPreference('ui-position-top', options.top).userPreference('ui-position-left', options.left);
+        async savePosition(options) {
+            await this.userPreference('ui-position-top', options.top);
+            await this.userPreference('ui-position-left', options.left);
         }
 
-        getDimensions() {
+        async getDimensions() {
             return {
-                width: this.userPreference('ui-size-width'),
-                height: this.userPreference('ui-size-height')
+                width: await this.userPreference('ui-size-width'),
+                height: await this.userPreference('ui-size-height')
             };
         }
 
-        saveDimensions(options) {
-            this.userPreference('ui-size-width', options.width).userPreference('ui-size-height', options.height);
+        async saveDimensions(options) {
+            await this.userPreference('ui-size-width', options.width);
+            await this.userPreference('ui-size-height', options.height);
         }
 
-        setTextContainerDimensions(options, propagateTo) {
-            this.saveDimensions(options);
+        async setTextContainerDimensions(options, propagateTo) {
+            await this.saveDimensions(options);
             if (propagateTo && propagateTo.propagateTo === 'codemirror') {
                 this.setCodeMirrorDimensions(options);
             }
         }
 
-        hide() {
-            this.triggerEvent('beforehide');
+        async hide() {
+            await this.triggerEvent('beforehide');
             this.container.style.display = 'none';
             this.hidden = true;
-            this.triggerEvent('afterhide');
+            await this.triggerEvent('afterhide');
         }
 
-        show() {
-            this.triggerEvent('beforeshow');
+        async show() {
+            await this.triggerEvent('beforeshow');
             this.container.style.display = '';
             this.hidden = false;
             this.focus();
-            this.triggerEvent('aftershow');
+            await this.triggerEvent('aftershow');
         }
 
         isVisible() {
@@ -1328,10 +1385,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             this.cm.setSize(options.width, options.height);
         }
 
-        reInitCodeMirror() {
+        async reInitCodeMirror() {
             var thisOb = this;
             thisOb.setCodeMirrorValue(thisOb.getTextValue());
-            thisOb.setCodeMirrorDimensions(thisOb.getDimensions());
+            thisOb.setCodeMirrorDimensions(await thisOb.getDimensions());
 
             var $that = $(thisOb.container);
             $that.addClass('mode-codeMirror');
@@ -1345,10 +1402,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
         }
 
-        reInitTextComponent(options) {
+        async reInitTextComponent(options) {
             options = options || {};
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = true; }
-            this.reInitCodeMirror();
+            await this.reInitCodeMirror();
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
             return this;
         }
@@ -1366,6 +1423,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         'use-tab-for-indentation': 'no',
         'indentation-spaces-count': '4',
         [USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: 'yes',
+        [USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES]: 'yes',
         [USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: 'no',
         [USER_PREFERENCE_USE_CUSTOM_FONT_SIZE]: 'no',
         [USER_PREFERENCE_FONT_SIZE_IN_PX]: '12',
@@ -1400,7 +1458,27 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             // With the waterfall() function being used currently, errors in any of
             // the upcoming functions are not caught or reported in the final callback
             function (callback) {
-                chromeStorage.get('default-language-mode', function (values) {
+                // Note: In most of the practical scenarios, by the time the execution reaches here,
+                // "runMigration()" call from elsewhere would have already completed. So, eventually,
+                // this piece of code shouldn't live here
+                setTimeout(async function () {
+                    await runMigration();
+                    callback(null);
+                });
+            },
+            function (callback) {
+                // TODO: The check for storage mode should be moved to the beginning of execution of this file
+                chromeStorageForExtensionData.get(USER_PREFERENCE_STORAGE_MODE, function (values) {
+                    if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'localStorage') {
+                        whichStoreToUse = 'localStorage';
+                    } else {
+                        whichStoreToUse = 'chrome.storage.local';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorageForExtensionData.get('default-language-mode', function (values) {
                     if (values && values['default-language-mode'] === 'less') {
                         Editor.defaultPreferences['language-mode'] = 'less';
                     } else if (values && values['default-language-mode'] === 'sass') {
@@ -1410,7 +1488,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
                     if (values && values[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] === 'no') {
                         Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] = 'no';
                     }
@@ -1418,7 +1496,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES, function (values) {
+                    if (values && values[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES] === 'no') {
+                        Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES] = 'no';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
                     if (values && values[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT] === 'yes') {
                         Editor.defaultPreferences[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT] = 'yes';
                     }
@@ -1426,7 +1512,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
-                chromeStorage.get('use-tab-for-indentation', function (values) {
+                chromeStorageForExtensionData.get('use-tab-for-indentation', function (values) {
                     if (values && values['use-tab-for-indentation'] === 'yes') {
                         Editor.defaultPreferences['use-tab-for-indentation'] = 'yes';
                     }
@@ -1434,7 +1520,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
-                chromeStorage.get('indentation-spaces-count', function (values) {
+                chromeStorageForExtensionData.get('indentation-spaces-count', function (values) {
                     var value = parseInt(values && values['indentation-spaces-count'], 10);
                     if (!isNaN(value)) {
                         Editor.defaultPreferences['indentation-spaces-count'] = '' + value;
@@ -1443,7 +1529,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE, function (values) {
                     if (values && values[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] === 'yes') {
                         Editor.defaultPreferences[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] = 'yes';
                     }
@@ -1451,7 +1537,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_FONT_SIZE_IN_PX, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_FONT_SIZE_IN_PX, function (values) {
                     var value = parseInt(values && values[USER_PREFERENCE_FONT_SIZE_IN_PX], 10);
                     if (!isNaN(value)) {
                         Editor.defaultPreferences[USER_PREFERENCE_FONT_SIZE_IN_PX] = '' + value;
@@ -1460,7 +1546,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
-                chromeStorage.get('use-css-linting', function (values) {
+                chromeStorageForExtensionData.get('use-css-linting', function (values) {
                     if (values && values['use-css-linting'] === 'yes') {
                         Editor.defaultPreferences['use-css-linting'] = 'yes';
                     }

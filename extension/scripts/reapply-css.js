@@ -1,29 +1,50 @@
-/* global utils, amplify */
+/* global chrome, utils, amplify, runMigration */
 
-(function () {
+(async function () {
+    await runMigration();
+
+    var USER_PREFERENCE_STORAGE_MODE = 'storage-mode';
+
     var showReapplyingStylesNotification = true;
     if (window.hideReapplyingStylesNotification === true) {
         showReapplyingStylesNotification = false;
     }
+
+    var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
+
+    var whichStoreToUse = await utils.chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
+    if (whichStoreToUse === 'localStorage') {
+        // do nothing
+    } else {
+        whichStoreToUse = 'chrome.storage.local';
+    }
+
+    var chromeStorageLocal = chrome.storage.local;
+
     // TODO: Refactor/Reuse the definition of "userPreference"
-    var userPreference = function (pref, value) {
-        var prefix = 'MagiCSS-bookmarklet-';
-        if (value === undefined) {
-            return amplify.store(prefix + pref) || '';
-        } else {
-            amplify.store(prefix + pref, value);
-            return this;
-        }
+    var getUserPreference = function (pref) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            if (whichStoreToUse === 'chrome.storage.local') {
+                let prefix = 'live-css-';
+                var propertyName = `(${window.location.origin}) ${prefix}${pref}`;
+                chromeStorageLocal.get(propertyName, function (values) {
+                    resolve(values[propertyName] || '');
+                });
+            } else {
+                let prefix = 'MagiCSS-bookmarklet-';
+                resolve(amplify.store(prefix + pref) || '');
+            }
+        });
     };
 
     var localStorageDisableStyles = 'disable-styles';
-    var disableStyles = userPreference(localStorageDisableStyles) === 'yes';
+    var disableStyles = await getUserPreference(localStorageDisableStyles) === 'yes';
 
     var localStorageApplyStylesAutomatically = 'apply-styles-automatically';
-    var applyStylesAutomatically = userPreference(localStorageApplyStylesAutomatically) === 'yes';
+    var applyStylesAutomatically = await getUserPreference(localStorageApplyStylesAutomatically) === 'yes';
 
     var localStorageLastAppliedCss = 'last-applied-css';
-    var cssText = userPreference(localStorageLastAppliedCss).trim();
+    var cssText = (await getUserPreference(localStorageLastAppliedCss)).trim();
 
     if (cssText && applyStylesAutomatically && !disableStyles) {
         var showReapplyingStylesNotificationAt = (window.showReapplyingStylesNotificationAt || 'top-right').split('-');

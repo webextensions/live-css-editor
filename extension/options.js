@@ -2,15 +2,17 @@
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
+    USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
     USER_PREFERENCE_ALL_FRAMES = 'all-frames',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT = 'show-reapplying-styles-notification-at',
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
+    USER_PREFERENCE_STORAGE_MODE = 'storage-mode',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 jQuery(function ($) {
-    var chromeStorage = chrome.storage.sync || chrome.storage.local;
+    var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
     var RadionButtonSelectedValueSet = function (name, SelectedValue) {
         $('input[name="' + name+ '"]').val([SelectedValue]);
@@ -20,7 +22,7 @@ jQuery(function ($) {
         utils.alertNote('Your change would apply next time onwards :-)', 2500);
     };
 
-    chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
+    chromeStorageForExtensionData.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
         var $useAutocompleteForCssSelectors = $('#autocomplete-selectors'),
             markChecked = true;
         if (values && values[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] === 'no') {
@@ -33,11 +35,28 @@ jQuery(function ($) {
         if($(this).is(':checked')) {
             valueToSet = 'yes';
         }
-        chromeStorage.set({[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: valueToSet});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS]: valueToSet});
         notifyUser();
     });
 
-    chromeStorage.get(USER_PREFERENCE_ALL_FRAMES, function (values) {
+    chromeStorageForExtensionData.get(USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES, function (values) {
+        var $useAutocompleteForCssPropertyAndValue = $('#autocomplete-css-properties-and-values'),
+            markChecked = true;
+        if (values && values[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES] === 'no') {
+            markChecked = false;
+        }
+        $useAutocompleteForCssPropertyAndValue.prop('checked', markChecked);
+    });
+    $('#autocomplete-css-properties-and-values').on('click', function () {
+        var valueToSet = 'no';
+        if($(this).is(':checked')) {
+            valueToSet = 'yes';
+        }
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES]: valueToSet});
+        notifyUser();
+    });
+
+    chromeStorageForExtensionData.get(USER_PREFERENCE_ALL_FRAMES, function (values) {
         var $allFrames = $('#all-frames'),
             markChecked = false;
         if (values && values[USER_PREFERENCE_ALL_FRAMES] === 'yes') {
@@ -50,11 +69,11 @@ jQuery(function ($) {
         if($(this).is(':checked')) {
             valueToSet = 'yes';
         }
-        chromeStorage.set({[USER_PREFERENCE_ALL_FRAMES]: valueToSet});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_ALL_FRAMES]: valueToSet});
         notifyUser();
     });
 
-    chromeStorage.get(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION, function (values) {
+    chromeStorageForExtensionData.get(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION, function (values) {
         var $reapplyingStylesNotification = $('#reapplying-styles-notification'),
             markChecked = true;
         if (values && values[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION] === 'no') {
@@ -67,11 +86,11 @@ jQuery(function ($) {
         if(!$(this).is(':checked')) {
             valueToSet = 'no';
         }
-        chromeStorage.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION]: valueToSet});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION]: valueToSet});
         notifyUser();
     });
 
-    chromeStorage.get(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT, function (values) {
+    chromeStorageForExtensionData.get(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT, function (values) {
         var value = values && values[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT];
         if (['bottom-right', 'bottom-left', 'top-left'].indexOf(value) >= 0) {
             // do nothing
@@ -86,15 +105,15 @@ jQuery(function ($) {
         if (['bottom-right', 'bottom-left', 'top-left'].indexOf(value) >= 0) {
             valueToSet = value; // default value
         }
-        chromeStorage.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT]: valueToSet});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT]: valueToSet});
 
         // Also mark that "Show notification" would be checked
         $('#reapplying-styles-notification').prop('checked', true);
-        chromeStorage.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION]: 'yes'});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION]: 'yes'});
         notifyUser();
     });
 
-    chromeStorage.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
+    chromeStorageForExtensionData.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
         var $hideOnPageMouseOut = $('#hide-on-page-mouseout'),
             markChecked = false;
         if (values && values[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT] === 'yes') {
@@ -107,11 +126,31 @@ jQuery(function ($) {
         if($(this).is(':checked')) {
             valueToSet = 'yes';
         }
-        chromeStorage.set({[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: valueToSet});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: valueToSet});
         notifyUser();
     });
 
-    chromeStorage.get('default-language-mode', function (values) {
+    chromeStorageForExtensionData.get(USER_PREFERENCE_STORAGE_MODE, function (values) {
+        if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'localStorage') {
+            RadionButtonSelectedValueSet(USER_PREFERENCE_STORAGE_MODE, 'localStorage');
+        } else {
+            RadionButtonSelectedValueSet(USER_PREFERENCE_STORAGE_MODE, 'chrome.storage.local');
+        }
+    });
+    $('input[name=storage-mode]').change(function () {
+        var value = $(this).val(),
+            valueToSet;
+        if (value === 'localStorage') {
+            valueToSet = 'localStorage';
+        } else {
+            valueToSet = 'chrome.storage.local';
+        }
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_STORAGE_MODE]: valueToSet});
+        notifyUser();
+    });
+
+
+    chromeStorageForExtensionData.get('default-language-mode', function (values) {
         if (values && values['default-language-mode'] === 'less') {
             RadionButtonSelectedValueSet('default-language-mode', 'less');
         } else if (values && values['default-language-mode'] === 'sass') {
@@ -130,11 +169,11 @@ jQuery(function ($) {
         } else {
             valueToSet = 'css';
         }
-        chromeStorage.set({'default-language-mode': valueToSet});
+        chromeStorageForExtensionData.set({'default-language-mode': valueToSet});
         notifyUser();
     });
 
-    chromeStorage.get('use-tab-for-indentation', function (values) {
+    chromeStorageForExtensionData.get('use-tab-for-indentation', function (values) {
         if (values && values['use-tab-for-indentation'] === 'yes') {
             RadionButtonSelectedValueSet('indentation', 'tab');
         } else {
@@ -147,11 +186,11 @@ jQuery(function ($) {
         if (value === 'tab') {
             valueToSet = 'yes';
         }
-        chromeStorage.set({'use-tab-for-indentation': valueToSet});
+        chromeStorageForExtensionData.set({'use-tab-for-indentation': valueToSet});
         notifyUser();
     });
 
-    chromeStorage.get('indentation-spaces-count', function (values) {
+    chromeStorageForExtensionData.get('indentation-spaces-count', function (values) {
         var value = parseInt(values && values['indentation-spaces-count'], 10);
         if (isNaN(value) || !(value >= 1 && value <= 8)) {
             value = 4;
@@ -164,15 +203,15 @@ jQuery(function ($) {
         if (!(value >= 1 && value <= 8)) {
             valueToSet = 4; // default value
         }
-        chromeStorage.set({'indentation-spaces-count': valueToSet});
+        chromeStorageForExtensionData.set({'indentation-spaces-count': valueToSet});
 
         // Also mark that space characters would be used for indentation
         RadionButtonSelectedValueSet('indentation', 'spaces');
-        chromeStorage.set({'use-tab-for-indentation': 'no'});
+        chromeStorageForExtensionData.set({'use-tab-for-indentation': 'no'});
         notifyUser();
     });
 
-    chromeStorage.get(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE, function (values) {
+    chromeStorageForExtensionData.get(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE, function (values) {
         if (values && values[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] === 'yes') {
             RadionButtonSelectedValueSet('font-size-setting', 'custom');
         } else {
@@ -185,11 +224,11 @@ jQuery(function ($) {
         if (value === 'custom') {
             valueToSet = 'yes';
         }
-        chromeStorage.set({[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE]: valueToSet});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE]: valueToSet});
         notifyUser();
     });
 
-    chromeStorage.get(USER_PREFERENCE_FONT_SIZE_IN_PX, function (values) {
+    chromeStorageForExtensionData.get(USER_PREFERENCE_FONT_SIZE_IN_PX, function (values) {
         var value = parseInt(values && values[USER_PREFERENCE_FONT_SIZE_IN_PX], 10);
         if (isNaN(value) || !(value >= 8 && value <= 36)) {
             value = 12;
@@ -203,11 +242,11 @@ jQuery(function ($) {
         if (!(intValue >= 8 && intValue <= 36)) {
             valueToSet = "12"; // default value
         }
-        chromeStorage.set({[USER_PREFERENCE_FONT_SIZE_IN_PX]: valueToSet});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_FONT_SIZE_IN_PX]: valueToSet});
 
         // Also mark that "Custom" font-size would be used
         RadionButtonSelectedValueSet('font-size-setting', 'custom');
-        chromeStorage.set({[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE]: 'yes'});
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE]: 'yes'});
         notifyUser();
     });
 

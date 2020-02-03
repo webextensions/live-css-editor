@@ -1,7 +1,7 @@
 /* global utils */
 
 // Here goes the functional code
-(function(){
+(async function(){
     if (window.editor) {
         console.log('Editor window is already there.');
         return;
@@ -13,8 +13,9 @@
         return;
     }
 
-    (function () {
-        utils.delayFunctionUntilTestFunction({
+    // Just a block
+    {
+        await utils.delayFunctionUntilTestFunction({
             tryLimit: 100,
             waitFor: 500,
             fnTest: function () {
@@ -32,7 +33,7 @@
             fnFailure: function () {
                 // do nothing
             },
-            fnSuccess: function () {
+            fnSuccess: async function () {
                 var id = 'Editor';
                 var options = {
                     id: id,
@@ -47,7 +48,8 @@
                 };
 
                 window.editor = new window.Editor(options);
+                await window.editor.create();
             }
         });
-    }());
+    }
 }());

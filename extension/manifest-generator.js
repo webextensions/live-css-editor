@@ -29,7 +29,8 @@ var generateManifest = function (whichBrowser) {
         "permissions": (function () {
             var permissions = [
                 "activeTab",
-                "storage"
+                "storage",
+                "unlimitedStorage"
             ];
             if (whichBrowser === "edge") {
                 permissions.push("webNavigation");

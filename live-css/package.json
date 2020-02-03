@@ -1,6 +1,6 @@
 {
   "name": "@webextensions/live-css",
-  "version": "7.0.10",
+  "version": "7.0.11",
   "description": "live-css is a Node JS based development server for use with the browser extension \"Live editor for CSS, Less & Sass - Magic CSS\" for Chrome/Edge/Firefox/Opera",
   "repository": "https://github.com/webextensions/live-css-editor.git",
   "homepage": "https://webextensions.org/",
@@ -16,22 +16,23 @@
     "test": "echo \"Warning: no test specified\""
   },
   "dependencies": {
-    "anymatch": "~3.0.3",
+    "anymatch": "^3.1.1",
     "body-parser": "1.18.3",
-    "boxen": "~4.1.0",
-    "chokidar-webextensions": "2.0.4",
+    "boxen": "^4.2.0",
+    "chokidar-webextensions": "^2.0.4",
     "express": "^4.17.1",
-    "find-free-port": "2.0.0",
-    "local-ip-addresses-and-hostnames": "0.1.3",
+    "find-free-port": "^2.0.0",
+    "local-ip-addresses-and-hostnames": "^0.1.3",
+    "lodash": "^4.17.15",
     "lodash.uniq": "^4.5.0",
-    "nocache": "~2.1.0",
-    "note-down": "0.2.3",
-    "socket.io": "~2.2.0",
-    "tiny-emitter": "~2.1.0",
-    "unused-filename": "~2.1.0",
-    "update-notifier": "^3.0.1",
+    "nocache": "^2.1.0",
+    "note-down": "^0.2.3",
+    "socket.io": "^2.3.0",
+    "tiny-emitter": "^2.1.0",
+    "unused-filename": "^2.1.0",
+    "update-notifier": "^4.0.0",
     "serve-index": "1.9.1",
-    "yargs": "^13.3.0"
+    "yargs": "^15.1.0"
   },
   "devDependencies": {
     "forever": "0.15.3",

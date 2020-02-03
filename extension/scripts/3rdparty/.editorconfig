@@ -5,9 +5,9 @@
 #     https://github.com/eslint/eslint/blob/master/.editorconfig (Sample file)
 
 [*]
-charset = utf-8
-end_of_line = disabled
-indent_size = disabled
-indent_style = disabled
-insert_final_newline = disabled
-trim_trailing_whitespace = disabled
+charset = unset
+end_of_line = unset
+indent_size = unset
+indent_style = unset
+insert_final_newline = false
+trim_trailing_whitespace = false
