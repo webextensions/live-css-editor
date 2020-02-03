@@ -13,11 +13,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_STORAGE_MODE = 'storage-mode',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
-// This value is updated elsewhere in this file (after fetching the user selected option)
-var whichStoreToUse = 'chrome.storage.local';
-
 (function ($) {
     'use strict';
+
+    // This value is updated elsewhere in this file (after fetching the user selected option)
+    var whichStoreToUse = 'chrome.storage.local';
 
     var CONSTANTS = {
         EDITOR_MIN_WIDTH: 301,
