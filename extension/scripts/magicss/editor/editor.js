@@ -1,4 +1,4 @@
-/* global amplify: false, utils, CodeMirror, jQuery, chrome */
+/* global amplify: false, utils, CodeMirror, jQuery, chrome, runMigration */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
@@ -1447,6 +1447,15 @@ var whichStoreToUse = 'chrome.storage.local';
             // If there is an error, it would get caught in the first function itself
             // With the waterfall() function being used currently, errors in any of
             // the upcoming functions are not caught or reported in the final callback
+            function (callback) {
+                // Note: In most of the practical scenarios, by the time the execution reaches here,
+                // "runMigration()" call from elsewhere would have already completed. So, eventually,
+                // this piece of code shouldn't live here
+                setTimeout(async function () {
+                    await runMigration();
+                    callback(null);
+                });
+            },
             function (callback) {
                 // TODO: The check for storage mode should be moved to the beginning of execution of this file
                 chromeStorageForExtensionData.get(USER_PREFERENCE_STORAGE_MODE, function (values) {

@@ -1,5 +1,8 @@
-/* global chrome, utils, amplify */
+/* global chrome, utils, amplify, runMigration */
+
 (async function () {
+    await runMigration();
+
     var USER_PREFERENCE_STORAGE_MODE = 'storage-mode';
 
     var showReapplyingStylesNotification = true;

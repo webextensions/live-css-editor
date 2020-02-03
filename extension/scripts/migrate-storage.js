@@ -35,7 +35,7 @@ dataMigration.arrPropNamesForChromeStorageLocal = dataMigration.arrPropNames.map
 
 var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
-(async function () {
+var runMigration = async function () {
     var whichStoreToUse = await utils.chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
     if (whichStoreToUse === 'localStorage') {
         // do nothing
@@ -85,4 +85,8 @@ var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
     } catch (e) {
         // TODO: Handle this error
     }
+};
+
+(async function () {
+    await runMigration();
 }());
