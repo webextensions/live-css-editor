@@ -1,4 +1,4 @@
-/* global jQuery, less, Sass, csspretty */
+/* global chrome, jQuery, less, Sass, csspretty */
 
 'use strict';
 
@@ -289,6 +289,48 @@ if (!utils.defined) {
                     return primatives[n];
                 })
         );
+    };
+
+    utils.chromeStorageGet = function (storageObject, prop) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.get(prop, function (values) {
+                resolve(values[prop]);
+            });
+        });
+    };
+
+    utils.chromeStorageSet = function (storageObject, prop, value) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.set(
+                {
+                    [prop]: value
+                },
+                function () {
+                    resolve();
+                }
+            );
+        });
+    };
+
+    utils.chromeStorageRemove = function (storageObject, prop) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.remove(prop, function () {
+                resolve();
+            });
+        });
+    };
+
+    utils.chromeStorageLocalGet = async function (prop) {
+        const value = await utils.chromeStorageGet(chrome.storage.local, prop);
+        return value;
+    };
+
+    utils.chromeStorageLocalSet = async function (prop, value) {
+        await utils.chromeStorageSet(chrome.storage.local, prop, value);
+    };
+
+    utils.chromeStorageLocalRemove = async function (prop, value) {
+        await utils.chromeStorageRemove(chrome.storage.local, prop, value);
     };
 
     utils.delayFunctionUntilTestFunction = async function(config) {

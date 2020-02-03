@@ -384,15 +384,12 @@ var whichStoreToUse = 'chrome.storage.local';
 
         async userPreference(pref, value) {
             var _this = this;
-            // var prefix = _this.options.localDataKeyPrefix;
             if (whichStoreToUse === 'chrome.storage.local') {
                 let prefix = 'live-css-';
                 return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
                     var propertyName = `(${window.location.origin}) ${prefix}${pref}`;
-                    // console.log(`propertyName: ${propertyName}`);
                     if (value === undefined) {
                         chromeStorageLocal.get(propertyName, function (values) {
-                            // console.log(`get values: ${JSON.stringify(values, null, '    ')}`);
                             resolve(
                                 values[propertyName] ||
                                 _this.defaultPreference(pref)

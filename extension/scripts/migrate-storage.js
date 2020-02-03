@@ -1,4 +1,4 @@
-/* global chrome */
+/* global chrome, utils */
 
 /* eslint-disable require-atomic-updates */
 
@@ -35,50 +35,8 @@ dataMigration.arrPropNamesForChromeStorageLocal = dataMigration.arrPropNames.map
 
 var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
-var chromeStorageGet = async function (storageObject, prop) {
-    return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-        storageObject.get(prop, function (values) {
-            resolve(values[prop]);
-        });
-    });
-};
-
-var chromeStorageSet = async function (storageObject, prop, value) {
-    return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-        storageObject.set(
-            {
-                [prop]: value
-            },
-            function () {
-                resolve();
-            }
-        );
-    });
-};
-
-var chromeStorageRemove = async function (storageObject, prop) {
-    return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-        storageObject.remove(prop, function () {
-            resolve();
-        });
-    });
-};
-
-var chromeStorageLocalGet = async function (prop) {
-    const value = await chromeStorageGet(chrome.storage.local, prop);
-    return value;
-};
-
-var chromeStorageLocalSet = async function (prop, value) {
-    await chromeStorageSet(chrome.storage.local, prop, value);
-};
-
-var chromeStorageLocalRemove = async function (prop, value) {
-    await chromeStorageRemove(chrome.storage.local, prop, value);
-};
-
 (async function () {
-    var whichStoreToUse = await chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
+    var whichStoreToUse = await utils.chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
     if (whichStoreToUse === 'localStorage') {
         // do nothing
     } else {
@@ -91,7 +49,7 @@ var chromeStorageLocalRemove = async function (prop, value) {
                 let propNameForLocalStorage = dataMigration.arrPropNamesForLocalStorage[i];
                 let propNameForChromeStorageLocal = dataMigration.arrPropNamesForChromeStorageLocal[i];
                 let valueFromLocalStorage = localStorage[propNameForLocalStorage];
-                let valueFromChromeStorageLocal = await chromeStorageLocalGet(propNameForChromeStorageLocal);
+                let valueFromChromeStorageLocal = await utils.chromeStorageLocalGet(propNameForChromeStorageLocal);
 
                 if (!valueFromChromeStorageLocal) {
                     let json = {};
@@ -101,7 +59,7 @@ var chromeStorageLocalRemove = async function (prop, value) {
                         // TODO: Handle this error
                     }
                     if (json.data) {
-                        await chromeStorageLocalSet(propNameForChromeStorageLocal, json.data);
+                        await utils.chromeStorageLocalSet(propNameForChromeStorageLocal, json.data);
                     }
                 }
                 delete localStorage[propNameForLocalStorage];
@@ -111,7 +69,7 @@ var chromeStorageLocalRemove = async function (prop, value) {
                 let propNameForLocalStorage = dataMigration.arrPropNamesForLocalStorage[i];
                 let propNameForChromeStorageLocal = dataMigration.arrPropNamesForChromeStorageLocal[i];
                 let valueFromLocalStorage = localStorage[propNameForLocalStorage];
-                let valueFromChromeStorageLocal = await chromeStorageLocalGet(propNameForChromeStorageLocal);
+                let valueFromChromeStorageLocal = await utils.chromeStorageLocalGet(propNameForChromeStorageLocal);
 
                 if (!valueFromLocalStorage) {
                     if (valueFromChromeStorageLocal) {
@@ -121,7 +79,7 @@ var chromeStorageLocalRemove = async function (prop, value) {
                         });
                     }
                 }
-                await chromeStorageLocalRemove(propNameForChromeStorageLocal);
+                await utils.chromeStorageLocalRemove(propNameForChromeStorageLocal);
             }
         }
     } catch (e) {
