@@ -302,7 +302,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             path3rdparty + 'socket.io/socket.io.slim.js',
 
             path3rdparty + 'amplify-store.js',
-            path3rdparty + 'migrate-storage.js',
+            pathScripts + 'migrate-storage.js',
 
             path3rdparty + 'tooltipster/tooltipster.css',
             path3rdparty + 'tooltipster/jquery.tooltipster.js',
