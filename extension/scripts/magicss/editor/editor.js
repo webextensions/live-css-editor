@@ -10,14 +10,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
+    USER_PREFERENCE_STORAGE_MODE = 'storage-mode',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
+// This value is updated elsewhere in this file (after fetching the user selected option)
 var whichStoreToUse = 'chrome.storage.local';
-/*
-    Allowed values:
-        'chrome.storage.local'
-        'localStorage'
-*/
 
 (function ($) {
     'use strict';
@@ -29,12 +26,8 @@ var whichStoreToUse = 'chrome.storage.local';
         EDITOR_DEFAULT_HEIGHT: 249
     };
 
-    var chromeStorage;
-    try {
-        chromeStorage = chrome.storage.sync || chrome.storage.local;
-    } catch (e) {
-        // do nothing
-    }
+    var chromeStorageLocal = chrome.storage.local;
+    var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
     var runOnceFor = function (fn, delay) {
         clearTimeout(fn.timer);
@@ -343,7 +336,7 @@ var whichStoreToUse = 'chrome.storage.local';
             this.options = $.extend({}, defaults, this.passedOptions);
 
             this.normalizeOptions(this.options);     // Normalize the options object
-            this.addDerivedOptions(this.options);    // Add derived options
+            // this.addDerivedOptions(this.options);    // Add derived options
 
             this.events = this.events || {};
 
@@ -369,12 +362,12 @@ var whichStoreToUse = 'chrome.storage.local';
             options.rememberText = !!options.rememberText;
         }
 
-        addDerivedOptions(options) {
-            if (options.rememberText || options.rememberDimensions) {
-                // Add options.localDataKeyPrefix
-                options.localDataKeyPrefix = options.id + '-';
-            }
-        }
+        // addDerivedOptions(options) {
+        //     if (options.rememberText || options.rememberDimensions) {
+        //         // Add options.localDataKeyPrefix
+        //         options.localDataKeyPrefix = options.id + '-';
+        //     }
+        // }
 
         getOption(option) {
             return this.options[option];
@@ -391,13 +384,14 @@ var whichStoreToUse = 'chrome.storage.local';
 
         async userPreference(pref, value) {
             var _this = this;
-            var prefix = _this.options.localDataKeyPrefix;
+            // var prefix = _this.options.localDataKeyPrefix;
             if (whichStoreToUse === 'chrome.storage.local') {
+                let prefix = 'live-css-';
                 return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
                     var propertyName = `(${window.location.origin}) ${prefix}${pref}`;
                     // console.log(`propertyName: ${propertyName}`);
                     if (value === undefined) {
-                        chromeStorage.get(propertyName, function (values) {
+                        chromeStorageLocal.get(propertyName, function (values) {
                             // console.log(`get values: ${JSON.stringify(values, null, '    ')}`);
                             resolve(
                                 values[propertyName] ||
@@ -405,7 +399,7 @@ var whichStoreToUse = 'chrome.storage.local';
                             );
                         });
                     } else {
-                        chromeStorage.set(
+                        chromeStorageLocal.set(
                             {
                                 [propertyName]: value
                             },
@@ -416,6 +410,7 @@ var whichStoreToUse = 'chrome.storage.local';
                     }
                 });
             } else {
+                let prefix = 'MagiCSS-bookmarklet-';
                 return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
                     var propertyName = `${prefix}${pref}`;
                     if (value === undefined) {
@@ -1456,7 +1451,18 @@ var whichStoreToUse = 'chrome.storage.local';
             // With the waterfall() function being used currently, errors in any of
             // the upcoming functions are not caught or reported in the final callback
             function (callback) {
-                chromeStorage.get('default-language-mode', function (values) {
+                // TODO: The check for storage mode should be moved to the beginning of execution of this file
+                chromeStorageForExtensionData.get(USER_PREFERENCE_STORAGE_MODE, function (values) {
+                    if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'localStorage') {
+                        whichStoreToUse = 'localStorage';
+                    } else {
+                        whichStoreToUse = 'chrome.storage.local';
+                    }
+                    callback(null);
+                });
+            },
+            function (callback) {
+                chromeStorageForExtensionData.get('default-language-mode', function (values) {
                     if (values && values['default-language-mode'] === 'less') {
                         Editor.defaultPreferences['language-mode'] = 'less';
                     } else if (values && values['default-language-mode'] === 'sass') {
@@ -1466,7 +1472,7 @@ var whichStoreToUse = 'chrome.storage.local';
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS, function (values) {
                     if (values && values[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] === 'no') {
                         Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_SELECTORS] = 'no';
                     }
@@ -1474,7 +1480,7 @@ var whichStoreToUse = 'chrome.storage.local';
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES, function (values) {
                     if (values && values[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES] === 'no') {
                         Editor.defaultPreferences[USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES] = 'no';
                     }
@@ -1482,7 +1488,7 @@ var whichStoreToUse = 'chrome.storage.local';
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
                     if (values && values[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT] === 'yes') {
                         Editor.defaultPreferences[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT] = 'yes';
                     }
@@ -1490,7 +1496,7 @@ var whichStoreToUse = 'chrome.storage.local';
                 });
             },
             function (callback) {
-                chromeStorage.get('use-tab-for-indentation', function (values) {
+                chromeStorageForExtensionData.get('use-tab-for-indentation', function (values) {
                     if (values && values['use-tab-for-indentation'] === 'yes') {
                         Editor.defaultPreferences['use-tab-for-indentation'] = 'yes';
                     }
@@ -1498,7 +1504,7 @@ var whichStoreToUse = 'chrome.storage.local';
                 });
             },
             function (callback) {
-                chromeStorage.get('indentation-spaces-count', function (values) {
+                chromeStorageForExtensionData.get('indentation-spaces-count', function (values) {
                     var value = parseInt(values && values['indentation-spaces-count'], 10);
                     if (!isNaN(value)) {
                         Editor.defaultPreferences['indentation-spaces-count'] = '' + value;
@@ -1507,7 +1513,7 @@ var whichStoreToUse = 'chrome.storage.local';
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE, function (values) {
                     if (values && values[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] === 'yes') {
                         Editor.defaultPreferences[USER_PREFERENCE_USE_CUSTOM_FONT_SIZE] = 'yes';
                     }
@@ -1515,7 +1521,7 @@ var whichStoreToUse = 'chrome.storage.local';
                 });
             },
             function (callback) {
-                chromeStorage.get(USER_PREFERENCE_FONT_SIZE_IN_PX, function (values) {
+                chromeStorageForExtensionData.get(USER_PREFERENCE_FONT_SIZE_IN_PX, function (values) {
                     var value = parseInt(values && values[USER_PREFERENCE_FONT_SIZE_IN_PX], 10);
                     if (!isNaN(value)) {
                         Editor.defaultPreferences[USER_PREFERENCE_FONT_SIZE_IN_PX] = '' + value;
@@ -1524,7 +1530,7 @@ var whichStoreToUse = 'chrome.storage.local';
                 });
             },
             function (callback) {
-                chromeStorage.get('use-css-linting', function (values) {
+                chromeStorageForExtensionData.get('use-css-linting', function (values) {
                     if (values && values['use-css-linting'] === 'yes') {
                         Editor.defaultPreferences['use-css-linting'] = 'yes';
                     }

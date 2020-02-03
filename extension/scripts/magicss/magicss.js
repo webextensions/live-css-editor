@@ -13,12 +13,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function($){
-    var chromeStorage;
-    try {
-        chromeStorage = chrome.storage.sync || chrome.storage.local;
-    } catch (e) {
-        // do nothing
-    }
+    var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
     var checkIfMagicCssLoadedFine = function (MagiCSSEditor) {
         if (!MagiCSSEditor.container.clientHeight) {
@@ -3091,7 +3086,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 checkIfMagicCssLoadedFine(window.MagiCSSEditor);
 
                 try {
-                    chromeStorage.get('use-autocomplete-for-css-selectors', function (values) {
+                    chromeStorageForExtensionData.get('use-autocomplete-for-css-selectors', function (values) {
                         if (values && values['use-autocomplete-for-css-selectors'] === false) {
                             disableAutocompleteSelectors(window.MagiCSSEditor);
                         } else {
@@ -3104,7 +3099,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
                 if (executionCounter && !isNaN(executionCounter)) {
                     try {
-                        chromeStorage.set({'magicss-execution-counter': executionCounter}, function() {
+                        chromeStorageForExtensionData.set({'magicss-execution-counter': executionCounter}, function() {
                             // do nothing
                         });
                     } catch (e) {
@@ -3162,7 +3157,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
     var executionCounter = 0;
     try {
-        chromeStorage.get('magicss-execution-counter', function (values) {
+        chromeStorageForExtensionData.get('magicss-execution-counter', function (values) {
             try {
                 executionCounter = parseInt(values && values['magicss-execution-counter'], 10);
                 executionCounter = isNaN(executionCounter) ? 0 : executionCounter;
