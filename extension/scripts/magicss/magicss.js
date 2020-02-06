@@ -28,7 +28,10 @@ console.log(
     };
 
     var socketOb = {};
+    window.socketOb = socketOb;
+
     socketOb.socket = null;
+    socketOb.flagWatchingCssFiles = false;
 
     socketOb.setup = async function () {
         var $backEndConnectivityOptions = window.$backEndConnectivityOptions;
@@ -234,6 +237,71 @@ console.log(
     socketOb.reset = async function () {
         socketOb.close();
         await socketOb.setup();
+    };
+
+    socketOb.getConnected = async function (editor, asyncCb) {
+        var socketIfAlreadyConnected = await getConnectedWithBackEnd(
+            editor,
+            async function callback (err) {
+            // function callback (err, socket) {
+                if (err) {
+                    // The user cancelled watching files
+                    utils.alertNote('You cancelled watching CSS files for changes');
+                    await editor.userPreference('watching-css-files', 'no');
+                } else {
+                    // socket.on('file-modified', function(changeDetails) {
+                    //     if (changeDetails.useOnlyFileNamesForMatch) {
+                    //         reloadCSSResourceInPage({
+                    //             fullPath: changeDetails.fullPath,
+                    //             useOnlyFileNamesForMatch: true,
+                    //             fileName: changeDetails.fileName
+                    //         });
+                    //     } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                    //         var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                    //         reloadCSSResourceInPage({
+                    //             fullPath: changeDetails.fullPath,
+                    //             url: resolveUrl(pathWrtRoot)
+                    //         });
+                    //     } else {
+                    //         // The code should never reach here
+                    //         utils.alertNote(
+                    //             'Unexpected scenario occurred in reloading some CSS resources.' +
+                    //             '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                    //             10000
+                    //         );
+                    //     }
+                    // });
+                    if (!socketOb.flagWatchingCssFiles) {
+                        socketOb.flagWatchingCssFiles = true;
+                        utils.alertNote(
+                            'Watching CSS files for changes.' +
+                            '<br />' +
+                            '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                            20000,
+                            {
+                                unobtrusive: true
+                            }
+                        );
+                        $(editor.container).addClass('watching-css-files');
+                        await editor.userPreference('watching-css-files', 'yes');
+                    }
+
+                    if (!socketIfAlreadyConnected && asyncCb) {
+                        await asyncCb();
+                    }
+                }
+            },
+            async function callbackForReconfiguration () {
+                await socketOb.getConnected(editor);
+            }
+        );
+        if (socketIfAlreadyConnected && asyncCb) {
+            await asyncCb();
+        }
+    };
+
+    socketOb.startWatchingFiles = async function (editor) {
+        await socketOb.getConnected(editor);
     };
 
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
@@ -1084,74 +1152,6 @@ console.log(
         }, duration);
     };
 
-    var flagWatchingCssFiles = false;
-    var socket = null;
-
-    var getConnected = async function (editor, asyncCb) {
-        var socketIfAlreadyConnected = await getConnectedWithBackEnd(
-            editor,
-            async function callback (err) {
-            // function callback (err, socket) {
-                if (err) {
-                    // The user cancelled watching files
-                    utils.alertNote('You cancelled watching CSS files for changes');
-                    await editor.userPreference('watching-css-files', 'no');
-                } else {
-                    // socket.on('file-modified', function(changeDetails) {
-                    //     if (changeDetails.useOnlyFileNamesForMatch) {
-                    //         reloadCSSResourceInPage({
-                    //             fullPath: changeDetails.fullPath,
-                    //             useOnlyFileNamesForMatch: true,
-                    //             fileName: changeDetails.fileName
-                    //         });
-                    //     } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                    //         var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                    //         reloadCSSResourceInPage({
-                    //             fullPath: changeDetails.fullPath,
-                    //             url: resolveUrl(pathWrtRoot)
-                    //         });
-                    //     } else {
-                    //         // The code should never reach here
-                    //         utils.alertNote(
-                    //             'Unexpected scenario occurred in reloading some CSS resources.' +
-                    //             '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                    //             10000
-                    //         );
-                    //     }
-                    // });
-                    if (!flagWatchingCssFiles) {
-                        flagWatchingCssFiles = true;
-                        utils.alertNote(
-                            'Watching CSS files for changes.' +
-                            '<br />' +
-                            '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
-                            20000,
-                            {
-                                unobtrusive: true
-                            }
-                        );
-                        $(editor.container).addClass('watching-css-files');
-                        await editor.userPreference('watching-css-files', 'yes');
-                    }
-
-                    if (!socketIfAlreadyConnected && asyncCb) {
-                        await asyncCb();
-                    }
-                }
-            },
-            async function callbackForReconfiguration () {
-                await getConnected(editor);
-            }
-        );
-        if (socketIfAlreadyConnected && asyncCb) {
-            await asyncCb();
-        }
-    };
-
-    var startWatchingFiles = async function (editor) {
-        await getConnected(editor);
-    };
-
     // A pretty basic OS detection logic based on:
     // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js/38241481#38241481
     var getOS = function () {
@@ -1446,8 +1446,8 @@ console.log(
     };
 
     var updateUiMentioningNotWatchingCssFiles = async function (editor) {
-        if (flagWatchingCssFiles) {
-            flagWatchingCssFiles = false;
+        if (socketOb.flagWatchingCssFiles) {
+            socketOb.flagWatchingCssFiles = false;
             utils.alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
             await editor.userPreference('watching-css-files', 'no');
@@ -1471,23 +1471,24 @@ console.log(
         var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
             serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
-        if (socket) {
-            var socketOpts = (socket.io || {}).opts || {};
+        if (socketOb.socket) {
+            var socketOpts = (socketOb.socket.io || {}).opts || {};
             if (
                 socketOpts.hostname === serverHostnameValue &&
                 socketOpts.port === serverPortValue &&
                 (
-                    socket.connected ||
-                    (socket.io || {}).readyState === 'opening'
+                    socketOb.socket.connected ||
+                    (socketOb.socket.io || {}).readyState === 'opening'
                 )
             ) {
-                return socket;
+                return socketOb.socket;
             } else {
                 editor.markLiveCssServerConnectionStatus(false);
 
                 debugger;
-                socket.close();
-                socket = null;
+                socketOb.close();
+                // socketOb.socket.close();
+                // socketOb.socket = null;
             }
         }
 
@@ -2401,7 +2402,7 @@ console.log(
                     }
 
                     console.log('TODO: The following piece of code needs to be refactored');
-                    getConnected(editor, async function () {
+                    socketOb.getConnected(editor, async function () {
                         if (needInputThroughUi || options.showUi) {
                             await showFileEditOptions(editor, function (filePath) {
                                 loadFile({
@@ -3010,7 +3011,7 @@ console.log(
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-stop-watch-and-reload-link-tags',
                                             onclick: async function (evt, editor) {
-                                                if (flagWatchingCssFiles) {
+                                                if (socketOb.flagWatchingCssFiles) {
                                                     await getDisconnectedWithBackEnd(
                                                         editor,
                                                         {},
@@ -3034,13 +3035,13 @@ console.log(
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-watch-and-reload-link-tags',
                                             onclick: async function (evt, editor) {
-                                                if (!flagWatchingCssFiles) {
-                                                    await startWatchingFiles(editor);
+                                                if (!socketOb.flagWatchingCssFiles) {
+                                                    await socketOb.startWatchingFiles(editor);
                                                 }
                                                 editor.focus();
                                             },
                                             beforeShow: function (origin, tooltip) {
-                                                tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
+                                                tooltip.addClass(socketOb.flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
                                             }
                                         };
                                     } else {
@@ -3594,7 +3595,7 @@ console.log(
 
                             var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
                             if (watchingCssFiles) {
-                                await startWatchingFiles(editor);
+                                await socketOb.startWatchingFiles(editor);
                             }
 
                             var applyStylesAutomatically = await editor.userPreference('apply-styles-automatically') === 'yes';
