@@ -392,6 +392,7 @@ var handleLiveCss = function (options) {
                         });
                     }
                 });
+                res.setHeader('Access-Control-Allow-Origin', '*');
                 res.send(arrFiles);
             });
         });

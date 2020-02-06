@@ -424,7 +424,7 @@ console.log(
         var disableStyles = await userPreference(localStorageDisableStyles) === 'yes';
 
         var localStorageLastAppliedCss = 'last-applied-css';
-        var cssText = await userPreference(localStorageLastAppliedCss).trim();
+        var cssText = (await userPreference(localStorageLastAppliedCss)).trim();
 
         if (cssText) {
             var id = 'MagiCSS-bookmarklet',
@@ -2307,7 +2307,7 @@ console.log(
                         maxSelection: 1,
                         typeDelay: 50,
 
-                        data: (async function () {
+                        data: await (async function () {
                             var protocolValue = (window.location.protocol === 'https:') ? 'https:' : 'http:',
                                 serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
                                 serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort,
@@ -2505,10 +2505,9 @@ console.log(
                             if (!options.skipNotifications) {
                                 utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
                             }
-                            editor
-                                .setTextValue(file.contents)
-                                .reInitTextComponent({pleaseIgnoreCursorActivity: true})
-                                .focus();
+                            await editor.setTextValue(file.contents);
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            editor.focus();
 
                             // Clear the undo-redo hstory
                             editor.cm.clearHistory();
@@ -2519,9 +2518,8 @@ console.log(
                         // If previous mode was 'file'
                         if (getLanguageMode() === 'file') {
                             // Restore the saved code
-                            editor
-                                .setTextValue(editor.userPreference('textarea-value'))
-                                .reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            await editor.setTextValue(editor.userPreference('textarea-value'));
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
 
                             // Clear the undo-redo hstory
                             editor.cm.clearHistory();
@@ -3416,7 +3414,7 @@ console.log(
                                     url: 'http://localhost:3456/' + this.getValue()[0],
                                     success: function (data, textStatus) {
                                         if (textStatus === 'success') {
-                                            editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                            await editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                         }
                                     }
                                 });
@@ -3437,7 +3435,7 @@ console.log(
                         // });
 
                         $fileToEdit.on('click', async function () {
-                            await getDataForFileToEdit(editor, {showUi: true} ,function (file) {
+                            await getDataForFileToEdit(editor, {showUi: true}, async function (file) {
                                 // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
                                 // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user switches the editing mode
                                 $('.footer-for-file-mode .name-of-file-being-edited')
@@ -3448,10 +3446,10 @@ console.log(
                                     .fadeOut(100)
                                     .fadeIn(750);
                                 utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
-                                editor
-                                    .setTextValue(file.contents)
-                                    .reInitTextComponent({pleaseIgnoreCursorActivity: true})
-                                    .focus();
+
+                                await editor.setTextValue(file.contents);
+                                await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                editor.focus();
 
                                 // Clear the undo-redo hstory
                                 editor.cm.clearHistory();

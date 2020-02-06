@@ -1387,7 +1387,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
         async reInitCodeMirror() {
             var thisOb = this;
-            thisOb.setCodeMirrorValue(thisOb.getTextValue());
+            thisOb.setCodeMirrorValue(await thisOb.getTextValue());
             thisOb.setCodeMirrorDimensions(await thisOb.getDimensions());
 
             var $that = $(thisOb.container);
