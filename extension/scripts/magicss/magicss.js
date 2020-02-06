@@ -1171,8 +1171,8 @@ console.log(
 
 
     var getServerDetailsFromUserAlreadyOpen = false;
-    var getServerDetailsFromUser = async function (editor) {
-    // var getServerDetailsFromUser = async function (editor, callback) {
+    // var getServerDetailsFromUser = async function (editor) {
+    var getServerDetailsFromUser = async function (editor, callback) {
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
@@ -1436,10 +1436,10 @@ console.log(
             await editor.userPreference('live-css-server-hostname', serverHostnameValue);
             await editor.userPreference('live-css-server-port', serverPortValue);
 
-            // callback(null, {
-            //     serverHostname: serverHostnameValue,
-            //     serverPort: serverPortValue
-            // });
+            callback(null, {
+                serverHostname: serverHostnameValue,
+                serverPort: serverPortValue
+            });
         });
         $('body').append(window.$backEndConnectivityOptions);
         // refreshConnectivityUi();
@@ -1545,7 +1545,7 @@ console.log(
         // show them the configuration options along with the guide/help
         // about the live-css server
         if (
-            !(await editor.userPreference('live-css-server-hostname')) &&
+            !(await editor.userPreference('live-css-server-hostname')) ||
             !(await editor.userPreference('live-css-server-port'))
         ) {
             await getServerDetailsFromUser(editor, function (err, serverDetails) {
@@ -1554,6 +1554,14 @@ console.log(
                         await asyncCallbackForReconfiguration(serverDetails);
                     });
                 }
+            });
+        } else {
+            const _serverHostnameValue = await editor.userPreference('live-css-server-hostname');
+            const _serverPort = await editor.userPreference('live-css-server-port');
+
+            await asyncCallbackForReconfiguration({
+                serverHostname: _serverHostnameValue,
+                serverPort: _serverPort
             });
         }
 
