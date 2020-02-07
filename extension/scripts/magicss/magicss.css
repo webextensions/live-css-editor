@@ -965,7 +965,8 @@ html .magicss-mouse-over-dom-element {
 }
 
 .magic-css-edit-file-options {
-    width: 300px;
+    min-width: 300px;
+    width: 75%;
     position: fixed !important; /* Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;" */
     -z-index: 2147483646;
     z-index: 2147483647;
@@ -1060,12 +1061,13 @@ html .magicss-mouse-over-dom-element {
     z-index: 10000;
     background-color: #fff;
     left: 0px;
-    bottom: 30px;
+    max-height: calc(70vh);
 }
 .magic-css-edit-file-options .ms-ctn {
     padding-left: 7px;
     padding-top: 0;
     padding-bottom: 0;
+    background-color: #fff;
 }
 .magic-css-edit-file-options .ms-ctn .ms-trigger .ms-trigger-ico {
     margin-top: 9px;
@@ -1079,6 +1081,17 @@ html .magicss-mouse-over-dom-element {
 }
 .magic-css-edit-file-options .ms-ctn.form-control {
     border: 1px solid #aaa;
+}
+.magic-css-edit-file-options .ms-ctn .ms-sel-ctn {
+    background-color: #fff;
+    padding-top: 5px;
+    padding-bottom: 3px;
+    padding-left: 8px;
+}
+.magic-css-edit-file-options .ms-ctn .ms-sel-item {
+    color: #000;
+    background-color: #fff;
+    border: none;
 }
 
 

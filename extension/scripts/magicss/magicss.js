@@ -1173,6 +1173,7 @@ console.log(
     var getServerDetailsFromUserAlreadyOpen = false;
     // var getServerDetailsFromUser = async function (editor) {
     var getServerDetailsFromUser = async function (editor, callback) {
+        debugger;
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
@@ -1443,6 +1444,10 @@ console.log(
         });
         $('body').append(window.$backEndConnectivityOptions);
         // refreshConnectivityUi();
+
+        if (serverHostnameValue && serverPortValue) {
+            await socketOb.reset();
+        }
     };
 
     var updateUiMentioningNotWatchingCssFiles = async function (editor) {
@@ -1509,7 +1514,7 @@ console.log(
                 backEndPathToShowToUser +
             '</div>' +
             '<div>' +
-                // '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right;">Cancel</button>' +
+                '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right;">Cancel</button>' +
                 '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
             '</div>',
             'Connecting with live-css server at: ',
@@ -1524,18 +1529,27 @@ console.log(
                                 });
                             }
                         });
-                    // } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
-                    //     if (socket) {
-                    //         editor.markLiveCssServerConnectionStatus(false);
+                    } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
+                        await getDisconnectedWithBackEnd(
+                            editor,
+                            {},
+                            async function asyncCallback () {
+                                if (socketOb.flagWatchingCssFiles) {
+                                    await updateUiMentioningNotWatchingCssFiles(editor);
+                                }
+                            }
+                        );
+                        // if (socket) {
+                        //     editor.markLiveCssServerConnectionStatus(false);
 
-                    //         socket.close();
-                    //         socket = null;
-                    //     }
-                    //     toastr.clear($toastrConnecting, {force: true});
-                    //     if (!flagCallbackCalledOnce) {
-                    //         flagCallbackCalledOnce = true;
-                    //         await mainAsyncCallback('cancelled-by-user', socket);
-                    //     }
+                        //     socket.close();
+                        //     socket = null;
+                        // }
+                        // toastr.clear($toastrConnecting, {force: true});
+                        // if (!flagCallbackCalledOnce) {
+                        //     flagCallbackCalledOnce = true;
+                        //     await mainAsyncCallback('cancelled-by-user', socket);
+                        // }
                     }
                 }
             }
@@ -2272,15 +2286,15 @@ console.log(
                                 '<div class="magic-css-full-page-overlay">',
                                 '</div>',
                                 '<div class="magic-css-full-page-contents" style="pointer-events:none;">',
-                                    '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
+                                    '<div style="display:flex;justify-content:center;/*align-items:center;*/margin-top:20px;height:100%;">',
                                         '<div class="magic-css-edit-file-options" style="pointer-events:initial;">',
                                             '<div class="magic-css-row magic-css-file-config-item">',
                                                 '<div class="magic-css-row-item-1 magic-css-file-field-header">File to edit</div>',
                                                 '<div class="magic-css-row-item-2"><input class="magicss-file-to-edit" /></div>',
                                             '</div>',
-                                            '<div class="magic-css-row magic-css-file-config-item">',
+                                            '<div class="magic-css-row magic-css-file-config-item" style="text-align:center">',
                                                 '<input type="button" class="magicss-start-file-editing" value="Start Editing" />',
-                                                '<input type="button" class="magicss-cancel-file-mode" value="Cancel" />',
+                                                '<input type="button" class="magicss-cancel-file-mode" value="Cancel" style="margin-left:20px" />',
                                             '</div>',
                                         '</div>',
                                     '</div>',
