@@ -20,6 +20,12 @@ console.log(
 );
 
 (function($){
+    var asyncTimeout = function (delay) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, delay);
+        });
+    };
+
     var flagConnectedAtLeastOnce = false;
     window.currentlyConnected = false;
     var setCurrentlyConnected = function (value) {
@@ -1144,11 +1150,10 @@ console.log(
         var lineHandle = editor.cm.addLineClass(errorInLine, 'background', 'line-has-parsing-error-transition-effect');
         editor.cm.addLineClass(errorInLine, 'background', 'line-has-parsing-error');
         var duration = 2000;
-        setTimeout(function () {
+        setTimeout(async function () {
             editor.cm.removeLineClass(lineHandle, 'background', 'line-has-parsing-error');
-            setTimeout(function () {
-                editor.cm.removeLineClass(lineHandle, 'background', 'line-has-parsing-error-transition-effect');
-            }, 500);   /* 500ms delay matches the transition duration specified for the CSS selector ".line-has-parsing-error-transition-effect" */
+            await asyncTimeout(500); /* 500ms delay matches the transition duration specified for the CSS selector ".line-has-parsing-error-transition-effect" */
+            editor.cm.removeLineClass(lineHandle, 'background', 'line-has-parsing-error-transition-effect');
         }, duration);
     };
 
@@ -2278,7 +2283,7 @@ console.log(
                     }
                 };
 
-                var showFileEditOptions = async function (editor, cb) {
+                var showFileEditOptions = async function (editor, callback) {
                     /* eslint-disable indent */
                     var $fileEditOptions = $(
                         [
@@ -2359,7 +2364,7 @@ console.log(
                     $fileEditOptions.find('.magicss-start-file-editing').on('click', function () {
                         var filePath = fileSuggestions.getValue()[0];
                         $fileEditOptions.remove();
-                        cb(filePath);
+                        callback(filePath);
                     });
                     $('body').append($fileEditOptions);
                 };
@@ -2388,30 +2393,6 @@ console.log(
                             }
                         );
                     }, 0);
-                    /*
-                    $.ajax({
-                        _: (function () {
-                            console.log('TODO: Remove hard-coding');
-                        }()),
-                        // TODO: Remove hard-coding
-                        url: 'http://localhost:3456/' + filePath,
-                        dataType: 'text',
-
-                        success: function (data, textStatus) {
-                            if (textStatus === 'success') {
-                                successCallback({
-                                    path: filePath,
-                                    contents: data
-                                });
-                            } else {
-                                console.log('TODO');
-                            }
-                        },
-                        error: function () {
-                            await asyncErrorCallback();
-                        }
-                    });
-                    /* */
                 };
 
                 var getDataForFileToEdit = async function (editor, options, cb) {
