@@ -988,6 +988,8 @@ html .magicss-mouse-over-dom-element {
 .magic-css-file-field-header {
     color: #777;
     margin-bottom: 2px;
+    font-size: 13px;
+    margin-bottom: 5px;
 }
 
 /*
@@ -1056,8 +1058,7 @@ html .magicss-mouse-over-dom-element {
 .magic-css-edit-file-options .ms-res-ctn.dropdown-menu {
     height: 58px;
     position: absolute;
-    border: 1px solid #777;
-    width: calc(100% - 2px);
+    outline: 1px solid #777;
     z-index: 10000;
     background-color: #fff;
     left: 0px;
@@ -1085,13 +1086,25 @@ html .magicss-mouse-over-dom-element {
 .magic-css-edit-file-options .ms-ctn .ms-sel-ctn {
     background-color: #fff;
     padding-top: 5px;
-    padding-bottom: 3px;
+    padding-bottom: 5px;
     padding-left: 8px;
+}
+.magic-css-edit-file-options .ms-ctn .ms-trigger {
+    padding-top: 5px;
+}
+.magic-css-edit-file-options .ms-ctn .ms-trigger:hover {
+    right: 0;
+    width: 25px;
 }
 .magic-css-edit-file-options .ms-ctn .ms-sel-item {
     color: #000;
     background-color: #fff;
     border: none;
+}
+
+.magic-css-edit-file-options .ms-ctn .ms-res-ctn .ms-res-item {
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
 
