@@ -1178,7 +1178,7 @@ console.log(
     var getServerDetailsFromUserAlreadyOpen = false;
     // var getServerDetailsFromUser = async function (editor) {
     var getServerDetailsFromUser = async function (editor, callback) {
-        debugger;
+        // debugger;
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
@@ -2313,6 +2313,19 @@ console.log(
 
                     var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
                         method: 'GET',
+                        placeholder: 'Type file name or click here',
+                        // noSuggestionText: 'Could not find a matching file', // This option didn't seem to work
+                        allowFreeEntries: false,
+                        maxSelection: 1,
+                        typeDelay: 50,
+                        useZebraStyle: true,
+                        // expanded: true, // We may want it, but it seems more cleaner without expanded: true
+                        // expandOnFocus: true, // This option (when set to true) does not seem to work well with useTabKey: true
+                        useTabKey: true,
+                        toggleOnClick: true,
+                        inputCfg: {
+                            id: 'file-suggestion-input' // Useful for setting focus later on
+                        },
                         value: (function () {
                             var ob = undefined;
                             if (fileSuggestionValue) {
@@ -2323,8 +2336,6 @@ console.log(
                             }
                             return ob;
                         }()),
-                        maxSelection: 1,
-                        typeDelay: 50,
 
                         data: await (async function () {
                             var protocolValue = (window.location.protocol === 'https:') ? 'https:' : 'http:',
@@ -2356,7 +2367,9 @@ console.log(
                         await editor.userPreference('file-to-edit', fileToEdit);
                     });
 
-                    $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
+                    // If we wish to make it draggable, then ideally, the height/direction of the files list would also
+                    // need to be adjusted. Hence, commenting it out for now.
+                    // $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
                     $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
                         $fileEditOptions.remove();
@@ -2367,6 +2380,9 @@ console.log(
                         callback(filePath);
                     });
                     $('body').append($fileEditOptions);
+
+                    await asyncTimeout(0); // Required for the focus functionality to work correctly
+                    $fileEditOptions.find('#file-suggestion-input').focus();
                 };
 
                 var loadFile = function (options) {

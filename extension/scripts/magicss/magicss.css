@@ -1062,7 +1062,7 @@ html .magicss-mouse-over-dom-element {
     z-index: 10000;
     background-color: #fff;
     left: 0px;
-    max-height: calc(70vh);
+    max-height: calc(90vh - 85px);
 }
 .magic-css-edit-file-options .ms-ctn {
     padding-left: 7px;
