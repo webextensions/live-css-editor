@@ -3380,7 +3380,7 @@ console.log(
 
                         var $fileToEdit = $(
                             '<div class="file-to-edit">' +
-                                '<div class="name-of-file-being-edited" style="color:#fff"></div>' +
+                                '<div class="name-of-file-being-edited" style="color:#fff; cursor:pointer"></div>' +
                             '</div>'
                         );
                         var $fileEditStatus = $('<div class="file-edit-status" style="color:#fff"></div>');
