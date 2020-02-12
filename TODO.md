@@ -11,6 +11,7 @@
 * Allow moving editor to external window and/or in a separate panel along with the extension icon.
 
 #### Improvements
+* Add Ctrl/Cmd + p and Ctrl/Cmd + o shortcuts to open file mode and if the file mode is already open, then open file selector
 * Change the background color to neutral dark-gray with appropriate shadow
 * Use black-and-white/grayscale + transparent/translucent for all icons under "+"
 * "Reload CSS resources" feature should try to detect and reload `@import` instructions through `<style>` and `<link>` tags
