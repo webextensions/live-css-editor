@@ -1120,6 +1120,22 @@ html .magicss-mouse-over-dom-element {
     padding-right: 12px;
 }
 
+.magic-css-edit-file-options .ms-sel-item + input {
+    /*
+    Used to avoid showing the <input> element and hence the cursor.
+    Otherwise, the users may get a feeling that they can type multiple
+    file names to edit.
+    */
+    opacity: 0;
+}
+
+.magic-css-edit-file-options .ms-sel-ctn .ms-sel-item .ms-close-btn {
+    filter: brightness(70%);
+}
+.magic-css-edit-file-options .ms-sel-ctn .ms-sel-item .ms-close-btn:hover {
+    filter: brightness(50%);
+}
+
 
 /*
     Begin: Site-specific / CSS-style-specific fixes
