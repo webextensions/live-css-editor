@@ -3137,11 +3137,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 'html #' + id + ' {',
                                 '    opacity: 0 !important;',
                                 '    pointer-events: none !important;',
-                                '    transition: opacity 0.5s ease-in-out;',
                                 '}',
                                 'html:hover #' + id + ' {',
-                                '    pointer-events: initial !important;',
                                 '    opacity: 1 !important;',
+                                '    pointer-events: initial !important;',
                                 '}'
                             ].join('\n'),
                             parentTag: 'body'

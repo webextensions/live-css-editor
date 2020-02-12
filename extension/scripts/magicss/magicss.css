@@ -7,6 +7,19 @@
     box-sizing: content-box !important;
 }
 
+#MagiCSS-bookmarklet {
+    /*
+    This "opacity" transition is currently useful under two scenarios:
+        * Point and click is activated (for generating CSS selector)
+        * The user has set preference of hiding the editor on page-mouseout
+    */
+    transition: opacity 0.5s ease-in-out;
+}
+.magicss-point-and-click-activated#MagiCSS-bookmarklet {
+    pointer-events: none !important;
+    opacity: 0 !important;
+}
+
 /* Begin: CSS changes related to font-size */
 .alert-note-text,
 .tooltipster-base ul li a,
