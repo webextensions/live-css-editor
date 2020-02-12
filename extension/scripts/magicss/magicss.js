@@ -3050,6 +3050,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     }
 
+                    isPointAndClickActivated() {
+                        return enablePointAndClick;
+                    }
+                    deactivatePointAndClick() {
+                        disablePointAndClickFunctionality(this);
+                    }
+
                     async disableEnableCSS(doWhat) {
                         var disabled;
                         if (doWhat === 'disable') {
