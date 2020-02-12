@@ -682,8 +682,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     },
                     Esc: async function () {
-                        // If there is some selection
-                        if (thisOb.cm.getSelection()) {
+                        if (thisOb.isPointAndClickActivated()) {
+                            thisOb.deactivatePointAndClick();
+                        } else if (thisOb.cm.getSelection()) { // If there is some selection
                             // Clear selection
                             thisOb.setCursorPosition(
                                 thisOb.getCursorPosition()

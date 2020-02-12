@@ -3877,6 +3877,13 @@ console.log(
                         }
                     }
 
+                    isPointAndClickActivated() {
+                        return enablePointAndClick;
+                    }
+                    deactivatePointAndClick() {
+                        disablePointAndClickFunctionality(this);
+                    }
+
                     async disableEnableCSS(doWhat) {
                         var disabled;
                         if (doWhat === 'disable') {
