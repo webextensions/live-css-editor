@@ -3964,10 +3964,12 @@ console.log(
                             }],
                             cssText: [
                                 'html #' + id + ' {',
+                                '    transition: opacity 0.5s ease-in-out;',
                                 '    opacity: 0 !important;',
                                 '    pointer-events: none !important;',
                                 '}',
                                 'html:hover #' + id + ' {',
+                                // Note that this opacity CSS would not let the editor hide in point-and-click mode (to generate CSS selector)
                                 '    opacity: 1 !important;',
                                 '    pointer-events: initial !important;',
                                 '}'
