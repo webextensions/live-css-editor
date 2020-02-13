@@ -1122,10 +1122,24 @@ html .magicss-mouse-over-dom-element {
 }
 
 .magic-css-edit-file-options .ms-sel-ctn .ms-sel-item .ms-close-btn {
-    filter: brightness(70%);
+    background-image: none;
+    margin: 0;
+    margin-left: 5px;
+    width: 25px;
+    height: 20px;
 }
-.magic-css-edit-file-options .ms-sel-ctn .ms-sel-item .ms-close-btn:hover {
-    filter: brightness(50%);
+.magic-css-edit-file-options .ms-sel-ctn .ms-sel-item .ms-close-btn:before {
+    font-family: monospace !important;
+    content: '×';
+    font-weight: bold;
+    display: block;
+    padding-top: 1px;
+    padding-left: 5px;
+    font-size: 16px;
+    color: #aaa;
+}
+.magic-css-edit-file-options .ms-sel-ctn .ms-sel-item .ms-close-btn:hover:before {
+    color: #333;
 }
 
 
