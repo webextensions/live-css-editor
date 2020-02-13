@@ -1268,7 +1268,7 @@ console.log(
                                             '<input type="number" min="1" max="65535" step="1" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px;" />',
                                         '</div>',
                                     '</div>',
-                                    '<div style="min-height:10px; height: calc(4vh + 10px); max-height:35px; padding-top:3px; clear:both;">',
+                                    '<div style="min-height:35px; padding-top:3px; clear:both;">',
                                         '<div class="live-css-connectivity-error-message live-css-server-client-general-error-message" style="display:none;">',
                                             '<div>You are not connected. Is live-css server running?</div>',
                                             '<div>',
