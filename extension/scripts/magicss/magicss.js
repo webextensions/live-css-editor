@@ -3805,6 +3805,17 @@ console.log(
                         disablePointAndClickFunctionality(this);
                     }
 
+                    async keyPressed(keyCombination) {
+                        if (
+                            keyCombination === 'Ctrl-P' ||
+                            keyCombination === 'Cmd-P' ||
+                            keyCombination === 'Ctrl-O' ||
+                            keyCombination === 'Cmd-P'
+                        ) {
+                            await setLanguageMode('file', this);
+                        }
+                    }
+
                     async disableEnableCSS(doWhat) {
                         var disabled;
                         if (doWhat === 'disable') {

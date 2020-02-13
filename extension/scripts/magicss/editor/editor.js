@@ -694,6 +694,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 await thisOb.hide();
                             }
                         }
+                    },
+                    'Ctrl-P': async function () {
+                        thisOb.keyPressed('Ctrl-P');
+                    },
+                    'Cmd-P': async function () {
+                        thisOb.keyPressed('Cmd-P');
+                    },
+                    'Ctrl-O': async function () {
+                        thisOb.keyPressed('Ctrl-O');
+                    },
+                    'Cmd-O': async function () {
+                        thisOb.keyPressed('Cmd-O');
                     }
                 }
             };
