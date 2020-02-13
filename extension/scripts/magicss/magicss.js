@@ -30,7 +30,7 @@ console.log(
     window.currentlyConnected = false;
     var setCurrentlyConnected = function (value) {
         window.currentlyConnected = value;
-        console.log('window.currentlyConnected', window.currentlyConnected);
+        // console.log('window.currentlyConnected', window.currentlyConnected);
     };
 
     var socketOb = {};
@@ -67,7 +67,7 @@ console.log(
         // debugger;
 
         socket.on('connect', function () {
-            console.log('inside on connect');
+            // console.log('inside on connect');
             editor.markLiveCssServerConnectionStatus(true);
 
             setCurrentlyConnected(true);
@@ -250,33 +250,12 @@ console.log(
             editor,
             async function callback (err) {
             // function callback (err, socket) {
+                debugger;
                 if (err) {
                     // The user cancelled watching files
                     utils.alertNote('You cancelled watching CSS files for changes');
                     await editor.userPreference('watching-css-files', 'no');
                 } else {
-                    // socket.on('file-modified', function(changeDetails) {
-                    //     if (changeDetails.useOnlyFileNamesForMatch) {
-                    //         reloadCSSResourceInPage({
-                    //             fullPath: changeDetails.fullPath,
-                    //             useOnlyFileNamesForMatch: true,
-                    //             fileName: changeDetails.fileName
-                    //         });
-                    //     } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                    //         var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                    //         reloadCSSResourceInPage({
-                    //             fullPath: changeDetails.fullPath,
-                    //             url: resolveUrl(pathWrtRoot)
-                    //         });
-                    //     } else {
-                    //         // The code should never reach here
-                    //         utils.alertNote(
-                    //             'Unexpected scenario occurred in reloading some CSS resources.' +
-                    //             '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                    //             10000
-                    //         );
-                    //     }
-                    // });
                     if (!socketOb.flagWatchingCssFiles) {
                         socketOb.flagWatchingCssFiles = true;
                         utils.alertNote(
@@ -293,11 +272,13 @@ console.log(
                     }
 
                     if (!socketIfAlreadyConnected && asyncCb) {
+                        debugger;
                         await asyncCb();
                     }
                 }
             },
             async function callbackForReconfiguration () {
+                debugger;
                 await socketOb.getConnected(editor);
             }
         );
@@ -1177,7 +1158,7 @@ console.log(
 
     var getServerDetailsFromUserAlreadyOpen = false;
     // var getServerDetailsFromUser = async function (editor) {
-    var getServerDetailsFromUser = async function (editor, callback) {
+    var getServerDetailsFromUser = async function (editor, cbGotServerDetailsFromUser) {
         // debugger;
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
@@ -1197,7 +1178,7 @@ console.log(
                         '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
                             '<div class="magic-css-back-end-connectivity-options" style="pointer-events:initial;">',
                                 '<div class="magic-css-server-config-item" style="padding-bottom:0;">',
-                                    '<div>',
+                                    '<div style="overflow-y:auto; max-height:calc(70vh - 70px);">',
                                         '<div style="margin-bottom:20px;">',
                                             'You need to run a development server, called',
                                             ' <a target="_blank" href="https://www.npmjs.com/package/@webextensions/live-css" style="font-weight:bold; text-decoration:underline; color:#000;">live-css</a>',
@@ -1287,7 +1268,7 @@ console.log(
                                             '<input type="number" min="1" max="65535" step="1" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px;" />',
                                         '</div>',
                                     '</div>',
-                                    '<div style="min-height:35px; padding-top:3px; clear:both;">',
+                                    '<div style="min-height:10px; height: calc(4vh + 10px); max-height:35px; padding-top:3px; clear:both;">',
                                         '<div class="live-css-connectivity-error-message live-css-server-client-general-error-message" style="display:none;">',
                                             '<div>You are not connected. Is live-css server running?</div>',
                                             '<div>',
@@ -1321,74 +1302,6 @@ console.log(
         var $serverPort = window.$backEndConnectivityOptions.find('.magic-css-server-port'),
             serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
-        /*
-        // TODO: Remove this variable
-        // var connectionTestingSocket = null;
-        var refreshConnectivityUi = function () {
-            var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
-            // if (connectionTestingSocket) {
-            //     connectionTestingSocket.close();
-            //     connectionTestingSocket = null;
-            // }
-            if (socket) {
-                editor.markLiveCssServerConnectionStatus(false);
-
-                socket.close();
-                socket = null;
-            }
-            $backEndConnectivityOptions
-                .removeClass('live-css-server-client-general-error')
-                .removeClass('live-css-server-client-incompatible-error')
-                .find('.magic-css-server-connectivity-status')
-                .removeClass('connected')
-                .removeClass('disconnected')
-                .addClass('connecting');
-            // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
-
-            // connectionTestingSocket = io(backEndPath);
-            socket = io(backEndPath);
-            socket.on('connect', function () {
-            // connectionTestingSocket.on('connect', function () {
-                editor.markLiveCssServerConnectionStatus(true);
-
-                $backEndConnectivityOptions
-                    .removeClass('live-css-server-client-general-error')
-                    .removeClass('live-css-server-client-incompatible-error')
-                    .find('.magic-css-server-connectivity-status')
-                    .removeClass('disconnected')
-                    .removeClass('connecting')
-                    .addClass('connected');
-                // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', false);
-            });
-            var errorHandler = function (err) {
-                editor.markLiveCssServerConnectionStatus(false);
-
-                $backEndConnectivityOptions
-                    .removeClass('live-css-server-client-general-error')
-                    .removeClass('live-css-server-client-incompatible-error')
-                    .find('.magic-css-server-connectivity-status')
-                    .removeClass('connected')
-                    .removeClass('connecting')
-                    .addClass('disconnected');
-
-                if (err === 'Invalid namespace') {
-                    $backEndConnectivityOptions
-                        .addClass('live-css-server-client-incompatible-error');
-                } else {
-                    $backEndConnectivityOptions
-                        .addClass('live-css-server-client-general-error');
-                }
-                // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
-            };
-
-            // connectionTestingSocket.on('connect_error', errorHandler);
-            // connectionTestingSocket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
-
-            socket.on('connect_error', errorHandler);
-            socket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
-        };
-        /* */
-
         $serverHostname.val(serverHostnameValue);
         $serverHostname.on('input', async function () {
             debugger;
@@ -1398,7 +1311,7 @@ console.log(
             await socketOb.reset();
         });
 
-        console.log('Haha 1');
+        // console.log('Haha 1');
         $serverPort.val(serverPortValue);
         $serverPort.on('input', async function () {
             console.log('inside input');
@@ -1411,41 +1324,32 @@ console.log(
         // Useful when developing/debugging
         // $backEndConnectivityOptions.find('.magic-css-back-end-connectivity-options').draggable();   // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
-        /*
-        var disconnectConnectionTestingSocket = function () {
-            // if (connectionTestingSocket) {
-            //     connectionTestingSocket.close();
-            //     connectionTestingSocket = null;
-            // }
-            if (socket) {
-                editor.markLiveCssServerConnectionStatus(false);
-
-                socket.close();
-                socket = null;
-            }
-        };
-        // $backEndConnectivityOptions.find('.magic-css-full-page-overlay').on('click', function () {
-        //     disconnectConnectionTestingSocket();
-        //     $backEndConnectivityOptions.remove();
-        //     getServerDetailsFromUserAlreadyOpen = false;
-        // });
-        /* */
-        window.$backEndConnectivityOptions.find('.magicss-done-server-path-changes').on('click', function () {
-            // await editor.userPreference('live-css-server-hostname', serverHostnameValue);
-            // await editor.userPreference('live-css-server-port', serverPortValue);
+        window.$backEndConnectivityOptions.find('.magicss-done-server-path-changes').on('click', async function () {
+            await editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            await editor.userPreference('live-css-server-port', serverPortValue);
 
             // disconnectConnectionTestingSocket();
             window.$backEndConnectivityOptions.remove();
             getServerDetailsFromUserAlreadyOpen = false;
+
+            debugger;
+            // callback();
+            // callback('todo');
+
+            cbGotServerDetailsFromUser(null, {
+                serverHostname: serverHostnameValue,
+                serverPort: serverPortValue
+            });
         });
         window.$backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', async function () {
             await editor.userPreference('live-css-server-hostname', serverHostnameValue);
             await editor.userPreference('live-css-server-port', serverPortValue);
 
-            callback(null, {
-                serverHostname: serverHostnameValue,
-                serverPort: serverPortValue
-            });
+            // cbGotServerDetailsFromUser(null, {
+            //     serverHostname: serverHostnameValue,
+            //     serverPort: serverPortValue
+            // });
+            await socketOb.reset();
         });
         $('body').append(window.$backEndConnectivityOptions);
         // refreshConnectivityUi();
@@ -1529,8 +1433,10 @@ console.log(
                     if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
                         await getServerDetailsFromUser(editor, function (err, serverDetails) {
                             if (!err) {
+                                // console.log('TODO', serverDetails);
                                 setTimeout(async function () {
-                                    await asyncCallbackForReconfiguration(serverDetails);
+                                    // await asyncCallbackForReconfiguration(serverDetails);
+                                    await mainAsyncCallback(serverDetails);
                                 });
                             }
                         });
@@ -1567,21 +1473,27 @@ console.log(
             !(await editor.userPreference('live-css-server-hostname')) ||
             !(await editor.userPreference('live-css-server-port'))
         ) {
+            // debugger;
             await getServerDetailsFromUser(editor, function (err, serverDetails) {
+                // debugger;
                 if (!err) {
                     setTimeout(async function () {
-                        await asyncCallbackForReconfiguration(serverDetails);
+                        // await asyncCallbackForReconfiguration(serverDetails);
+                        // await mainAsyncCallback(serverDetails);
+                        await mainAsyncCallback();
                     });
                 }
             });
         } else {
+            debugger;
             const _serverHostnameValue = await editor.userPreference('live-css-server-hostname');
             const _serverPort = await editor.userPreference('live-css-server-port');
 
-            await asyncCallbackForReconfiguration({
-                serverHostname: _serverHostnameValue,
-                serverPort: _serverPort
-            });
+            // await asyncCallbackForReconfiguration({
+            //     serverHostname: _serverHostnameValue,
+            //     serverPort: _serverPort
+            // });
+            await mainAsyncCallback();
         }
 
         /*
@@ -2290,16 +2202,16 @@ console.log(
                             '<div>',
                                 '<div class="magic-css-full-page-overlay">',
                                 '</div>',
-                                '<div class="magic-css-full-page-contents" style="pointer-events:none;">',
-                                    '<div style="display:flex;justify-content:center;/*align-items:center;*/margin-top:20px;height:100%;">',
+                                '<div class="magic-css-full-page-contents magic-css-ui" style="pointer-events:none;">',
+                                    '<div style="display:flex;justify-content:center;/*align-items:center;*/margin-top:38px;height:100%;">',
                                         '<div class="magic-css-edit-file-options" style="pointer-events:initial;">',
                                             '<div class="magic-css-row magic-css-file-config-item">',
                                                 '<div class="magic-css-row-item-1 magic-css-file-field-header">File to edit</div>',
                                                 '<div class="magic-css-row-item-2"><input class="magicss-file-to-edit" /></div>',
                                             '</div>',
                                             '<div class="magic-css-row magic-css-file-config-item" style="text-align:center">',
-                                                '<input type="button" class="magicss-start-file-editing" value="Start Editing" />',
-                                                '<input type="button" class="magicss-cancel-file-mode" value="Cancel" style="margin-left:20px" />',
+                                                '<button type="button" class="magicss-start-file-editing">Start Editing</button>',
+                                                '<button type="button" class="magicss-cancel-file-mode" style="margin-left:20px">Cancel</button>',
                                             '</div>',
                                         '</div>',
                                     '</div>',
@@ -2369,7 +2281,8 @@ console.log(
 
                     // If we wish to make it draggable, then ideally, the height/direction of the files list would also
                     // need to be adjusted. Hence, commenting it out for now.
-                    // $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
+                    console.log('TODO - Comment it out');
+                    $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
                     $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
                         $fileEditOptions.remove();
@@ -2411,7 +2324,7 @@ console.log(
                     }, 0);
                 };
 
-                var getDataForFileToEdit = async function (editor, options, cb) {
+                var getDataForFileToEdit = async function (editor, options, cbWhenGotDataForFileToEdit) {
                     options = options || {};
                     var needInputThroughUi = true;
 
@@ -2420,30 +2333,32 @@ console.log(
                         needInputThroughUi = false;
                     }
 
-                    console.log('TODO: The following piece of code needs to be refactored');
+                    // console.log('TODO: The following piece of code needs to be refactored');
                     socketOb.getConnected(editor, async function () {
                         if (needInputThroughUi || options.showUi) {
+                            console.log('tracking 201');
                             await showFileEditOptions(editor, function (filePath) {
                                 loadFile({
                                     filePath: filePath,
                                     successCallback: function (file) {
-                                        cb(file);
+                                        cbWhenGotDataForFileToEdit(file);
                                     },
                                     errorCallback: async function () {
                                         await editor.userPreference('file-to-edit', null);
-                                        await getDataForFileToEdit(editor, options, cb);
+                                        await getDataForFileToEdit(editor, options, cbWhenGotDataForFileToEdit);
                                     }
                                 });
                             });
                         } else {
+                            console.log('tracking 301');
                             loadFile({
                                 filePath: pathOfFileToEdit,
                                 successCallback: function (file) {
-                                    cb(file);
+                                    cbWhenGotDataForFileToEdit(file);
                                 },
                                 errorCallback: async function () {
                                     await editor.userPreference('file-to-edit', null);
-                                    await getDataForFileToEdit(editor, options, cb);
+                                    await getDataForFileToEdit(editor, options, cbWhenGotDataForFileToEdit);
                                 }
                             });
                         }
@@ -2489,7 +2404,7 @@ console.log(
                 var setLanguageMode = async function (newLanguageMode, editor, options) {
                     options = options || {};
                     if (newLanguageMode === 'file') {
-                        // debugger;
+                        debugger;
                         var fileEditingOptions = {};
                         // If previous mode was also 'file' (meaning the user clicked again), then we prompt the user for selecting file (or related options)
                         if (getLanguageMode() === 'file') {
@@ -3865,7 +3780,7 @@ console.log(
                         ) {
                             // debugger;
                         }
-                        console.log('markLiveCssServerConnectionStatus', connected);
+                        // console.log('markLiveCssServerConnectionStatus', connected);
                         if (connected) {
                             $(this.container)
                                 .removeClass('magic-css-live-css-server-is-not-connected')

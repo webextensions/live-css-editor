@@ -669,7 +669,7 @@ html .magicss-mouse-over-dom-element {
 }
 
 .magic-css-back-end-connectivity-options {
-    width: 410px;
+    width: 430px;
     position: fixed !important; /* Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;" */
     z-index: 2147483647;
     box-sizing: border-box;
@@ -1067,7 +1067,7 @@ html .magicss-mouse-over-dom-element {
     z-index: 10000;
     background-color: #fff;
     left: 0px;
-    max-height: calc(90vh - 85px);
+    max-height: calc(90vh - 100px);
 }
 .magic-css-edit-file-options .ms-ctn {
     padding-left: 7px;
