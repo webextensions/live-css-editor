@@ -2210,7 +2210,7 @@ console.log(
                                                 '<div class="magic-css-row-item-2"><input class="magicss-file-to-edit" /></div>',
                                             '</div>',
                                             '<div class="magic-css-row magic-css-file-config-item" style="text-align:center">',
-                                                '<button type="button" class="magicss-start-file-editing">Start Editing</button>',
+                                                '<button type="button" class="magicss-start-file-editing" disabled="disabled">Start Editing</button>',
                                                 '<button type="button" class="magicss-cancel-file-mode" style="margin-left:20px">Cancel</button>',
                                             '</div>',
                                         '</div>',
@@ -2276,19 +2276,25 @@ console.log(
                     var $fileSuggestions = $(fileSuggestions);
                     $fileSuggestions.on('selectionchange', async function(e, m){   // eslint-disable-line no-unused-vars
                         var fileToEdit = this.getValue()[0] || '';
-                        await editor.userPreference('file-to-edit', fileToEdit);
+                        if (fileToEdit) {
+                            $fileEditOptions.find('.magicss-start-file-editing').removeAttr('disabled');
+                        } else {
+                            $fileEditOptions.find('.magicss-start-file-editing').attr('disabled', 'disabled');
+                        }
                     });
 
                     // If we wish to make it draggable, then ideally, the height/direction of the files list would also
                     // need to be adjusted. Hence, commenting it out for now.
-                    console.log('TODO - Comment it out');
-                    $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
+                    // console.log('TODO - Comment it out');
+                    // $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
-                    $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
+                    // $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
+                    $fileEditOptions.find('.magicss-cancel-file-mode').on('click', function () {
                         $fileEditOptions.remove();
                     });
-                    $fileEditOptions.find('.magicss-start-file-editing').on('click', function () {
-                        var filePath = fileSuggestions.getValue()[0];
+                    $fileEditOptions.find('.magicss-start-file-editing').on('click', async function () {
+                        var filePath = fileSuggestions.getValue()[0] || '';
+                        await editor.userPreference('file-to-edit', filePath);
                         $fileEditOptions.remove();
                         callback(filePath);
                     });
