@@ -2423,7 +2423,9 @@ console.log(
                             await editor.userPreference('language-mode', 'file');
                             editor.cm.setOption('mode', 'text/x-less');
                             setCodeMirrorCSSLinting(editor, 'disable');
+
                             $('.footer-for-file-mode').show();
+                            editor.adjustUiPosition();
 
                             // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
                             // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user clicks on the footer in file mode
@@ -2458,6 +2460,8 @@ console.log(
                         }
 
                         $('.footer-for-file-mode').hide();
+                        editor.adjustUiPosition();
+
                         if (newLanguageMode === 'less') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-less');
                             await editor.userPreference('language-mode', 'less');

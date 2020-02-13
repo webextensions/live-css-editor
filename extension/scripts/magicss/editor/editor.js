@@ -585,6 +585,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             autoPositionEditor(thisOb);
         }
 
+        adjustUiPosition() {
+            var thisOb = this;
+            autoPositionEditor(thisOb);
+        }
+
         _makeDraggable() {
             var thisOb = this,
                 options = thisOb.options;
