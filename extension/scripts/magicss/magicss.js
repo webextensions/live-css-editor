@@ -39,7 +39,7 @@ console.log(
     socketOb.socket = null;
     socketOb.flagWatchingCssFiles = false;
 
-    socketOb.setup = async function () {
+    socketOb.setup = async function (asyncCallbackOnce) {
         var $backEndConnectivityOptions = window.$backEndConnectivityOptions;
         var editor = window.MagiCSSEditor;
 
@@ -242,9 +242,9 @@ console.log(
         }
     };
 
-    socketOb.reset = async function () {
+    socketOb.reset = async function (asyncCallbackOnce) {
         socketOb.close();
-        await socketOb.setup();
+        await socketOb.setup(asyncCallbackOnce);
     };
 
     socketOb.getConnected = async function (editor, asyncCb) {
@@ -258,6 +258,7 @@ console.log(
                     utils.alertNote('You cancelled watching CSS files for changes');
                     await editor.userPreference('watching-css-files', 'no');
                 } else {
+                    // TODO: This code is duplicated elsewhere
                     if (!socketOb.flagWatchingCssFiles) {
                         socketOb.flagWatchingCssFiles = true;
                         utils.alertNote(
@@ -284,8 +285,26 @@ console.log(
                 await socketOb.getConnected(editor);
             }
         );
-        if (socketIfAlreadyConnected && asyncCb) {
-            await asyncCb();
+        if (socketIfAlreadyConnected) {
+            if (asyncCb) {
+                await asyncCb();
+            }
+
+            // TODO: This code is duplicated elsewhere
+            if (!socketOb.flagWatchingCssFiles) {
+                socketOb.flagWatchingCssFiles = true;
+                utils.alertNote(
+                    'Watching CSS files for changes.' +
+                    '<br />' +
+                    '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                    20000,
+                    {
+                        unobtrusive: true
+                    }
+                );
+                $(editor.container).addClass('watching-css-files');
+                await editor.userPreference('watching-css-files', 'yes');
+            }
         }
     };
 
@@ -1306,7 +1325,7 @@ console.log(
 
         $serverHostname.val(serverHostnameValue);
         $serverHostname.on('input', async function () {
-            debugger;
+            // debugger;
             serverHostnameValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultHostname;
             await editor.userPreference('live-css-server-hostname', serverHostnameValue);
             // refreshConnectivityUi();
@@ -1334,7 +1353,7 @@ console.log(
             window.$backEndConnectivityOptions.remove();
             getServerDetailsFromUserAlreadyOpen = false;
 
-            debugger;
+            // debugger;
             // callback();
             // callback('todo');
 
@@ -1487,7 +1506,7 @@ console.log(
                 }
             });
         } else {
-            debugger;
+            // debugger;
             // const _serverHostnameValue = await editor.userPreference('live-css-server-hostname');
             // const _serverPort = await editor.userPreference('live-css-server-port');
 
@@ -1497,129 +1516,10 @@ console.log(
             // });
             // await mainAsyncCallback();
 
-            await socketOb.reset();
+            await socketOb.reset(async function () {
+                await mainAsyncCallback();
+            });
         }
-
-        /*
-        // var flagConnectedAtLeastOnce = false;
-        socket = io(backEndPath, {
-            // timeout: 5000
-            // reconnectionAttempts: 100
-        });
-
-        socket.on('error', async function asyncCallback(err) {
-            editor.markLiveCssServerConnectionStatus(false);
-            // In case of "Invalid namespace", we open the UI for details to inform that they are using
-            // incompatible version of the live-css server
-            if (err === 'Invalid namespace') {
-                await getServerDetailsFromUser(editor, function (err, serverDetails) {
-                    if (!err) {
-                        setTimeout(async function () {
-                            await asyncCallbackForReconfiguration(serverDetails);
-                        });
-                    }
-                });
-            }
-        });
-
-        /* */
-        /*
-        socket.on('connect', async function () {
-            editor.markLiveCssServerConnectionStatus(true);
-
-            // flagConnectedAtLeastOnce = true;
-
-            // if (!flagCallbackCalledOnce) {
-            //     flagCallbackCalledOnce = true;
-            //     callback(null, socket);
-            // }
-
-            // if ($toastrReconnectAttempt) {
-            //     $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-            //     $toastrReconnectAttempt = null;
-            // }
-
-            // $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-            // $toastrConnected = toastr.success(
-            //     '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
-            //         backEndPathToShowToUser +
-            //     '</div>' +
-            //     '<div>' +
-            //     '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
-            //         '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
-            //     '</div>',
-            //     'Connected with live-css server at:',
-            //     {
-            //         onclick: async function (evt) {
-            //             if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-            //                 toastr.clear($toastrConnected, {force: true});
-            //                 await getServerDetailsFromUser(editor, function (err, serverDetails) {
-            //                     if (!err) {
-            //                         setTimeout(async function () {
-            //                             await asyncCallbackForReconfiguration(serverDetails);
-            //                         });
-            //                     }
-            //                 });
-            //             } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
-            //                 toastr.clear($toastrConnected, {force: true});
-            //             }
-            //         }
-            //     }
-            // );
-            // var $toastrToHide = $toastrConnected;
-            // setTimeout(function () {
-            //     toastr.clear($toastrToHide);
-            // }, 4000);
-        });
-        /* */
-
-        /*
-        socket.on('reconnect_attempt', function () {
-            editor.markLiveCssServerConnectionStatus(false);
-
-            if (flagConnectedAtLeastOnce) {
-                if ($toastrReconnectAttempt) {
-                    // do nothing
-                } else {
-                    if ($toastrConnected) {
-                        $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-                    }
-                    $toastrReconnectAttempt = toastr.warning(
-                        '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
-                            backEndPathToShowToUser +
-                        '</div>' +
-                        '<div>' +
-                            '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right">Cancel</button>' +
-                            '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
-                        '</div>',
-                        'Reconnecting with live-css server at:',
-                        {
-                            timeOut: 0,
-                            onclick: async function (evt) {
-                                if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                    await getServerDetailsFromUser(editor, function (err, serverDetails) {
-                                        if (!err) {
-                                            setTimeout(async function () {
-                                                await asyncCallbackForReconfiguration(serverDetails);
-                                            });
-                                        }
-                                    });
-                                } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
-                                    if (socket) {
-                                        editor.markLiveCssServerConnectionStatus(false);
-
-                                        socket.close();
-                                        socket = null;
-                                    }
-                                    toastr.clear($toastrReconnectAttempt, {force: true});
-                                    await liveCssServerSessionClosedByUser(editor);
-                                }
-                            }
-                        }
-                    );
-                }
-            }
-        }); /* */
     };
 
     var getDisconnectedWithBackEnd = async function (editor, options, asyncCallback) {
@@ -2414,7 +2314,7 @@ console.log(
                 var setLanguageMode = async function (newLanguageMode, editor, options) {
                     options = options || {};
                     if (newLanguageMode === 'file') {
-                        debugger;
+                        // debugger;
                         var fileEditingOptions = {};
                         // If previous mode was also 'file' (meaning the user clicked again), then we prompt the user for selecting file (or related options)
                         if (getLanguageMode() === 'file') {
@@ -3953,3 +3853,96 @@ console.log(
         });
     }
 }(jQuery));
+
+
+/* eslint-disable */
+var unusedCode = function () {
+    socketOb = {
+        watchingCssFiles: false,
+        disconnect: function () {
+            socketOb.deactivateWatchingCssFiles();
+            socketOb.deactivateEditingCssFiles();
+        },
+        activateWatchingCssFiles: function () {
+
+        },
+        deactivateWatchingCssFiles: function () {
+
+        },
+        selectFileEditingMode: function () {
+            connectServerHelper(function () {
+                selectFileToEdit(function (fileToEdit) {
+                    editor.loadFile(fileToEdit);
+                });
+            });
+        },
+        deselectFileEditingMode: function () {
+
+        }
+    };
+
+    connectServer = function (callback) {
+
+    }
+
+
+    connectServerHelper = function (mainCallback) {
+        if (userHadNeverConnectedToLiveCssServerOnThisSite()) {
+            askForUserInputAlongWithGuide(function () {
+                connectServer(mainCallback);
+            });
+        } else {
+            connectServer(mainCallback);
+        }
+    }
+
+    extension.onLoad = function () {
+        const connectForWatching = userPreference('watchingCssFiles') === 'yes';
+        const connectForEditing = userPreference('editingCssFiles') === 'yes';
+        if (
+            connectForWatching ||
+            connectForEditing
+        ) {
+            connectServerHelper(function () {
+                // Checking the status again, in case by this time something changed
+                const stillConnectForWatching = userPreference('watchingCssFiles') === 'yes';
+                const stillConnectForEditing = userPreference('editingCssFiles') === 'yes';
+
+                if (stillConnectForWatching || stillConnectForEditing) {
+                    if (stillConnectForWatching) {
+                        socketOb.activateWatchingCssFiles();
+                    }
+                    if (stillConnectForEditing) {
+                        socketOb.selectFileEditingMode();
+                    }
+                } else {
+                    socketOb.disconnect();
+                }
+            });
+        }
+    };
+
+    iconWatchCssFiles.onclick = function () {
+        if (socketOb.socket) {
+            socketOb.activateWatchingCssFiles();
+            userPreference('watchingCssFiles', 'yes');
+        } else {
+            connectServerHelper(function () {
+                socketOb.activateWatchingCssFiles();
+                userPreference('watchingCssFiles', 'yes');
+            });
+        }
+    };
+
+    fileTab.onclick = function () {
+        socketOb.selectFileEditingMode();
+    };
+
+
+    // Given: - User had enabled watching files in a previous session
+    //        - Hence, the connection details were available in local storage
+    //        - The live-css server is running
+    // When:  - Extension loads
+    // Then:  - The live-css server should be auto-connected
+    //        - The user should see a notification that the files are being watched
+}
