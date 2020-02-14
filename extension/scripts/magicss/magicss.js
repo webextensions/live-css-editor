@@ -72,13 +72,15 @@ console.log(
 
             setCurrentlyConnected(true);
 
-            $backEndConnectivityOptions
-                .removeClass('live-css-server-client-general-error')
-                .removeClass('live-css-server-client-incompatible-error')
-                .find('.magic-css-server-connectivity-status')
-                .removeClass('disconnected')
-                .removeClass('connecting')
-                .addClass('connected');
+            if ($backEndConnectivityOptions) {
+                $backEndConnectivityOptions
+                    .removeClass('live-css-server-client-general-error')
+                    .removeClass('live-css-server-client-incompatible-error')
+                    .find('.magic-css-server-connectivity-status')
+                    .removeClass('disconnected')
+                    .removeClass('connecting')
+                    .addClass('connected');
+            }
 
             flagConnectedAtLeastOnce = true;
 
@@ -1486,14 +1488,16 @@ console.log(
             });
         } else {
             debugger;
-            const _serverHostnameValue = await editor.userPreference('live-css-server-hostname');
-            const _serverPort = await editor.userPreference('live-css-server-port');
+            // const _serverHostnameValue = await editor.userPreference('live-css-server-hostname');
+            // const _serverPort = await editor.userPreference('live-css-server-port');
 
             // await asyncCallbackForReconfiguration({
             //     serverHostname: _serverHostnameValue,
             //     serverPort: _serverPort
             // });
-            await mainAsyncCallback();
+            // await mainAsyncCallback();
+
+            await socketOb.reset();
         }
 
         /*
