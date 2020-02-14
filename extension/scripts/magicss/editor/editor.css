@@ -62,3 +62,9 @@ html div.CodeMirror span.CodeMirror-nonmatchingbracket {
     background-color: #fbb;
     color: #f22;
 }
+
+/* When the browser is in zoom-out mode, items with 1px width may not show up under some scenarios. */
+/* This code fixes the problem for most of the common cases. */
+.CodeMirror-cursor {
+    border-left-width: 1.49px;
+}
