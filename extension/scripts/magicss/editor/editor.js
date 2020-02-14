@@ -728,6 +728,15 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     await thisOb.triggerEvent('delayedtextchange');
                 }, delay);
             });
+            cm.on('keydown', function(cm, evt) {
+                evt.stopPropagation();
+            });
+            cm.on('keypress', function(cm, evt) {
+                evt.stopPropagation();
+            });
+            cm.on('keyup', function(cm, evt) {
+                evt.stopPropagation();
+            });
 
             // http://stackoverflow.com/questions/4179708/how-to-detect-if-the-pressed-key-will-produce-a-character-inside-an-input-text/4180715#4180715
             var isCharacterKeyPress = function (evt) {
