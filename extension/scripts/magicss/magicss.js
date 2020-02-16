@@ -67,7 +67,9 @@ console.log(
         // debugger;
 
         socket.on('connect', async function () {
-            await asyncCallbackOnce();
+            if (asyncCallbackOnce) {
+                await asyncCallbackOnce();
+            }
 
             // console.log('inside on connect');
             editor.markLiveCssServerConnectionStatus(true);
@@ -107,15 +109,23 @@ console.log(
                 '</div>',
                 'Connected with live-css server at:',
                 {
-                    onclick: function (evt) {
+                    onclick: async function (evt) {
                         if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
                             toastr.clear($toastrConnected, {force: true});
-                            getServerDetailsFromUser(editor, function (err) {
+                            await _getServerDetailsFromUser(editor, function (err) {
                             // getServerDetailsFromUser(editor, function (err, serverDetails) {
                                 if (!err) {
                                     console.log('TODO');
-                                    debugger;
+                                    // debugger;
                                     // callbackForReconfiguration(serverDetails);
+
+                                    /*
+                                    setTimeout(async function () {
+                                        // await asyncCallbackForReconfiguration(serverDetails);
+                                        // await mainAsyncCallback(serverDetails);
+                                        await asyncCallbackOnce();
+                                    });
+                                    /* */
                                 }
                             });
                         } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
@@ -135,22 +145,24 @@ console.log(
 
             editor.markLiveCssServerConnectionStatus(false);
 
-            $backEndConnectivityOptions
-                .removeClass('live-css-server-client-general-error')
-                .removeClass('live-css-server-client-incompatible-error')
-                .find('.magic-css-server-connectivity-status')
-                .removeClass('connected')
-                .removeClass('connecting')
-                .addClass('disconnected');
+            if ($backEndConnectivityOptions) {
+                $backEndConnectivityOptions
+                    .removeClass('live-css-server-client-general-error')
+                    .removeClass('live-css-server-client-incompatible-error')
+                    .find('.magic-css-server-connectivity-status')
+                    .removeClass('connected')
+                    .removeClass('connecting')
+                    .addClass('disconnected');
 
-            if (err === 'Invalid namespace') {
-                $backEndConnectivityOptions
-                    .addClass('live-css-server-client-incompatible-error');
-            } else {
-                $backEndConnectivityOptions
-                    .addClass('live-css-server-client-general-error');
+                if (err === 'Invalid namespace') {
+                    $backEndConnectivityOptions
+                        .addClass('live-css-server-client-incompatible-error');
+                } else {
+                    $backEndConnectivityOptions
+                        .addClass('live-css-server-client-general-error');
+                }
+                // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
             }
-            // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
         };
 
         // connectionTestingSocket.on('connect_error', errorHandler);
@@ -186,11 +198,11 @@ console.log(
                             timeOut: 0,
                             onclick: function (evt) {
                                 if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                    getServerDetailsFromUser(editor, function (err) {
+                                    _getServerDetailsFromUser(editor, function (err) {
                                     // getServerDetailsFromUser(editor, function (err, serverDetails) {
                                         if (!err) {
                                             console.log('TODO');
-                                            debugger;
+                                            // debugger;
                                             // callbackForReconfiguration(serverDetails);
                                         }
                                     });
@@ -198,7 +210,7 @@ console.log(
                                     if (socket) {
                                         editor.markLiveCssServerConnectionStatus(false);
 
-                                        debugger;
+                                        // debugger;
                                         socket.close();
                                         socket = null;
                                     }
@@ -250,11 +262,11 @@ console.log(
     };
 
     socketOb._connectServerHelper = async function (editor, asyncCb) {
-        debugger;
+        // debugger;
         await _getConnectedWithBackEnd(
             editor,
             async function () {
-                debugger;
+                // debugger;
                 await asyncCb();
             }
         );
@@ -269,11 +281,11 @@ console.log(
         }
     };
     socketOb.getConnected = async function (editor, asyncCb) {
-        var socketIfAlreadyConnected = await getConnectedWithBackEnd(
+        var socketIfAlreadyConnected = await _getConnectedWithBackEnd(
             editor,
             async function callback (err) {
             // function callback (err, socket) {
-                debugger;
+                // debugger;
                 if (err) {
                     // The user cancelled watching files
                     utils.alertNote('You cancelled watching CSS files for changes');
@@ -296,15 +308,15 @@ console.log(
                     }
 
                     if (!socketIfAlreadyConnected && asyncCb) {
-                        debugger;
+                        // debugger;
                         await asyncCb();
                     }
                 }
-            },
-            async function callbackForReconfiguration () {
-                debugger;
-                await socketOb.getConnected(editor);
-            }
+            } //,
+            // async function callbackForReconfiguration () {
+            //     // debugger;
+            //     await socketOb.getConnected(editor);
+            // }
         );
         if (socketIfAlreadyConnected) {
             if (asyncCb) {
@@ -336,7 +348,7 @@ console.log(
 
         if (!socketOb.flagWatchingCssFiles) {
             await socketOb._connectServerHelper(editor, async function () {
-                debugger;
+                // debugger;
                 if (!socketOb.flagWatchingCssFiles) {
                     socketOb.flagWatchingCssFiles = true;
                     utils.alertNote(
@@ -1242,7 +1254,7 @@ console.log(
     // var getServerDetailsFromUser = async function (editor) {
     // var getServerDetailsFromUser = async function (editor, cbGotServerDetailsFromUser) {
     var _getServerDetailsFromUser = async function (editor, cbGotServerDetailsFromUser) {
-        debugger;
+        // debugger;
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
@@ -1465,7 +1477,7 @@ console.log(
         $toastrReconnectAttempt;
     // var getConnectedWithBackEnd = async function (editor, mainAsyncCallback, asyncCallbackForReconfiguration) {
     var _getConnectedWithBackEnd = async function (editor, mainAsyncCallback) {
-        debugger;
+        // debugger;
         // var flagCallbackCalledOnce = false;
         var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
             serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
@@ -1480,14 +1492,14 @@ console.log(
                     (socketOb.socket.io || {}).readyState === 'opening'
                 )
             ) {
-                debugger;
+                // debugger;
                 // return socketOb.socket;
                 await mainAsyncCallback();
                 return;
             } else {
                 editor.markLiveCssServerConnectionStatus(false);
 
-                debugger;
+                // debugger;
                 socketOb.close();
                 // socketOb.socket.close();
                 // socketOb.socket = null;
@@ -1519,7 +1531,8 @@ console.log(
                 timeOut: 0,
                 onclick: async function (evt) {
                     if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                        await getServerDetailsFromUser(editor, function (err, serverDetails) {
+                        await _getServerDetailsFromUser(editor, function (err, serverDetails) {
+                            /*
                             if (!err) {
                                 // console.log('TODO', serverDetails);
                                 setTimeout(async function () {
@@ -1527,6 +1540,7 @@ console.log(
                                     await mainAsyncCallback(serverDetails);
                                 });
                             }
+                            /* */
                         });
                     } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
                         await getDisconnectedWithBackEnd(
@@ -1563,7 +1577,7 @@ console.log(
         ) {
             // debugger;
             await _getServerDetailsFromUser(editor, function (err, serverDetails) {
-                debugger;
+                // debugger;
                 if (!err) {
                     setTimeout(async function () {
                         // await asyncCallbackForReconfiguration(serverDetails);
@@ -1573,7 +1587,7 @@ console.log(
                 }
             });
         } else {
-            debugger;
+            // debugger;
             // const _serverHostnameValue = await editor.userPreference('live-css-server-hostname');
             // const _serverPort = await editor.userPreference('live-css-server-port');
 
@@ -2924,7 +2938,7 @@ console.log(
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-stop-watch-and-reload-link-tags',
                                             onclick: async function (evt, editor) {
-                                                debugger;
+                                                // debugger;
                                                 await socketOb._stopWatchingFiles(editor);
                                                 /*
                                                 if (socketOb.flagWatchingCssFiles) {
@@ -3511,7 +3525,7 @@ console.log(
 
                             var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
                             if (watchingCssFiles) {
-                                debugger;
+                                // debugger;
                                 // await socketOb.startWatchingFiles(editor);
                                 await socketOb._startWatchingFiles(editor);
                             }
