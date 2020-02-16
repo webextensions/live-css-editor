@@ -66,7 +66,9 @@ console.log(
 
         // debugger;
 
-        socket.on('connect', function () {
+        socket.on('connect', async function () {
+            await asyncCallbackOnce();
+
             // console.log('inside on connect');
             editor.markLiveCssServerConnectionStatus(true);
 
@@ -247,6 +249,25 @@ console.log(
         await socketOb.setup(asyncCallbackOnce);
     };
 
+    socketOb._connectServerHelper = async function (editor, asyncCb) {
+        debugger;
+        await _getConnectedWithBackEnd(
+            editor,
+            async function () {
+                debugger;
+                await asyncCb();
+            }
+        );
+    };
+    socketOb._disconnectIfRequiredServerHelper = async function () {
+        if (socketOb.flagWatchingCssFiles || socketOb.editingFiles) {
+            // do nothing
+        } else {
+            // console.log('TODO: Disconnect server');
+            // debugger;
+            socketOb.close();
+        }
+    };
     socketOb.getConnected = async function (editor, asyncCb) {
         var socketIfAlreadyConnected = await getConnectedWithBackEnd(
             editor,
@@ -308,8 +329,48 @@ console.log(
         }
     };
 
-    socketOb.startWatchingFiles = async function (editor) {
-        await socketOb.getConnected(editor);
+    socketOb._startWatchingFiles = async function (editor) {
+
+        // debugger;
+        // await socketOb.getConnected(editor);
+
+        if (!socketOb.flagWatchingCssFiles) {
+            await socketOb._connectServerHelper(editor, async function () {
+                debugger;
+                if (!socketOb.flagWatchingCssFiles) {
+                    socketOb.flagWatchingCssFiles = true;
+                    utils.alertNote(
+                        'Watching CSS files for changes.' +
+                        '<br />' +
+                        '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                        20000,
+                        {
+                            unobtrusive: true
+                        }
+                    );
+                    $(editor.container).addClass('watching-css-files');
+                    await editor.userPreference('watching-css-files', 'yes');
+                }
+            });
+        }
+    };
+
+    socketOb._updateUiMentioningNotWatchingCssFiles = async function (editor, asyncCallback) {
+        if (socketOb.flagWatchingCssFiles) {
+            socketOb.flagWatchingCssFiles = false;
+            utils.alertNote('Stopped watching CSS files for changes');
+            $(editor.container).removeClass('watching-css-files');
+            await editor.userPreference('watching-css-files', 'no');
+        }
+        if (asyncCallback) {
+            await asyncCallback();
+        }
+    };
+
+    socketOb._stopWatchingFiles = async function (editor) {
+        await socketOb._updateUiMentioningNotWatchingCssFiles(editor, async function () {
+            await socketOb._disconnectIfRequiredServerHelper();
+        });
     };
 
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
@@ -1179,8 +1240,9 @@ console.log(
 
     var getServerDetailsFromUserAlreadyOpen = false;
     // var getServerDetailsFromUser = async function (editor) {
-    var getServerDetailsFromUser = async function (editor, cbGotServerDetailsFromUser) {
-        // debugger;
+    // var getServerDetailsFromUser = async function (editor, cbGotServerDetailsFromUser) {
+    var _getServerDetailsFromUser = async function (editor, cbGotServerDetailsFromUser) {
+        debugger;
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
@@ -1401,7 +1463,9 @@ console.log(
     var $toastrConnecting,
         $toastrConnected,
         $toastrReconnectAttempt;
-    var getConnectedWithBackEnd = async function (editor, mainAsyncCallback, asyncCallbackForReconfiguration) {
+    // var getConnectedWithBackEnd = async function (editor, mainAsyncCallback, asyncCallbackForReconfiguration) {
+    var _getConnectedWithBackEnd = async function (editor, mainAsyncCallback) {
+        debugger;
         // var flagCallbackCalledOnce = false;
         var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
             serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
@@ -1416,7 +1480,10 @@ console.log(
                     (socketOb.socket.io || {}).readyState === 'opening'
                 )
             ) {
-                return socketOb.socket;
+                debugger;
+                // return socketOb.socket;
+                await mainAsyncCallback();
+                return;
             } else {
                 editor.markLiveCssServerConnectionStatus(false);
 
@@ -1495,8 +1562,8 @@ console.log(
             !(await editor.userPreference('live-css-server-port'))
         ) {
             // debugger;
-            await getServerDetailsFromUser(editor, function (err, serverDetails) {
-                // debugger;
+            await _getServerDetailsFromUser(editor, function (err, serverDetails) {
+                debugger;
                 if (!err) {
                     setTimeout(async function () {
                         // await asyncCallbackForReconfiguration(serverDetails);
@@ -1506,7 +1573,7 @@ console.log(
                 }
             });
         } else {
-            // debugger;
+            debugger;
             // const _serverHostnameValue = await editor.userPreference('live-css-server-hostname');
             // const _serverPort = await editor.userPreference('live-css-server-port');
 
@@ -2857,15 +2924,20 @@ console.log(
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-stop-watch-and-reload-link-tags',
                                             onclick: async function (evt, editor) {
+                                                debugger;
+                                                await socketOb._stopWatchingFiles(editor);
+                                                /*
                                                 if (socketOb.flagWatchingCssFiles) {
-                                                    await getDisconnectedWithBackEnd(
-                                                        editor,
-                                                        {},
-                                                        async function asyncCallback () {
-                                                            await updateUiMentioningNotWatchingCssFiles(editor);
-                                                        }
-                                                    );
+                                                    await socketOb._stopWatchingFiles(editor);
+                                                    // await getDisconnectedWithBackEnd(
+                                                    //     editor,
+                                                    //     {},
+                                                    //     async function asyncCallback () {
+                                                    //         await updateUiMentioningNotWatchingCssFiles(editor);
+                                                    //     }
+                                                    // );
                                                 }
+                                                */
                                                 editor.focus();
                                             }
                                         };
@@ -2881,9 +2953,7 @@ console.log(
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-watch-and-reload-link-tags',
                                             onclick: async function (evt, editor) {
-                                                if (!socketOb.flagWatchingCssFiles) {
-                                                    await socketOb.startWatchingFiles(editor);
-                                                }
+                                                await socketOb._startWatchingFiles(editor);
                                                 editor.focus();
                                             },
                                             beforeShow: function (origin, tooltip) {
@@ -3441,7 +3511,9 @@ console.log(
 
                             var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
                             if (watchingCssFiles) {
-                                await socketOb.startWatchingFiles(editor);
+                                debugger;
+                                // await socketOb.startWatchingFiles(editor);
+                                await socketOb._startWatchingFiles(editor);
                             }
 
                             var applyStylesAutomatically = await editor.userPreference('apply-styles-automatically') === 'yes';
@@ -3921,6 +3993,7 @@ var unusedCode = function () {
             });
         }
     };
+
 
     iconWatchCssFiles.onclick = function () {
         if (socketOb.socket) {
