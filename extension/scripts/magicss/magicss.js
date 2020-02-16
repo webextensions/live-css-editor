@@ -1459,8 +1459,8 @@ console.log(
             socketOb.flagWatchingCssFiles = false;
             utils.alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
-            await editor.userPreference('watching-css-files', 'no');
         }
+        await editor.userPreference('watching-css-files', 'no');
     };
 
     var liveCssServerSessionClosedByUser = async function (editor) {
@@ -1547,9 +1547,7 @@ console.log(
                             editor,
                             {},
                             async function asyncCallback () {
-                                if (socketOb.flagWatchingCssFiles) {
-                                    await updateUiMentioningNotWatchingCssFiles(editor);
-                                }
+                                await updateUiMentioningNotWatchingCssFiles(editor);
                             }
                         );
                         // if (socket) {
