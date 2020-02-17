@@ -2411,7 +2411,7 @@ console.log(
                         if (previousLanguageMode === 'file') {
                             // do nothing
                         } else {
-                            await editor.userPreference('non-file-language-mode', previousLanguageMode);
+                            await editor.userPreference('language-mode-non-file', previousLanguageMode);
                         }
                         await getDataForFileToEdit(editor, fileEditingOptions, async function (file) {
                             // debugger;
@@ -3530,7 +3530,7 @@ console.log(
                                 await applyLastAppliedCss(editor);
 
                                 // FIXME: Improve the hard-coding done here for the fallback
-                                var previousNonFileLanguageMode = await editor.userPreference('non-file-language-mode') || 'css';
+                                var previousNonFileLanguageMode = await editor.userPreference('language-mode-non-file') || 'css';
                                 await setLanguageMode(previousNonFileLanguageMode, editor, {skipNotifications: true});
 
                                 await setLanguageMode('file', editor, {skipNotifications: true});
