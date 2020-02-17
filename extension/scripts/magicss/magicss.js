@@ -2122,7 +2122,9 @@ console.log(
                                                 // https://cdnjs.com/libraries/sass.js
                                 var sassJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js',
                                     preRunReplace = [{oldText: 'this,function', newText: 'window,function'}];   // Required for making Sass load in Firefox - Reference: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Xray_vision
-                                utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
+                                if (!options.skipNotifications) {
+                                    utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
+                                }
 
                                 try {
                                     chrome.runtime.sendMessage(
@@ -2144,7 +2146,9 @@ console.log(
                                                     10000
                                                 );
                                             } else {
-                                                utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                                if (!options.skipNotifications) {
+                                                    utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                                }
                                                 setTimeout(function () {
                                                     // Ensure that getLanguageMode() is still 'sass'
                                                     if (getLanguageMode() === 'sass') {
@@ -2482,7 +2486,9 @@ console.log(
                                 utils.alertNote('Now editing code in CSS mode', 5000);
                             }
                         }
-                        await fnApplyTextAsCSS(editor);
+                        await fnApplyTextAsCSS(editor, {
+                            skipNotifications: options.skipNotifications
+                        });
                     }
                 };
 
