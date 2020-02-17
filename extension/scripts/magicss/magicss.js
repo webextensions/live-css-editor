@@ -1489,8 +1489,8 @@ console.log(
                 socketOpts.hostname === serverHostnameValue &&
                 socketOpts.port === serverPortValue &&
                 (
-                    socketOb.socket.connected ||
-                    (socketOb.socket.io || {}).readyState === 'opening'
+                    // (socketOb.socket.io || {}).readyState === 'opening' ||
+                    socketOb.socket.connected
                 )
             ) {
                 // debugger;
@@ -1581,7 +1581,12 @@ console.log(
                     setTimeout(async function () {
                         // await asyncCallbackForReconfiguration(serverDetails);
                         // await mainAsyncCallback(serverDetails);
-                        await mainAsyncCallback();
+
+                        // await mainAsyncCallback();
+
+                        await socketOb.reset(async function () {
+                            await mainAsyncCallback();
+                        });
                     });
                 }
             });

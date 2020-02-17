@@ -660,13 +660,18 @@ var handleLiveCss = function (options) {
         socket.on('PUT', function (dataOb, cb) {
             var relativeFilePath = dataOb.url.substr('/live-css/edit-file/'.length);
             try {
-                fs.writeFileSync(
-                    // __dirname + '/' + relativeFilePath,
-                    relativeFilePath,
-                    dataOb.targetFileContents
-                );
-                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Saved changes: ' + relativeFilePath));
-                cb('success');
+                if (relativeFilePath) {
+                    fs.writeFileSync(
+                        // __dirname + '/' + relativeFilePath,
+                        relativeFilePath,
+                        dataOb.targetFileContents
+                    );
+                    logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Saved changes: ' + relativeFilePath));
+                    cb('success');
+                } else {
+                    logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.red(' ✘ Failed to save changes: Please ensure that you are editing the correct file.'));
+                    cb('error');
+                }
             } catch (e) {
                 logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.red(' ✘ Failed to save changes: ' + relativeFilePath));
                 cb('error');
