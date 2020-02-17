@@ -1489,7 +1489,7 @@ console.log(
                 socketOpts.hostname === serverHostnameValue &&
                 socketOpts.port === serverPortValue &&
                 (
-                    // (socketOb.socket.io || {}).readyState === 'opening' ||
+                    (socketOb.socket.io || {}).readyState === 'opening' ||
                     socketOb.socket.connected
                 )
             ) {
