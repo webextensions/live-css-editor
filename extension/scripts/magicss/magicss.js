@@ -272,7 +272,7 @@ console.log(
         );
     };
     socketOb._disconnectIfRequiredServerHelper = async function () {
-        if (socketOb.flagWatchingCssFiles || socketOb.editingFiles) {
+        if (socketOb.flagWatchingCssFiles || socketOb.flagEditingFile) {
             // do nothing
         } else {
             // console.log('TODO: Disconnect server');
@@ -2397,11 +2397,19 @@ console.log(
                     if (newLanguageMode === 'file') {
                         // debugger;
                         var fileEditingOptions = {};
+                        var previousLanguageMode = getLanguageMode();
                         // If previous mode was also 'file' (meaning the user clicked again), then we prompt the user for selecting file (or related options)
-                        if (getLanguageMode() === 'file') {
+                        if (previousLanguageMode === 'file') {
                             fileEditingOptions.showUi = true;
                         }
+
+                        if (previousLanguageMode === 'file') {
+                            // do nothing
+                        } else {
+                            await editor.userPreference('non-file-language-mode', previousLanguageMode);
+                        }
                         await getDataForFileToEdit(editor, fileEditingOptions, async function (file) {
+                            // debugger;
                             editor.options.rememberText = false;
 
                             setLanguageModeClass(editor, 'magicss-selected-mode-file');
@@ -2409,6 +2417,7 @@ console.log(
                             editor.cm.setOption('mode', 'text/x-less');
                             setCodeMirrorCSSLinting(editor, 'disable');
 
+                            socketOb.flagEditingFile = true;
                             $('.footer-for-file-mode').show();
                             editor.adjustUiPosition();
 
@@ -2444,6 +2453,8 @@ console.log(
                             editor.cm.clearHistory();
                         }
 
+                        socketOb.flagEditingFile = false;
+                        await socketOb._disconnectIfRequiredServerHelper();
                         $('.footer-for-file-mode').hide();
                         editor.adjustUiPosition();
 
@@ -3510,6 +3521,11 @@ console.log(
                             // debugger;
                             if (languageMode === 'file') {
                                 await applyLastAppliedCss(editor);
+
+                                // FIXME: Improve the hard-coding done here for the fallback
+                                var previousNonFileLanguageMode = await editor.userPreference('non-file-language-mode') || 'css';
+                                await setLanguageMode(previousNonFileLanguageMode, editor, {skipNotifications: true});
+
                                 await setLanguageMode('file', editor, {skipNotifications: true});
                             } else {
                                 window.setTimeout(function () {
