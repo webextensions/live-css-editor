@@ -2322,6 +2322,8 @@ console.log(
                         needInputThroughUi = false;
                     }
 
+                    // debugger;
+
                     // console.log('TODO: The following piece of code needs to be refactored');
                     socketOb.getConnected(editor, async function () {
                         if (needInputThroughUi || options.showUi) {
@@ -3505,6 +3507,7 @@ console.log(
                                 $(editor.container).addClass('magicss-selected-mode-css');
                             }
 
+                            // debugger;
                             if (languageMode === 'file') {
                                 await applyLastAppliedCss(editor);
                                 await setLanguageMode('file', editor, {skipNotifications: true});
@@ -3514,18 +3517,23 @@ console.log(
                                 }, 100);
                             }
 
+                            // If language mode is file, then it might auto-connect for watching files as well
+                            if (languageMode === 'file') {
+                                // do nothing
+                            } else {
+                                var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
+                                if (watchingCssFiles) {
+                                    // debugger;
+                                    // await socketOb.startWatchingFiles(editor);
+                                    await socketOb._startWatchingFiles(editor);
+                                }
+                            }
+
                             var disableStyles = await editor.userPreference('disable-styles') === 'yes';
                             if (disableStyles) {
                                 editor.indicateEnabledDisabled('disabled');
                             } else {
                                 editor.indicateEnabledDisabled('enabled');
-                            }
-
-                            var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
-                            if (watchingCssFiles) {
-                                // debugger;
-                                // await socketOb.startWatchingFiles(editor);
-                                await socketOb._startWatchingFiles(editor);
                             }
 
                             var applyStylesAutomatically = await editor.userPreference('apply-styles-automatically') === 'yes';
