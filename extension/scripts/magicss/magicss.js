@@ -112,22 +112,25 @@ console.log(
                     onclick: async function (evt) {
                         if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
                             toastr.clear($toastrConnected, {force: true});
-                            await _getServerDetailsFromUser(editor, function (err) {
-                            // getServerDetailsFromUser(editor, function (err, serverDetails) {
-                                if (!err) {
-                                    console.log('TODO');
-                                    // debugger;
-                                    // callbackForReconfiguration(serverDetails);
 
-                                    /*
-                                    setTimeout(async function () {
-                                        // await asyncCallbackForReconfiguration(serverDetails);
-                                        // await mainAsyncCallback(serverDetails);
-                                        await asyncCallbackOnce();
-                                    });
-                                    /* */
-                                }
-                            });
+                            // TODO: Verify functionality
+                            await _getServerDetailsFromUser(editor);
+                            // await _getServerDetailsFromUser(editor, function (err) {
+                            // // getServerDetailsFromUser(editor, function (err, serverDetails) {
+                            //     if (!err) {
+                            //         console.log('TODO');
+                            //         // debugger;
+                            //         // callbackForReconfiguration(serverDetails);
+
+                            //         /*
+                            //         setTimeout(async function () {
+                            //             // await asyncCallbackForReconfiguration(serverDetails);
+                            //             // await mainAsyncCallback(serverDetails);
+                            //             await asyncCallbackOnce();
+                            //         });
+                            //         /* */
+                            //     }
+                            // });
                         } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
                             toastr.clear($toastrConnected, {force: true});
                         }
@@ -198,14 +201,17 @@ console.log(
                             timeOut: 0,
                             onclick: function (evt) {
                                 if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                    _getServerDetailsFromUser(editor, function (err) {
-                                    // getServerDetailsFromUser(editor, function (err, serverDetails) {
-                                        if (!err) {
-                                            console.log('TODO');
-                                            // debugger;
-                                            // callbackForReconfiguration(serverDetails);
-                                        }
-                                    });
+                                    // TODO: Verify functionality
+                                    _getServerDetailsFromUser(editor);
+
+                                    // _getServerDetailsFromUser(editor, function (err) {
+                                    // // getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                    //     if (!err) {
+                                    //         console.log('TODO');
+                                    //         // debugger;
+                                    //         // callbackForReconfiguration(serverDetails);
+                                    //     }
+                                    // });
                                 } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
                                     if (socket) {
                                         editor.markLiveCssServerConnectionStatus(false);
@@ -1432,10 +1438,12 @@ console.log(
             // callback();
             // callback('todo');
 
-            cbGotServerDetailsFromUser(null, {
-                serverHostname: serverHostnameValue,
-                serverPort: serverPortValue
-            });
+            if (cbGotServerDetailsFromUser) {
+                cbGotServerDetailsFromUser(null, {
+                    serverHostname: serverHostnameValue,
+                    serverPort: serverPortValue
+                });
+            }
         });
         window.$backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', async function () {
             await editor.userPreference('live-css-server-hostname', serverHostnameValue);
@@ -1532,17 +1540,19 @@ console.log(
                 timeOut: 0,
                 onclick: async function (evt) {
                     if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                        await _getServerDetailsFromUser(editor, function (err, serverDetails) {
-                            /*
-                            if (!err) {
-                                // console.log('TODO', serverDetails);
-                                setTimeout(async function () {
-                                    // await asyncCallbackForReconfiguration(serverDetails);
-                                    await mainAsyncCallback(serverDetails);
-                                });
-                            }
-                            /* */
-                        });
+                        // TODO: Verify functionality
+                        await _getServerDetailsFromUser(editor);
+                        // await _getServerDetailsFromUser(editor, function (err, serverDetails) {
+                        //     /*
+                        //     if (!err) {
+                        //         // console.log('TODO', serverDetails);
+                        //         setTimeout(async function () {
+                        //             // await asyncCallbackForReconfiguration(serverDetails);
+                        //             await mainAsyncCallback(serverDetails);
+                        //         });
+                        //     }
+                        //     /* */
+                        // });
                     } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
                         await getDisconnectedWithBackEnd(
                             editor,
@@ -3384,9 +3394,8 @@ console.log(
                         // });
 
                         $liveCssServerStatus.on('click', async function () {
-                            await _getServerDetailsFromUser(editor, function (err, serverDetails) {
-                                // TODO: Verify functionality
-                            });
+                            // TODO: Verify functionality
+                            await _getServerDetailsFromUser(editor);
                         });
 
                         $fileToEdit.on('click', async function () {
