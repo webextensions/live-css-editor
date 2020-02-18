@@ -90,6 +90,13 @@ settings.svg
     https://www.iconfinder.com/icons/326699/settings_icon#size=128
     https://www.iconfinder.com/icons/326699/download/svg/128
 
+settings-server.svg
+    https://www.iconfinder.com/icons/326699/settings_icon#size=128
+    https://www.iconfinder.com/icons/326699/download/svg/128
+
+settings-server_edited.svg
+    Slightly edited version of "settings-server_edited.svg"
+
 unordered-list.svg
     https://www.iconfinder.com/icons/383201/list_unordered_icon#size=128
     https://www.iconfinder.com/icons/383201/download/svg/128

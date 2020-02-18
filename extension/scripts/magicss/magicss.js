@@ -2007,7 +2007,7 @@ console.log(
                             var saveInProgress = true;
                             setTimeout(function () {
                                 if (saveInProgress) {
-                                    $fileEditStatus.html('◔ Saving');
+                                    $fileEditStatus.html('<span style="top:-1px; position:relative;">◔</span> Saving');
                                 }
                             }, 300);
 
@@ -3320,7 +3320,9 @@ console.log(
                             '</div>'
                         );
                         var $fileEditStatus = $('<div class="file-edit-status" style="color:#fff"></div>');
+                        var $liveCssServerStatus = $('<div class="live-css-server-status"></div>');
                         $footerForFileMode.append($fileToEdit);
+                        $footerForFileMode.append($liveCssServerStatus);
                         $footerForFileMode.append($fileEditStatus);
 
                         /*
