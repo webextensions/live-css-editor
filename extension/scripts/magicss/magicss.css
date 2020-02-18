@@ -951,11 +951,30 @@ html .magicss-mouse-over-dom-element {
     float: left;
 }
 
+.magicss-selected-mode-file#MagiCSS-bookmarklet .footer-for-server-mode,
+.watching-css-files#MagiCSS-bookmarklet .footer-for-server-mode,
+.magic-css-live-css-server-is-connected#MagiCSS-bookmarklet .footer-for-server-mode {
+    display: block !important;
+}
+
+
+#MagiCSS-bookmarklet .file-edit-status,
+#MagiCSS-bookmarklet .file-to-edit {
+    display: none !important;
+}
+
+.magicss-selected-mode-file#MagiCSS-bookmarklet .file-edit-status,
+.magicss-selected-mode-file#MagiCSS-bookmarklet .file-to-edit {
+    display: block !important;
+}
+
+
 #MagiCSS-bookmarklet .live-css-server-status {
     width: 12px;
     height: 12px;
     background-size: contain;
     margin-top: 1px;
+    margin-bottom: 1px;
     background-repeat: no-repeat;
     float: left;
     cursor: pointer;

@@ -2438,8 +2438,8 @@ console.log(
                             setCodeMirrorCSSLinting(editor, 'disable');
 
                             socketOb.flagEditingFile = true;
-                            $('.footer-for-server-mode').show();
-                            editor.adjustUiPosition();
+                            // $('.footer-for-server-mode').show();
+                            // editor.adjustUiPosition();
 
                             // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
                             // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user clicks on the footer in file mode
@@ -2475,8 +2475,8 @@ console.log(
 
                         socketOb.flagEditingFile = false;
                         await socketOb._disconnectIfRequiredServerHelper();
-                        $('.footer-for-server-mode').hide();
-                        editor.adjustUiPosition();
+                        // $('.footer-for-server-mode').hide();
+                        // editor.adjustUiPosition();
 
                         if (newLanguageMode === 'less') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-less');
