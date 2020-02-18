@@ -1323,7 +1323,7 @@ console.log(
                                         '<div style="clear:both; padding-top:4px;">',
                                             '<div style="font-weight:bold; float:left;">Step 3:</div>',
                                             '<div style="margin-left:50px;">',
-                                                'Start live-css server',
+                                                'Start live-css server in your project folder',
                                                 '<br />',
                                                 '<div style="float:left; line-height:16px; background-color:#bbb; padding:3px 7px; border-radius:3px; margin-top:2px; font-family:monospace;">',
                                                     // Source for SVG: https://www.npmjs.com/package/@webextensions/live-css
@@ -1334,7 +1334,7 @@ console.log(
                                         '</div>',
                                         '<div style="clear:both; padding-top:4px;">',
                                             '<div style="font-weight:bold; float:left;">Step 4:</div>',
-                                            '<div style="margin-left:50px;">Enter server path based on output of the previous command</div>',
+                                            '<div style="margin-left:50px;">Enter following details based on previous command\'s output</div>',
                                         '</div>',
                                     '</div>',
                                     '<div class="magic-css-server-config-field-header" style="margin-top:20px;">',
@@ -1367,10 +1367,10 @@ console.log(
                                     '<div style="min-height:35px; padding-top:3px; clear:both;">',
                                         '<div class="live-css-connectivity-error-message live-css-server-client-general-error-message" style="display:none;">',
                                             '<div>You are not connected. Is live-css server running?</div>',
-                                            '<div>',
-                                                'Do you need to enable CORS? ',
-                                                '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" style="margin-left:10px;">Learn more</a>',
-                                            '</div>',
+                                            // '<div>',
+                                            //     'Do you need to enable CORS? ',
+                                            //     '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" style="margin-left:10px;">Learn more</a>',
+                                            // '</div>',
                                         '</div>',
                                         '<div class="live-css-connectivity-error-message live-css-server-client-incompatible-error-message" style="display:none;">',
                                             'Error: You need to use version ', constants.appMajorVersion, ' of the live-css server',
@@ -3382,6 +3382,12 @@ console.log(
                         // $footerItems.on('mousedown', function (evt) {
                         //     evt.stopPropagation();
                         // });
+
+                        $liveCssServerStatus.on('click', async function () {
+                            await _getServerDetailsFromUser(editor, function (err, serverDetails) {
+                                // TODO: Verify functionality
+                            });
+                        });
 
                         $fileToEdit.on('click', async function () {
                             await getDataForFileToEdit(editor, {showUi: true}, async function (file) {
