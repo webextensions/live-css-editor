@@ -2013,7 +2013,7 @@ console.log(
                         } else {
                             var targetFileContents = editor.getTextValue();
 
-                            var $fileEditStatus = $('.footer-for-file-mode .file-edit-status');
+                            var $fileEditStatus = $('.footer-for-server-mode .file-edit-status');
                             var saveInProgress = true;
                             setTimeout(function () {
                                 if (saveInProgress) {
@@ -2438,12 +2438,12 @@ console.log(
                             setCodeMirrorCSSLinting(editor, 'disable');
 
                             socketOb.flagEditingFile = true;
-                            $('.footer-for-file-mode').show();
+                            $('.footer-for-server-mode').show();
                             editor.adjustUiPosition();
 
                             // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
                             // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user clicks on the footer in file mode
-                            $('.footer-for-file-mode .name-of-file-being-edited')
+                            $('.footer-for-server-mode .name-of-file-being-edited')
                                 .html(htmlEscape(getFileNameFromPath(file.path)))
                                 .attr('title', file.path)
                                 .css({marginRight: 75})
@@ -2475,7 +2475,7 @@ console.log(
 
                         socketOb.flagEditingFile = false;
                         await socketOb._disconnectIfRequiredServerHelper();
-                        $('.footer-for-file-mode').hide();
+                        $('.footer-for-server-mode').hide();
                         editor.adjustUiPosition();
 
                         if (newLanguageMode === 'less') {
@@ -3321,8 +3321,8 @@ console.log(
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
 
-                        var $footerForFileMode = $('<div class="footer-for-file-mode" style="display:none;margin-top:3px;margin-bottom:-4px;overflow:auto"></div>');
-                        $footerItems.append($footerForFileMode);
+                        var $footerForServerMode = $('<div class="footer-for-server-mode" style="display:none;margin-top:3px;margin-bottom:-4px;overflow:auto"></div>');
+                        $footerItems.append($footerForServerMode);
 
                         var $fileToEdit = $(
                             '<div class="file-to-edit">' +
@@ -3331,9 +3331,9 @@ console.log(
                         );
                         var $fileEditStatus = $('<div class="file-edit-status" style="color:#fff"></div>');
                         var $liveCssServerStatus = $('<div class="live-css-server-status"></div>');
-                        $footerForFileMode.append($fileToEdit);
-                        $footerForFileMode.append($liveCssServerStatus);
-                        $footerForFileMode.append($fileEditStatus);
+                        $footerForServerMode.append($fileToEdit);
+                        $footerForServerMode.append($liveCssServerStatus);
+                        $footerForServerMode.append($fileEditStatus);
 
                         /*
                         // Magic Suggest uses old jQuery code. Minor changes to fix that
@@ -3402,7 +3402,7 @@ console.log(
                             await getDataForFileToEdit(editor, {showUi: true}, async function (file) {
                                 // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
                                 // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user switches the editing mode
-                                $('.footer-for-file-mode .name-of-file-being-edited')
+                                $('.footer-for-server-mode .name-of-file-being-edited')
                                     .html(htmlEscape(getFileNameFromPath(file.path)))
                                     .attr('title', file.path)
                                     .css({marginRight: 75})
