@@ -68,14 +68,14 @@
     height: 20px;
 }
 
-.magicss-title {
+.magic-css-header .magicss-title {
+    display: flex;
     background-color: #4458ae;
     border-radius: 5px 5px 0 0;
     font-weight: bold;
     color: #fff;
     letter-spacing: 1px;
     font-family: Helvetica, "Trebuchet MS", sans-serif;
-    overflow: auto;
     font-size: 15px;
     line-height: 1.7;
     cursor: default;
@@ -115,6 +115,22 @@
 .magicss-selected-mode-file .magicss-mode-file {
     opacity: 1;
     color: #ff0;
+}
+
+#MagiCSS-bookmarklet .file-mode-is-beta {
+    display: none;
+    position: absolute;
+    top: -27px;
+    left: 20px;
+    border: 2px solid #eb7;
+    background-color: #f9edbe;
+    color: #000;
+    border-radius: 5px;
+    white-space: nowrap;
+    font-weight: bold;
+}
+#MagiCSS-bookmarklet .magicss-mode-file:hover .file-mode-is-beta {
+    display: block;
 }
 
 .magicss-disable-css {

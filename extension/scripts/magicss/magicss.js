@@ -2712,7 +2712,12 @@ console.log(
                             '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>' +
                             '<div class="magicss-mode-button magicss-mode-less" title="Less mode">less</div>' +
                             '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>' +
-                            '<div class="magicss-mode-button magicss-mode-file" title="File mode">file</div>'
+                            '<div class="magicss-mode-button magicss-mode-file" title="File mode">' +
+                                '<span class="file-mode-is-beta">' +
+                                    '&nbsp;This is a BETA feature&nbsp;' +
+                                '</span>' +
+                                'file' +
+                            '</div>'
                         );
 
                         $(document).on('click', '.magicss-mode-css', async function () {
