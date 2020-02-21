@@ -12,13 +12,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
-console.log(
-    'TODO:' +
-    '\nIf we add some styles from CSS/Less/Sass scratchpad' +
-    ' then load a "file" and then if we reload the webpage and start Magic CSS,' +
-    ' in that case, the scratchpad styles do not get applied'
-);
-
 (function($){
     var asyncTimeout = function (delay) {
         return new Promise((resolve) => {
