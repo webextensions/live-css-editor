@@ -235,25 +235,27 @@ console.log(
         });
 
         socket.on('file-modified', function(changeDetails) {
-            if (changeDetails.useOnlyFileNamesForMatch) {
-                reloadCSSResourceInPage({
-                    fullPath: changeDetails.fullPath,
-                    useOnlyFileNamesForMatch: true,
-                    fileName: changeDetails.fileName
-                });
-            } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                reloadCSSResourceInPage({
-                    fullPath: changeDetails.fullPath,
-                    url: resolveUrl(pathWrtRoot)
-                });
-            } else {
-                // The code should never reach here
-                utils.alertNote(
-                    'Unexpected scenario occurred in reloading some CSS resources.' +
-                    '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                    10000
-                );
+            if (socketOb && socketOb.flagWatchingCssFiles) {
+                if (changeDetails.useOnlyFileNamesForMatch) {
+                    reloadCSSResourceInPage({
+                        fullPath: changeDetails.fullPath,
+                        useOnlyFileNamesForMatch: true,
+                        fileName: changeDetails.fileName
+                    });
+                } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                    var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                    reloadCSSResourceInPage({
+                        fullPath: changeDetails.fullPath,
+                        url: resolveUrl(pathWrtRoot)
+                    });
+                } else {
+                    // The code should never reach here
+                    utils.alertNote(
+                        'Unexpected scenario occurred in reloading some CSS resources.' +
+                        '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                        10000
+                    );
+                }
             }
         });
     };
