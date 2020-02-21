@@ -66,6 +66,10 @@ console.log(
 
         // debugger;
 
+        socket.on('disconnect', function () {
+            editor.markLiveCssServerConnectionStatus(false);
+        });
+
         socket.on('connect', async function () {
             if (asyncCallbackOnce) {
                 await asyncCallbackOnce();
