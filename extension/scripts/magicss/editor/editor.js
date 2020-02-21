@@ -20,9 +20,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     var whichStoreToUse = 'chrome.storage.local';
 
     var CONSTANTS = {
-        EDITOR_MIN_WIDTH: 301,
+        EDITOR_MIN_WIDTH: 326,
         EDITOR_MIN_HEIGHT: 40,
-        EDITOR_DEFAULT_WIDTH: 301,
+        EDITOR_DEFAULT_WIDTH: 326,
         EDITOR_DEFAULT_HEIGHT: 249
     };
 

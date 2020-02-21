@@ -122,8 +122,10 @@
     position: absolute;
     top: -27px;
     left: 20px;
-    border: 2px solid #eb7;
-    background-color: #f9edbe;
+    /* background-color: #f9edbe; */
+    background-color: lightgreen;
+    /* border: 2px solid #eb7; */
+    border: 2px solid darkgreen;
     color: #000;
     border-radius: 5px;
     white-space: nowrap;
