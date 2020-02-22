@@ -76,7 +76,12 @@
                     "src": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/codemirror/addons/emmet/emmet-codemirror-plugin.js"
+            "to": {
+                "default": {
+                    "dest": "extension/scripts/3rdparty/codemirror/addons/emmet/emmet-codemirror-plugin.js",
+                    "removeSourceMappingURL": true
+                }
+            }
         },
         {
             "from": {
@@ -257,7 +262,12 @@
                     "latest": "https://raw.githubusercontent.com/caolan/async/master/dist/async.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/async.js"
+            "to": {
+                "default": {
+                    "dest": "extension/scripts/3rdparty/async.js",
+                    "removeSourceMappingURL": true
+                }
+            }
         },
         {
             "from": {
@@ -355,7 +365,12 @@
                     "src": "node_modules/socket.io-client/dist/socket.io.slim.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/socket.io/socket.io.slim.js"
+            "to": {
+                "default": {
+                    "dest": "extension/scripts/3rdparty/socket.io/socket.io.slim.js",
+                    "removeSourceMappingURL": true
+                }
+            }
         },
         {
             "from": {
@@ -367,7 +382,12 @@
                     "src": "https://raw.githubusercontent.com/mozilla/source-map/0.6.1/dist/source-map.debug.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/source-map.js"
+            "to": {
+                "default": {
+                    "dest": "extension/scripts/3rdparty/source-map.js",
+                    "removeSourceMappingURL": true
+                }
+            }
         }
     ]
 }

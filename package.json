@@ -25,7 +25,7 @@
   "devDependencies": {
     "archiver": "^3.1.1",
     "chalk": "^3.0.0",
-    "copy-files-from-to": "^2.1.0",
+    "copy-files-from-to": "^2.2.0",
     "cp-file": "^7.0.0",
     "del": "^5.1.0",
     "eslint": "^6.8.0",

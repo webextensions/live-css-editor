@@ -1,1 +1,3 @@
 node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.min.js
+
+Note: Removed "sourceMappingURL"
