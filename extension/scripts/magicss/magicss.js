@@ -2274,7 +2274,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 .fadeOut(100)
                                 .fadeIn(750);
                             if (!options.skipNotifications) {
-                                utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
+                                utils.alertNote(
+                                    'Auto-save changes for: <span style="font-weight:normal;">' + htmlEscape(file.path) + '</span>',
+                                    5000,
+                                    {
+                                        backgroundColor: 'lightgreen',
+                                        borderColor: 'darkgreen'
+                                    }
+                                );
                             }
                             await editor.setTextValue(file.contents);
                             await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
@@ -3224,7 +3231,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     .animate({marginRight: 0}, 1000)
                                     .fadeOut(100)
                                     .fadeIn(750);
-                                utils.alertNote('Now editing file: ' + htmlEscape(file.path), 5000);
+                                utils.alertNote(
+                                    'Auto-save changes for: <span style="font-weight:normal;">' + htmlEscape(file.path) + '</span>',
+                                    5000,
+                                    {
+                                        backgroundColor: 'lightgreen',
+                                        borderColor: 'darkgreen'
+                                    }
+                                );
 
                                 await editor.setTextValue(file.contents);
                                 await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
