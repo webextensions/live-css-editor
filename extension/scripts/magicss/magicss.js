@@ -1408,10 +1408,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (
                 socketOpts.hostname === serverHostnameValue &&
                 socketOpts.port === serverPortValue &&
-                (
-                    (socketOb.socket.io || {}).readyState === 'opening' ||
-                    socketOb.socket.connected
-                )
+                socketOb.socket.connected
             ) {
                 await mainAsyncCallback();
                 return;
