@@ -13,6 +13,324 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 (function($){
+    var asyncTimeout = function (delay) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, delay);
+        });
+    };
+
+    var flagConnectedAtLeastOnce = false;
+    window.currentlyConnected = false;
+    var setCurrentlyConnected = function (value) {
+        window.currentlyConnected = value;
+    };
+
+    var socketOb = {};
+    window.socketOb = socketOb;
+
+    socketOb.socket = null;
+    socketOb.flagWatchingCssFiles = false;
+
+    socketOb.setup = async function (asyncCallbackOnce) {
+        var $backEndConnectivityOptions = window.$backEndConnectivityOptions;
+        var editor = window.MagiCSSEditor;
+
+        var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+            serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
+
+        var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
+        var backEndPathToShowToUser = serverHostnameValue + ':' + serverPortValue;
+
+        socketOb.socket = io(backEndPath, {
+            timeout: 3000
+        });
+        var socket = socketOb.socket;
+
+        socket.on('disconnect', function () {
+            editor.markLiveCssServerConnectionStatus(false);
+        });
+
+        socket.on('connect', async function () {
+            // This callback may lead to opening the "File to edit" input form. We wouldn't want it
+            // to open again everytime disconnection / connection happens, due to some intermittent
+            // issues like manual disconnection or network/debugging related causes.
+            if (asyncCallbackOnce && !asyncCallbackOnce.alreadyCalled) {
+                asyncCallbackOnce.alreadyCalled = true;
+                await asyncCallbackOnce();
+            }
+
+            editor.markLiveCssServerConnectionStatus(true);
+
+            setCurrentlyConnected(true);
+
+            if ($backEndConnectivityOptions) {
+                $backEndConnectivityOptions
+                    .removeClass('live-css-server-client-general-error')
+                    .removeClass('live-css-server-client-incompatible-error')
+                    .find('.magic-css-server-connectivity-status')
+                    .removeClass('disconnected')
+                    .removeClass('connecting')
+                    .addClass('connected');
+            }
+
+            flagConnectedAtLeastOnce = true;
+
+            if ($toastrReconnectAttempt) {
+                $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                $toastrReconnectAttempt = null;
+            }
+
+            $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+            $toastrConnected = toastr.success(
+                '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                    backEndPathToShowToUser +
+                '</div>' +
+                '<div>' +
+                '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
+                    '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
+                '</div>',
+                'Connected with live-css server at:',
+                {
+                    onclick: async function (evt) {
+                        if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                            toastr.clear($toastrConnected, {force: true});
+
+                            // TODO: Verify functionality
+                            await _getServerDetailsFromUser(editor);
+                        } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
+                            toastr.clear($toastrConnected, {force: true});
+                        }
+                    }
+                }
+            );
+            var $toastrToHide = $toastrConnected;
+            setTimeout(function () {
+                toastr.clear($toastrToHide);
+            }, 4000);
+        });
+
+        var errorHandler = function (err) {
+            setCurrentlyConnected(false);
+
+            editor.markLiveCssServerConnectionStatus(false);
+
+            if ($backEndConnectivityOptions) {
+                $backEndConnectivityOptions
+                    .removeClass('live-css-server-client-general-error')
+                    .removeClass('live-css-server-client-incompatible-error')
+                    .find('.magic-css-server-connectivity-status')
+                    .removeClass('connected')
+                    .removeClass('connecting')
+                    .addClass('disconnected');
+
+                if (err === 'Invalid namespace') {
+                    $backEndConnectivityOptions
+                        .addClass('live-css-server-client-incompatible-error');
+                } else {
+                    $backEndConnectivityOptions
+                        .addClass('live-css-server-client-general-error');
+                }
+                // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
+            }
+        };
+
+        socket.on('connect_error', errorHandler);
+        socket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
+
+        socket.on('reconnect_attempt', function () {
+            setCurrentlyConnected(false);
+
+            editor.markLiveCssServerConnectionStatus(false);
+
+            if (flagConnectedAtLeastOnce) {
+                if ($toastrReconnectAttempt) {
+                    // do nothing
+                } else {
+                    if ($toastrConnected) {
+                        $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
+                    }
+                    $toastrReconnectAttempt = toastr.warning(
+                        '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
+                            backEndPathToShowToUser +
+                        '</div>' +
+                        '<div>' +
+                            '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right">Cancel</button>' +
+                            '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
+                        '</div>',
+                        'Reconnecting with live-css server at:',
+                        {
+                            timeOut: 0,
+                            onclick: function (evt) {
+                                if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
+                                    // TODO: Verify functionality
+                                    _getServerDetailsFromUser(editor);
+                                } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
+                                    if (socket) {
+                                        editor.markLiveCssServerConnectionStatus(false);
+
+                                        socket.close();
+                                        socket = null;
+                                    }
+                                    toastr.clear($toastrReconnectAttempt, {force: true});
+                                    liveCssServerSessionClosedByUser(editor);
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        });
+
+        socket.on('file-modified', function(changeDetails) {
+            if (socketOb && socketOb.flagWatchingCssFiles) {
+                if (changeDetails.useOnlyFileNamesForMatch) {
+                    reloadCSSResourceInPage({
+                        fullPath: changeDetails.fullPath,
+                        useOnlyFileNamesForMatch: true,
+                        fileName: changeDetails.fileName
+                    });
+                } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
+                    var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
+                    reloadCSSResourceInPage({
+                        fullPath: changeDetails.fullPath,
+                        url: resolveUrl(pathWrtRoot)
+                    });
+                } else {
+                    // The code should never reach here
+                    utils.alertNote(
+                        'Unexpected scenario occurred in reloading some CSS resources.' +
+                        '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
+                        10000
+                    );
+                }
+            }
+        });
+    };
+
+    socketOb.close = function () {
+        if (socketOb.socket) {
+            socketOb.socket.close();
+            socketOb.socket = null;
+        }
+    };
+
+    socketOb.reset = async function (asyncCallbackOnce) {
+        socketOb.close();
+        await socketOb.setup(asyncCallbackOnce);
+    };
+
+    socketOb._connectServerHelper = async function (editor, asyncCb) {
+        await _getConnectedWithBackEnd(
+            editor,
+            async function () {
+                await asyncCb();
+            }
+        );
+    };
+    socketOb._disconnectIfRequiredServerHelper = async function () {
+        if (socketOb.flagWatchingCssFiles || socketOb.flagEditingFile) {
+            // do nothing
+        } else {
+            socketOb.close();
+        }
+    };
+    socketOb.getConnected = async function (editor, asyncCb) {
+        var socketIfAlreadyConnected = await _getConnectedWithBackEnd(
+            editor,
+            async function callback (err) {
+                if (err) {
+                    // The user cancelled watching files
+                    utils.alertNote('You cancelled watching CSS files for changes');
+                    await editor.userPreference('watching-css-files', 'no');
+                } else {
+                    // TODO: This code is duplicated elsewhere
+                    if (!socketOb.flagWatchingCssFiles) {
+                        socketOb.flagWatchingCssFiles = true;
+                        utils.alertNote(
+                            'Watching CSS files for changes.' +
+                            '<br />' +
+                            '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                            20000,
+                            {
+                                unobtrusive: true
+                            }
+                        );
+                        $(editor.container).addClass('watching-css-files');
+                        editor.adjustUiPosition();
+                        await editor.userPreference('watching-css-files', 'yes');
+                    }
+
+                    if (!socketIfAlreadyConnected && asyncCb) {
+                        await asyncCb();
+                    }
+                }
+            }
+        );
+        if (socketIfAlreadyConnected) {
+            if (asyncCb) {
+                await asyncCb();
+            }
+
+            // TODO: This code is duplicated elsewhere
+            if (!socketOb.flagWatchingCssFiles) {
+                socketOb.flagWatchingCssFiles = true;
+                utils.alertNote(
+                    'Watching CSS files for changes.' +
+                    '<br />' +
+                    '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                    20000,
+                    {
+                        unobtrusive: true
+                    }
+                );
+                $(editor.container).addClass('watching-css-files');
+                editor.adjustUiPosition();
+                await editor.userPreference('watching-css-files', 'yes');
+            }
+        }
+    };
+
+    socketOb._startWatchingFiles = async function (editor) {
+        if (!socketOb.flagWatchingCssFiles) {
+            await socketOb._connectServerHelper(editor, async function () {
+                if (!socketOb.flagWatchingCssFiles) {
+                    socketOb.flagWatchingCssFiles = true;
+                    utils.alertNote(
+                        'Watching CSS files for changes.' +
+                        '<br />' +
+                        '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
+                        20000,
+                        {
+                            unobtrusive: true
+                        }
+                    );
+                    $(editor.container).addClass('watching-css-files');
+                    editor.adjustUiPosition();
+                    await editor.userPreference('watching-css-files', 'yes');
+                }
+            });
+        }
+    };
+
+    socketOb._updateUiMentioningNotWatchingCssFiles = async function (editor, asyncCallback) {
+        if (socketOb.flagWatchingCssFiles) {
+            socketOb.flagWatchingCssFiles = false;
+            utils.alertNote('Stopped watching CSS files for changes');
+            $(editor.container).removeClass('watching-css-files');
+            editor.adjustUiPosition();
+            await editor.userPreference('watching-css-files', 'no');
+        }
+        if (asyncCallback) {
+            await asyncCallback();
+        }
+    };
+
+    socketOb._stopWatchingFiles = async function (editor) {
+        await socketOb._updateUiMentioningNotWatchingCssFiles(editor, async function () {
+            await socketOb._disconnectIfRequiredServerHelper();
+        });
+    };
+
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
     var checkIfMagicCssLoadedFine = function (MagiCSSEditor) {
@@ -118,10 +436,40 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     toastr.options.extendedTimeOut = 0;
     // toastr.options.tapToDismiss = false;
 
-
     var rememberLastAppliedCss = async function (css) {
         var editor = window.MagiCSSEditor;
         await editor.userPreference('last-applied-css', css);
+    };
+
+    var applyLastAppliedCss = async function (editor) {
+        // TODO: Some of the code related to this function may be reused
+
+        var userPreference = editor.userPreference.bind(editor);
+
+        var localStorageDisableStyles = 'disable-styles';
+        var disableStyles = await userPreference(localStorageDisableStyles) === 'yes';
+
+        var localStorageLastAppliedCss = 'last-applied-css';
+        var cssText = (await userPreference(localStorageLastAppliedCss)).trim();
+
+        if (cssText) {
+            var id = 'MagiCSS-bookmarklet',
+                newStyleTagId = id + '-html-id',
+                newStyleTag = new utils.StyleTag({
+                    id: newStyleTagId,
+                    parentTag: 'body',
+                    attributes: [{
+                        name: 'data-style-created-by',
+                        value: 'magicss'
+                    }],
+                    overwriteExistingStyleTagWithSameId: true
+                });
+
+            newStyleTag.cssText = cssText;
+
+            newStyleTag.disabled = disableStyles;
+            newStyleTag.applyTag();
+        }
     };
 
     var ellipsis = function (str, limit) {
@@ -160,7 +508,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return linkTags;
     };
 
-    var getFilenameFromPath = function (path) {
+    var getFileNameFromPath = function (path) {
         path = path.split('?')[0];
         path = path.split('#')[0];
         path = path.split('/').pop();
@@ -168,12 +516,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     };
 
     var findProbableMatchElementIndexes = function (arr, useOnlyFileNamesForMatch, itemToMatch) {
-        var fileNameOfItemToMatch = getFilenameFromPath(itemToMatch);
+        var fileNameOfItemToMatch = getFileNameFromPath(itemToMatch);
         var matchedIndexes = [];
         arr.forEach(function (item, index) {
             item = item.replace(/[?&]reloadedAt=[\d-_:.]+/, '');
             if (useOnlyFileNamesForMatch) {
-                if (getFilenameFromPath(item) === fileNameOfItemToMatch) {
+                if (getFileNameFromPath(item) === fileNameOfItemToMatch) {
                     matchedIndexes.push(index);
                 }
             } else {
@@ -265,7 +613,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         var successCount = 0,
             errorCount = 0;
         var checkCompletion = function () {
-            utils.alertNote(htmlEscape('Reloading active CSS <link> tags.') + '<br/>Success: ' + successCount + '/' + linkTags.length);
+            utils.alertNote(
+                '<span style="font-weight:normal;">' +
+                    htmlEscape('Reloading active CSS <link> tags.') +
+                '</span>' +
+                ' Success: ' + successCount + '/' + linkTags.length
+            );
             if (linkTags.length === successCount + errorCount) {
                 setTimeout(function () {
                     if (errorCount) {
@@ -276,7 +629,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             msg = htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.');
                         }
                         msg += '<br/><span style="font-weight:normal;">Please check availability of the CSS resources included in this page.</span>';
-                        utils.alertNote(msg);
+                        utils.alertNote(
+                            msg,
+                            undefined,
+                            {
+                                backgroundColor: '#f5bcae',
+                                borderColor: '#e87457'
+                            }
+                        );
                     } else {
                         if (successCount === 1) {
                             utils.alertNote(htmlEscape(successCount + ' active CSS <link> tag got reloaded successfully :-)'));
@@ -692,7 +1052,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             };
 
             var cssSelectorToShow = htmlEscape(trunc(cssSelectorString, 100));
-            var sourcesToShow = (cssSelector && cssSelector.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(cssSelector.sources) + '</span></span>') : '';
+            var sourcesToShow = (cssSelector && cssSelector.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(decodeURIComponent(cssSelector.sources)) + '</span></span>') : '';
             if (count) {
                 utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
             } else {
@@ -810,71 +1170,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         var lineHandle = editor.cm.addLineClass(errorInLine, 'background', 'line-has-parsing-error-transition-effect');
         editor.cm.addLineClass(errorInLine, 'background', 'line-has-parsing-error');
         var duration = 2000;
-        setTimeout(function () {
+        setTimeout(async function () {
             editor.cm.removeLineClass(lineHandle, 'background', 'line-has-parsing-error');
-            setTimeout(function () {
-                editor.cm.removeLineClass(lineHandle, 'background', 'line-has-parsing-error-transition-effect');
-            }, 500);   /* 500ms delay matches the transition duration specified for the CSS selector ".line-has-parsing-error-transition-effect" */
+            await asyncTimeout(500); /* 500ms delay matches the transition duration specified for the CSS selector ".line-has-parsing-error-transition-effect" */
+            editor.cm.removeLineClass(lineHandle, 'background', 'line-has-parsing-error-transition-effect');
         }, duration);
-    };
-
-    var flagWatchingCssFiles = false;
-    var socket = null;
-
-    var startWatchingFiles = async function (editor) {
-        var getConnected = async function () {
-            await getConnectedWithBackEnd(
-                editor,
-                async function (err, socket) {
-                    if (err) {
-                        // The user cancelled watching files
-                        utils.alertNote('You cancelled watching CSS files for changes');
-                        await editor.userPreference('watching-css-files', 'no');
-                    } else {
-                        socket.on('file-modified', function(changeDetails) {
-                            if (changeDetails.useOnlyFileNamesForMatch) {
-                                reloadCSSResourceInPage({
-                                    fullPath: changeDetails.fullPath,
-                                    useOnlyFileNamesForMatch: true,
-                                    fileName: changeDetails.fileName
-                                });
-                            } else if (changeDetails.fullPath.indexOf(changeDetails.root) === 0) {
-                                var pathWrtRoot = changeDetails.fullPath.substr(changeDetails.root.length);
-                                reloadCSSResourceInPage({
-                                    fullPath: changeDetails.fullPath,
-                                    url: resolveUrl(pathWrtRoot)
-                                });
-                            } else {
-                                // The code should never reach here
-                                utils.alertNote(
-                                    'Unexpected scenario occurred in reloading some CSS resources.' +
-                                    '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
-                                    10000
-                                );
-                            }
-                        });
-                        if (!flagWatchingCssFiles) {
-                            flagWatchingCssFiles = true;
-                            utils.alertNote(
-                                'Watching CSS files for changes.' +
-                                '<br />' +
-                                '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
-                                20000,
-                                {
-                                    unobtrusive: true
-                                }
-                            );
-                            $(editor.container).addClass('watching-css-files');
-                            await editor.userPreference('watching-css-files', 'yes');
-                        }
-                    }
-                },
-                async function callbackForReconfiguration () {
-                    await getConnected();
-                }
-            );
-        };
-        await getConnected();
     };
 
     // A pretty basic OS detection logic based on:
@@ -894,15 +1194,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         return os;
     };
 
-
     var getServerDetailsFromUserAlreadyOpen = false;
-    var getServerDetailsFromUser = async function (editor, callback) {
+    var _getServerDetailsFromUser = async function (editor, cbGotServerDetailsFromUser) {
         if (getServerDetailsFromUserAlreadyOpen) {
             return;
         }
         getServerDetailsFromUserAlreadyOpen = true;
+
         /* eslint-disable indent */
-        var $backEndConnectivityOptions = $(
+        window.$backEndConnectivityOptions = $(
+        // var $backEndConnectivityOptions = $(
             [
                 '<div>',
                     '<div class="magic-css-full-page-overlay">',
@@ -911,13 +1212,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         '<div style="display:flex;justify-content:center;align-items:center;height:100%;">',
                             '<div class="magic-css-back-end-connectivity-options" style="pointer-events:initial;">',
                                 '<div class="magic-css-server-config-item" style="padding-bottom:0;">',
-                                    '<div>',
+                                    '<div style="overflow-y:auto; max-height:calc(70vh - 70px);">',
                                         '<div style="margin-bottom:20px;">',
-                                            'You need to run a development server, called',
+                                            'This feature is meant for use during web development.',
+                                            ' You need to run a development server, called',
                                             ' <a target="_blank" href="https://www.npmjs.com/package/@webextensions/live-css" style="font-weight:bold; text-decoration:underline; color:#000;">live-css</a>',
-                                            ', for using the feature',
-                                            ' "Watch CSS files to apply changes automatically".',
-                                            ' This feature is meant for use during web development.',
+                                            ', for using the features',
+                                            ' "Edit file"',
+                                            ' and "Watch CSS files to apply changes automatically".',
                                         '</div>',
                                         '<div>',
                                             '<div style="font-weight:bold; float:left;">Step 1:</div>',
@@ -960,7 +1262,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         '<div style="clear:both; padding-top:4px;">',
                                             '<div style="font-weight:bold; float:left;">Step 3:</div>',
                                             '<div style="margin-left:50px;">',
-                                                'Start live-css server',
+                                                'Start live-css server in your project folder',
                                                 '<br />',
                                                 '<div style="float:left; line-height:16px; background-color:#bbb; padding:3px 7px; border-radius:3px; margin-top:2px; font-family:monospace;">',
                                                     // Source for SVG: https://www.npmjs.com/package/@webextensions/live-css
@@ -971,7 +1273,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         '</div>',
                                         '<div style="clear:both; padding-top:4px;">',
                                             '<div style="font-weight:bold; float:left;">Step 4:</div>',
-                                            '<div style="margin-left:50px;">Enter server path based on output of the previous command</div>',
+                                            '<div style="margin-left:50px;">Enter following details based on previous command\'s output</div>',
                                         '</div>',
                                     '</div>',
                                     '<div class="magic-css-server-config-field-header" style="margin-top:20px;">',
@@ -1004,20 +1306,19 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     '<div style="min-height:35px; padding-top:3px; clear:both;">',
                                         '<div class="live-css-connectivity-error-message live-css-server-client-general-error-message" style="display:none;">',
                                             '<div>You are not connected. Is live-css server running?</div>',
-                                            '<div>',
-                                                'Do you need to enable CORS? ',
-                                                '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" style="margin-left:10px;">Learn more</a>',
-                                            '</div>',
+                                            // '<div>',
+                                            //     'Do you need to enable CORS? ',
+                                            //     '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" style="margin-left:10px;">Learn more</a>',
+                                            // '</div>',
                                         '</div>',
                                         '<div class="live-css-connectivity-error-message live-css-server-client-incompatible-error-message" style="display:none;">',
                                             'Error: You need to use version ', constants.appMajorVersion, ' of the live-css server',
                                         '</div>',
                                     '</div>',
                                 '</div>',
-                                '<div class="magic-css-server-config-item">',
+                                '<div class="magic-css-server-config-item" style="text-align:right">',
                                     '<div>',
-                                        '<button type="button" class="magicss-save-server-path-changes" style="float:right">Save & Apply</button>',
-                                        '<button type="button" class="magicss-cancel-server-path-changes">Cancel</button>',
+                                        '<button type="button" class="magicss-done-server-path-changes">Done</button>',
                                     '</div>',
                                 '</div>',
                             '</div>',
@@ -1028,111 +1329,64 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         );
         /* eslint-enable indent */
 
-        var $serverHostname = $backEndConnectivityOptions.find('.magic-css-server-hostname'),
+        var $serverHostname = window.$backEndConnectivityOptions.find('.magic-css-server-hostname'),
             serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname;
 
-        var $serverPort = $backEndConnectivityOptions.find('.magic-css-server-port'),
+        var $serverPort = window.$backEndConnectivityOptions.find('.magic-css-server-port'),
             serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
-        var connectionTestingSocket = null;
-        var refreshConnectivityUi = function () {
-            var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
-            if (connectionTestingSocket) {
-                connectionTestingSocket.close();
-                connectionTestingSocket = null;
-            }
-            $backEndConnectivityOptions
-                .removeClass('live-css-server-client-general-error')
-                .removeClass('live-css-server-client-incompatible-error')
-                .find('.magic-css-server-connectivity-status')
-                .removeClass('connected')
-                .removeClass('disconnected')
-                .addClass('connecting');
-            $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
-
-            connectionTestingSocket = io(backEndPath);
-            connectionTestingSocket.on('connect', function () {
-                $backEndConnectivityOptions
-                    .removeClass('live-css-server-client-general-error')
-                    .removeClass('live-css-server-client-incompatible-error')
-                    .find('.magic-css-server-connectivity-status')
-                    .removeClass('disconnected')
-                    .removeClass('connecting')
-                    .addClass('connected');
-                $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', false);
-            });
-            var errorHandler = function (err) {
-                $backEndConnectivityOptions
-                    .removeClass('live-css-server-client-general-error')
-                    .removeClass('live-css-server-client-incompatible-error')
-                    .find('.magic-css-server-connectivity-status')
-                    .removeClass('connected')
-                    .removeClass('connecting')
-                    .addClass('disconnected');
-
-                if (err === 'Invalid namespace') {
-                    $backEndConnectivityOptions
-                        .addClass('live-css-server-client-incompatible-error');
-                } else {
-                    $backEndConnectivityOptions
-                        .addClass('live-css-server-client-general-error');
-                }
-                $backEndConnectivityOptions.find('.magicss-save-server-path-changes').prop('disabled', true);
-            };
-            connectionTestingSocket.on('connect_error', errorHandler);
-            connectionTestingSocket.on('error', errorHandler);  // This would pass on the "Invalid namespace" error
-        };
-
         $serverHostname.val(serverHostnameValue);
-        $serverHostname.on('input', function () {
+        $serverHostname.on('input', async function () {
             serverHostnameValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultHostname;
-            refreshConnectivityUi();
+            await editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            await socketOb.reset();
         });
 
         $serverPort.val(serverPortValue);
-        $serverPort.on('input', function () {
+        $serverPort.on('input', async function () {
             serverPortValue = $(this).val().trim().replace(/\/$/, '') || constants.liveCssServer.defaultPort;
-            refreshConnectivityUi();
+            await editor.userPreference('live-css-server-port', serverPortValue);
+            await socketOb.reset();
         });
 
         // Useful when developing/debugging
         // $backEndConnectivityOptions.find('.magic-css-back-end-connectivity-options').draggable();   // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
 
-        var disconnectConnectionTestingSocket = function () {
-            if (connectionTestingSocket) {
-                connectionTestingSocket.close();
-                connectionTestingSocket = null;
-            }
-        };
-        $backEndConnectivityOptions.find('.magic-css-full-page-overlay, .magicss-cancel-server-path-changes').on('click', function () {
-            disconnectConnectionTestingSocket();
-            $backEndConnectivityOptions.remove();
-            getServerDetailsFromUserAlreadyOpen = false;
-        });
-        $backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', async function () {
+        window.$backEndConnectivityOptions.find('.magicss-done-server-path-changes').on('click', async function () {
             await editor.userPreference('live-css-server-hostname', serverHostnameValue);
             await editor.userPreference('live-css-server-port', serverPortValue);
 
-            disconnectConnectionTestingSocket();
-            $backEndConnectivityOptions.remove();
+            window.$backEndConnectivityOptions.remove();
             getServerDetailsFromUserAlreadyOpen = false;
 
-            callback(null, {
-                serverHostname: serverHostnameValue,
-                serverPort: serverPortValue
-            });
+            if (cbGotServerDetailsFromUser) {
+                cbGotServerDetailsFromUser(null, {
+                    serverHostname: serverHostnameValue,
+                    serverPort: serverPortValue
+                });
+            }
         });
-        $('body').append($backEndConnectivityOptions);
-        refreshConnectivityUi();
+        window.$backEndConnectivityOptions.find('.magicss-save-server-path-changes').on('click', async function () {
+            await editor.userPreference('live-css-server-hostname', serverHostnameValue);
+            await editor.userPreference('live-css-server-port', serverPortValue);
+
+            await socketOb.reset();
+        });
+        $('body').append(window.$backEndConnectivityOptions);
+
+        if (serverHostnameValue && serverPortValue) {
+            await socketOb.reset();
+        }
     };
 
     var updateUiMentioningNotWatchingCssFiles = async function (editor) {
-        if (flagWatchingCssFiles) {
-            flagWatchingCssFiles = false;
+        if (socketOb.flagWatchingCssFiles) {
+            socketOb.flagWatchingCssFiles = false;
             utils.alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
-            await editor.userPreference('watching-css-files', 'no');
+            editor.adjustUiPosition();
         }
+        await editor.userPreference('watching-css-files', 'no');
     };
 
     var liveCssServerSessionClosedByUser = async function (editor) {
@@ -1147,26 +1401,25 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     var $toastrConnecting,
         $toastrConnected,
         $toastrReconnectAttempt;
-    var getConnectedWithBackEnd = async function (editor, mainAsyncCallback, asyncCallbackForReconfiguration) {
-        var flagCallbackCalledOnce = false;
+    var _getConnectedWithBackEnd = async function (editor, mainAsyncCallback) {
         var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
             serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
-        if (socket) {
-            var socketOpts = (socket.io || {}).opts || {};
+        if (socketOb.socket) {
+            var socketOpts = (socketOb.socket.io || {}).opts || {};
             if (
-                socket.connected &&
                 socketOpts.hostname === serverHostnameValue &&
-                socketOpts.port === serverPortValue
+                socketOpts.port === serverPortValue &&
+                socketOb.socket.connected
             ) {
+                await mainAsyncCallback();
                 return;
             } else {
-                socket.close();
-                socket = null;
+                editor.markLiveCssServerConnectionStatus(false);
+                socketOb.close();
             }
         }
 
-        var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
         var backEndPathToShowToUser = serverHostnameValue + ':' + serverPortValue;
         if ($toastrConnecting) {
             $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
@@ -1191,23 +1444,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 timeOut: 0,
                 onclick: async function (evt) {
                     if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                        await getServerDetailsFromUser(editor, function (err, serverDetails) {
-                            if (!err) {
-                                setTimeout(async function () {
-                                    await asyncCallbackForReconfiguration(serverDetails);
-                                });
-                            }
-                        });
+                        // TODO: Verify functionality
+                        await _getServerDetailsFromUser(editor);
                     } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
-                        if (socket) {
-                            socket.close();
-                            socket = null;
-                        }
-                        toastr.clear($toastrConnecting, {force: true});
-                        if (!flagCallbackCalledOnce) {
-                            flagCallbackCalledOnce = true;
-                            await mainAsyncCallback('cancelled-by-user', socket);
-                        }
+                        await getDisconnectedWithBackEnd(
+                            editor,
+                            {},
+                            async function asyncCallback () {
+                                await updateUiMentioningNotWatchingCssFiles(editor);
+                            }
+                        );
                     }
                 }
             }
@@ -1217,132 +1463,27 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // show them the configuration options along with the guide/help
         // about the live-css server
         if (
-            !(await editor.userPreference('live-css-server-hostname')) &&
+            !(await editor.userPreference('live-css-server-hostname')) ||
             !(await editor.userPreference('live-css-server-port'))
         ) {
-            await getServerDetailsFromUser(editor, function (err, serverDetails) {
+            await _getServerDetailsFromUser(editor, function (err) {
                 if (!err) {
                     setTimeout(async function () {
-                        await asyncCallbackForReconfiguration(serverDetails);
+                        await socketOb.reset(async function () {
+                            await mainAsyncCallback();
+                        });
                     });
                 }
             });
+        } else {
+            await socketOb.reset(async function () {
+                await mainAsyncCallback();
+            });
         }
-
-        var flagConnectedAtLeastOnce = false;
-        socket = io(backEndPath, {
-            // timeout: 5000
-            // reconnectionAttempts: 100
-        });
-
-        socket.on('error', async function asyncCallback(err) {
-            // In case of "Invalid namespace", we open the UI for details to inform that they are using
-            // incompatible version of the live-css server
-            if (err === 'Invalid namespace') {
-                await getServerDetailsFromUser(editor, function (err, serverDetails) {
-                    if (!err) {
-                        setTimeout(async function () {
-                            await asyncCallbackForReconfiguration(serverDetails);
-                        });
-                    }
-                });
-            }
-        });
-        socket.on('connect', async function () {
-            flagConnectedAtLeastOnce = true;
-
-            if (!flagCallbackCalledOnce) {
-                flagCallbackCalledOnce = true;
-                await mainAsyncCallback(null, socket);
-            }
-
-            if ($toastrReconnectAttempt) {
-                $toastrReconnectAttempt.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-                $toastrReconnectAttempt = null;
-            }
-
-            $toastrConnecting.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-            $toastrConnected = toastr.success(
-                '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
-                    backEndPathToShowToUser +
-                '</div>' +
-                '<div>' +
-                '<button type="button" class="magic-css-toastr-socket-ok" style="float:right;">OK</button>' +
-                    '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
-                '</div>',
-                'Connected with live-css server at:',
-                {
-                    onclick: async function (evt) {
-                        if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                            toastr.clear($toastrConnected, {force: true});
-                            await getServerDetailsFromUser(editor, function (err, serverDetails) {
-                                if (!err) {
-                                    setTimeout(async function () {
-                                        await asyncCallbackForReconfiguration(serverDetails);
-                                    });
-                                }
-                            });
-                        } else if ($(evt.target).hasClass('magic-css-toastr-socket-ok')) {
-                            toastr.clear($toastrConnected, {force: true});
-                        }
-                    }
-                }
-            );
-            var $toastrToHide = $toastrConnected;
-            setTimeout(function () {
-                toastr.clear($toastrToHide);
-            }, 4000);
-        });
-
-        socket.on('reconnect_attempt', function () {
-            if (flagConnectedAtLeastOnce) {
-                if ($toastrReconnectAttempt) {
-                    // do nothing
-                } else {
-                    if ($toastrConnected) {
-                        $toastrConnected.hide();   // Using jQuery's .hide() directly, rather than toastr.clear(), because there is no option to pass duration in the function call itself
-                    }
-                    $toastrReconnectAttempt = toastr.warning(
-                        '<div style="display:block; text-align:center; margin-top:3px; margin-bottom:15px; font-weight:bold;">' +
-                            backEndPathToShowToUser +
-                        '</div>' +
-                        '<div>' +
-                            '<button type="button" class="magic-css-toastr-socket-cancel" style="float:right">Cancel</button>' +
-                            '<button type="button" class="magic-css-toastr-socket-configure">Settings</button>' +
-                        '</div>',
-                        'Reconnecting with live-css server at:',
-                        {
-                            timeOut: 0,
-                            onclick: async function (evt) {
-                                if ($(evt.target).hasClass('magic-css-toastr-socket-configure')) {
-                                    await getServerDetailsFromUser(editor, function (err, serverDetails) {
-                                        if (!err) {
-                                            setTimeout(async function () {
-                                                await asyncCallbackForReconfiguration(serverDetails);
-                                            });
-                                        }
-                                    });
-                                } else if ($(evt.target).hasClass('magic-css-toastr-socket-cancel')) {
-                                    if (socket) {
-                                        socket.close();
-                                        socket = null;
-                                    }
-                                    toastr.clear($toastrReconnectAttempt, {force: true});
-                                    await liveCssServerSessionClosedByUser(editor);
-                                }
-                            }
-                        }
-                    );
-                }
-            }
-        });
     };
 
     var getDisconnectedWithBackEnd = async function (editor, options, asyncCallback) {
-        if (socket) {
-            socket.close();
-            socket = null;
-        }
+        socketOb.close();
         if ($toastrConnected) {
             toastr.clear($toastrConnected, {force: true});
         }
@@ -1715,13 +1856,63 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         overwriteExistingStyleTagWithSameId: true
                     });
 
-                var fnApplyTextAsCSS = async function (editor) {
+                var saveStatusUpdateTimeout;
+                var fnApplyTextAsCSS = async function (editor, options) {
+                    options = options || {};
                     var disabled = false;
                     if ((await editor.userPreference('disable-styles')) === 'yes') {
                         disabled = true;
                     }
 
-                    if (getLanguageMode() === 'less') {
+                    if (getLanguageMode() === 'file') {
+                        if (options.skipSavingFile) {
+                            // do nothing
+                        } else {
+                            var targetFileContents = editor.getTextValue();
+
+                            var $fileEditStatus = $('.footer-for-server-mode .file-edit-status');
+                            var saveInProgress = true;
+                            setTimeout(function () {
+                                if (saveInProgress) {
+                                    $fileEditStatus.html('<span style="top:-1px; position:relative;">◔</span> Saving');
+                                }
+                            }, 300);
+
+                            var filePath = await editor.userPreference('file-to-edit');
+
+                            socketOb.socket.emit(
+                                'PUT',
+                                {
+                                    url: '/live-css/edit-file/' + filePath,
+                                    targetFileContents: targetFileContents
+                                },
+                                function (status) {
+                                    saveInProgress = false;
+
+                                    if (status === 'success') {
+                                        $fileEditStatus.html('✔ Saved');
+
+                                        clearTimeout(saveStatusUpdateTimeout);
+                                        saveStatusUpdateTimeout = setTimeout(function () {
+                                            $fileEditStatus.html('');
+                                        }, 2500);
+                                    } else {
+                                        $fileEditStatus.html('✘ Save failed');
+
+                                        utils.alertNote(
+                                            '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
+                                            '<br/>Probable cause: <span style="font-weight:normal">live-css server encountered an unexpected error in saving the file</span>',
+                                            7500,
+                                            {
+                                                backgroundColor: '#f5bcae',
+                                                borderColor: '#e87457'
+                                            }
+                                        );
+                                    }
+                                }
+                            );
+                        }
+                    } else if (getLanguageMode() === 'less') {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
 
@@ -1804,7 +1995,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                 // https://cdnjs.com/libraries/sass.js
                                 var sassJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js',
                                     preRunReplace = [{oldText: 'this,function', newText: 'window,function'}];   // Required for making Sass load in Firefox - Reference: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Xray_vision
-                                utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
+                                if (!options.skipNotifications) {
+                                    utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
+                                }
 
                                 try {
                                     chrome.runtime.sendMessage(
@@ -1826,7 +2019,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                                     10000
                                                 );
                                             } else {
-                                                utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                                if (!options.skipNotifications) {
+                                                    utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                                }
                                                 setTimeout(function () {
                                                     // Ensure that getLanguageMode() is still 'sass'
                                                     if (getLanguageMode() === 'sass') {
@@ -1860,39 +2055,300 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 };
 
-                var setLanguageMode = async function (languageMode, editor) {
-                    $(editor.container)
-                        .removeClass('magicss-selected-mode-sass')
-                        .removeClass('magicss-selected-mode-less')
-                        .removeClass('magicss-selected-mode-css');
-                    if (languageMode === 'less') {
-                        $(editor.container).addClass('magicss-selected-mode-less');
-                        await editor.userPreference('language-mode', 'less');
-                        editor.cm.setOption('mode', 'text/x-less');
-                        await setCodeMirrorCSSLinting(editor, 'disable');
-                        utils.alertNote('Now editing code in LESS mode', 5000);
-                    } else if (languageMode === 'sass') {
-                        $(editor.container).addClass('magicss-selected-mode-sass');
-                        await editor.userPreference('language-mode', 'sass');
-                        editor.cm.setOption('mode', 'text/x-scss');
-                        await setCodeMirrorCSSLinting(editor, 'disable');
-                        utils.alertNote('Now editing code in SASS mode', 5000);
-                    } else {
-                        $(editor.container).addClass('magicss-selected-mode-css');
-                        await editor.userPreference('language-mode', 'css');
-                        editor.cm.setOption('mode', 'text/css');
-                        utils.alertNote('Now editing code in CSS mode', 5000);
+                var showFileEditOptions = async function (editor, callback) {
+                    /* eslint-disable indent */
+                    var $fileEditOptions = $(
+                        [
+                            '<div>',
+                                '<div class="magic-css-full-page-overlay">',
+                                '</div>',
+                                '<div class="magic-css-full-page-contents magic-css-ui" style="pointer-events:none;">',
+                                    '<div style="display:flex;justify-content:center;/*align-items:center;*/margin-top:38px;height:100%;">',
+                                        '<div class="magic-css-edit-file-options" style="pointer-events:initial;">',
+                                            '<div class="magic-css-row magic-css-file-config-item">',
+                                                '<div class="magic-css-row-item-1 magic-css-file-field-header">File to edit</div>',
+                                                '<div class="magic-css-row-item-2"><input class="magicss-file-to-edit" /></div>',
+                                            '</div>',
+                                            '<div class="magic-css-row magic-css-file-config-item" style="text-align:center">',
+                                                '<button type="button" class="magicss-start-file-editing" disabled="disabled">Start Editing</button>',
+                                                '<button type="button" class="magicss-cancel-file-mode" style="margin-left:20px">Cancel</button>',
+                                            '</div>',
+                                        '</div>',
+                                    '</div>',
+                                '</div>',
+                            '</div>'
+                        ].join('')
+                    );
+                    /* eslint-enable indent */
+
+                    var fileSuggestionValue = await editor.userPreference('file-to-edit');
+
+                    var fileSuggestions = $fileEditOptions.find('.magicss-file-to-edit').magicSuggest({
+                        method: 'GET',
+                        placeholder: 'Type file name or click here',
+                        // noSuggestionText: 'Could not find a matching file', // This option didn't seem to work
+                        allowFreeEntries: false,
+                        maxSelection: 1,
+                        typeDelay: 50,
+                        useZebraStyle: true,
+                        // expanded: true, // We may want it, but it seems more cleaner without expanded: true
+                        // expandOnFocus: true, // This option (when set to true) does not seem to work well with useTabKey: true
+                        useTabKey: true,
+                        toggleOnClick: true,
+                        inputCfg: {
+                            id: 'file-suggestion-input' // Useful for setting focus later on
+                        },
+                        value: (function () {
+                            var ob = undefined;
+                            if (fileSuggestionValue) {
+                                ob = {
+                                    id: fileSuggestionValue,
+                                    name: fileSuggestionValue
+                                };
+                            }
+                            return ob;
+                        }()),
+
+                        data: await (async function () {
+                            var protocolValue = (window.location.protocol === 'https:') ? 'https:' : 'http:',
+                                serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
+                                serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort,
+                                backEndPath = serverHostnameValue + ':' + serverPortValue + '/',
+                                url = protocolValue + '//' + backEndPath + 'live-css/list-of-editable-files';
+                            return url;
+                        }())
+
+                        // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
+                        // data: 'random.json',
+                        // renderer: function(data){
+                        //     return '<div style="padding: 5px; overflow:hidden;">' +
+                        //     // '<div style="float: left;"><img src="' + data.picture + '" /></div>' +
+                        //     '<div style="float: left; margin-left: 5px">' +
+                        //     '<div style="font-weight: bold; color: #333; font-size: 10px; line-height: 11px">' + data.name + '</div>' +
+                        //     '<div style="color: #999; font-size: 9px">' + data.name + '</div>' +
+                        //     '</div>' +
+                        //     '</div><div style="clear:both;"></div>'; // make sure we have closed our dom stuff
+                        // }
+                    });
+                    window.fileSuggestions = fileSuggestions;
+
+                    var $fileSuggestions = $(fileSuggestions);
+                    $fileSuggestions.on('selectionchange', async function(e, m){   // eslint-disable-line no-unused-vars
+                        var fileToEdit = this.getValue()[0] || '';
+                        if (fileToEdit) {
+                            $fileEditOptions.find('.magicss-start-file-editing').removeAttr('disabled');
+                        } else {
+                            $fileEditOptions.find('.magicss-start-file-editing').attr('disabled', 'disabled');
+                        }
+                    });
+
+                    // If we wish to make it draggable, then ideally, the height/direction of the files list would also
+                    // need to be adjusted. Hence, commenting it out for now.
+                    // console.log('TODO - Comment it out');
+                    // $fileEditOptions.find('.magic-css-edit-file-options').draggable();      // Note: jQuery UI .draggable() adds "position: relative" inline. Overriding that in CSS with "position: fixed !important;"
+
+                    // $fileEditOptions.find('.magic-css-full-page-overlay, .magicss-cancel-file-mode').on('click', function () {
+                    $fileEditOptions.find('.magicss-cancel-file-mode').on('click', function () {
+                        $fileEditOptions.remove();
+                    });
+                    $fileEditOptions.find('.magicss-start-file-editing').on('click', async function () {
+                        var filePath = fileSuggestions.getValue()[0] || '';
+                        await editor.userPreference('file-to-edit', filePath);
+                        $fileEditOptions.remove();
+                        callback(filePath);
+                    });
+                    $('body').append($fileEditOptions);
+
+                    await asyncTimeout(0); // Required for the focus functionality to work correctly
+                    $fileEditOptions.find('#file-suggestion-input').focus();
+                };
+
+                var loadFile = function (options) {
+                    var filePath = options.filePath,
+                        successCallback = options.successCallback,
+                        asyncErrorCallback = options.errorCallback;
+
+                    // Using a timeout of 0ms so that the "socket" gets initiated if it is required
+                    setTimeout(function () {
+                        socketOb.socket.emit(
+                            'GET',
+                            {
+                                url: filePath
+                            },
+                            async function (status, data) {
+                                if (status === 'success') {
+                                    successCallback({
+                                        path: filePath,
+                                        contents: data.fileContents
+                                    });
+                                } else {
+                                    await asyncErrorCallback();
+                                }
+                            }
+                        );
+                    }, 0);
+                };
+
+                var getDataForFileToEdit = async function (editor, options, cbWhenGotDataForFileToEdit) {
+                    options = options || {};
+                    var needInputThroughUi = true;
+
+                    var pathOfFileToEdit = await editor.userPreference('file-to-edit');
+                    if (pathOfFileToEdit) {
+                        needInputThroughUi = false;
                     }
-                    await fnApplyTextAsCSS(editor);
+
+                    socketOb.getConnected(editor, async function () {
+                        if (needInputThroughUi || options.showUi) {
+                            await showFileEditOptions(editor, function (filePath) {
+                                loadFile({
+                                    filePath: filePath,
+                                    successCallback: function (file) {
+                                        cbWhenGotDataForFileToEdit(file);
+                                    },
+                                    errorCallback: async function () {
+                                        await editor.userPreference('file-to-edit', null);
+                                        await getDataForFileToEdit(editor, options, cbWhenGotDataForFileToEdit);
+                                    }
+                                });
+                            });
+                        } else {
+                            loadFile({
+                                filePath: pathOfFileToEdit,
+                                successCallback: function (file) {
+                                    cbWhenGotDataForFileToEdit(file);
+                                },
+                                errorCallback: async function () {
+                                    await editor.userPreference('file-to-edit', null);
+                                    await getDataForFileToEdit(editor, options, cbWhenGotDataForFileToEdit);
+                                }
+                            });
+                        }
+                    });
+                };
+
+                var setLanguageModeClass = function (editor, cls) {
+                    $(editor.container)
+                        .removeClass('magicss-selected-mode-css')
+                        .removeClass('magicss-selected-mode-less')
+                        .removeClass('magicss-selected-mode-sass')
+                        .removeClass('magicss-selected-mode-file')
+                        .addClass(cls);
+                    editor.adjustUiPosition();
+                };
+
+                var setLanguageMode = async function (newLanguageMode, editor, options) {
+                    options = options || {};
+                    if (newLanguageMode === 'file') {
+                        var fileEditingOptions = {};
+                        var previousLanguageMode = getLanguageMode();
+                        // If previous mode was also 'file' (meaning the user clicked again), then we prompt the user for selecting file (or related options)
+                        if (previousLanguageMode === 'file') {
+                            fileEditingOptions.showUi = true;
+                        }
+
+                        if (previousLanguageMode === 'file') {
+                            // do nothing
+                        } else {
+                            await editor.userPreference('language-mode-non-file', previousLanguageMode);
+                        }
+                        await getDataForFileToEdit(editor, fileEditingOptions, async function (file) {
+                            editor.options.rememberText = false;
+
+                            setLanguageModeClass(editor, 'magicss-selected-mode-file');
+                            await editor.userPreference('language-mode', 'file');
+                            editor.cm.setOption('mode', 'text/x-less');
+                            setCodeMirrorCSSLinting(editor, 'disable');
+
+                            socketOb.flagEditingFile = true;
+                            // $('.footer-for-server-mode').show();
+                            // editor.adjustUiPosition();
+
+                            // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
+                            // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user clicks on the footer in file mode
+                            $('.footer-for-server-mode .name-of-file-being-edited')
+                                .html(htmlEscape(getFileNameFromPath(file.path)))
+                                .attr('title', file.path)
+                                .css({marginRight: 75})
+                                .animate({marginRight: 0}, 1000)
+                                .fadeOut(100)
+                                .fadeIn(750);
+                            if (!options.skipNotifications) {
+                                utils.alertNote(
+                                    'Auto-save changes for: <span style="font-weight:normal;">' + htmlEscape(file.path) + '</span>',
+                                    5000,
+                                    {
+                                        backgroundColor: 'lightgreen',
+                                        borderColor: 'darkgreen'
+                                    }
+                                );
+                            }
+                            await editor.setTextValue(file.contents);
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            editor.focus();
+
+                            // Clear the undo-redo hstory
+                            editor.cm.clearHistory();
+                        });
+                    } else {
+                        editor.options.rememberText = true;
+
+                        // If previous mode was 'file'
+                        if (getLanguageMode() === 'file') {
+                            // Restore the saved code
+                            await editor.setTextValue(editor.userPreference('textarea-value'));
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                            // Clear the undo-redo hstory
+                            editor.cm.clearHistory();
+                        }
+
+                        socketOb.flagEditingFile = false;
+                        await socketOb._disconnectIfRequiredServerHelper();
+                        // $('.footer-for-server-mode').hide();
+                        // editor.adjustUiPosition();
+
+                        if (newLanguageMode === 'less') {
+                            setLanguageModeClass(editor, 'magicss-selected-mode-less');
+                            await editor.userPreference('language-mode', 'less');
+                            editor.cm.setOption('mode', 'text/x-less');
+                            await setCodeMirrorCSSLinting(editor, 'disable');
+                            if (!options.skipNotifications) {
+                                utils.alertNote('Now editing code in LESS mode', 5000);
+                            }
+                        } else if (newLanguageMode === 'sass') {
+                            setLanguageModeClass(editor, 'magicss-selected-mode-sass');
+                            await editor.userPreference('language-mode', 'sass');
+                            editor.cm.setOption('mode', 'text/x-scss');
+                            await setCodeMirrorCSSLinting(editor, 'disable');
+                            if (!options.skipNotifications) {
+                                utils.alertNote('Now editing code in SASS mode', 5000);
+                            }
+                        } else {
+                            setLanguageModeClass(editor, 'magicss-selected-mode-css');
+                            await editor.userPreference('language-mode', 'css');
+                            editor.cm.setOption('mode', 'text/css');
+                            if (!options.skipNotifications) {
+                                utils.alertNote('Now editing code in CSS mode', 5000);
+                            }
+                        }
+                        await fnApplyTextAsCSS(editor, {
+                            skipNotifications: options.skipNotifications
+                        });
+                    }
                 };
 
                 var getLanguageMode = function () {
                     var $el = $('#' + id),
-                        mode = 'css';
-                    if ($el.hasClass('magicss-selected-mode-less')) {
+                        mode;
+                    if ($el.hasClass('magicss-selected-mode-file')) {
+                        mode = 'file';
+                    } else if ($el.hasClass('magicss-selected-mode-less')) {
                         mode = 'less';
                     } else if ($el.hasClass('magicss-selected-mode-sass')) {
                         mode = 'sass';
+                    } else {
+                        mode = 'css';
                     }
                     return mode;
                 };
@@ -2085,7 +2541,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         $titleItems.append(
                             '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>' +
                             '<div class="magicss-mode-button magicss-mode-less" title="Less mode">less</div>' +
-                            '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>'
+                            '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>' +
+                            '<div class="magicss-mode-button magicss-mode-file" title="File mode">' +
+                                '<span class="file-mode-is-beta">' +
+                                    '&nbsp;This is a BETA feature&nbsp;' +
+                                '</span>' +
+                                'file' +
+                            '</div>'
                         );
 
                         $(document).on('click', '.magicss-mode-css', async function () {
@@ -2098,6 +2560,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         });
                         $(document).on('click', '.magicss-mode-sass', async function () {
                             await setLanguageMode('sass', editor);
+                            editor.focus();
+                        });
+                        $(document).on('click', '.magicss-mode-file', async function () {
+                            await setLanguageMode('file', editor);
                             editor.focus();
                         });
 
@@ -2211,7 +2677,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             return options;
                         }
                     },
-                    bgColor: '68,88,174,0.85',
+                    // bgColor: '68,88,174,0.85',
+                    bgColor: '99,113,186,1',
                     headerIcons: [
                         (function () {
                             if (executionCounter < 25 || 50 <= executionCounter) {
@@ -2339,15 +2806,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-stop-watch-and-reload-link-tags',
                                             onclick: async function (evt, editor) {
-                                                if (flagWatchingCssFiles) {
-                                                    await getDisconnectedWithBackEnd(
-                                                        editor,
-                                                        {},
-                                                        async function asyncCallback () {
-                                                            await updateUiMentioningNotWatchingCssFiles(editor);
-                                                        }
-                                                    );
-                                                }
+                                                await socketOb._stopWatchingFiles(editor);
                                                 editor.focus();
                                             }
                                         };
@@ -2363,13 +2822,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                             // cls: 'magicss-watch-resources',
                                             uniqCls: 'magicss-watch-and-reload-link-tags',
                                             onclick: async function (evt, editor) {
-                                                if (!flagWatchingCssFiles) {
-                                                    await startWatchingFiles(editor);
-                                                }
+                                                await socketOb._startWatchingFiles(editor);
                                                 editor.focus();
                                             },
                                             beforeShow: function (origin, tooltip) {
-                                                tooltip.addClass(flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
+                                                tooltip.addClass(socketOb.flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
                                             }
                                         };
                                     } else {
@@ -2483,13 +2940,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             beforeShow: async function (origin, tooltip, editor) {
                                 // TODO: Move the .addClass() calls to their corresponding .beforeShow()
                                 tooltip
-                                    .addClass(
-                                        getLanguageMode() === 'less' ?
-                                            'tooltipster-selected-mode-less' :
-                                            getLanguageMode() === 'sass' ?
-                                                'tooltipster-selected-mode-sass' :
-                                                'tooltipster-selected-mode-css'
-                                    )
+                                    .addClass(function () {
+                                        switch(getLanguageMode()) {
+                                            case 'file':    return 'tooltipster-selected-mode-file';
+                                            case 'less':    return 'tooltipster-selected-mode-less';
+                                            case 'sass':    return 'tooltipster-selected-mode-sass';
+                                            default:        return 'tooltipster-selected-mode-css';
+                                        }
+                                    }())
                                     .addClass(editor.cm.getOption('lineNumbers') ? 'tooltipster-line-numbers-enabled' : 'tooltipster-line-numbers-disabled')
                                     .addClass(editor.cm.getOption('lint') ? 'tooltipster-css-linting-enabled' : 'tooltipster-css-linting-disabled')
                                     // FIXME: Probably tooltipster-autocomplete-selectors-disabled/enabled is not used anymore
@@ -2680,10 +3138,123 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         }
                     ],
-                    footer: function ($) {
+                    footer: function ($, editor) {
                         var $footerItems = $('<div></div>'),
                             $status = $('<div class="magicss-status"></div>');
                         $footerItems.append($status);
+
+                        var $footerForServerMode = $('<div class="footer-for-server-mode" style="display:none;margin-top:3px;margin-bottom:-4px;overflow:auto"></div>');
+                        $footerItems.append($footerForServerMode);
+
+                        var $fileToEdit = $(
+                            '<div class="file-to-edit">' +
+                                '<div class="name-of-file-being-edited" style="color:#fff; cursor:pointer"></div>' +
+                            '</div>'
+                        );
+                        var $fileEditStatus = $('<div class="file-edit-status" style="color:#fff"></div>');
+                        var $liveCssServerStatus = $('<div class="live-css-server-status"></div>');
+                        $footerForServerMode.append($fileToEdit);
+                        $footerForServerMode.append($liveCssServerStatus);
+                        $footerForServerMode.append($fileEditStatus);
+
+                        /*
+                        // Magic Suggest uses old jQuery code. Minor changes to fix that
+                        jQuery.fn.extend({
+                            size: function() {
+                                return this.length;
+                            }
+                        });
+                        setTimeout(function () {
+                            // $.ajax({
+                            //     method: 'PUT',
+                            //     url: 'http://localhost:3456/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3456/magic-css/asdf.txt'
+                            //     // url: 'http://localhost:3456/asdf.txt'
+                            //     // url: 'http://localhost:3456/asdf.txt'
+                            // });
+                            var fileSuggestions = $('#magicss-file-to-edit').magicSuggest({
+                                method: 'GET',
+                                data: 'http://localhost:3456/magic-css?query=asdf'
+                                // data: [{"id":"Paris", "name":"Paris"}, {"id":"New York", "name":"New York"}]
+                                // data: 'random.json',
+                                // renderer: function(data){
+                                //     // debugger;
+                                //     return '<div style="padding: 5px; overflow:hidden;">' +
+                                //     // '<div style="float: left;"><img src="' + data.picture + '" /></div>' +
+                                //     '<div style="float: left; margin-left: 5px">' +
+                                //     '<div style="font-weight: bold; color: #333; font-size: 10px; line-height: 11px">' + data.name + '</div>' +
+                                //     '<div style="color: #999; font-size: 9px">' + data.name + '</div>' +
+                                //     '</div>' +
+                                //     '</div><div style="clear:both;"></div>'; // make sure we have closed our dom stuff
+                                // }
+                            });
+                            window.fileSuggestions = fileSuggestions;
+                            // fileSuggestions.expand();
+                            $(fileSuggestions).on('selectionchange', function(e, m){
+                                $.ajax({
+                                    url: 'http://localhost:3456/' + this.getValue()[0],
+                                    success: function (data, textStatus) {
+                                        if (textStatus === 'success') {
+                                            await editor.setTextValue(data).reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        }
+                                    }
+                                });
+                            });
+                        }, 0);
+                        $selectLinkTag.on('mousedown', function (evt) {
+                            evt.stopPropagation();
+                        });
+                        // $selectLinkTag.on('click', function (evt) {
+                        //     $;
+                        //     $selectLinkTag;
+                        //     debugger;
+                        // });
+                        /* */
+
+                        // $footerItems.on('mousedown', function (evt) {
+                        //     evt.stopPropagation();
+                        // });
+
+                        $liveCssServerStatus.on('click', async function () {
+                            // TODO: Verify functionality
+                            await _getServerDetailsFromUser(editor);
+                        });
+
+                        $fileToEdit.on('click', async function () {
+                            await getDataForFileToEdit(editor, {showUi: true}, async function (file) {
+                                // TODO: Fix this code related to "getFileNameFromPath" (it is not in a consistent state after the rebase operation)
+                                // TODO: Reuse code. Currently, the following piece of code is also copied for the scenario when user switches the editing mode
+                                $('.footer-for-server-mode .name-of-file-being-edited')
+                                    .html(htmlEscape(getFileNameFromPath(file.path)))
+                                    .attr('title', file.path)
+                                    .css({marginRight: 75})
+                                    .animate({marginRight: 0}, 1000)
+                                    .fadeOut(100)
+                                    .fadeIn(750);
+                                utils.alertNote(
+                                    'Auto-save changes for: <span style="font-weight:normal;">' + htmlEscape(file.path) + '</span>',
+                                    5000,
+                                    {
+                                        backgroundColor: 'lightgreen',
+                                        borderColor: 'darkgreen'
+                                    }
+                                );
+
+                                await editor.setTextValue(file.contents);
+                                await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                editor.focus();
+
+                                // Clear the undo-redo hstory
+                                editor.cm.clearHistory();
+                            });
+                        });
+
+                        // Magic Suggest uses old jQuery code. Minor changes to fix that
+                        jQuery.fn.extend({
+                            size: function() {
+                                return this.length;
+                            }
+                        });
 
                         // The following DOM elements are added just to cache some Magic CSS icons/images which may otherwise fail to load on a
                         // domain with CSP settings like:
@@ -2790,12 +3361,38 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             });
 
                             var languageMode = await editor.userPreference('language-mode');
+
+                            // Editing mode 'file' is handled outside this if...else block
                             if (languageMode === 'less') {
                                 $(editor.container).addClass('magicss-selected-mode-less');
                             } else if (languageMode === 'sass') {
                                 $(editor.container).addClass('magicss-selected-mode-sass');
                             } else {
                                 $(editor.container).addClass('magicss-selected-mode-css');
+                            }
+
+                            if (languageMode === 'file') {
+                                await applyLastAppliedCss(editor);
+
+                                // FIXME: Improve the hard-coding done here for the fallback
+                                var previousNonFileLanguageMode = await editor.userPreference('language-mode-non-file') || 'css';
+                                await setLanguageMode(previousNonFileLanguageMode, editor, {skipNotifications: true});
+
+                                await setLanguageMode('file', editor, {skipNotifications: true});
+                            } else {
+                                window.setTimeout(function () {
+                                    fnApplyTextAsCSS(editor);
+                                }, 100);
+                            }
+
+                            // If language mode is file, then it might auto-connect for watching files as well
+                            if (languageMode === 'file') {
+                                // do nothing
+                            } else {
+                                var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
+                                if (watchingCssFiles) {
+                                    await socketOb._startWatchingFiles(editor);
+                                }
                             }
 
                             var disableStyles = await editor.userPreference('disable-styles') === 'yes';
@@ -2805,11 +3402,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.indicateEnabledDisabled('enabled');
                             }
 
-                            var watchingCssFiles = await editor.userPreference('watching-css-files') === 'yes';
-                            if (watchingCssFiles) {
-                                await startWatchingFiles(editor);
-                            }
-
                             var applyStylesAutomatically = await editor.userPreference('apply-styles-automatically') === 'yes';
                             if (applyStylesAutomatically) {
                                 editor.applyStylesAutomatically(true);
@@ -2817,9 +3409,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 editor.applyStylesAutomatically(false);
                             }
 
-                            window.setTimeout(async function () {
-                                await fnApplyTextAsCSS(editor);
-                            }, 100);
+                            // window.setTimeout(async function () {
+                            //     await fnApplyTextAsCSS(editor, {
+                            //         skipSavingFile: true    // Skip saving file since it is first launch
+                            //     });
+                            // }, 100);
 
                             // FIXME: Probably this piece of code is not used anymore
                             var autocompleteSelectors = await editor.userPreference(USER_PREFERENCE_AUTOCOMPLETE_SELECTORS);
@@ -3050,11 +3644,35 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     }
 
+                    markLiveCssServerConnectionStatus(connected) {
+                        if (connected) {
+                            $(this.container)
+                                .removeClass('magic-css-live-css-server-is-not-connected')
+                                .addClass('magic-css-live-css-server-is-connected');
+                        } else {
+                            $(this.container)
+                                .removeClass('magic-css-live-css-server-is-connected')
+                                .addClass('magic-css-live-css-server-is-not-connected');
+                        }
+                        this.adjustUiPosition();
+                    }
+
                     isPointAndClickActivated() {
                         return enablePointAndClick;
                     }
                     deactivatePointAndClick() {
                         disablePointAndClickFunctionality(this);
+                    }
+
+                    async keyPressed(keyCombination) {
+                        if (
+                            keyCombination === 'Ctrl-P' ||
+                            keyCombination === 'Cmd-P' ||
+                            keyCombination === 'Ctrl-O' ||
+                            keyCombination === 'Cmd-P'
+                        ) {
+                            await setLanguageMode('file', this);
+                        }
                     }
 
                     async disableEnableCSS(doWhat) {
@@ -3091,6 +3709,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 await window.MagiCSSEditor.create();
 
                 checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+
+                window.MagiCSSEditor.markLiveCssServerConnectionStatus(false);
 
                 try {
                     chromeStorageForExtensionData.get('use-autocomplete-for-css-selectors', function (values) {

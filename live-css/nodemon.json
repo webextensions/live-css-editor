@@ -1,0 +1,15 @@
+{
+  "verbose": true,
+  "watch": [
+    "index.js",
+    "default.live-css.config.js",
+    ".live-css.config.js"
+  ],
+  "ext": "js json cjson",
+  "ignore": [
+    ".git",
+    "node_modules",
+    "test",
+    "temp"
+  ]
+}

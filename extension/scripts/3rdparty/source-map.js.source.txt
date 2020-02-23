@@ -1,1 +1,3 @@
 https://raw.githubusercontent.com/mozilla/source-map/0.6.1/dist/source-map.min.js
+
+Note: Removed "sourceMappingURL"

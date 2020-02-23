@@ -9,6 +9,7 @@ var dataMigration = {
         'apply-styles-automatically',
         'disable-styles',
         'language-mode',
+        'language-mode-non-file',
         'last-applied-css',
         'live-css-server-hostname',
         'live-css-server-port',

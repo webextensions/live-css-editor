@@ -48,8 +48,11 @@ var path = require('path'),
 var chokidar = require('chokidar-webextensions'),
     anymatch = require('anymatch'),
     boxen = require('boxen'),
-    unusedFilename = require('unused-filename'),
-    _uniq = require('lodash/uniq.js');
+    unusedFilename = require('unused-filename');
+
+var express = require('express'),
+    // serveIndex = require('serve-index'),
+    bodyParser = require('body-parser');
 
 var nocache = require('nocache');
 
@@ -149,8 +152,8 @@ var getLiveCssParams = function (configFilePath, argv) {
             logger.warnHeading('\nUnable to read live-css configuration from ' + configFilePath);
             logger.warn('Using default configuration for live-css server.');
         } else {
-            logger.verbose([
-                'Run ' + logger.chalk.underline('live-css --init') + ' to generate the configuration file (recommended).'
+            logger.warn([
+                'Run ' + logger.chalk.underline('live-css --init') + ' to generate the configuration file which offers more customizations (recommended).'
             ].join('\n'));
         }
     }
@@ -180,7 +183,9 @@ var getLiveCssParams = function (configFilePath, argv) {
         );
     }
 
-    var paramWatchPatterns = configuration['watch-patterns'] || defaultConfig['watch-patterns'],
+    var paramEditFilePatterns = configuration['edit-file-patterns'] || defaultConfig['edit-file-patterns'],
+        paramEditFileIgnorePatterns = configuration['edit-file-ignore-patterns'] || defaultConfig['edit-file-ignore-patterns'],
+        paramWatchPatterns = configuration['watch-patterns'] || defaultConfig['watch-patterns'],
         paramWatchIgnorePatterns = configuration['watch-ignore-patterns'] || defaultConfig['watch-ignore-patterns'],
         paramAllowSymlinks = argv.allowSymlinks || configuration['allow-symlinks'] || defaultConfig['allow-symlinks'],
         paramListFiles = argv.listFiles || configuration['list-files'] || defaultConfig['list-files'];
@@ -190,6 +195,8 @@ var getLiveCssParams = function (configFilePath, argv) {
         logger.log({
             'port': paramPort,
             'root': paramRoot,
+            'edit-file-patterns': paramEditFilePatterns,
+            'edit-file-ignore-patterns': paramEditFileIgnorePatterns,
             'watch-patterns': paramWatchPatterns,
             'watch-ignore-patterns': paramWatchIgnorePatterns,
             'allow-symlinks': paramAllowSymlinks,
@@ -204,6 +211,8 @@ var getLiveCssParams = function (configFilePath, argv) {
         flagConfigurationLoaded: flagConfigurationLoaded,
         configuration: configuration,
         paramAllowSymlinks: paramAllowSymlinks,
+        paramEditFilePatterns: paramEditFilePatterns,
+        paramEditFileIgnorePatterns: paramEditFileIgnorePatterns,
         paramWatchPatterns: paramWatchPatterns,
         paramWatchIgnorePatterns: paramWatchIgnorePatterns,
         paramListFiles: paramListFiles,
@@ -228,8 +237,7 @@ var startTheServer = function (options) {
         });
     } else {
         var beginServerListening = function (portNumber) {
-            var express = require('express'),
-                expressApp = express();
+            var expressApp = express();
             var httpServer = expressApp.listen(portNumber, function () {
                 var localIpAddressesAndHostnames = [];
                 try {
@@ -254,10 +262,10 @@ var startTheServer = function (options) {
                 }
 
                 if (!module.parent) {
-                    logger.info('Use it along with the browser extension "Live editor for CSS, Less & Sass - Magic CSS":');
-                    logger.info('    https://github.com/webextensions/live-css-editor');
+                    logger.info('Press CTRL+C to stop the server');
 
-                    logger.info('\nPress CTRL+C to stop the server\n');
+                    logger.verbose('\nUse live-css server along with the browser extension "Live editor for CSS, Less & Sass - Magic CSS":');
+                    logger.verbose('    https://github.com/webextensions/live-css-editor\n');
                 }
 
                 handleLiveCss({
@@ -332,6 +340,8 @@ var handleLiveCss = function (options) {
     var processedParams = options.processedParams,
         configFilePath = processedParams.configFilePath,
         paramAllowSymlinks = processedParams.paramAllowSymlinks,
+        paramEditFilePatterns = processedParams.paramEditFilePatterns,
+        paramEditFileIgnorePatterns = processedParams.paramEditFileIgnorePatterns,
         paramWatchPatterns = processedParams.paramWatchPatterns,
         paramWatchIgnorePatterns = processedParams.paramWatchIgnorePatterns,
         paramListFiles = processedParams.paramListFiles,
@@ -342,7 +352,52 @@ var handleLiveCss = function (options) {
     var connectedSessions = 0;
 
     if (expressApp) {
-        expressApp.use(nocache());
+        expressApp.use(function (req, res, next) {
+            if (req.originalUrl.indexOf('/live-css/') === 0) {
+                (nocache())(req, res, next);
+            } else {
+                next();
+            }
+        });
+
+        expressApp.use(bodyParser.urlencoded({ extended: false }));
+
+        var editFileWatcherCwd = process.cwd();
+        var editFileWatcher = chokidar.watch(
+            paramEditFilePatterns,
+            {
+                cwd: editFileWatcherCwd,
+
+                ignored: paramEditFileIgnorePatterns,
+
+                followSymlinks: paramAllowSymlinks
+            }
+        );
+        var obFilesForEditing = {};
+        editFileWatcher.on('add', function (filePath, stats) {
+            if (!stats.isSymbolicLink() && !stats.isDirectory()) {
+                obFilesForEditing[filePath] = true;
+            }
+        });
+        editFileWatcher.on('unlink', function (filePath) {
+            delete obFilesForEditing[filePath];
+        });
+        editFileWatcher.on('ready', function () {
+            expressApp.get('/live-css/list-of-editable-files', function (req, res, next) { // eslint-disable-line no-unused-vars
+                var arrFiles = [];
+                var paramQuery = req.query.query;
+                Object.keys(obFilesForEditing).forEach(function (filePath) {
+                    if (!paramQuery || filePath.indexOf(paramQuery) >= 0) {
+                        arrFiles.push({
+                            id: filePath,
+                            name: filePath
+                        });
+                    }
+                });
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.send(arrFiles);
+            });
+        });
 
         expressApp.get('/live-css', function (req, res) {
             res.sendFile(__dirname + '/live-css.html');
@@ -353,6 +408,12 @@ var handleLiveCss = function (options) {
                 res.redirect(307, redirectToUrl);
             });
         }
+
+        /*
+        // https://expressjs.com/en/starter/static-files.html
+        // https://expressjs.com/en/resources/middleware/serve-index.html
+        expressApp.use('/', express.static('.'), serveIndex('.', {'icons': true}));
+        /* */
     }
 
     var watcherCwd = (function () {
@@ -422,7 +483,6 @@ var handleLiveCss = function (options) {
     );
 
     var versionNamespace = io.of('/api/v' + parseInt(pkg.version, 10));
-    var flagFileWatchReady = false;
     var filesBeingWatched = [];
     var fileModifiedHandler = function (changeObj) {
         versionNamespace.emit('file-modified', changeObj);
@@ -443,6 +503,10 @@ var handleLiveCss = function (options) {
     emitter.on('file-added', fileAddedHandler);
     emitter.on('file-deleted', fileDeletedHandler);
 
+    /*
+    // Commented out this section since it is not being used currently
+
+    var _uniq = require('lodash.uniq');
     var anyFileNameIsRepeated = function (arrPaths) {
         var arrWithFileNames = arrPaths.map(function (item) {
             return item.fileName;
@@ -454,9 +518,15 @@ var handleLiveCss = function (options) {
             return true;
         }
     };
+    /* */
 
+    var flagFileWatchReady = false;
     emitter.on('file-watch-ready', function () {
         flagFileWatchReady = true;
+
+        /*
+        // Commented out this section since it could probably cause more confusion related to "--root" parameter
+
         if (!paramListFiles) {
             logger.log('');
         }
@@ -479,6 +549,9 @@ var handleLiveCss = function (options) {
         } else {
             logger.log('');
         }
+        /* */
+        logger.log('\n');
+
         logger.success(
             'live-css server is ready.' +
             '\nWatching ' + filesBeingWatched.length + ' files under:' +
@@ -492,18 +565,18 @@ var handleLiveCss = function (options) {
     });
 
     var printSessionCount = function (connectedSessions) {
-        logger.info(logger.chalk.gray(getLocalISOTime()) + ' Number of active socket connections: ' + connectedSessions);
+        logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Number of active socket connections: ' + connectedSessions));
     };
 
     emitter.on('connected-socket', function () {
         connectedSessions++;
-        logger.info(logger.chalk.gray(getLocalISOTime()) + ' Connected to a socket.');
+        logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Connected to a socket.'));
         printSessionCount(connectedSessions);
     });
 
     emitter.on('disconnected-socket', function () {
         connectedSessions--;
-        logger.info(logger.chalk.gray(getLocalISOTime()) + ' Disconnected from a socket.');
+        logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Disconnected from a socket.'));
         printSessionCount(connectedSessions);
     });
 
@@ -585,6 +658,39 @@ var handleLiveCss = function (options) {
         socket.on('disconnect', function () {
             emitter.emit('disconnected-socket');
         });
+
+        socket.on('PUT', function (dataOb, cb) {
+            var relativeFilePath = dataOb.url.substr('/live-css/edit-file/'.length);
+            try {
+                if (relativeFilePath) {
+                    fs.writeFileSync(
+                        // __dirname + '/' + relativeFilePath,
+                        relativeFilePath,
+                        dataOb.targetFileContents
+                    );
+                    logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Saved changes: ' + relativeFilePath));
+                    cb('success');
+                } else {
+                    logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.red(' ✘ Failed to save changes: Please ensure that you are editing the correct file.'));
+                    cb('error');
+                }
+            } catch (e) {
+                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.red(' ✘ Failed to save changes: ' + relativeFilePath));
+                cb('error');
+            }
+        });
+
+        socket.on('GET', function (dataOb, cb) {
+            var relativeFilePath = dataOb.url;
+            try {
+                var fileContents = fs.readFileSync(relativeFilePath, 'utf8');
+                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.dim(' Read file: ' + relativeFilePath));
+                cb('success', { fileContents: fileContents });
+            } catch (e) {
+                logger.log(logger.chalk.gray(getLocalISOTime()) + logger.chalk.red(' ✘ Failed to read file: ' + relativeFilePath));
+                cb('error');
+            }
+        });
     });
 
     // In some of the cases, the following setTimeout helps in keeping the message (like: "Adding files to watch ")
@@ -636,10 +742,10 @@ if (module.parent) {    // If being loaded via require()
                 '          live-css --root project/http-pub',
                 '          live-css --init',
                 'Options:  -h --help                            Show help',
-                '          -r --root <http-server-root-folder>  Folder mapping to root (/) of your HTTP server',
-                '          -p --port <port-number>              Port number to run live-css server',
-                '             --init                            Generate the configuration file',
+                '             --init                            Generate the configuration file for more customizations (recommended)',
                 '             --list-files                      List the files being monitored',
+                '          -p --port <port-number>              Port number to run live-css server',
+                '          -r --root <http-server-root-folder>  Folder mapping to root (/) of your HTTP server',
                 '             --allow-symlinks                  Allow symbolic links',
                 '          -v --version                         Output the version number',
                 '             --debug                           Extra logging to help in debugging live-css',

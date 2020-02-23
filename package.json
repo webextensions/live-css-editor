@@ -6,6 +6,7 @@
     "manifest-generator": "node ./extension/manifest-generator.js",
     "copy-files-from-to": "copy-files-from-to",
     "copy-files-from-to-outdated": "copy-files-from-to --outdated",
+    "copy-files-from-to-dev-mode": "copy-files-from-to --mode dev",
     "postinstall": "npm run copy-files-from-to",
     "zip-chrome-extension": "node ./zip-extension.js chrome",
     "zip-edge-extension": "node ./zip-extension.js edge",
@@ -15,7 +16,7 @@
     "all-is-well": "./scripts/all-is-well.sh"
   },
   "dependencies": {
-    "codemirror": "=5.31.0",
+    "codemirror": "=5.34.0",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
     "jquery": "^3.4.1",
     "socket.io": "^2.3.0",
@@ -24,7 +25,7 @@
   "devDependencies": {
     "archiver": "^3.1.1",
     "chalk": "^3.0.0",
-    "copy-files-from-to": "^2.1.0",
+    "copy-files-from-to": "^2.2.0",
     "cp-file": "^7.0.0",
     "del": "^5.1.0",
     "eslint": "^6.8.0",

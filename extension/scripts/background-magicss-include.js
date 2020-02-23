@@ -243,7 +243,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
                 sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
             },
             {
-                src: path3rdparty + 'jquery-3.2.1.js',
+                src: path3rdparty + 'jquery.js',
                 skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
             },
             {
@@ -309,6 +309,9 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
             path3rdparty + 'toastr/toastr.css',
             path3rdparty + 'toastr/toastr_customized.js',
+
+            path3rdparty + 'magicsuggest/magicsuggest.css',
+            path3rdparty + 'magicsuggest/magicsuggest.js',
 
             path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
             path3rdparty + 'csspretty/csspretty.js',

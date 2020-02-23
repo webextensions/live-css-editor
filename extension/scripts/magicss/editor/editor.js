@@ -20,9 +20,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     var whichStoreToUse = 'chrome.storage.local';
 
     var CONSTANTS = {
-        EDITOR_MIN_WIDTH: 301,
+        EDITOR_MIN_WIDTH: 326,
         EDITOR_MIN_HEIGHT: 40,
-        EDITOR_DEFAULT_WIDTH: 301,
+        EDITOR_DEFAULT_WIDTH: 326,
         EDITOR_DEFAULT_HEIGHT: 249
     };
 
@@ -382,6 +382,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
         }
 
+        // Passing null as "value" would effectively delete the value from the store
+        // Reference: http://amplifyjs.com/api/store/
         async userPreference(pref, value) {
             var _this = this;
             if (whichStoreToUse === 'chrome.storage.local') {
@@ -583,6 +585,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             autoPositionEditor(thisOb);
         }
 
+        adjustUiPosition() {
+            var thisOb = this;
+            autoPositionEditor(thisOb);
+        }
+
         _makeDraggable() {
             var thisOb = this,
                 options = thisOb.options;
@@ -692,6 +699,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 await thisOb.hide();
                             }
                         }
+                    },
+                    'Ctrl-P': async function () {
+                        thisOb.keyPressed('Ctrl-P');
+                    },
+                    'Cmd-P': async function () {
+                        thisOb.keyPressed('Cmd-P');
+                    },
+                    'Ctrl-O': async function () {
+                        thisOb.keyPressed('Ctrl-O');
+                    },
+                    'Cmd-O': async function () {
+                        thisOb.keyPressed('Cmd-O');
                     }
                 }
             };
@@ -720,13 +739,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             cm.setSize(dimWH.width, dimWH.height);
 
             var t_timer;
-            cm.on('change', function() {
-                var delay = 500;
-                clearTimeout(t_timer);
-                t_timer = setTimeout(async function () {
-                    await thisOb.setTextValue(cm.getValue());
-                    await thisOb.triggerEvent('delayedtextchange');
-                }, delay);
+            cm.on('change', function(cm, changeObj) {
+                if (changeObj.origin === 'setValue') {
+                    thisOb.setTextValue(cm.getValue());
+                } else {
+                    var delay = 500;
+                    clearTimeout(t_timer);
+                    t_timer = setTimeout(async function () {
+                        await thisOb.setTextValue(cm.getValue());
+                        await thisOb.triggerEvent('delayedtextchange');
+                    }, delay);
+                }
             });
             cm.on('keydown', function(cm, evt) {
                 evt.stopPropagation();
@@ -1391,11 +1414,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
         async reInitCodeMirror() {
             var thisOb = this;
-            thisOb.setCodeMirrorValue(thisOb.getTextValue());
+            thisOb.setCodeMirrorValue(await thisOb.getTextValue());
             thisOb.setCodeMirrorDimensions(await thisOb.getDimensions());
 
             var $that = $(thisOb.container);
             $that.addClass('mode-codeMirror');
+            return this;
         }
 
         setCursor(cursorPosition, options) {
@@ -1410,11 +1434,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = true; }
             await this.reInitCodeMirror();
             if (options.pleaseIgnoreCursorActivity) { this.pleaseIgnoreCursorActivity = false; }
+            return this;
         }
     }
     // TODO:
     // Move out the default preferences of Magic CSS into magicss.js
     Editor.defaultPreferences = {
+        'file-to-edit': '',                                 // TODO: Move this into Magic CSS code
+
         'language-mode': 'css',
         'use-css-linting': 'no',
         'disable-styles': 'no',

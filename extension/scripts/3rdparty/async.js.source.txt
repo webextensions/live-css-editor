@@ -1,1 +1,3 @@
 https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.min.js
+
+Note: Removed "sourceMappingURL"

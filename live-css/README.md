@@ -6,7 +6,7 @@ live-css is a Node JS based development server for use with the browser extensio
     Reference: https://stackoverflow.com/questions/13808020/include-an-svg-hosted-on-github-in-markdown/16462143#16462143
 -->
 
-> <img width="32" alt="Google Chrome Logo" src="../extension/ui-images/logo-google-chrome.svg"> &nbsp; https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol  
+> <img width="32" alt="Google Chrome Logo" src="assets/logo-google-chrome.svg"> &nbsp; https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol  
 
 For availability of the latest version of Magic CSS extension on Microsoft Edge, Mozilla Firefox and Opera, follow:
 > https://github.com/webextensions/live-css-editor
@@ -81,7 +81,6 @@ The configuration file can be generated using ```$ live-css --init```
 *_Note:_* Configuration options are described in the [configuration file](https://github.com/webextensions/live-css-editor/blob/master/live-css/default.live-css.config.js)
 
 ## TODO
-* Ability to edit files within the extension "Live editor for CSS, Less & Sass - Magic CSS"
 * Ability to auto-connect live-css server without launching the browser extension
 * Ability to integrate webpage front-end and live-css server without the browser extension
 
