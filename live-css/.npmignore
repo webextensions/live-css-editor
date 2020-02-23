@@ -1,0 +1,6 @@
+node_modules/
+scripts/
+test/
+.nvmrc
+nodemon.json
+webextensions-live-css-*.tgz
