@@ -13,12 +13,14 @@ Extension **Live editor for CSS, Less & Sass** *(Magic CSS)* for Google Chrome, 
 
 <img width="32" alt="Opera Logo" src="extension/ui-images/logo-opera.svg"> &nbsp; https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/
 
-**Live preview of CSS/Less/Sass code with an in-page editor. Autocomplete, convert Less/Sass to CSS, beautify, minify, CSS reloader, linter, ...**
+**Live preview of CSS/Less/Sass code changes. Auto-save file, autocomplete, convert Less/Sass to CSS, beautify, minify, CSS reloader, linter, ...**
 
-Run this extension and start writing your CSS/Less/Sass code which gets applied immediately. The code you write will be saved in your browser's local storage at site level.
+Run this extension and start writing your CSS/Less/Sass code which gets applied immediately. The code you write will be saved in the browser extension's storage space or the site's local storage.
 
 **Featuring:**
 * Live editor for CSS/Less/Sass code - Preview changes as you write code
+* Live edit CSS files and auto-save on file system
+* CSS reloader
 * Syntax Highlighting
 * Auto-generate CSS selectors with point-and-click
 * Autocomplete for CSS selectors, properties and values
@@ -28,7 +30,6 @@ Run this extension and start writing your CSS/Less/Sass code which gets applied 
 * Beautify / Format code
 * Minify code
 * Highlight DOM elements matching the CSS selectors
-* CSS reloader
 * Lint CSS code
 
 **Open source:**
@@ -47,6 +48,7 @@ Visit https://webextensions.org/ for further details
 
 **Uses:**
 * No need to refresh pages to test your CSS/Less/Sass code
+* Auto-save your changes to filesystem as you write the code
 * Speed-up development and testing of your styling code by doing it directly on your page
 * Develop and test your code before finalizing your changes into the project files
 * Apply some temporary styles (like hiding some components)
@@ -55,6 +57,7 @@ Visit https://webextensions.org/ for further details
 
 **Notes:**
 * The CSS/Less/Sass code you write gets applied as you write it
+* The CSS reloader watches CSS files and live updates them immediately
 * The Sass parser is loaded remotely from https://cdnjs.cloudflare.com/ajax/libs/sass.js/...
 * With this styling code tester, you can develop and test the code at the same time
 * The code is saved in browser as soon as you write it
@@ -82,8 +85,10 @@ Visit https://webextensions.org/ for further details
 * jQuery
 * jQuery UI
 * Less
+* magicsuggest
 * Mozilla Source Map
 * SASS / SCSS
+* socket.io
 * Tooltipster
 
 **Inspirations:**
