@@ -23,7 +23,6 @@
     "express": "^4.17.1",
     "find-free-port": "^2.0.0",
     "local-ip-addresses-and-hostnames": "^0.1.3",
-    "lodash.uniq": "^4.5.0",
     "nocache": "^2.1.0",
     "note-down": "^0.2.3",
     "socket.io": "^2.3.0",
