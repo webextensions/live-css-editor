@@ -49,7 +49,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         });
 
         socket.on('connect', async function () {
-            if (asyncCallbackOnce) {
+            // This callback may lead to opening the "File to edit" input form. We wouldn't want it
+            // to open again everytime disconnection / connection happens, due to some intermittent
+            // issues like manual disconnection or network/debugging related causes.
+            if (asyncCallbackOnce && !asyncCallbackOnce.alreadyCalled) {
+                asyncCallbackOnce.alreadyCalled = true;
                 await asyncCallbackOnce();
             }
 

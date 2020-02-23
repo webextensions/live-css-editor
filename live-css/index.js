@@ -374,8 +374,10 @@ var handleLiveCss = function (options) {
             }
         );
         var obFilesForEditing = {};
-        editFileWatcher.on('add', function (filePath) {
-            obFilesForEditing[filePath] = true;
+        editFileWatcher.on('add', function (filePath, stats) {
+            if (!stats.isSymbolicLink() && !stats.isDirectory()) {
+                obFilesForEditing[filePath] = true;
+            }
         });
         editFileWatcher.on('unlink', function (filePath) {
             delete obFilesForEditing[filePath];
