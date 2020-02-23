@@ -254,6 +254,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         );
                         $(editor.container).addClass('watching-css-files');
+                        editor.adjustUiPosition();
                         await editor.userPreference('watching-css-files', 'yes');
                     }
 
@@ -281,6 +282,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     }
                 );
                 $(editor.container).addClass('watching-css-files');
+                editor.adjustUiPosition();
                 await editor.userPreference('watching-css-files', 'yes');
             }
         }
@@ -301,6 +303,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     );
                     $(editor.container).addClass('watching-css-files');
+                    editor.adjustUiPosition();
                     await editor.userPreference('watching-css-files', 'yes');
                 }
             });
@@ -312,6 +315,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             socketOb.flagWatchingCssFiles = false;
             utils.alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
+            editor.adjustUiPosition();
             await editor.userPreference('watching-css-files', 'no');
         }
         if (asyncCallback) {
@@ -1378,6 +1382,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             socketOb.flagWatchingCssFiles = false;
             utils.alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
+            editor.adjustUiPosition();
         }
         await editor.userPreference('watching-css-files', 'no');
     };
@@ -2230,6 +2235,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         .removeClass('magicss-selected-mode-sass')
                         .removeClass('magicss-selected-mode-file')
                         .addClass(cls);
+                    editor.adjustUiPosition();
                 };
 
                 var setLanguageMode = async function (newLanguageMode, editor, options) {
@@ -3635,6 +3641,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 .removeClass('magic-css-live-css-server-is-connected')
                                 .addClass('magic-css-live-css-server-is-not-connected');
                         }
+                        this.adjustUiPosition();
                     }
 
                     isPointAndClickActivated() {
