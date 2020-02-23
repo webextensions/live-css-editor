@@ -41,7 +41,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
         var backEndPathToShowToUser = serverHostnameValue + ':' + serverPortValue;
 
-        socketOb.socket = io(backEndPath);
+        socketOb.socket = io(backEndPath, {
+            timeout: 3000
+        });
         var socket = socketOb.socket;
 
         socket.on('disconnect', function () {
