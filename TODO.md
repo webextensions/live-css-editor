@@ -1,7 +1,5 @@
 #### New Features
 * Add Autoprefixer (References: https://github.com/postcss/autoprefixer https://autoprefixer.github.io/)
-* Add support for editing and saving the CSS/Less/Sass files (back-end would need to support saving those files, while keeping a check on line-ending)
-* Add support for optionally saving the data in extension storage (rather than just localStorage)
 * Add link in the suggested selectors list, so that the user can directly edit the file containing the suggested selector.
 * Add a "copy-to-clipboard" button
 * Add support for running JavaScript code as well
