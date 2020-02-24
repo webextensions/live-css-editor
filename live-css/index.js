@@ -227,12 +227,16 @@ var getLiveCssParams = function (configFilePath, argv) {
 };
 
 var startTheServer = function (options) {
-    var processedParams = options.processedParams;
     var httpServer = options.httpServer;
+    var expressApp = options.expressApp;
+    var runningOnSeparatePort = options.runningOnSeparatePort;
+    var processedParams = options.processedParams;
 
     if (httpServer) {
         handleLiveCss({
             httpServer: httpServer,
+            expressApp: expressApp,
+            runningOnSeparatePort: runningOnSeparatePort,
             processedParams: processedParams
         });
     } else {
@@ -716,11 +720,15 @@ if (module.parent) {    // If being loaded via require()
         var liveCss = function (options) {
             options = options || {};
             var httpServer = options.httpServer,
+                expressApp = options.expressApp,
+                runningOnSeparatePort = options.runningOnSeparatePort,
                 configFilePath = options.configFilePath,
                 processedParams = getLiveCssParams(configFilePath);
 
             startTheServer({
                 httpServer: httpServer,
+                expressApp: expressApp,
+                runningOnSeparatePort: runningOnSeparatePort,
                 processedParams: processedParams
             });
         };

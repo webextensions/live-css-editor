@@ -45,6 +45,12 @@ if (codeIsRunningInDevelopmentMode) {
         //            Otherwise, live-css server would run on a separate port.
         httpServer: httpServer,
 
+        // Optional - If provided, routes for '/live-css/' requests would be setup appropriately
+        expressApp: app,
+
+        // Optional - Use it along with "expressApp" if the "live-css" server runs on a different port
+        runningOnSeparatePort: false,
+
         // Optional - Useful for providing some common configuration options.
         //            This example assumes that the path of the config file is same as that of
         //            server code file initiating live-css server
