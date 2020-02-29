@@ -12,6 +12,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
+var const_rateUsUsageCounterFrom = 20,
+    const_rateUsUsageCounterTo = 100;
+
 (function($){
     var asyncTimeout = function (delay) {
         return new Promise((resolve) => {
@@ -2681,7 +2684,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     bgColor: '99,113,186,1',
                     headerIcons: [
                         (function () {
-                            if (executionCounter < 25 || 50 <= executionCounter) {
+                            if (executionCounter < const_rateUsUsageCounterFrom || const_rateUsUsageCounterTo <= executionCounter) {
                                 return null;
                             } else {
                                 return iconForRateUs({addOpaqueOnHoverClass: true});
@@ -2857,7 +2860,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     ],
                     headerOtherIcons: [
                         (function () {
-                            if (executionCounter < 50) {
+                            if (executionCounter < const_rateUsUsageCounterTo) {
                                 return null;
                             } else {
                                 return iconForRateUs();
