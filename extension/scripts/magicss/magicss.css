@@ -1239,8 +1239,7 @@ html .magicss-mouse-over-dom-element {
 /* */
 /* Potential fix for https://github.com/webextensions/live-css-editor/issues/41 */
 .CodeMirror span {
-    font-family: "Courier New" !important;
-    font-family: monospace !important;
+    font-family: monospace, "Courier New" !important;
 }
 
 /* Show cursors if the CSS contains style like: div { overflow: hidden } */
