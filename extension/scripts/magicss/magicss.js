@@ -1,4 +1,4 @@
-/* global jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr */
+/* global jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr, extLib */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
@@ -2354,7 +2354,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 };
 
                 var getMagicCSSForChrome = null,
-                    getMagicCSSForEdge = null,
+                    // getMagicCSSForEdge = null,
                     getMagicCSSForFirefox = null;
                 if (!isChrome) {
                     getMagicCSSForChrome = {
@@ -2364,14 +2364,14 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         href: extensionUrl.chrome
                     };
                 }
-                if (!isEdge) {
-                    getMagicCSSForEdge = {
-                        name: 'get-magic-css-for-edge',
-                        title: 'Magic CSS for Edge',
-                        uniqCls: 'get-magic-css-for-edge',
-                        href: extensionUrl.edge
-                    };
-                }
+                // if (!isEdge) {
+                //     getMagicCSSForEdge = {
+                //         name: 'get-magic-css-for-edge',
+                //         title: 'Magic CSS for Edge',
+                //         uniqCls: 'get-magic-css-for-edge',
+                //         href: extensionUrl.edge
+                //     };
+                // }
                 if (!isFirefox) {
                     getMagicCSSForFirefox = {
                         name: 'get-magic-css-for-firefox',
@@ -3086,20 +3086,18 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             }
                         },
                         /* */
-                        /*
+                        getMagicCSSForChrome,
+                        // getMagicCSSForEdge,
+                        getMagicCSSForFirefox,
                         {
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=' + extensionUrl.chrome + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
-                        /* */
-                        getMagicCSSForChrome,
-                        getMagicCSSForEdge,
-                        getMagicCSSForFirefox,
                         {
                             name: 'share-on-facebook',
-                            title: 'Share this extension with friends',
+                            title: 'Share',
                             uniqCls: 'magicss-share-on-facebook',
                             href: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser)
                         },
