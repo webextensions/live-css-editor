@@ -119,8 +119,6 @@ var const_rateUsUsageCounterFrom = 20,
 
             if ($backEndConnectivityOptions) {
                 $backEndConnectivityOptions
-                    .removeClass('live-css-server-client-general-error')
-                    .removeClass('live-css-server-client-incompatible-error')
                     .find('.magic-css-server-connectivity-status')
                     .removeClass('connected')
                     .removeClass('connecting')
@@ -128,9 +126,11 @@ var const_rateUsUsageCounterFrom = 20,
 
                 if (err === 'Invalid namespace') {
                     $backEndConnectivityOptions
+                        .removeClass('live-css-server-client-general-error')
                         .addClass('live-css-server-client-incompatible-error');
                 } else {
                     $backEndConnectivityOptions
+                        .removeClass('live-css-server-client-incompatible-error')
                         .addClass('live-css-server-client-general-error');
                 }
                 // $backEndConnectivityOptions.find('.magicss-done-server-path-changes').prop('disabled', true);
