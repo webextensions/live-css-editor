@@ -1,5 +1,5 @@
 {
-    "version": "8.0.6",
+    "version": "8.0.7",
     "manifest_version": 2,
     "author": "Priyank Parashar",
     "default_locale": "en",
@@ -19,11 +19,10 @@
         "activeTab",
         "storage",
         "unlimitedStorage",
-        "<all_urls>",
-        "webNavigation"
+        "webNavigation",
+        "<all_urls>"
     ],
-    "optional_permissions": [
-    ],
+    "optional_permissions": [],
     "browser_action": {
         "default_icon": {
             "16": "icons/icon-16.png",

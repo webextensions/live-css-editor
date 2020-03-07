@@ -32,16 +32,20 @@ var generateManifest = function (whichBrowser) {
                 "storage",
                 "unlimitedStorage"
             ];
-            if (whichBrowser === "edge") {
+            if (whichBrowser === "edge" || whichBrowser === "firefox") {
                 permissions.push("webNavigation");
                 permissions.push("<all_urls>");
             }
             return permissions;
         }()),
-        "optional_permissions": [
-            "webNavigation",
-            "<all_urls>"
-        ],
+        "optional_permissions": (function () {
+            var optional_permissions = [];
+            if (whichBrowser !== "edge" && whichBrowser !== "firefox") {
+                optional_permissions.push("webNavigation");
+                optional_permissions.push("<all_urls>");
+            }
+            return optional_permissions;
+        }()),
         "browser_action": {
             "default_icon": {
                 "16": "icons/icon-16.png",
