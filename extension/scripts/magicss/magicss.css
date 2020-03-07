@@ -1314,6 +1314,11 @@ html .magicss-mouse-over-dom-element {
     overflow: initial !important;
 }
 
+/* https://www.agegeek.com/ - br is marked as display: none in this site. This causes minor layout issue in live-css settings popup dialog. */
+.magic-css-ui br {
+    display: initial;
+}
+
 /* http://cssbeautify.com/ - Without this style, a scrollbar might appear when the size (height) of CodeMirror is increased */
 #MagiCSS-bookmarklet .CodeMirror-scroll {
     height: 100%;
@@ -1359,6 +1364,18 @@ html .magicss-mouse-over-dom-element {
 #MagiCSS-bookmarklet .CodeMirror {
     position: relative !important;
 }
+
+/* Begin: https://howlongtoread.com/ */
+.magic-css-ui .toast-success {
+    background-color: #51A351;
+}
+.magic-css-ui .toast-info {
+    background-color: #2F96B4;
+}
+.magic-css-ui .toast-warning {
+    background-color: #F89406;
+}
+/* End */
 
 /* http://koimoi.com/ */
 .magic-css-tooltipster .tooltipster-content ul li {
