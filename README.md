@@ -9,7 +9,7 @@ Extension **Live editor for CSS, Less & Sass** *(Magic CSS)* for Google Chrome, 
 
 <img width="32" alt="Microsoft Edge Logo" src="extension/ui-images/logo-microsoft-edge.svg"> &nbsp; https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1
 
-<img width="32" alt="Mozilla Firefox Logo" src="extension/ui-images/logo-firefox_edited.png"> &nbsp; https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/
+<img width="32" alt="Mozilla Firefox Logo" src="extension/ui-images/logo-firefox_edited.png"> &nbsp; https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/
 
 <img width="32" alt="Opera Logo" src="extension/ui-images/logo-opera.svg"> &nbsp; https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/
 

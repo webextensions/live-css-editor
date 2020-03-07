@@ -901,7 +901,7 @@ var const_rateUsUsageCounterFrom = 20,
     var extensionUrl = {
         chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
         edge: 'https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1',
-        firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-and-less/',
+        firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/',
         opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
     };
     extensionUrl.forThisBrowser = (function () {
