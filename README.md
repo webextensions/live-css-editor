@@ -68,7 +68,7 @@ Visit https://webextensions.org/ for further details
 * You can use "TAB" key to indent your code
 * Running Magic CSS again, while it is already loaded, will restore it to its original position and size
 * Press "Esc" or click on close to hide it and run it again to continue making changes
-* The code you write is added at the bottom of the <body> tag of the active page
+* The code you write is added at the bottom of the `<body>` tag of the active page
 * It includes CSS/Less/Sass beautifier
 * It includes CSS minifier
 * It highlights the DOM elements matching the CSS selectors
