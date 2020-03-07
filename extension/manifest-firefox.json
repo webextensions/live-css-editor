@@ -18,11 +18,11 @@
     "permissions": [
         "activeTab",
         "storage",
-        "unlimitedStorage"
+        "unlimitedStorage",
+        "<all_urls>",
+        "webNavigation"
     ],
     "optional_permissions": [
-        "webNavigation",
-        "<all_urls>"
     ],
     "browser_action": {
         "default_icon": {

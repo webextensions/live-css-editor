@@ -2692,7 +2692,7 @@ var const_rateUsUsageCounterFrom = 20,
                         }()),
                         (function () {
                             // Currently, this feature has been tested only in Chrome, Opera and Edge browsers
-                            if (isChrome || isOpera || isEdge) {
+                            if (isChrome || isOpera || isEdge || isFirefox) {
                                 return {
                                     name: 'reapply',
                                     title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
@@ -2705,30 +2705,38 @@ var const_rateUsUsageCounterFrom = 20,
                                                 5000
                                             );
                                         } else {
-                                            chrome.runtime.sendMessage(
-                                                {
-                                                    requestPermissions: true,
-                                                    url: window.location.href
-                                                },
-                                                async function asyncCallback(status) {
-                                                    if (chrome.runtime.lastError) {
-                                                        console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                        utils.alertNote(
-                                                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                            10000
-                                                        );
+                                            if (isFirefox) {
+                                                await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                utils.alertNote(
+                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                    10000
+                                                );
+                                            } else {
+                                                chrome.runtime.sendMessage(
+                                                    {
+                                                        requestPermissions: true,
+                                                        url: window.location.href
+                                                    },
+                                                    async function asyncCallback(status) {
+                                                        if (chrome.runtime.lastError) {
+                                                            console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                            utils.alertNote(
+                                                                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                                10000
+                                                            );
+                                                        }
+                                                        if (status === 'request-granted') {
+                                                            await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                            utils.alertNote(
+                                                                '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                                10000
+                                                            );
+                                                        } else if (status === 'request-not-granted') {
+                                                            utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                        }
                                                     }
-                                                    if (status === 'request-granted') {
-                                                        await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                        utils.alertNote(
-                                                            '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
-                                                            10000
-                                                        );
-                                                    } else if (status === 'request-not-granted') {
-                                                        utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
-                                                    }
-                                                }
-                                            );
+                                                );
+                                            }
                                         }
                                         editor.focus();
                                     }
@@ -2802,7 +2810,7 @@ var const_rateUsUsageCounterFrom = 20,
                             cls: 'magicss-reload-css-resources editor-gray-out cancelDragHandle',
                             icons: [
                                 (function () {
-                                    if (isChrome || isOpera || isEdge) {
+                                    if (isChrome || isOpera || isEdge || isFirefox) {
                                         return {
                                             name: 'stopWatchingCssFiles',
                                             title: 'Stop watching CSS files',
@@ -2818,7 +2826,7 @@ var const_rateUsUsageCounterFrom = 20,
                                     }
                                 }()),
                                 (function () {
-                                    if (isChrome || isOpera || isEdge) {
+                                    if (isChrome || isOpera || isEdge || isFirefox) {
                                         return {
                                             name: 'watchCssFiles',
                                             title: 'Watch CSS files to apply changes automatically',

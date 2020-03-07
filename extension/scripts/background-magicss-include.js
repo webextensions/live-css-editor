@@ -558,6 +558,8 @@ var onDOMContentLoadedHandler = function () {
                         // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
                         if (runningInEdgeLikeEnvironment()) {
                             reapplyCss(tabId);
+                        } else if (runningInFirefoxLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
+                            reapplyCss(tabId);
                         } else if (tab && tab.url) {
                             // Old logic:
                             //     "if (permissionsPattern && details.frameId === 0) {"

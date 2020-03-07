@@ -1213,6 +1213,9 @@ html .magicss-mouse-over-dom-element {
     background-color: #fff;
     border: none;
 }
+.magic-css-edit-file-options .ms-ctn .ms-sel-item {
+    line-height: 1.6 !important; /* Required for Firefox */
+}
 
 .magic-css-edit-file-options .ms-ctn .ms-res-ctn .ms-res-item {
     padding-left: 12px;
@@ -1240,7 +1243,6 @@ html .magicss-mouse-over-dom-element {
     content: '×';
     font-weight: bold;
     display: block;
-    padding-top: 1px;
     padding-left: 5px;
     font-size: 16px;
     color: #aaa;
