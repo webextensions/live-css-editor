@@ -1319,8 +1319,8 @@ var const_rateUsUsageCounterFrom = 20,
                                         '</div>',
                                     '</div>',
                                 '</div>',
-                                '<div class="magic-css-server-config-item" style="text-align:right">',
-                                    '<div>',
+                                '<div class="magic-css-server-config-item">',
+                                    '<div style="text-align:right">',
                                         '<button type="button" class="magicss-done-server-path-changes">Done</button>',
                                     '</div>',
                                 '</div>',
@@ -2572,7 +2572,7 @@ var const_rateUsUsageCounterFrom = 20,
 
                         return $outer;
                     },
-                    placeholder: 'Shortcut: Alt + Shift + C' + '\n\nWrite CSS/Less/Sass code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}',
+                    placeholder: 'Write CSS/Less/Sass code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}' + '\n\nShortcut: Alt + Shift + C',
                     codemirrorOptions: {
                         colorpicker: {
                             mode: 'edit'
@@ -3274,60 +3274,67 @@ var const_rateUsUsageCounterFrom = 20,
                     },
                     events: {
                         beforeInstantiatingCodeMirror: async function (editor) {
+                            // TODO: Cleanup commented out code below and related code/variables elsewhere (code related
+                            //       to USER_PREFERENCE_USE_CUSTOM_FONT_SIZE)
+
                             // Need to add font-styling before CodeMirror is instantiated
-                            if (await editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
-                                var userPrefFontSizeInPx = parseInt(await editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
-                                if (userPrefFontSizeInPx !== 12) {
-                                    var cssLintErrorWarningMarkerSize = 16;
-                                    if (userPrefFontSizeInPx < 12) {
-                                        cssLintErrorWarningMarkerSize = Math.round(userPrefFontSizeInPx * 1.2);
-                                    }
-                                    utils.addStyleTag({
-                                        attributes: [{
-                                            name: 'data-style-created-by',
-                                            value: 'magicss'
-                                        }],
-                                        cssText: [
-                                            '#' + id + ' *,',
-                                            '.alert-note-text,',
-                                            '.tooltipster-base ul li a,',
-                                            '.CodeMirror-hints *,',
-                                            '.CodeMirror-lint-message-error,',
-                                            '.CodeMirror-lint-message-warning {',
-                                            '    font-size: ' + userPrefFontSizeInPx + 'px !important;',
-                                            '}',
-                                            '.CodeMirror-overwrite .CodeMirror-cursor {',
-                                            '    width: ' + Math.round(userPrefFontSizeInPx * 62 / 100) + 'px;',
-                                            '}',
-                                            '.CodeMirror-lint-tooltip {',
-                                            '    max-width: ' + Math.round(600 * userPrefFontSizeInPx / 12) + 'px;',
-                                            '}',
-                                            '.CodeMirror-lint-marker-error,',
-                                            '.CodeMirror-lint-marker-warning {',
-                                            '    padding: ' + Math.round(((userPrefFontSizeInPx * 1.2) - cssLintErrorWarningMarkerSize) / 2) + 'px 0;',
-                                            (function () {
-                                                if (cssLintErrorWarningMarkerSize <= 16) {
-                                                    var size = cssLintErrorWarningMarkerSize;
-                                                    return 'width: ' + size + 'px; height: ' + size + 'px;';
-                                                }
-                                                return '';
-                                            }()),
-                                            '}',
-                                            (function () {
-                                                if (userPrefFontSizeInPx < 12) {
-                                                    return (
-                                                        '.CodeMirror-lint-message-error, .CodeMirror-lint-message-warning {' +
-                                                        '    background-size: contain;' +
-                                                        '}'
-                                                    );
-                                                }
-                                                return '';
-                                            }())
-                                        ].join('\n'),
-                                        parentTag: 'body'
-                                    });
-                                }
+                            // if (await editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
+                            var userPrefFontSizeInPx = parseInt(await editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                            // if (userPrefFontSizeInPx !== 12) {
+                            var cssLintErrorWarningMarkerSize = 16;
+                            if (userPrefFontSizeInPx < 12) {
+                                cssLintErrorWarningMarkerSize = Math.round(userPrefFontSizeInPx * 1.2);
                             }
+                            utils.addStyleTag({
+                                attributes: [{
+                                    name: 'data-style-created-by',
+                                    value: 'magicss'
+                                }],
+                                cssText: [
+                                    '#' + id + ' *,',
+                                    '.alert-note-text,',
+                                    '.alert-note-text *,',
+                                    '.magic-css-ui,',
+                                    '.magic-css-ui *,',
+                                    '.tooltipster-content *,',
+                                    '.tooltipster-base ul li a,',
+                                    '.CodeMirror-hints *,',
+                                    '.CodeMirror-lint-message-error,',
+                                    '.CodeMirror-lint-message-warning {',
+                                    '    font-size: ' + userPrefFontSizeInPx + 'px !important;',
+                                    '}',
+                                    '.CodeMirror-overwrite .CodeMirror-cursor {',
+                                    '    width: ' + Math.round(userPrefFontSizeInPx * 62 / 100) + 'px;',
+                                    '}',
+                                    '.CodeMirror-lint-tooltip {',
+                                    '    max-width: ' + Math.round(600 * userPrefFontSizeInPx / 12) + 'px;',
+                                    '}',
+                                    '.CodeMirror-lint-marker-error,',
+                                    '.CodeMirror-lint-marker-warning {',
+                                    '    padding: ' + Math.round(((userPrefFontSizeInPx * 1.2) - cssLintErrorWarningMarkerSize) / 2) + 'px 0;',
+                                    (function () {
+                                        if (cssLintErrorWarningMarkerSize <= 16) {
+                                            var size = cssLintErrorWarningMarkerSize;
+                                            return 'width: ' + size + 'px; height: ' + size + 'px;';
+                                        }
+                                        return '';
+                                    }()),
+                                    '}',
+                                    (function () {
+                                        if (userPrefFontSizeInPx < 12) {
+                                            return (
+                                                '.CodeMirror-lint-message-error, .CodeMirror-lint-message-warning {' +
+                                                '    background-size: contain;' +
+                                                '}'
+                                            );
+                                        }
+                                        return '';
+                                    }())
+                                ].join('\n'),
+                                parentTag: 'body'
+                            });
+                            // }
+                            // }
                         },
                         launched: async function (editor) {
                             utils.addStyleTag({
