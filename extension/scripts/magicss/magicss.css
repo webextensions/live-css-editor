@@ -745,6 +745,11 @@ html .magicss-mouse-over-dom-element {
     font-size: 12px;
     box-shadow: #555 0px 0px 20px 3px;
 }
+@media screen and (max-width: 430px) {
+    .magic-css-back-end-connectivity-options {
+        width: calc(100% - 10px);
+    }
+}
 
 .magic-css-back-end-connectivity-options {
     box-sizing: border-box;

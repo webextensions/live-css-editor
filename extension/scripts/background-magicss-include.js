@@ -210,6 +210,16 @@ var reapplyCss = function (tabId) {
     });
 };
 
+// By the time "platformInfoOs" variable would be used, its value would be set appropriately.
+var platformInfoOs = '';
+try {
+    chrome.runtime.getPlatformInfo(function (platformInfo) {
+        platformInfoOs = platformInfo.os;
+    });
+} catch (e) {
+    platformInfoOs = 'unavailable';
+}
+
 var main = function (tab) {     // eslint-disable-line no-unused-vars
     var isChrome = false,       // eslint-disable-line no-unused-vars
         isEdge = false,         // eslint-disable-line no-unused-vars
@@ -241,6 +251,10 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             {
                 type: 'js',
                 sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
+            },
+            {
+                type: 'js',
+                sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
             },
             {
                 src: path3rdparty + 'jquery.js',

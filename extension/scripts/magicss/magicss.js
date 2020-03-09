@@ -16,6 +16,11 @@ var const_rateUsUsageCounterFrom = 20,
     const_rateUsUsageCounterTo = 100;
 
 (function($){
+    var runningInAndroidFirefox = false;
+    if (window.platformInfoOs === 'android') {
+        runningInAndroidFirefox = true;
+    }
+
     var asyncTimeout = function (delay) {
         return new Promise((resolve) => {
             setTimeout(resolve, delay);
@@ -1300,10 +1305,12 @@ var const_rateUsUsageCounterFrom = 20,
                                             '<span style="display:inline-block; line-height:21px;">' + constants.liveCssServer.defaultProtocol + '//&nbsp;</span>',
                                             '<input type="text" spellcheck="false" class="magic-css-server-hostname" placeholder="',
                                                 constants.liveCssServer.defaultHostname,
-                                                '" style="width:165px;"',
+                                                '" style="width:' + (runningInAndroidFirefox ? 120 : 165) + 'px;"',
                                             ' />',
                                             '<span style="display:inline-block; line-height:21px;">&nbsp;:&nbsp;</span>',
-                                            '<input type="number" min="1" max="65535" step="1" spellcheck="false" class="magic-css-server-port" placeholder="3456" style="width:80px;" />',
+                                            '<input type="number" min="1" max="65535" step="1" spellcheck="false" class="magic-css-server-port" placeholder="3456"',
+                                                ' style="width:' + (runningInAndroidFirefox ? 40 : 80) + 'px;"',
+                                            ' />',
                                         '</div>',
                                     '</div>',
                                     '<div style="min-height:35px; padding-top:3px; clear:both;">',
@@ -2638,6 +2645,7 @@ var const_rateUsUsageCounterFrom = 20,
                                 options.mode = 'text/css';
                             }
 
+
                             options.hintOptions = {
                                 completeSingle: false,
                                 // closeCharacters: /[\s()\[\]{};:>,]/,     // This is the default value defined in show-hint.js
@@ -2755,7 +2763,10 @@ var const_rateUsUsageCounterFrom = 20,
                                 } else {
                                     await editor.disableEnableCSS('disable');
                                 }
-                                editor.focus();
+
+                                if (!runningInAndroidFirefox) {
+                                    editor.focus();
+                                }
                             },
                             afterrender: function (editor, divIcon) {
                                 // TODO: Make the code independent of this setTimeout logic.

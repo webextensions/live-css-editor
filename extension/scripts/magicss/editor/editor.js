@@ -16,6 +16,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 (function ($) {
     'use strict';
 
+    var runningInAndroidFirefox = false;
+    if (window.platformInfoOs === 'android') {
+        runningInAndroidFirefox = true;
+    }
+
     // This value is updated elsewhere in this file (after fetching the user selected option)
     var whichStoreToUse = 'chrome.storage.local';
 
@@ -23,7 +28,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         EDITOR_MIN_WIDTH: 326,
         EDITOR_MIN_HEIGHT: 40,
         EDITOR_DEFAULT_WIDTH: 326,
-        EDITOR_DEFAULT_HEIGHT: 249
+        EDITOR_DEFAULT_HEIGHT: runningInAndroidFirefox ? 140 : 249
     };
 
     var chromeStorageLocal = chrome.storage.local;
@@ -571,8 +576,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             await thisOb._addChildComponents();
             thisOb.container.style.visibility = '';
 
-            // Set focus on editor
-            thisOb.focus();
+            if (!runningInAndroidFirefox) {
+                // Set focus on editor
+                thisOb.focus();
+            }
 
             await thisOb.triggerEvent('launched');
 
@@ -629,7 +636,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             await thisOb.savePosition({ top: ui.position.top, left: ui.position.left });
                         }
 
-                        thisOb.focus();
+                        if (!runningInAndroidFirefox) {
+                            thisOb.focus();
+                        }
                     });
                 }
             });
@@ -1072,7 +1081,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             }
 
-            thisOb.container.style.padding = '0 7px 7px 7px';
+            if (runningInAndroidFirefox) {
+                thisOb.container.style.padding = '0 12px 12px 12px';
+            } else {
+                thisOb.container.style.padding = '0 7px 7px 7px';
+            }
 
             var disableResize = !!options.disableResize;
             if (!disableResize) {
