@@ -2496,7 +2496,14 @@ var const_rateUsUsageCounterFrom = 20,
                             }
                         }
 
-                        utils.alertNote('Select an element in the page to generate its CSS selector<br />(Shortcut: Alt + Shift + S)', 5000);
+                        utils.alertNote(
+                            (
+                                runningInAndroidFirefox ?
+                                    'Select an element in the page to generate its CSS selector' :
+                                    'Select an element in the page to generate its CSS selector<br />(Shortcut: Alt + Shift + S)'
+                            ),
+                            5000
+                        );
                         enablePointAndClickFunctionality(editor);
                     }
                 };
@@ -2583,7 +2590,11 @@ var const_rateUsUsageCounterFrom = 20,
 
                         return $outer;
                     },
-                    placeholder: 'Write CSS/Less/Sass code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}' + '\n\nShortcut: Alt + Shift + C',
+                    placeholder: (
+                        runningInAndroidFirefox ?
+                            ('Write CSS/Less/Sass code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}' + '\n\nKindly use a keyboard without autocorrect.') :
+                            ('Write CSS/Less/Sass code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}' + '\n\nShortcut: Alt + Shift + C')
+                    ),
                     codemirrorOptions: {
                         colorpicker: {
                             mode: 'edit'
@@ -2873,7 +2884,11 @@ var const_rateUsUsageCounterFrom = 20,
                         },
                         {
                             name: 'point-and-click',
-                            title: 'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)',
+                            title: (
+                                runningInAndroidFirefox ?
+                                    'Select an element in the page to generate its CSS Selector' :
+                                    'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)'
+                            ),
                             cls: 'magicss-point-and-click',
                             onclick: function (evt, editor) {
                                 togglePointAndClick(editor);
