@@ -2366,6 +2366,7 @@ var const_rateUsUsageCounterFrom = 20,
                 var getMagicCSSForChrome = null,
                     // getMagicCSSForEdge = null,
                     getMagicCSSForFirefox = null;
+
                 if (!isChrome) {
                     getMagicCSSForChrome = {
                         name: 'get-magic-css-for-chrome',
@@ -2374,6 +2375,7 @@ var const_rateUsUsageCounterFrom = 20,
                         href: extensionUrl.chrome
                     };
                 }
+
                 // if (!isEdge) {
                 //     getMagicCSSForEdge = {
                 //         name: 'get-magic-css-for-edge',
@@ -2382,14 +2384,16 @@ var const_rateUsUsageCounterFrom = 20,
                 //         href: extensionUrl.edge
                 //     };
                 // }
-                if (!isFirefox) {
-                    getMagicCSSForFirefox = {
-                        name: 'get-magic-css-for-firefox',
-                        title: 'Magic CSS for Firefox',
-                        uniqCls: 'get-magic-css-for-firefox',
-                        href: extensionUrl.firefox
-                    };
-                }
+
+                // if (!isFirefox) {
+                getMagicCSSForFirefox = {
+                    name: 'get-magic-css-for-firefox',
+                    // title: 'Magic CSS for Firefox (Android)',
+                    title: 'Magic CSS for Android / Firefox',
+                    uniqCls: 'get-magic-css-for-firefox',
+                    href: extensionUrl.firefox
+                };
+                // }
 
                 var iconForRateUs = function (options) {
                     options = options || {};
@@ -2885,6 +2889,9 @@ var const_rateUsUsageCounterFrom = 20,
                                 return iconForRateUs();
                             }
                         }()),
+                        getMagicCSSForChrome,
+                        // getMagicCSSForEdge,
+                        getMagicCSSForFirefox,
                         {
                             name: 'less-or-sass-to-css',
                             title: 'Convert this code from Less/Sass to CSS',
@@ -3108,9 +3115,6 @@ var const_rateUsUsageCounterFrom = 20,
                             }
                         },
                         /* */
-                        getMagicCSSForChrome,
-                        // getMagicCSSForEdge,
-                        getMagicCSSForFirefox,
                         {
                             name: 'tweet',
                             title: 'Tweet',
