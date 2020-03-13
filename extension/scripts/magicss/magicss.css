@@ -695,6 +695,7 @@
 #MagiCSS-bookmarklet .codemirror-colorview {
     top: -1px;  /* It looks better with top: -1px; */
     vertical-align: middle;
+    border-width: 1.49px; /* In zoomed-out mode, browsers may not draw borders randomly. This style helps avoid that issue to a certain extent. */
 }
 
 html.magicss-mouse-over-dom-element,
