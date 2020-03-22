@@ -26,11 +26,11 @@
     "archiver": "^3.1.1",
     "chalk": "^3.0.0",
     "copy-files-from-to": "^2.3.0",
-    "cp-file": "^8.0.1",
+    "cp-file": "^9.0.0",
     "del": "^5.1.0",
     "eslint": "^6.8.0",
     "git-hooks": "^1.1.10",
-    "jsonfile": "^6.0.0",
+    "jsonfile": "^6.0.1",
     "note-down": "^0.2.3"
   }
 }
