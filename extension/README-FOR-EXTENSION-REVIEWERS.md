@@ -40,7 +40,7 @@ The file, `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browse
 3rdparty code which is used "as-is" from other sources
 ------------------------------------------------------
 
-Loading Sass in extension for Opera browser:
+Loading Sass in extension for Firefox and Opera browsers:
   - It is loaded from the "scripts/3rdparty/sass/sass.sync.min.js". For more details, refer to section "Notes about usage of 3rdparty code".
 
 Loading Sass in extension for all other browsers:

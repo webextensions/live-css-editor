@@ -1,4 +1,4 @@
-/* global jQuery, less, utils, sourceMap, chrome, CodeMirror, io, toastr, extLib */
+/* global jQuery, less, Sass, utils, sourceMap, chrome, CodeMirror, io, toastr, extLib */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
@@ -1955,10 +1955,10 @@ var const_rateUsUsageCounterFrom = 20,
                         });
                     } else if (getLanguageMode() === 'sass') {
                         var fnSassToCssAndApply = function () {
-                            var Sass = window.Sass,
+                            var SassParser = window.Sass || (typeof Sass !== 'undefined' && Sass),
                                 sassCode = editor.getTextValue() || ' ';    // Sass compiler throws an error for empty code string
 
-                            Sass.compile(sassCode, async function asyncCallback(result) {
+                            SassParser.compile(sassCode, async function asyncCallback(result) {
                                 smc = null;     // Unset old SourceMapConsumer
 
                                 if (result.status === 0) {
@@ -1995,7 +1995,12 @@ var const_rateUsUsageCounterFrom = 20,
                                 }
                             });
                         };
-                        if (isOpera || window.Sass) {
+                        if (
+                            isOpera ||
+                            isFirefox ||
+                            window.Sass ||
+                            (typeof Sass !== 'undefined' && Sass)
+                        ) {
                             fnSassToCssAndApply();
                         } else {
                             // Ensure that we don't send multiple load requests at once, by not sending request if previous one is still pending for succeess/failure

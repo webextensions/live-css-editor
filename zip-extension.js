@@ -100,7 +100,7 @@ try {
                 pathsToIgnore.push('backgroundScriptsAPIBridge.js');
                 pathsToIgnore.push('contentScriptsAPIBridge.js');
             }
-            if (whichBrowser !== 'opera') {
+            if (whichBrowser !== 'opera' && whichBrowser !== 'firefox') {
                 pathsToIgnore.push('scripts/3rdparty/sass/**');
             }
             return pathsToIgnore;
