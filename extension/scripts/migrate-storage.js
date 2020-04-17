@@ -20,6 +20,7 @@ var dataMigration = {
         'ui-size-height',
         'ui-size-width',
         'use-css-linting',
+        'file-to-edit',
         'watching-css-files'
     ],
     oldDataPrefix: 'MagiCSS-bookmarklet-',
