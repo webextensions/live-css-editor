@@ -15,19 +15,26 @@
     var whichStoreToUse = await utils.chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
     if (whichStoreToUse === 'localStorage') {
         // do nothing
+    } else if (whichStoreToUse === 'chrome.storage.sync') {
+        // do nothing
     } else {
         whichStoreToUse = 'chrome.storage.local';
     }
 
-    var chromeStorageLocal = chrome.storage.local;
+    var chromeStorage;
+    if (whichStoreToUse === 'chrome.storage.sync') {
+        chromeStorage = chrome.storage.sync;
+    } else {
+        chromeStorage = chrome.storage.local;
+    }
 
     // TODO: Refactor/Reuse the definition of "userPreference"
     var getUserPreference = function (pref) {
         return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-            if (whichStoreToUse === 'chrome.storage.local') {
+            if (whichStoreToUse === 'chrome.storage.local' || whichStoreToUse === 'chrome.storage.sync') {
                 let prefix = 'live-css-';
                 var propertyName = `(${window.location.origin}) ${prefix}${pref}`;
-                chromeStorageLocal.get(propertyName, function (values) {
+                chromeStorage.get(propertyName, function (values) {
                     resolve(values[propertyName] || '');
                 });
             } else {

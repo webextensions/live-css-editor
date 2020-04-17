@@ -324,13 +324,23 @@ if (!utils.defined) {
         const value = await utils.chromeStorageGet(chrome.storage.local, prop);
         return value;
     };
+    utils.chromeStorageSyncGet = async function (prop) {
+        const value = await utils.chromeStorageGet(chrome.storage.sync, prop);
+        return value;
+    };
 
     utils.chromeStorageLocalSet = async function (prop, value) {
         await utils.chromeStorageSet(chrome.storage.local, prop, value);
     };
+    utils.chromeStorageSyncSet = async function (prop, value) {
+        await utils.chromeStorageSet(chrome.storage.sync, prop, value);
+    };
 
     utils.chromeStorageLocalRemove = async function (prop, value) {
         await utils.chromeStorageRemove(chrome.storage.local, prop, value);
+    };
+    utils.chromeStorageSyncRemove = async function (prop, value) {
+        await utils.chromeStorageRemove(chrome.storage.sync, prop, value);
     };
 
     utils.delayFunctionUntilTestFunction = async function(config) {

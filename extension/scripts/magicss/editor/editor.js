@@ -21,9 +21,6 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         runningInAndroidFirefox = true;
     }
 
-    // This value is updated elsewhere in this file (after fetching the user selected option)
-    var whichStoreToUse = 'chrome.storage.local';
-
     var CONSTANTS = {
         EDITOR_MIN_WIDTH: 326,
         EDITOR_MIN_HEIGHT: 40,
@@ -31,8 +28,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         EDITOR_DEFAULT_HEIGHT: runningInAndroidFirefox ? 140 : 249
     };
 
-    var chromeStorageLocal = chrome.storage.local;
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
+
+    // This value is updated elsewhere in this file (after fetching the user selected option)
+    var whichStoreToUse = 'chrome.storage.local';
 
     var runOnceFor = function (fn, delay) {
         clearTimeout(fn.timer);
@@ -391,19 +390,27 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         // Reference: http://amplifyjs.com/api/store/
         async userPreference(pref, value) {
             var _this = this;
-            if (whichStoreToUse === 'chrome.storage.local') {
+            if (whichStoreToUse === 'chrome.storage.local' || whichStoreToUse === 'chrome.storage.sync') {
                 let prefix = 'live-css-';
+
+                var chromeStorage;
+                if (whichStoreToUse === 'chrome.storage.sync') {
+                    chromeStorage = chrome.storage.sync;
+                } else {
+                    chromeStorage = chrome.storage.local;
+                }
+
                 return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
                     var propertyName = `(${window.location.origin}) ${prefix}${pref}`;
                     if (value === undefined) {
-                        chromeStorageLocal.get(propertyName, function (values) {
+                        chromeStorage.get(propertyName, function (values) {
                             resolve(
                                 values[propertyName] ||
                                 _this.defaultPreference(pref)
                             );
                         });
                     } else {
-                        chromeStorageLocal.set(
+                        chromeStorage.set(
                             {
                                 [propertyName]: value
                             },
@@ -1511,6 +1518,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 chromeStorageForExtensionData.get(USER_PREFERENCE_STORAGE_MODE, function (values) {
                     if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'localStorage') {
                         whichStoreToUse = 'localStorage';
+                    } else if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'chrome.storage.sync') {
+                        whichStoreToUse = 'chrome.storage.sync';
                     } else {
                         whichStoreToUse = 'chrome.storage.local';
                     }

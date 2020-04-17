@@ -133,6 +133,8 @@ jQuery(function ($) {
     chromeStorageForExtensionData.get(USER_PREFERENCE_STORAGE_MODE, function (values) {
         if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'localStorage') {
             RadionButtonSelectedValueSet(USER_PREFERENCE_STORAGE_MODE, 'localStorage');
+        } else if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'chrome.storage.sync') {
+            RadionButtonSelectedValueSet(USER_PREFERENCE_STORAGE_MODE, 'chrome.storage.sync');
         } else {
             RadionButtonSelectedValueSet(USER_PREFERENCE_STORAGE_MODE, 'chrome.storage.local');
         }
@@ -142,6 +144,8 @@ jQuery(function ($) {
             valueToSet;
         if (value === 'localStorage') {
             valueToSet = 'localStorage';
+        } else if (value === 'chrome.storage.sync') {
+            valueToSet = 'chrome.storage.sync';
         } else {
             valueToSet = 'chrome.storage.local';
         }
