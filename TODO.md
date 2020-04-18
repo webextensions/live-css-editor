@@ -4,7 +4,8 @@
 * Add a "copy-to-clipboard" button
 * Add support for running JavaScript code as well
 * Anonymous GitHub gists do not work anymore (https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/). Hence, "Mail code (via Gist)" feature has been disabled. Analyze if that feature can/should be brought back in some form.
-* Provide a scalable way to share CSS across computers. The current approach of chrome.storage.sync is heavily limited. May use a solution via a custom or third-party service like "GitHub Gist".
+* Optimize the data structure for improved usage of chrome.storage.sync
+* Provide a scalable way to share CSS across computers. The current approach of chrome.storage.sync is limited. May use a solution via a custom or third-party service like "GitHub Gist".
 * Provide option for choosing light/dark theme
 * Allow moving editor to external window and/or in a separate panel along with the extension icon.
 
