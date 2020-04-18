@@ -415,6 +415,51 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 [propertyName]: value
                             },
                             function () {
+                                const lastError = chrome.runtime.lastError;
+                                if (lastError) {
+                                    console.log([
+                                        'Error reported by Magic CSS extension: An error occurred in saving your recent changes.',
+                                        '',
+                                        'Error message: ' + (lastError && lastError.message),
+                                        '',
+                                        'If you are using chrome.storage.sync mode, kindly refer to https://developer.chrome.com/apps/storage#property-sync',
+                                        '',
+                                        'Most likely, it is not a bug in the extension.',
+                                        'If you think it is a bug in the extension, kindly report this issue at https://github.com/webextensions/live-css-editor/issues'
+                                    ].join('\n'));
+
+                                    var htmlEscape = function (str) {
+                                        return str
+                                            .replace(/&/g, '&amp;')
+                                            .replace(/"/g, '&quot;')
+                                            .replace(/'/g, '&#39;')
+                                            .replace(/</g, '&lt;')
+                                            .replace(/>/g, '&gt;');
+                                    };
+
+                                    utils.alertNote(
+                                        [
+                                            'Error! An error was encountered by Magic CSS extension while saving your changes.',
+                                            '',
+                                            htmlEscape(String(lastError && lastError.message)),
+                                            '',
+                                            '<div style="text-align:left;color:#000;">Possible solutions:',
+                                            '&nbsp;&nbsp;&nbsp;&nbsp;* Try to store less data',
+                                            '&nbsp;&nbsp;&nbsp;&nbsp;* Try to reduce frequency of your changes',
+                                            '&nbsp;&nbsp;&nbsp;&nbsp;* Try again after 30 seconds',
+                                            '&nbsp;&nbsp;&nbsp;&nbsp;* Try again after reloading the page',
+                                            '&nbsp;&nbsp;&nbsp;&nbsp;* Switch away from chrome.storage.sync mode</div>'
+                                        ].join('<br />'),
+                                        15000,
+                                        {
+                                            backgroundColor: '#f5bcae',
+                                            borderColor: '#e87457'
+                                        }
+                                    );
+
+                                    reject();
+                                }
+
                                 resolve();
                             }
                         );
