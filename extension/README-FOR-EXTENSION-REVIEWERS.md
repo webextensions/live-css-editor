@@ -45,7 +45,7 @@ Loading Sass in extension for Firefox and Opera browsers:
 
 Loading Sass in extension for all other browsers:
   - For parsing Sass, during runtime, we load:  
-    https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js  
+    https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js  
     The GitHub page for this library is at:  
     https://github.com/medialize/sass.js  
     More information available at:  

@@ -307,10 +307,15 @@
         {
             "from": {
                 "default": {
-                    "src": "https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.9/sass.sync.min.js"
+                    "src": "https://raw.githubusercontent.com/medialize/sass.js/0.11.1/dist/sass.sync.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/sass/sass.sync.min.js"
+            "to": {
+                "default": {
+                    "dest": "extension/scripts/3rdparty/sass/sass.sync.min.js",
+                    "uglifyJs": true
+                }
+            }
         },
         {
             "from": {
