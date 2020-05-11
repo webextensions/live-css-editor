@@ -1,1 +1,248 @@
-(function($){"use strict";var MagicSuggest=function(element,options){var ms=this;var defaults={allowFreeEntries:true,allowDuplicates:false,ajaxConfig:{},autoSelect:true,selectFirst:false,queryParam:"query",beforeSend:function(){},cls:"",data:null,dataUrlParams:{},disabled:false,disabledField:null,displayField:"name",editable:true,expanded:false,expandOnFocus:false,groupBy:null,hideTrigger:false,highlight:true,id:null,infoMsgCls:"",inputCfg:{},invalidCls:"ms-inv",matchCase:false,maxDropHeight:290,maxEntryLength:null,maxEntryRenderer:function(v){return"Please reduce your entry by "+v+" character"+(v>1?"s":"")},maxSuggestions:null,maxSelection:10,maxSelectionRenderer:function(v){return"You cannot choose more than "+v+" item"+(v>1?"s":"")},method:"POST",minChars:0,minCharsRenderer:function(v){return"Please type "+v+" more character"+(v>1?"s":"")},mode:"local",name:null,noSuggestionText:"No suggestions",placeholder:"Type or click here",renderer:null,required:false,resultAsString:false,resultAsStringDelimiter:",",resultsField:"results",selectionCls:"",selectionContainer:null,selectionPosition:"inner",selectionRenderer:null,selectionStacked:false,sortDir:"asc",sortOrder:null,strictSuggest:false,style:"",toggleOnClick:false,typeDelay:400,useTabKey:false,useCommaKey:true,useZebraStyle:false,value:null,valueField:"id",vregex:null,vtype:null};var conf=$.extend({},options);var cfg=$.extend(true,{},defaults,conf);this.addToSelection=function(items,isSilent){if(!cfg.maxSelection||_selection.length<cfg.maxSelection){if(!$.isArray(items)){items=[items]}var valuechanged=false;$.each(items,function(index,json){if(cfg.allowDuplicates||$.inArray(json[cfg.valueField],ms.getValue())===-1){_selection.push(json);valuechanged=true}});if(valuechanged===true){self._renderSelection();this.empty();if(isSilent!==true){$(this).trigger("selectionchange",[this,this.getSelection()])}}}this.input.attr("placeholder",cfg.selectionPosition==="inner"&&this.getValue().length>0?"":cfg.placeholder)};this.clear=function(isSilent){this.removeFromSelection(_selection.slice(0),isSilent)};this.collapse=function(){if(cfg.expanded===true){this.combobox.detach();cfg.expanded=false;$(this).trigger("collapse",[this])}};this.disable=function(){this.container.addClass("ms-ctn-disabled");cfg.disabled=true;ms.input.attr("disabled",true)};this.empty=function(){this.input.val("")};this.enable=function(){this.container.removeClass("ms-ctn-disabled");cfg.disabled=false;ms.input.attr("disabled",false)};this.expand=function(){if(!cfg.expanded&&(this.input.val().length>=cfg.minChars||this.combobox.children().size()>0)){this.combobox.appendTo(this.container);self._processSuggestions();cfg.expanded=true;$(this).trigger("expand",[this])}};this.isDisabled=function(){return cfg.disabled};this.isValid=function(){var valid=cfg.required===false||_selection.length>0;if(cfg.vtype||cfg.vregex){$.each(_selection,function(index,item){valid=valid&&self._validateSingleItem(item[cfg.valueField])})}return valid};this.getDataUrlParams=function(){return cfg.dataUrlParams};this.getName=function(){return cfg.name};this.getSelection=function(){return _selection};this.getRawValue=function(){return ms.input.val()};this.getValue=function(){return $.map(_selection,function(o){return o[cfg.valueField]})};this.removeFromSelection=function(items,isSilent){if(!$.isArray(items)){items=[items]}var valuechanged=false;$.each(items,function(index,json){var i=$.inArray(json[cfg.valueField],ms.getValue());if(i>-1){_selection.splice(i,1);valuechanged=true}});if(valuechanged===true){self._renderSelection();if(isSilent!==true){$(this).trigger("selectionchange",[this,this.getSelection()])}if(cfg.expandOnFocus){ms.expand()}if(cfg.expanded){self._processSuggestions()}}this.input.attr("placeholder",cfg.selectionPosition==="inner"&&this.getValue().length>0?"":cfg.placeholder)};this.getData=function(){return _cbData};this.setData=function(data){cfg.data=data;self._processSuggestions()};this.setName=function(name){cfg.name=name;if(name){cfg.name+=name.indexOf("[]")>0?"":"[]"}if(ms._valueContainer){$.each(ms._valueContainer.children(),function(i,el){el.name=cfg.name})}};this.setSelection=function(items){this.clear();this.addToSelection(items)};this.setValue=function(values){var items=[];$.each(values,function(index,value){var found=false;$.each(_cbData,function(i,item){if(item[cfg.valueField]==value){items.push(item);found=true;return false}});if(!found){if(typeof value==="object"){items.push(value)}else{var json={};json[cfg.valueField]=value;json[cfg.displayField]=value;items.push(json)}}});if(items.length>0){this.addToSelection(items)}};this.setDataUrlParams=function(params){cfg.dataUrlParams=$.extend({},params)};var _selection=[],_comboItemHeight=0,_timer,_hasFocus=false,_groups=null,_cbData=[],_ctrlDown=false,KEYCODES={BACKSPACE:8,TAB:9,ENTER:13,CTRL:17,ESC:27,SPACE:32,UPARROW:38,DOWNARROW:40,COMMA:188};var self={_displaySuggestions:function(data){ms.combobox.show();ms.combobox.empty();var resHeight=0,nbGroups=0;if(_groups===null){self._renderComboItems(data);resHeight=_comboItemHeight*data.length}else{for(var grpName in _groups){nbGroups+=1;$("<div/>",{"class":"ms-res-group",html:grpName}).appendTo(ms.combobox);self._renderComboItems(_groups[grpName].items,true)}var _groupItemHeight=ms.combobox.find(".ms-res-group").outerHeight();if(_groupItemHeight!==null){var tmpResHeight=nbGroups*_groupItemHeight;resHeight=_comboItemHeight*data.length+tmpResHeight}else{resHeight=_comboItemHeight*(data.length+nbGroups)}}if(resHeight<ms.combobox.height()||resHeight<=cfg.maxDropHeight){ms.combobox.height(resHeight)}else if(resHeight>=ms.combobox.height()&&resHeight>cfg.maxDropHeight){ms.combobox.height(cfg.maxDropHeight)}if(data.length===1&&cfg.autoSelect===true){ms.combobox.children().filter(":not(.ms-res-item-disabled):last").addClass("ms-res-item-active")}if(cfg.selectFirst===true){ms.combobox.children().filter(":not(.ms-res-item-disabled):first").addClass("ms-res-item-active")}if(data.length===0&&ms.getRawValue()!==""){var noSuggestionText=cfg.noSuggestionText.replace(/\{\{.*\}\}/,ms.input.val());self._updateHelper(noSuggestionText);ms.collapse()}if(cfg.allowFreeEntries===false){if(data.length===0){$(ms.input).addClass(cfg.invalidCls);ms.combobox.hide()}else{$(ms.input).removeClass(cfg.invalidCls)}}},_getEntriesFromStringArray:function(data){var json=[];$.each(data,function(index,s){var entry={};entry[cfg.displayField]=entry[cfg.valueField]=$.trim(s);json.push(entry)});return json},_highlightSuggestion:function(html){var q=ms.input.val();var specialCharacters=["^","$","*","+","?",".","(",")",":","!","|","{","}","[","]"];$.each(specialCharacters,function(index,value){q=q.replace(value,"\\"+value)});if(q.length===0){return html}var glob=cfg.matchCase===true?"g":"gi";return html.replace(new RegExp("("+q+")(?!([^<]+)?>)",glob),"<em>$1</em>")},_moveSelectedRow:function(dir){if(!cfg.expanded){ms.expand()}var list,start,active,scrollPos;list=ms.combobox.find(".ms-res-item:not(.ms-res-item-disabled)");if(dir==="down"){start=list.eq(0)}else{start=list.filter(":last")}active=ms.combobox.find(".ms-res-item-active:not(.ms-res-item-disabled):first");if(active.length>0){if(dir==="down"){start=active.nextAll(".ms-res-item:not(.ms-res-item-disabled)").first();if(start.length===0){start=list.eq(0)}scrollPos=ms.combobox.scrollTop();ms.combobox.scrollTop(0);if(start[0].offsetTop+start.outerHeight()>ms.combobox.height()){ms.combobox.scrollTop(scrollPos+_comboItemHeight)}}else{start=active.prevAll(".ms-res-item:not(.ms-res-item-disabled)").first();if(start.length===0){start=list.filter(":last");ms.combobox.scrollTop(_comboItemHeight*list.length)}if(start[0].offsetTop<ms.combobox.scrollTop()){ms.combobox.scrollTop(ms.combobox.scrollTop()-_comboItemHeight)}}}list.removeClass("ms-res-item-active");start.addClass("ms-res-item-active")},_processSuggestions:function(source){var json=null,data=source||cfg.data;if(data!==null){if(typeof data==="function"){data=data.call(ms,ms.getRawValue())}if(typeof data==="string"){$(ms).trigger("beforeload",[ms]);var queryParams={};queryParams[cfg.queryParam]=ms.input.val();var params=$.extend(queryParams,cfg.dataUrlParams);$.ajax($.extend({type:cfg.method,url:data,data:params,beforeSend:cfg.beforeSend,success:function(asyncData){json=typeof asyncData==="string"?JSON.parse(asyncData):asyncData;self._processSuggestions(json);$(ms).trigger("load",[ms,json]);if(self._asyncValues){ms.setValue(typeof self._asyncValues==="string"?JSON.parse(self._asyncValues):self._asyncValues);self._renderSelection();delete self._asyncValues}},error:function(){throw"Could not reach server"}},cfg.ajaxConfig));return}else{if(data.length>0&&typeof data[0]==="string"){_cbData=self._getEntriesFromStringArray(data)}else{_cbData=data[cfg.resultsField]||data}}var sortedData=cfg.mode==="remote"?_cbData:self._sortAndTrim(_cbData);self._displaySuggestions(self._group(sortedData))}},_render:function(el){ms.setName(cfg.name);ms.container=$("<div/>",{"class":"ms-ctn form-control "+(cfg.resultAsString?"ms-as-string ":"")+cfg.cls+($(el).hasClass("input-lg")?" input-lg":"")+($(el).hasClass("input-sm")?" input-sm":"")+(cfg.disabled===true?" ms-ctn-disabled":"")+(cfg.editable===true?"":" ms-ctn-readonly")+(cfg.hideTrigger===false?"":" ms-no-trigger"),style:cfg.style,id:cfg.id});ms.container.focus($.proxy(handlers._onFocus,this));ms.container.blur($.proxy(handlers._onBlur,this));ms.container.keydown($.proxy(handlers._onKeyDown,this));ms.container.keyup($.proxy(handlers._onKeyUp,this));ms.input=$("<input/>",$.extend({type:"text","class":cfg.editable===true?"":" ms-input-readonly",readonly:!cfg.editable,placeholder:cfg.placeholder,disabled:cfg.disabled},cfg.inputCfg));ms.input.focus($.proxy(handlers._onInputFocus,this));ms.input.click($.proxy(handlers._onInputClick,this));ms.combobox=$("<div/>",{"class":"ms-res-ctn dropdown-menu"}).height(cfg.maxDropHeight);ms.combobox.on("click","div.ms-res-item",$.proxy(handlers._onComboItemSelected,this));ms.combobox.on("mouseover","div.ms-res-item",$.proxy(handlers._onComboItemMouseOver,this));if(cfg.selectionContainer){ms.selectionContainer=cfg.selectionContainer;$(ms.selectionContainer).addClass("ms-sel-ctn")}else{ms.selectionContainer=$("<div/>",{"class":"ms-sel-ctn"})}ms.selectionContainer.click($.proxy(handlers._onFocus,this));if(cfg.selectionPosition==="inner"&&!cfg.selectionContainer){ms.selectionContainer.append(ms.input)}else{ms.container.append(ms.input)}ms.helper=$("<span/>",{"class":"ms-helper "+cfg.infoMsgCls});self._updateHelper();ms.container.append(ms.helper);$(el).replaceWith(ms.container);if(!cfg.selectionContainer){switch(cfg.selectionPosition){case"bottom":ms.selectionContainer.insertAfter(ms.container);if(cfg.selectionStacked===true){ms.selectionContainer.width(ms.container.width());ms.selectionContainer.addClass("ms-stacked")}break;case"right":ms.selectionContainer.insertAfter(ms.container);ms.container.css("float","left");break;default:ms.container.append(ms.selectionContainer);break}}if(cfg.hideTrigger===false){ms.trigger=$("<div/>",{"class":"ms-trigger",html:'<div class="ms-trigger-ico"></div>'});ms.trigger.click($.proxy(handlers._onTriggerClick,this));ms.container.append(ms.trigger)}$(window).resize($.proxy(handlers._onWindowResized,this));if(cfg.value!==null||cfg.data!==null){if(typeof cfg.data==="string"){self._asyncValues=cfg.value;self._processSuggestions()}else{self._processSuggestions();if(cfg.value!==null){ms.setValue(cfg.value);self._renderSelection()}}}$("body").click(function(e){if(ms.container.hasClass("ms-ctn-focus")&&ms.container.has(e.target).length===0&&e.target.className.indexOf("ms-res-item")<0&&e.target.className.indexOf("ms-close-btn")<0&&ms.container[0]!==e.target){handlers._onBlur()}});if(cfg.expanded===true){cfg.expanded=false;ms.expand()}},_renderComboItems:function(items,isGrouped){var ref=this,html="";$.each(items,function(index,value){var displayed=cfg.renderer!==null?cfg.renderer.call(ref,value):value[cfg.displayField];var disabled=cfg.disabledField!==null&&value[cfg.disabledField]===true;var resultItemEl=$("<div/>",{"class":"ms-res-item "+(isGrouped?"ms-res-item-grouped ":"")+(disabled?"ms-res-item-disabled ":"")+(index%2===1&&cfg.useZebraStyle===true?"ms-res-odd":""),html:cfg.highlight===true?self._highlightSuggestion(displayed):displayed,"data-json":JSON.stringify(value)});html+=$("<div/>").append(resultItemEl).html()});ms.combobox.append(html);_comboItemHeight=ms.combobox.find(".ms-res-item:first").outerHeight()},_renderSelection:function(){var ref=this,w=0,inputOffset=0,items=[],asText=cfg.resultAsString===true&&!_hasFocus;ms.selectionContainer.find(".ms-sel-item").remove();if(ms._valueContainer!==undefined){ms._valueContainer.remove()}$.each(_selection,function(index,value){var selectedItemEl,delItemEl,selectedItemHtml=cfg.selectionRenderer!==null?cfg.selectionRenderer.call(ref,value):value[cfg.displayField];var validCls=self._validateSingleItem(value[cfg.displayField])?"":" ms-sel-invalid";if(asText===true){selectedItemEl=$("<div/>",{"class":"ms-sel-item ms-sel-text "+cfg.selectionCls+validCls,html:selectedItemHtml+(index===_selection.length-1?"":cfg.resultAsStringDelimiter)}).data("json",value)}else{selectedItemEl=$("<div/>",{"class":"ms-sel-item "+cfg.selectionCls+validCls,html:selectedItemHtml}).data("json",value);if(cfg.disabled===false){delItemEl=$("<span/>",{"class":"ms-close-btn"}).data("json",value).appendTo(selectedItemEl);delItemEl.click($.proxy(handlers._onTagTriggerClick,ref))}}items.push(selectedItemEl)});ms.selectionContainer.prepend(items);ms._valueContainer=$("<div/>",{style:"display: none;"});$.each(ms.getValue(),function(i,val){var el=$("<input/>",{type:"hidden",name:cfg.name,value:val});el.appendTo(ms._valueContainer)});ms._valueContainer.appendTo(ms.selectionContainer);if(cfg.selectionPosition==="inner"&&!cfg.selectionContainer){ms.input.width(0);inputOffset=ms.input.offset().left-ms.selectionContainer.offset().left;w=ms.container.width()-inputOffset-42;ms.input.width(w)}if(_selection.length===cfg.maxSelection){self._updateHelper(cfg.maxSelectionRenderer.call(this,_selection.length))}else{ms.helper.hide()}},_selectItem:function(item){if(cfg.maxSelection===1){_selection=[]}ms.addToSelection(item.data("json"));item.removeClass("ms-res-item-active");if(cfg.expandOnFocus===false||_selection.length===cfg.maxSelection){ms.collapse()}if(!_hasFocus){ms.input.focus()}else if(_hasFocus&&(cfg.expandOnFocus||_ctrlDown)){self._processSuggestions();if(_ctrlDown){ms.expand()}}},_sortAndTrim:function(data){var q=ms.getRawValue(),filtered=[],newSuggestions=[],selectedValues=ms.getValue();if(q.length>0){$.each(data,function(index,obj){var name=obj[cfg.displayField];if(cfg.matchCase===true&&name.indexOf(q)>-1||cfg.matchCase===false&&name.toLowerCase().indexOf(q.toLowerCase())>-1){if(cfg.strictSuggest===false||name.toLowerCase().indexOf(q.toLowerCase())===0){filtered.push(obj)}}})}else{filtered=data}$.each(filtered,function(index,obj){if(cfg.allowDuplicates||$.inArray(obj[cfg.valueField],selectedValues)===-1){newSuggestions.push(obj)}});if(cfg.sortOrder!==null){newSuggestions.sort(function(a,b){if(a[cfg.sortOrder]<b[cfg.sortOrder]){return cfg.sortDir==="asc"?-1:1}if(a[cfg.sortOrder]>b[cfg.sortOrder]){return cfg.sortDir==="asc"?1:-1}return 0})}if(cfg.maxSuggestions&&cfg.maxSuggestions>0){newSuggestions=newSuggestions.slice(0,cfg.maxSuggestions)}return newSuggestions},_group:function(data){if(cfg.groupBy!==null){_groups={};$.each(data,function(index,value){var props=cfg.groupBy.indexOf(".")>-1?cfg.groupBy.split("."):cfg.groupBy;var prop=value[cfg.groupBy];if(typeof props!="string"){prop=value;while(props.length>0){prop=prop[props.shift()]}}if(_groups[prop]===undefined){_groups[prop]={title:prop,items:[value]}}else{_groups[prop].items.push(value)}})}return data},_updateHelper:function(html){ms.helper.html(html);if(!ms.helper.is(":visible")){ms.helper.fadeIn()}},_validateSingleItem:function(value){if(cfg.vregex!==null&&cfg.vregex instanceof RegExp){return cfg.vregex.test(value)}else if(cfg.vtype!==null){switch(cfg.vtype){case"alpha":return/^[a-zA-Z_]+$/.test(value);case"alphanum":return/^[a-zA-Z0-9_]+$/.test(value);case"email":return/^(\w+)([\-+.][\w]+)*@(\w[\-\w]*\.){1,5}([A-Za-z]){2,6}$/.test(value);case"url":return/(((^https?)|(^ftp)):\/\/([\-\w]+\.)+\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*\/?)/i.test(value);case"ipaddress":return/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(value)}}return true}};var handlers={_onBlur:function(){ms.container.removeClass("ms-ctn-focus");ms.collapse();_hasFocus=false;if(ms.getRawValue()!==""&&cfg.allowFreeEntries===true){var obj={};obj[cfg.displayField]=obj[cfg.valueField]=ms.getRawValue().trim();ms.addToSelection(obj)}self._renderSelection();if(ms.isValid()===false){ms.container.addClass(cfg.invalidCls)}else if(ms.input.val()!==""&&cfg.allowFreeEntries===false){ms.empty();self._updateHelper("")}$(ms).trigger("blur",[ms])},_onComboItemMouseOver:function(e){var target=$(e.currentTarget);if(!target.hasClass("ms-res-item-disabled")){ms.combobox.children().removeClass("ms-res-item-active");target.addClass("ms-res-item-active")}},_onComboItemSelected:function(e){var target=$(e.currentTarget);if(!target.hasClass("ms-res-item-disabled")){self._selectItem($(e.currentTarget))}},_onFocus:function(){ms.input.focus()},_onInputClick:function(){if(ms.isDisabled()===false&&_hasFocus){if(cfg.toggleOnClick===true){if(cfg.expanded){ms.collapse()}else{ms.expand()}}}},_onInputFocus:function(){if(ms.isDisabled()===false&&!_hasFocus){_hasFocus=true;ms.container.addClass("ms-ctn-focus");ms.container.removeClass(cfg.invalidCls);var curLength=ms.getRawValue().length;if(cfg.expandOnFocus===true){ms.expand()}if(_selection.length===cfg.maxSelection){self._updateHelper(cfg.maxSelectionRenderer.call(this,_selection.length))}else if(curLength<cfg.minChars){self._updateHelper(cfg.minCharsRenderer.call(this,cfg.minChars-curLength))}self._renderSelection();$(ms).trigger("focus",[ms])}},_onKeyDown:function(e){var active=ms.combobox.find(".ms-res-item-active:not(.ms-res-item-disabled):first"),freeInput=ms.input.val();$(ms).trigger("keydown",[ms,e]);if(e.keyCode===KEYCODES.TAB&&(cfg.useTabKey===false||cfg.useTabKey===true&&active.length===0&&ms.input.val().length===0)){handlers._onBlur();return}switch(e.keyCode){case KEYCODES.BACKSPACE:if(freeInput.length===0&&ms.getSelection().length>0&&cfg.selectionPosition==="inner"){_selection.pop();self._renderSelection();$(ms).trigger("selectionchange",[ms,ms.getSelection()]);ms.input.attr("placeholder",cfg.selectionPosition==="inner"&&ms.getValue().length>0?"":cfg.placeholder);ms.input.focus();e.preventDefault()}break;case KEYCODES.TAB:case KEYCODES.ESC:e.preventDefault();break;case KEYCODES.ENTER:if(freeInput!==""||cfg.expanded){e.preventDefault()}break;case KEYCODES.COMMA:if(cfg.useCommaKey===true){e.preventDefault()}break;case KEYCODES.CTRL:_ctrlDown=true;break;case KEYCODES.DOWNARROW:e.preventDefault();self._moveSelectedRow("down");break;case KEYCODES.UPARROW:e.preventDefault();self._moveSelectedRow("up");break;default:if(_selection.length===cfg.maxSelection){e.preventDefault()}break}},_onKeyUp:function(e){var freeInput=ms.getRawValue(),inputValid=$.trim(ms.input.val()).length>0&&(!cfg.maxEntryLength||$.trim(ms.input.val()).length<=cfg.maxEntryLength),selected,obj={};$(ms).trigger("keyup",[ms,e]);clearTimeout(_timer);if(e.keyCode===KEYCODES.ESC&&cfg.expanded){ms.combobox.hide()}if(e.keyCode===KEYCODES.TAB&&cfg.useTabKey===false||e.keyCode>KEYCODES.ENTER&&e.keyCode<KEYCODES.SPACE){if(e.keyCode===KEYCODES.CTRL){_ctrlDown=false}return}switch(e.keyCode){case KEYCODES.UPARROW:case KEYCODES.DOWNARROW:e.preventDefault();break;case KEYCODES.ENTER:case KEYCODES.TAB:case KEYCODES.COMMA:if(e.keyCode!==KEYCODES.COMMA||cfg.useCommaKey===true){e.preventDefault();if(cfg.expanded===true){selected=ms.combobox.find(".ms-res-item-active:not(.ms-res-item-disabled):first");if(selected.length>0){self._selectItem(selected);return}}if(inputValid===true&&cfg.allowFreeEntries===true){obj[cfg.displayField]=obj[cfg.valueField]=freeInput.trim();ms.addToSelection(obj);ms.collapse();ms.input.focus()}break}default:if(_selection.length===cfg.maxSelection){self._updateHelper(cfg.maxSelectionRenderer.call(this,_selection.length))}else{if(freeInput.length<cfg.minChars){self._updateHelper(cfg.minCharsRenderer.call(this,cfg.minChars-freeInput.length));if(cfg.expanded===true){ms.collapse()}}else if(cfg.maxEntryLength&&freeInput.length>cfg.maxEntryLength){self._updateHelper(cfg.maxEntryRenderer.call(this,freeInput.length-cfg.maxEntryLength));if(cfg.expanded===true){ms.collapse()}}else{ms.helper.hide();if(cfg.minChars<=freeInput.length){_timer=setTimeout(function(){if(cfg.expanded===true){self._processSuggestions()}else{ms.expand()}},cfg.typeDelay)}}}break}},_onTagTriggerClick:function(e){ms.removeFromSelection($(e.currentTarget).data("json"))},_onTriggerClick:function(){if(ms.isDisabled()===false&&!(cfg.expandOnFocus===true&&_selection.length===cfg.maxSelection)){$(ms).trigger("triggerclick",[ms]);if(cfg.expanded===true){ms.collapse()}else{var curLength=ms.getRawValue().length;if(curLength>=cfg.minChars){ms.input.focus();ms.expand()}else{self._updateHelper(cfg.minCharsRenderer.call(this,cfg.minChars-curLength))}}}},_onWindowResized:function(){self._renderSelection()}};if(element!==null){self._render(element)}};$.fn.magicSuggest=function(options){var obj=$(this);if(obj.size()===1&&obj.data("magicSuggest")){return obj.data("magicSuggest")}obj.each(function(i){var cntr=$(this);if(cntr.data("magicSuggest")){return}if(this.nodeName.toLowerCase()==="select"){options.data=[];options.value=[];$.each(this.children,function(index,child){if(child.nodeName&&child.nodeName.toLowerCase()==="option"){options.data.push({id:child.value,name:child.text});if($(child).attr("selected")){options.value.push(child.value)}}})}var def={};$.each(this.attributes,function(i,att){def[att.name]=att.name==="value"&&att.value!==""?JSON.parse(att.value):att.value});var field=new MagicSuggest(this,$.extend([],$.fn.magicSuggest.defaults,options,def));cntr.data("magicSuggest",field);field.container.data("magicSuggest",field)});if(obj.size()===1){return obj.data("magicSuggest")}return obj};$.fn.magicSuggest.defaults={}})(jQuery);
+!function($){"use strict"
+function MagicSuggest(element,options){var ms=this,conf=$.extend({},options),cfg=$.extend(!0,{},{allowFreeEntries:!0,allowDuplicates:!1,ajaxConfig:{},autoSelect:!0,selectFirst:!1,queryParam:"query",beforeSend:function(){},cls:"",data:null,dataUrlParams:{},disabled:!1,disabledField:null,displayField:"name",editable:!0,expanded:!1,expandOnFocus:!1,groupBy:null,hideTrigger:!1,highlight:!0,id:null,infoMsgCls:"",inputCfg:{},invalidCls:"ms-inv",matchCase:!1,maxDropHeight:290,maxEntryLength:null,maxEntryRenderer:function(v){return"Please reduce your entry by "+v+" character"+(1<v?"s":"")},maxSuggestions:null,maxSelection:10,maxSelectionRenderer:function(v){return"You cannot choose more than "+v+" item"+(1<v?"s":"")},method:"POST",minChars:0,minCharsRenderer:function(v){return"Please type "+v+" more character"+(1<v?"s":"")},mode:"local",name:null,noSuggestionText:"No suggestions",placeholder:"Type or click here",renderer:null,required:!1,resultAsString:!1,resultAsStringDelimiter:",",resultsField:"results",selectionCls:"",selectionContainer:null,selectionPosition:"inner",selectionRenderer:null,selectionStacked:!1,sortDir:"asc",sortOrder:null,strictSuggest:!1,style:"",toggleOnClick:!1,typeDelay:400,useTabKey:!1,useCommaKey:!0,useZebraStyle:!1,value:null,valueField:"id",vregex:null,vtype:null},conf)
+this.addToSelection=function(items,isSilent){if(!cfg.maxSelection||_selection.length<cfg.maxSelection){$.isArray(items)||(items=[items])
+var valuechanged=!1
+$.each(items,function(index,json){if(cfg.allowDuplicates||-1===$.inArray(json[cfg.valueField],ms.getValue())){_selection.push(json)
+valuechanged=!0}})
+if(!0===valuechanged){self._renderSelection()
+this.empty()
+!0!==isSilent&&$(this).trigger("selectionchange",[this,this.getSelection()])}}this.input.attr("placeholder","inner"===cfg.selectionPosition&&0<this.getValue().length?"":cfg.placeholder)}
+this.clear=function(isSilent){this.removeFromSelection(_selection.slice(0),isSilent)}
+this.collapse=function(){if(!0===cfg.expanded){this.combobox.detach()
+cfg.expanded=!1
+$(this).trigger("collapse",[this])}}
+this.disable=function(){this.container.addClass("ms-ctn-disabled")
+cfg.disabled=!0
+ms.input.attr("disabled",!0)}
+this.empty=function(){this.input.val("")}
+this.enable=function(){this.container.removeClass("ms-ctn-disabled")
+cfg.disabled=!1
+ms.input.attr("disabled",!1)}
+this.expand=function(){if(!cfg.expanded&&(this.input.val().length>=cfg.minChars||0<this.combobox.children().size())){this.combobox.appendTo(this.container)
+self._processSuggestions()
+cfg.expanded=!0
+$(this).trigger("expand",[this])}}
+this.isDisabled=function(){return cfg.disabled}
+this.isValid=function(){var valid=!1===cfg.required||0<_selection.length;(cfg.vtype||cfg.vregex)&&$.each(_selection,function(index,item){valid=valid&&self._validateSingleItem(item[cfg.valueField])})
+return valid}
+this.getDataUrlParams=function(){return cfg.dataUrlParams}
+this.getName=function(){return cfg.name}
+this.getSelection=function(){return _selection}
+this.getRawValue=function(){return ms.input.val()}
+this.getValue=function(){return $.map(_selection,function(o){return o[cfg.valueField]})}
+this.removeFromSelection=function(items,isSilent){$.isArray(items)||(items=[items])
+var valuechanged=!1
+$.each(items,function(index,json){var i=$.inArray(json[cfg.valueField],ms.getValue())
+if(-1<i){_selection.splice(i,1)
+valuechanged=!0}})
+if(!0===valuechanged){self._renderSelection()
+!0!==isSilent&&$(this).trigger("selectionchange",[this,this.getSelection()])
+cfg.expandOnFocus&&ms.expand()
+cfg.expanded&&self._processSuggestions()}this.input.attr("placeholder","inner"===cfg.selectionPosition&&0<this.getValue().length?"":cfg.placeholder)}
+this.getData=function(){return _cbData}
+this.setData=function(data){cfg.data=data
+self._processSuggestions()}
+this.setName=function(name){(cfg.name=name)&&(cfg.name+=0<name.indexOf("[]")?"":"[]")
+ms._valueContainer&&$.each(ms._valueContainer.children(),function(i,el){el.name=cfg.name})}
+this.setSelection=function(items){this.clear()
+this.addToSelection(items)}
+this.setValue=function(values){var items=[]
+$.each(values,function(index,value){var found=!1
+$.each(_cbData,function(i,item){if(item[cfg.valueField]==value){items.push(item)
+return!(found=!0)}})
+if(!found)if("object"==typeof value)items.push(value)
+else{var json={}
+json[cfg.valueField]=value
+json[cfg.displayField]=value
+items.push(json)}})
+0<items.length&&this.addToSelection(items)}
+this.setDataUrlParams=function(params){cfg.dataUrlParams=$.extend({},params)}
+var _timer,_selection=[],_comboItemHeight=0,_hasFocus=!1,_groups=null,_cbData=[],_ctrlDown=!1,KEYCODES_BACKSPACE=8,KEYCODES_TAB=9,KEYCODES_ENTER=13,KEYCODES_CTRL=17,KEYCODES_ESC=27,KEYCODES_SPACE=32,KEYCODES_UPARROW=38,KEYCODES_DOWNARROW=40,KEYCODES_COMMA=188,self={_displaySuggestions:function(data){ms.combobox.show()
+ms.combobox.empty()
+var resHeight=0,nbGroups=0
+if(null===_groups){self._renderComboItems(data)
+resHeight=_comboItemHeight*data.length}else{for(var grpName in _groups){nbGroups+=1
+$("<div/>",{class:"ms-res-group",html:grpName}).appendTo(ms.combobox)
+self._renderComboItems(_groups[grpName].items,!0)}var _groupItemHeight=ms.combobox.find(".ms-res-group").outerHeight()
+if(null!==_groupItemHeight){var tmpResHeight=nbGroups*_groupItemHeight
+resHeight=_comboItemHeight*data.length+tmpResHeight}else resHeight=_comboItemHeight*(data.length+nbGroups)}resHeight<ms.combobox.height()||resHeight<=cfg.maxDropHeight?ms.combobox.height(resHeight):resHeight>=ms.combobox.height()&&resHeight>cfg.maxDropHeight&&ms.combobox.height(cfg.maxDropHeight)
+1===data.length&&!0===cfg.autoSelect&&ms.combobox.children().filter(":not(.ms-res-item-disabled):last").addClass("ms-res-item-active")
+!0===cfg.selectFirst&&ms.combobox.children().filter(":not(.ms-res-item-disabled):first").addClass("ms-res-item-active")
+if(0===data.length&&""!==ms.getRawValue()){var noSuggestionText=cfg.noSuggestionText.replace(/\{\{.*\}\}/,ms.input.val())
+self._updateHelper(noSuggestionText)
+ms.collapse()}if(!1===cfg.allowFreeEntries)if(0===data.length){$(ms.input).addClass(cfg.invalidCls)
+ms.combobox.hide()}else $(ms.input).removeClass(cfg.invalidCls)},_getEntriesFromStringArray:function(data){var json=[]
+$.each(data,function(index,s){var entry={}
+entry[cfg.displayField]=entry[cfg.valueField]=$.trim(s)
+json.push(entry)})
+return json},_highlightSuggestion:function(html){var q=ms.input.val()
+$.each(["^","$","*","+","?",".","(",")",":","!","|","{","}","[","]"],function(index,value){q=q.replace(value,"\\"+value)})
+if(0===q.length)return html
+var glob=!0===cfg.matchCase?"g":"gi"
+return html.replace(new RegExp("("+q+")(?!([^<]+)?>)",glob),"<em>$1</em>")},_moveSelectedRow:function(dir){cfg.expanded||ms.expand()
+var list,start,active,scrollPos
+list=ms.combobox.find(".ms-res-item:not(.ms-res-item-disabled)")
+start="down"===dir?list.eq(0):list.filter(":last")
+if(0<(active=ms.combobox.find(".ms-res-item-active:not(.ms-res-item-disabled):first")).length)if("down"===dir){0===(start=active.nextAll(".ms-res-item:not(.ms-res-item-disabled)").first()).length&&(start=list.eq(0))
+scrollPos=ms.combobox.scrollTop()
+ms.combobox.scrollTop(0)
+start[0].offsetTop+start.outerHeight()>ms.combobox.height()&&ms.combobox.scrollTop(scrollPos+_comboItemHeight)}else{if(0===(start=active.prevAll(".ms-res-item:not(.ms-res-item-disabled)").first()).length){start=list.filter(":last")
+ms.combobox.scrollTop(_comboItemHeight*list.length)}start[0].offsetTop<ms.combobox.scrollTop()&&ms.combobox.scrollTop(ms.combobox.scrollTop()-_comboItemHeight)}list.removeClass("ms-res-item-active")
+start.addClass("ms-res-item-active")},_processSuggestions:function(source){var json=null,data=source||cfg.data
+if(null!==data){"function"==typeof data&&(data=data.call(ms,ms.getRawValue()))
+if("string"==typeof data){$(ms).trigger("beforeload",[ms])
+var queryParams={}
+queryParams[cfg.queryParam]=ms.input.val()
+var params=$.extend(queryParams,cfg.dataUrlParams)
+$.ajax($.extend({type:cfg.method,url:data,data:params,beforeSend:cfg.beforeSend,success:function(asyncData){json="string"==typeof asyncData?JSON.parse(asyncData):asyncData
+self._processSuggestions(json)
+$(ms).trigger("load",[ms,json])
+if(self._asyncValues){ms.setValue("string"==typeof self._asyncValues?JSON.parse(self._asyncValues):self._asyncValues)
+self._renderSelection()
+delete self._asyncValues}},error:function(){throw"Could not reach server"}},cfg.ajaxConfig))
+return}_cbData=0<data.length&&"string"==typeof data[0]?self._getEntriesFromStringArray(data):data[cfg.resultsField]||data
+var sortedData="remote"===cfg.mode?_cbData:self._sortAndTrim(_cbData)
+self._displaySuggestions(self._group(sortedData))}},_render:function(el){ms.setName(cfg.name)
+ms.container=$("<div/>",{class:"ms-ctn form-control "+(cfg.resultAsString?"ms-as-string ":"")+cfg.cls+($(el).hasClass("input-lg")?" input-lg":"")+($(el).hasClass("input-sm")?" input-sm":"")+(!0===cfg.disabled?" ms-ctn-disabled":"")+(!0===cfg.editable?"":" ms-ctn-readonly")+(!1===cfg.hideTrigger?"":" ms-no-trigger"),style:cfg.style,id:cfg.id})
+ms.container.focus($.proxy(handlers._onFocus,this))
+ms.container.blur($.proxy(handlers._onBlur,this))
+ms.container.keydown($.proxy(handlers._onKeyDown,this))
+ms.container.keyup($.proxy(handlers._onKeyUp,this))
+ms.input=$("<input/>",$.extend({type:"text",class:!0===cfg.editable?"":" ms-input-readonly",readonly:!cfg.editable,placeholder:cfg.placeholder,disabled:cfg.disabled},cfg.inputCfg))
+ms.input.focus($.proxy(handlers._onInputFocus,this))
+ms.input.click($.proxy(handlers._onInputClick,this))
+ms.combobox=$("<div/>",{class:"ms-res-ctn dropdown-menu"}).height(cfg.maxDropHeight)
+ms.combobox.on("click","div.ms-res-item",$.proxy(handlers._onComboItemSelected,this))
+ms.combobox.on("mouseover","div.ms-res-item",$.proxy(handlers._onComboItemMouseOver,this))
+if(cfg.selectionContainer){ms.selectionContainer=cfg.selectionContainer
+$(ms.selectionContainer).addClass("ms-sel-ctn")}else ms.selectionContainer=$("<div/>",{class:"ms-sel-ctn"})
+ms.selectionContainer.click($.proxy(handlers._onFocus,this))
+"inner"!==cfg.selectionPosition||cfg.selectionContainer?ms.container.append(ms.input):ms.selectionContainer.append(ms.input)
+ms.helper=$("<span/>",{class:"ms-helper "+cfg.infoMsgCls})
+self._updateHelper()
+ms.container.append(ms.helper)
+$(el).replaceWith(ms.container)
+if(!cfg.selectionContainer)switch(cfg.selectionPosition){case"bottom":ms.selectionContainer.insertAfter(ms.container)
+if(!0===cfg.selectionStacked){ms.selectionContainer.width(ms.container.width())
+ms.selectionContainer.addClass("ms-stacked")}break
+case"right":ms.selectionContainer.insertAfter(ms.container)
+ms.container.css("float","left")
+break
+default:ms.container.append(ms.selectionContainer)}if(!1===cfg.hideTrigger){ms.trigger=$("<div/>",{class:"ms-trigger",html:'<div class="ms-trigger-ico"></div>'})
+ms.trigger.click($.proxy(handlers._onTriggerClick,this))
+ms.container.append(ms.trigger)}$(window).resize($.proxy(handlers._onWindowResized,this))
+if(null!==cfg.value||null!==cfg.data)if("string"==typeof cfg.data){self._asyncValues=cfg.value
+self._processSuggestions()}else{self._processSuggestions()
+if(null!==cfg.value){ms.setValue(cfg.value)
+self._renderSelection()}}$("body").click(function(e){ms.container.hasClass("ms-ctn-focus")&&0===ms.container.has(e.target).length&&e.target.className.indexOf("ms-res-item")<0&&e.target.className.indexOf("ms-close-btn")<0&&ms.container[0]!==e.target&&handlers._onBlur()})
+if(!0===cfg.expanded){cfg.expanded=!1
+ms.expand()}},_renderComboItems:function(items,isGrouped){var ref=this,html=""
+$.each(items,function(index,value){var displayed=null!==cfg.renderer?cfg.renderer.call(ref,value):value[cfg.displayField],disabled=null!==cfg.disabledField&&!0===value[cfg.disabledField],resultItemEl=$("<div/>",{class:"ms-res-item "+(isGrouped?"ms-res-item-grouped ":"")+(disabled?"ms-res-item-disabled ":"")+(index%2==1&&!0===cfg.useZebraStyle?"ms-res-odd":""),html:!0===cfg.highlight?self._highlightSuggestion(displayed):displayed,"data-json":JSON.stringify(value)})
+html+=$("<div/>").append(resultItemEl).html()})
+ms.combobox.append(html)
+_comboItemHeight=ms.combobox.find(".ms-res-item:first").outerHeight()},_renderSelection:function(){var ref=this,w=0,inputOffset=0,items=[],asText=!0===cfg.resultAsString&&!_hasFocus
+ms.selectionContainer.find(".ms-sel-item").remove()
+void 0!==ms._valueContainer&&ms._valueContainer.remove()
+$.each(_selection,function(index,value){var selectedItemEl,selectedItemHtml=null!==cfg.selectionRenderer?cfg.selectionRenderer.call(ref,value):value[cfg.displayField],validCls=self._validateSingleItem(value[cfg.displayField])?"":" ms-sel-invalid"
+if(!0==asText)selectedItemEl=$("<div/>",{class:"ms-sel-item ms-sel-text "+cfg.selectionCls+validCls,html:selectedItemHtml+(index===_selection.length-1?"":cfg.resultAsStringDelimiter)}).data("json",value)
+else{selectedItemEl=$("<div/>",{class:"ms-sel-item "+cfg.selectionCls+validCls,html:selectedItemHtml}).data("json",value)
+!1===cfg.disabled&&$("<span/>",{class:"ms-close-btn"}).data("json",value).appendTo(selectedItemEl).click($.proxy(handlers._onTagTriggerClick,ref))}items.push(selectedItemEl)})
+ms.selectionContainer.prepend(items)
+ms._valueContainer=$("<div/>",{style:"display: none;"})
+$.each(ms.getValue(),function(i,val){$("<input/>",{type:"hidden",name:cfg.name,value:val}).appendTo(ms._valueContainer)})
+ms._valueContainer.appendTo(ms.selectionContainer)
+if("inner"===cfg.selectionPosition&&!cfg.selectionContainer){ms.input.width(0)
+inputOffset=ms.input.offset().left-ms.selectionContainer.offset().left
+w=ms.container.width()-inputOffset-42
+ms.input.width(w)}_selection.length===cfg.maxSelection?self._updateHelper(cfg.maxSelectionRenderer.call(this,_selection.length)):ms.helper.hide()},_selectItem:function(item){1===cfg.maxSelection&&(_selection=[])
+ms.addToSelection(item.data("json"))
+item.removeClass("ms-res-item-active")
+!1!==cfg.expandOnFocus&&_selection.length!==cfg.maxSelection||ms.collapse()
+if(_hasFocus){if(_hasFocus&&(cfg.expandOnFocus||_ctrlDown)){self._processSuggestions()
+_ctrlDown&&ms.expand()}}else ms.input.focus()},_sortAndTrim:function(data){var q=ms.getRawValue(),filtered=[],newSuggestions=[],selectedValues=ms.getValue()
+0<q.length?$.each(data,function(index,obj){var name=obj[cfg.displayField];(!0===cfg.matchCase&&-1<name.indexOf(q)||!1===cfg.matchCase&&-1<name.toLowerCase().indexOf(q.toLowerCase()))&&(!1!==cfg.strictSuggest&&0!==name.toLowerCase().indexOf(q.toLowerCase())||filtered.push(obj))}):filtered=data
+$.each(filtered,function(index,obj){!cfg.allowDuplicates&&-1!==$.inArray(obj[cfg.valueField],selectedValues)||newSuggestions.push(obj)})
+null!==cfg.sortOrder&&newSuggestions.sort(function(a,b){return a[cfg.sortOrder]<b[cfg.sortOrder]?"asc"===cfg.sortDir?-1:1:a[cfg.sortOrder]>b[cfg.sortOrder]?"asc"===cfg.sortDir?1:-1:0})
+cfg.maxSuggestions&&0<cfg.maxSuggestions&&(newSuggestions=newSuggestions.slice(0,cfg.maxSuggestions))
+return newSuggestions},_group:function(data){if(null!==cfg.groupBy){_groups={}
+$.each(data,function(index,value){var props=-1<cfg.groupBy.indexOf(".")?cfg.groupBy.split("."):cfg.groupBy,prop=value[cfg.groupBy]
+if("string"!=typeof props){prop=value
+for(;0<props.length;)prop=prop[props.shift()]}void 0===_groups[prop]?_groups[prop]={title:prop,items:[value]}:_groups[prop].items.push(value)})}return data},_updateHelper:function(html){ms.helper.html(html)
+ms.helper.is(":visible")||ms.helper.fadeIn()},_validateSingleItem:function(value){if(null!==cfg.vregex&&cfg.vregex instanceof RegExp)return cfg.vregex.test(value)
+if(null!==cfg.vtype)switch(cfg.vtype){case"alpha":return/^[a-zA-Z_]+$/.test(value)
+case"alphanum":return/^[a-zA-Z0-9_]+$/.test(value)
+case"email":return/^(\w+)([\-+.][\w]+)*@(\w[\-\w]*\.){1,5}([A-Za-z]){2,6}$/.test(value)
+case"url":return/(((^https?)|(^ftp)):\/\/([\-\w]+\.)+\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*\/?)/i.test(value)
+case"ipaddress":return/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(value)}return!0}},handlers={_onBlur:function(){ms.container.removeClass("ms-ctn-focus")
+ms.collapse()
+_hasFocus=!1
+if(""!==ms.getRawValue()&&!0===cfg.allowFreeEntries){var obj={}
+obj[cfg.displayField]=obj[cfg.valueField]=ms.getRawValue().trim()
+ms.addToSelection(obj)}self._renderSelection()
+if(!1===ms.isValid())ms.container.addClass(cfg.invalidCls)
+else if(""!==ms.input.val()&&!1===cfg.allowFreeEntries){ms.empty()
+self._updateHelper("")}$(ms).trigger("blur",[ms])},_onComboItemMouseOver:function(e){var target=$(e.currentTarget)
+if(!target.hasClass("ms-res-item-disabled")){ms.combobox.children().removeClass("ms-res-item-active")
+target.addClass("ms-res-item-active")}},_onComboItemSelected:function(e){$(e.currentTarget).hasClass("ms-res-item-disabled")||self._selectItem($(e.currentTarget))},_onFocus:function(){ms.input.focus()},_onInputClick:function(){!1===ms.isDisabled()&&_hasFocus&&!0===cfg.toggleOnClick&&(cfg.expanded?ms.collapse():ms.expand())},_onInputFocus:function(){if(!1===ms.isDisabled()&&!_hasFocus){_hasFocus=!0
+ms.container.addClass("ms-ctn-focus")
+ms.container.removeClass(cfg.invalidCls)
+var curLength=ms.getRawValue().length
+!0===cfg.expandOnFocus&&ms.expand()
+_selection.length===cfg.maxSelection?self._updateHelper(cfg.maxSelectionRenderer.call(this,_selection.length)):curLength<cfg.minChars&&self._updateHelper(cfg.minCharsRenderer.call(this,cfg.minChars-curLength))
+self._renderSelection()
+$(ms).trigger("focus",[ms])}},_onKeyDown:function(e){var active=ms.combobox.find(".ms-res-item-active:not(.ms-res-item-disabled):first"),freeInput=ms.input.val()
+$(ms).trigger("keydown",[ms,e])
+if(e.keyCode!==KEYCODES_TAB||!1!==cfg.useTabKey&&(!0!==cfg.useTabKey||0!==active.length||0!==ms.input.val().length))switch(e.keyCode){case KEYCODES_BACKSPACE:if(0===freeInput.length&&0<ms.getSelection().length&&"inner"===cfg.selectionPosition){_selection.pop()
+self._renderSelection()
+$(ms).trigger("selectionchange",[ms,ms.getSelection()])
+ms.input.attr("placeholder","inner"===cfg.selectionPosition&&0<ms.getValue().length?"":cfg.placeholder)
+ms.input.focus()
+e.preventDefault()}break
+case KEYCODES_TAB:case KEYCODES_ESC:e.preventDefault()
+break
+case KEYCODES_ENTER:""===freeInput&&!cfg.expanded||e.preventDefault()
+break
+case KEYCODES_COMMA:!0===cfg.useCommaKey&&e.preventDefault()
+break
+case KEYCODES_CTRL:_ctrlDown=!0
+break
+case KEYCODES_DOWNARROW:e.preventDefault()
+self._moveSelectedRow("down")
+break
+case KEYCODES_UPARROW:e.preventDefault()
+self._moveSelectedRow("up")
+break
+default:_selection.length===cfg.maxSelection&&e.preventDefault()}else handlers._onBlur()},_onKeyUp:function(e){var selected,freeInput=ms.getRawValue(),inputValid=0<$.trim(ms.input.val()).length&&(!cfg.maxEntryLength||$.trim(ms.input.val()).length<=cfg.maxEntryLength),obj={}
+$(ms).trigger("keyup",[ms,e])
+clearTimeout(_timer)
+e.keyCode===KEYCODES_ESC&&cfg.expanded&&ms.combobox.hide()
+if(e.keyCode===KEYCODES_TAB&&!1===cfg.useTabKey||e.keyCode>KEYCODES_ENTER&&e.keyCode<KEYCODES_SPACE)e.keyCode===KEYCODES_CTRL&&(_ctrlDown=!1)
+else switch(e.keyCode){case KEYCODES_UPARROW:case KEYCODES_DOWNARROW:e.preventDefault()
+break
+case KEYCODES_ENTER:case KEYCODES_TAB:case KEYCODES_COMMA:if(e.keyCode!==KEYCODES_COMMA||!0===cfg.useCommaKey){e.preventDefault()
+if(!0===cfg.expanded&&0<(selected=ms.combobox.find(".ms-res-item-active:not(.ms-res-item-disabled):first")).length){self._selectItem(selected)
+return}if(!0==inputValid&&!0===cfg.allowFreeEntries){obj[cfg.displayField]=obj[cfg.valueField]=freeInput.trim()
+ms.addToSelection(obj)
+ms.collapse()
+ms.input.focus()}break}default:if(_selection.length===cfg.maxSelection)self._updateHelper(cfg.maxSelectionRenderer.call(this,_selection.length))
+else if(freeInput.length<cfg.minChars){self._updateHelper(cfg.minCharsRenderer.call(this,cfg.minChars-freeInput.length))
+!0===cfg.expanded&&ms.collapse()}else if(cfg.maxEntryLength&&freeInput.length>cfg.maxEntryLength){self._updateHelper(cfg.maxEntryRenderer.call(this,freeInput.length-cfg.maxEntryLength))
+!0===cfg.expanded&&ms.collapse()}else{ms.helper.hide()
+cfg.minChars<=freeInput.length&&(_timer=setTimeout(function(){!0===cfg.expanded?self._processSuggestions():ms.expand()},cfg.typeDelay))}}},_onTagTriggerClick:function(e){ms.removeFromSelection($(e.currentTarget).data("json"))},_onTriggerClick:function(){if(!1===ms.isDisabled()&&(!0!==cfg.expandOnFocus||_selection.length!==cfg.maxSelection)){$(ms).trigger("triggerclick",[ms])
+if(!0===cfg.expanded)ms.collapse()
+else{var curLength=ms.getRawValue().length
+if(curLength>=cfg.minChars){ms.input.focus()
+ms.expand()}else self._updateHelper(cfg.minCharsRenderer.call(this,cfg.minChars-curLength))}}},_onWindowResized:function(){self._renderSelection()}}
+null!==element&&self._render(element)}$.fn.magicSuggest=function(options){var obj=$(this)
+if(1===obj.size()&&obj.data("magicSuggest"))return obj.data("magicSuggest")
+obj.each(function(i){var cntr=$(this)
+if(!cntr.data("magicSuggest")){if("select"===this.nodeName.toLowerCase()){options.data=[]
+options.value=[]
+$.each(this.children,function(index,child){if(child.nodeName&&"option"===child.nodeName.toLowerCase()){options.data.push({id:child.value,name:child.text})
+$(child).attr("selected")&&options.value.push(child.value)}})}var def={}
+$.each(this.attributes,function(i,att){def[att.name]="value"===att.name&&""!==att.value?JSON.parse(att.value):att.value})
+var field=new MagicSuggest(this,$.extend([],$.fn.magicSuggest.defaults,options,def))
+cntr.data("magicSuggest",field)
+field.container.data("magicSuggest",field)}})
+return 1===obj.size()?obj.data("magicSuggest"):obj}
+$.fn.magicSuggest.defaults={}}(jQuery)

@@ -1,1 +1,8 @@
-https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.js
+https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.js
+
+$ uglifyjs <source> --compress sequences=false --beautify beautify=false,semicolons=false,comments=some --output <destination>
+
+Where:
+    uglifyjs = npm install -g uglify-js@^3.8.0
+    <source> = File https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.js
+    <destination> = File ./magicsuggest.js

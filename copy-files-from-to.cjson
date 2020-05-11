@@ -70,7 +70,7 @@
         {
             "from": {
                 "default": {
-                    "src": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.min.js"
+                    "src": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js"
                 },
                 "dev": {
                     "src": "node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js"
@@ -79,7 +79,8 @@
             "to": {
                 "default": {
                     "dest": "extension/scripts/3rdparty/codemirror/addons/emmet/emmet-codemirror-plugin.js",
-                    "removeSourceMappingURL": true
+                    "removeSourceMappingURL": true,
+                    "uglifyJs": true
                 }
             }
         },
@@ -224,14 +225,19 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.min.js",
+                    "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.js",
                     "latest": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/js/tooltipster.main.js"
                 },
                 "dev": {
                     "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/tooltipster/jquery.tooltipster.js"
+            "to": {
+                "default": {
+                    "dest": "extension/scripts/3rdparty/tooltipster/jquery.tooltipster.js",
+                    "uglifyJs": true
+                }
+            }
         },
         {
             "from": {
@@ -254,8 +260,8 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.min.js",
-                    "latest": "https://raw.githubusercontent.com/caolan/async/master/dist/async.min.js"
+                    "src": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.js",
+                    "latest": "https://raw.githubusercontent.com/caolan/async/master/dist/async.js"
                 },
                 "dev": {
                     "src": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.js",
@@ -265,30 +271,28 @@
             "to": {
                 "default": {
                     "dest": "extension/scripts/3rdparty/async.js",
-                    "removeSourceMappingURL": true
+                    "removeSourceMappingURL": true,
+                    "uglifyJs": true
                 }
             }
         },
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.js",
-                    "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest-min.js"
-                },
-                "dev": {
                     "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.js",
                     "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/magicsuggest/magicsuggest.js"
+            "to": {
+                "default": {
+                    "dest": "extension/scripts/3rdparty/magicsuggest/magicsuggest.js",
+                    "uglifyJs": true
+                }
+            }
         },
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest-min.css",
-                    "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest-min.css"
-                },
-                "dev": {
                     "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.css",
                     "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest.css"
                 }
@@ -351,7 +355,7 @@
         {
             "from": {
                 "default": {
-                    "src": "node_modules/toastr/build/toastr.min.css"
+                    "src": "node_modules/toastr/build/toastr.css"
                 }
             },
             "to": "extension/scripts/3rdparty/toastr/toastr.css"
@@ -380,8 +384,8 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/mozilla/source-map/0.6.1/dist/source-map.min.js",
-                    "latest": "https://raw.githubusercontent.com/mozilla/source-map/master/dist/source-map.min.js"
+                    "src": "https://raw.githubusercontent.com/mozilla/source-map/0.6.1/dist/source-map.debug.js",
+                    "latest": "https://raw.githubusercontent.com/mozilla/source-map/master/dist/source-map.debug.js"
                 },
                 "dev": {
                     "src": "https://raw.githubusercontent.com/mozilla/source-map/0.6.1/dist/source-map.debug.js"
@@ -390,6 +394,7 @@
             "to": {
                 "default": {
                     "dest": "extension/scripts/3rdparty/source-map.js",
+                    "uglifyJs": true,
                     "removeSourceMappingURL": true
                 }
             }

@@ -1,3 +1,10 @@
-node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.min.js
+node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js
 
 Note: Removed "sourceMappingURL"
+
+$ uglifyjs <source> --compress sequences=false --beautify beautify=false,semicolons=false,comments=some --output <destination>
+
+Where:
+    uglifyjs = npm install -g uglify-js@^3.8.0
+    <source> = File node_modules/emmetio-codemirror-plugin-webextensions/dist/emmet-codemirror-plugin.js
+    <destination> = File ./emmet-codemirror-plugin.js

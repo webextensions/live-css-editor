@@ -1,1 +1,237 @@
-/* Tooltipster v3.3.0 */;(function(e,t,n){function s(t,n){this.bodyOverflowX;this.callbacks={hide:[],show:[]};this.checkInterval=null;this.Content;this.$el=e(t);this.$elProxy;this.elProxyPosition;this.enabled=true;this.options=e.extend({},i,n);this.mouseIsOverProxy=false;this.namespace="tooltipster-"+Math.round(Math.random()*1e5);this.Status="hidden";this.timerHide=null;this.timerShow=null;this.$tooltip;this.options.iconTheme=this.options.iconTheme.replace(".","");this.options.theme=this.options.theme.replace(".","");this._init()}function o(t,n){var r=true;e.each(t,function(e,i){if(typeof n[e]==="undefined"||t[e]!==n[e]){r=false;return false}});return r}function f(){return!a&&u}function l(){var e=n.body||n.documentElement,t=e.style,r="transition";if(typeof t[r]=="string"){return true}v=["Moz","Webkit","Khtml","O","ms"],r=r.charAt(0).toUpperCase()+r.substr(1);for(var i=0;i<v.length;i++){if(typeof t[v[i]+r]=="string"){return true}}return false}var r="tooltipster",i={animation:"fade",arrow:true,arrowColor:"",autoClose:true,content:null,contentAsHTML:false,contentCloning:true,debug:true,delay:200,minWidth:0,maxWidth:null,functionInit:function(e,t){},functionBefore:function(e,t){t()},functionReady:function(e,t){},functionAfter:function(e){},hideOnClick:false,icon:"(?)",iconCloning:true,iconDesktop:false,iconTouch:false,iconTheme:"tooltipster-icon",interactive:false,interactiveTolerance:350,multiple:false,offsetX:0,offsetY:0,onlyOne:false,position:"top",positionTracker:false,positionTrackerCallback:function(e){if(this.option("trigger")=="hover"&&this.option("autoClose")){this.hide()}},restoration:"current",speed:350,timer:0,theme:"tooltipster-default",touchDevices:true,trigger:"hover",updateAnimation:true};s.prototype={_init:function(){var t=this;if(n.querySelector){var r=null;if(t.$el.data("tooltipster-initialTitle")===undefined){r=t.$el.attr("title");if(r===undefined)r=null;t.$el.data("tooltipster-initialTitle",r)}if(t.options.content!==null){t._content_set(t.options.content)}else{t._content_set(r)}var i=t.options.functionInit.call(t.$el,t.$el,t.Content);if(typeof i!=="undefined")t._content_set(i);t.$el.removeAttr("title").addClass("tooltipstered");if(!u&&t.options.iconDesktop||u&&t.options.iconTouch){if(typeof t.options.icon==="string"){t.$elProxy=e('<span class="'+t.options.iconTheme+'"></span>');t.$elProxy.text(t.options.icon)}else{if(t.options.iconCloning)t.$elProxy=t.options.icon.clone(true);else t.$elProxy=t.options.icon}t.$elProxy.insertAfter(t.$el)}else{t.$elProxy=t.$el}if(t.options.trigger=="hover"){t.$elProxy.on("mouseenter."+t.namespace,function(){if(!f()||t.options.touchDevices){t.mouseIsOverProxy=true;t._show()}}).on("mouseleave."+t.namespace,function(){if(!f()||t.options.touchDevices){t.mouseIsOverProxy=false}});if(u&&t.options.touchDevices){t.$elProxy.on("touchstart."+t.namespace,function(){t._showNow()})}}else if(t.options.trigger=="click"){t.$elProxy.on("click."+t.namespace,function(){if(!f()||t.options.touchDevices){t._show()}})}}},_show:function(){var e=this;if(e.Status!="shown"&&e.Status!="appearing"){if(e.options.delay){e.timerShow=setTimeout(function(){if(e.options.trigger=="click"||e.options.trigger=="hover"&&e.mouseIsOverProxy){e._showNow()}},e.options.delay)}else e._showNow()}},_showNow:function(n){var r=this;r.options.functionBefore.call(r.$el,r.$el,function(){if(r.enabled&&r.Content!==null){if(n)r.callbacks.show.push(n);r.callbacks.hide=[];clearTimeout(r.timerShow);r.timerShow=null;clearTimeout(r.timerHide);r.timerHide=null;if(r.options.onlyOne){e(".tooltipstered").not(r.$el).each(function(t,n){var r=e(n),i=r.data("tooltipster-ns");e.each(i,function(e,t){var n=r.data(t),i=n.status(),s=n.option("autoClose");if(i!=="hidden"&&i!=="disappearing"&&s){n.hide()}})})}var i=function(){r.Status="shown";e.each(r.callbacks.show,function(e,t){t.call(r.$el)});r.callbacks.show=[]};if(r.Status!=="hidden"){var s=0;if(r.Status==="disappearing"){r.Status="appearing";if(l()){r.$tooltip.clearQueue().removeClass("tooltipster-dying").addClass("tooltipster-"+r.options.animation+"-show");if(r.options.speed>0)r.$tooltip.delay(r.options.speed);r.$tooltip.queue(i)}else{r.$tooltip.stop().fadeIn(i)}}else if(r.Status==="shown"){i()}}else{r.Status="appearing";var s=r.options.speed;r.bodyOverflowX=e("body").css("overflow-x");e("body").css("overflow-x","hidden");var o="tooltipster-"+r.options.animation,a="-webkit-transition-duration: "+r.options.speed+"ms; -webkit-animation-duration: "+r.options.speed+"ms; -moz-transition-duration: "+r.options.speed+"ms; -moz-animation-duration: "+r.options.speed+"ms; -o-transition-duration: "+r.options.speed+"ms; -o-animation-duration: "+r.options.speed+"ms; -ms-transition-duration: "+r.options.speed+"ms; -ms-animation-duration: "+r.options.speed+"ms; transition-duration: "+r.options.speed+"ms; animation-duration: "+r.options.speed+"ms;",f=r.options.minWidth?"min-width:"+Math.round(r.options.minWidth)+"px;":"",c=r.options.maxWidth?"max-width:"+Math.round(r.options.maxWidth)+"px;":"",h=r.options.interactive?"pointer-events: auto;":"";r.$tooltip=e('<div class="tooltipster-base '+r.options.theme+'" style="'+f+" "+c+" "+h+" "+a+'"><div class="tooltipster-content"></div></div>');if(l())r.$tooltip.addClass(o);r._content_insert();r.$tooltip.appendTo("body");r.reposition();r.options.functionReady.call(r.$el,r.$el,r.$tooltip);if(l()){r.$tooltip.addClass(o+"-show");if(r.options.speed>0)r.$tooltip.delay(r.options.speed);r.$tooltip.queue(i)}else{r.$tooltip.css("display","none").fadeIn(r.options.speed,i)}r._interval_set();e(t).on("scroll."+r.namespace+" resize."+r.namespace,function(){r.reposition()});if(r.options.autoClose){e("body").off("."+r.namespace);if(r.options.trigger=="hover"){if(u){setTimeout(function(){e("body").on("touchstart."+r.namespace,function(){r.hide()})},0)}if(r.options.interactive){if(u){r.$tooltip.on("touchstart."+r.namespace,function(e){e.stopPropagation()})}var p=null;r.$elProxy.add(r.$tooltip).on("mouseleave."+r.namespace+"-autoClose",function(){clearTimeout(p);p=setTimeout(function(){r.hide()},r.options.interactiveTolerance)}).on("mouseenter."+r.namespace+"-autoClose",function(){clearTimeout(p)})}else{r.$elProxy.on("mouseleave."+r.namespace+"-autoClose",function(){r.hide()})}if(r.options.hideOnClick){r.$elProxy.on("click."+r.namespace+"-autoClose",function(){r.hide()})}}else if(r.options.trigger=="click"){setTimeout(function(){e("body").on("click."+r.namespace+" touchstart."+r.namespace,function(){r.hide()})},0);if(r.options.interactive){r.$tooltip.on("click."+r.namespace+" touchstart."+r.namespace,function(e){e.stopPropagation()})}}}}if(r.options.timer>0){r.timerHide=setTimeout(function(){r.timerHide=null;r.hide()},r.options.timer+s)}}})},_interval_set:function(){var t=this;t.checkInterval=setInterval(function(){if(e("body").find(t.$el).length===0||e("body").find(t.$elProxy).length===0||t.Status=="hidden"||e("body").find(t.$tooltip).length===0){if(t.Status=="shown"||t.Status=="appearing")t.hide();t._interval_cancel()}else{if(t.options.positionTracker){var n=t._repositionInfo(t.$elProxy),r=false;if(o(n.dimension,t.elProxyPosition.dimension)){if(t.$elProxy.css("position")==="fixed"){if(o(n.position,t.elProxyPosition.position))r=true}else{if(o(n.offset,t.elProxyPosition.offset))r=true}}if(!r){t.reposition();t.options.positionTrackerCallback.call(t,t.$el)}}}},200)},_interval_cancel:function(){clearInterval(this.checkInterval);this.checkInterval=null},_content_set:function(e){if(typeof e==="object"&&e!==null&&this.options.contentCloning){e=e.clone(true)}this.Content=e},_content_insert:function(){var e=this,t=this.$tooltip.find(".tooltipster-content");if(typeof e.Content==="string"&&!e.options.contentAsHTML){t.text(e.Content)}else{t.empty().append(e.Content)}},_update:function(e){var t=this;t._content_set(e);if(t.Content!==null){if(t.Status!=="hidden"){t._content_insert();t.reposition();if(t.options.updateAnimation){if(l()){t.$tooltip.css({width:"","-webkit-transition":"all "+t.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms","-moz-transition":"all "+t.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms","-o-transition":"all "+t.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms","-ms-transition":"all "+t.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms",transition:"all "+t.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms"}).addClass("tooltipster-content-changing");setTimeout(function(){if(t.Status!="hidden"){t.$tooltip.removeClass("tooltipster-content-changing");setTimeout(function(){if(t.Status!=="hidden"){t.$tooltip.css({"-webkit-transition":t.options.speed+"ms","-moz-transition":t.options.speed+"ms","-o-transition":t.options.speed+"ms","-ms-transition":t.options.speed+"ms",transition:t.options.speed+"ms"})}},t.options.speed)}},t.options.speed)}else{t.$tooltip.fadeTo(t.options.speed,.5,function(){if(t.Status!="hidden"){t.$tooltip.fadeTo(t.options.speed,1)}})}}}}else{t.hide()}},_repositionInfo:function(e){return{dimension:{height:e.outerHeight(false),width:e.outerWidth(false)},offset:e.offset(),position:{left:parseInt(e.css("left")),top:parseInt(e.css("top"))}}},hide:function(n){var r=this;if(n)r.callbacks.hide.push(n);r.callbacks.show=[];clearTimeout(r.timerShow);r.timerShow=null;clearTimeout(r.timerHide);r.timerHide=null;var i=function(){e.each(r.callbacks.hide,function(e,t){t.call(r.$el)});r.callbacks.hide=[]};if(r.Status=="shown"||r.Status=="appearing"){r.Status="disappearing";var s=function(){r.Status="hidden";if(typeof r.Content=="object"&&r.Content!==null){r.Content.detach()}r.$tooltip.remove();r.$tooltip=null;e(t).off("."+r.namespace);e("body").off("."+r.namespace).css("overflow-x",r.bodyOverflowX);e("body").off("."+r.namespace);r.$elProxy.off("."+r.namespace+"-autoClose");r.options.functionAfter.call(r.$el,r.$el);i()};if(l()){r.$tooltip.clearQueue().removeClass("tooltipster-"+r.options.animation+"-show").addClass("tooltipster-dying");if(r.options.speed>0)r.$tooltip.delay(r.options.speed);r.$tooltip.queue(s)}else{r.$tooltip.stop().fadeOut(r.options.speed,s)}}else if(r.Status=="hidden"){i()}return r},show:function(e){this._showNow(e);return this},update:function(e){return this.content(e)},content:function(e){if(typeof e==="undefined"){return this.Content}else{this._update(e);return this}},reposition:function(){var n=this;if(e("body").find(n.$tooltip).length!==0){n.$tooltip.css("width","");n.elProxyPosition=n._repositionInfo(n.$elProxy);var r=null,i=e(t).width(),s=n.elProxyPosition,o=n.$tooltip.outerWidth(false),u=n.$tooltip.innerWidth()+1,a=n.$tooltip.outerHeight(false);if(n.$elProxy.is("area")){var f=n.$elProxy.attr("shape"),l=n.$elProxy.parent().attr("name"),c=e('img[usemap="#'+l+'"]'),h=c.offset().left,p=c.offset().top,d=n.$elProxy.attr("coords")!==undefined?n.$elProxy.attr("coords").split(","):undefined;if(f=="circle"){var v=parseInt(d[0]),m=parseInt(d[1]),g=parseInt(d[2]);s.dimension.height=g*2;s.dimension.width=g*2;s.offset.top=p+m-g;s.offset.left=h+v-g}else if(f=="rect"){var v=parseInt(d[0]),m=parseInt(d[1]),y=parseInt(d[2]),b=parseInt(d[3]);s.dimension.height=b-m;s.dimension.width=y-v;s.offset.top=p+m;s.offset.left=h+v}else if(f=="poly"){var w=[],E=[],S=0,x=0,T=0,N=0,C="even";for(var k=0;k<d.length;k++){var L=parseInt(d[k]);if(C=="even"){if(L>T){T=L;if(k===0){S=T}}if(L<S){S=L}C="odd"}else{if(L>N){N=L;if(k==1){x=N}}if(L<x){x=L}C="even"}}s.dimension.height=N-x;s.dimension.width=T-S;s.offset.top=p+x;s.offset.left=h+S}else{s.dimension.height=c.outerHeight(false);s.dimension.width=c.outerWidth(false);s.offset.top=p;s.offset.left=h}}var A=0,O=0,M=0,_=parseInt(n.options.offsetY),D=parseInt(n.options.offsetX),P=n.options.position;function H(){var n=e(t).scrollLeft();if(A-n<0){r=A-n;A=n}if(A+o-n>i){r=A-(i+n-o);A=i+n-o}}function B(n,r){if(s.offset.top-e(t).scrollTop()-a-_-12<0&&r.indexOf("top")>-1){P=n}if(s.offset.top+s.dimension.height+a+12+_>e(t).scrollTop()+e(t).height()&&r.indexOf("bottom")>-1){P=n;M=s.offset.top-a-_-12}}if(P=="top"){var j=s.offset.left+o-(s.offset.left+s.dimension.width);A=s.offset.left+D-j/2;M=s.offset.top-a-_-12;H();B("bottom","top")}if(P=="top-left"){A=s.offset.left+D;M=s.offset.top-a-_-12;H();B("bottom-left","top-left")}if(P=="top-right"){A=s.offset.left+s.dimension.width+D-o;M=s.offset.top-a-_-12;H();B("bottom-right","top-right")}if(P=="bottom"){var j=s.offset.left+o-(s.offset.left+s.dimension.width);A=s.offset.left-j/2+D;M=s.offset.top+s.dimension.height+_+12;H();B("top","bottom")}if(P=="bottom-left"){A=s.offset.left+D;M=s.offset.top+s.dimension.height+_+12;H();B("top-left","bottom-left")}if(P=="bottom-right"){A=s.offset.left+s.dimension.width+D-o;M=s.offset.top+s.dimension.height+_+12;H();B("top-right","bottom-right")}if(P=="left"){A=s.offset.left-D-o-12;O=s.offset.left+D+s.dimension.width+12;var F=s.offset.top+a-(s.offset.top+s.dimension.height);M=s.offset.top-F/2-_;if(A<0&&O+o>i){var I=parseFloat(n.$tooltip.css("border-width"))*2,q=o+A-I;n.$tooltip.css("width",q+"px");a=n.$tooltip.outerHeight(false);A=s.offset.left-D-q-12-I;F=s.offset.top+a-(s.offset.top+s.dimension.height);M=s.offset.top-F/2-_}else if(A<0){A=s.offset.left+D+s.dimension.width+12;r="left"}}if(P=="right"){A=s.offset.left+D+s.dimension.width+12;O=s.offset.left-D-o-12;var F=s.offset.top+a-(s.offset.top+s.dimension.height);M=s.offset.top-F/2-_;if(A+o>i&&O<0){var I=parseFloat(n.$tooltip.css("border-width"))*2,q=i-A-I;n.$tooltip.css("width",q+"px");a=n.$tooltip.outerHeight(false);F=s.offset.top+a-(s.offset.top+s.dimension.height);M=s.offset.top-F/2-_}else if(A+o>i){A=s.offset.left-D-o-12;r="right"}}if(n.options.arrow){var R="tooltipster-arrow-"+P;if(n.options.arrowColor.length<1){var U=n.$tooltip.css("background-color")}else{var U=n.options.arrowColor}if(!r){r=""}else if(r=="left"){R="tooltipster-arrow-right";r=""}else if(r=="right"){R="tooltipster-arrow-left";r=""}else{r="left:"+Math.round(r)+"px;"}if(P=="top"||P=="top-left"||P=="top-right"){var z=parseFloat(n.$tooltip.css("border-bottom-width")),W=n.$tooltip.css("border-bottom-color")}else if(P=="bottom"||P=="bottom-left"||P=="bottom-right"){var z=parseFloat(n.$tooltip.css("border-top-width")),W=n.$tooltip.css("border-top-color")}else if(P=="left"){var z=parseFloat(n.$tooltip.css("border-right-width")),W=n.$tooltip.css("border-right-color")}else if(P=="right"){var z=parseFloat(n.$tooltip.css("border-left-width")),W=n.$tooltip.css("border-left-color")}else{var z=parseFloat(n.$tooltip.css("border-bottom-width")),W=n.$tooltip.css("border-bottom-color")}if(z>1){z++}var X="";if(z!==0){var V="",J="border-color: "+W+";";if(R.indexOf("bottom")!==-1){V="margin-top: -"+Math.round(z)+"px;"}else if(R.indexOf("top")!==-1){V="margin-bottom: -"+Math.round(z)+"px;"}else if(R.indexOf("left")!==-1){V="margin-right: -"+Math.round(z)+"px;"}else if(R.indexOf("right")!==-1){V="margin-left: -"+Math.round(z)+"px;"}X='<span class="tooltipster-arrow-border" style="'+V+" "+J+';"></span>'}n.$tooltip.find(".tooltipster-arrow").remove();var K='<div class="'+R+' tooltipster-arrow" style="'+r+'">'+X+'<span style="border-color:'+U+';"></span></div>';n.$tooltip.append(K)}n.$tooltip.css({top:Math.round(M)+"px",left:Math.round(A)+"px"})}return n},enable:function(){this.enabled=true;return this},disable:function(){this.hide();this.enabled=false;return this},destroy:function(){var t=this;t.hide();if(t.$el[0]!==t.$elProxy[0]){t.$elProxy.remove()}t.$el.removeData(t.namespace).off("."+t.namespace);var n=t.$el.data("tooltipster-ns");if(n.length===1){var r=null;if(t.options.restoration==="previous"){r=t.$el.data("tooltipster-initialTitle")}else if(t.options.restoration==="current"){r=typeof t.Content==="string"?t.Content:e("<div></div>").append(t.Content).html()}if(r){t.$el.attr("title",r)}t.$el.removeClass("tooltipstered").removeData("tooltipster-ns").removeData("tooltipster-initialTitle")}else{n=e.grep(n,function(e,n){return e!==t.namespace});t.$el.data("tooltipster-ns",n)}return t},elementIcon:function(){return this.$el[0]!==this.$elProxy[0]?this.$elProxy[0]:undefined},elementTooltip:function(){return this.$tooltip?this.$tooltip[0]:undefined},option:function(e,t){if(typeof t=="undefined")return this.options[e];else{this.options[e]=t;return this}},status:function(){return this.Status}};e.fn[r]=function(){var t=arguments;if(this.length===0){if(typeof t[0]==="string"){var n=true;switch(t[0]){case"setDefaults":e.extend(i,t[1]);break;default:n=false;break}if(n)return true;else return this}else{return this}}else{if(typeof t[0]==="string"){var r="#*$~&";this.each(function(){var n=e(this).data("tooltipster-ns"),i=n?e(this).data(n[0]):null;if(i){if(typeof i[t[0]]==="function"){var s=i[t[0]](t[1],t[2])}else{throw new Error('Unknown method .tooltipster("'+t[0]+'")')}if(s!==i){r=s;return false}}else{throw new Error("You called Tooltipster's \""+t[0]+'" method on an uninitialized element')}});return r!=="#*$~&"?r:this}else{var o=[],u=t[0]&&typeof t[0].multiple!=="undefined",a=u&&t[0].multiple||!u&&i.multiple,f=t[0]&&typeof t[0].debug!=="undefined",l=f&&t[0].debug||!f&&i.debug;this.each(function(){var n=false,r=e(this).data("tooltipster-ns"),i=null;if(!r){n=true}else if(a){n=true}else if(l){console.log('Tooltipster: one or more tooltips are already attached to this element: ignoring. Use the "multiple" option to attach more tooltips.')}if(n){i=new s(this,t[0]);if(!r)r=[];r.push(i.namespace);e(this).data("tooltipster-ns",r);e(this).data(i.namespace,i)}o.push(i)});if(a)return o;else return this}}};var u=!!("ontouchstart"in t);var a=false;e("body").one("mousemove",function(){a=true})})(jQuery,window,document);
+!function($,window,document){var defaults={animation:"fade",arrow:!0,arrowColor:"",autoClose:!0,content:null,contentAsHTML:!1,contentCloning:!0,debug:!0,delay:200,minWidth:0,maxWidth:null,functionInit:function(origin,content){},functionBefore:function(origin,continueTooltip){continueTooltip()},functionReady:function(origin,tooltip){},functionAfter:function(origin){},hideOnClick:!1,icon:"(?)",iconCloning:!0,iconDesktop:!1,iconTouch:!1,iconTheme:"tooltipster-icon",interactive:!1,interactiveTolerance:350,multiple:!1,offsetX:0,offsetY:0,onlyOne:!1,position:"top",positionTracker:!1,positionTrackerCallback:function(origin){"hover"==this.option("trigger")&&this.option("autoClose")&&this.hide()},restoration:"current",speed:350,timer:0,theme:"tooltipster-default",touchDevices:!0,trigger:"hover",updateAnimation:!0}
+function Plugin(element,options){this.bodyOverflowX
+this.callbacks={hide:[],show:[]}
+this.checkInterval=null
+this.Content
+this.$el=$(element)
+this.$elProxy
+this.elProxyPosition
+this.enabled=!0
+this.options=$.extend({},defaults,options)
+this.mouseIsOverProxy=!1
+this.namespace="tooltipster-"+Math.round(1e5*Math.random())
+this.Status="hidden"
+this.timerHide=null
+this.timerShow=null
+this.$tooltip
+this.options.iconTheme=this.options.iconTheme.replace(".","")
+this.options.theme=this.options.theme.replace(".","")
+this._init()}Plugin.prototype={_init:function(){var self=this
+if(document.querySelector){var initialTitle=null
+if(void 0===self.$el.data("tooltipster-initialTitle")){void 0===(initialTitle=self.$el.attr("title"))&&(initialTitle=null)
+self.$el.data("tooltipster-initialTitle",initialTitle)}null!==self.options.content?self._content_set(self.options.content):self._content_set(initialTitle)
+var c=self.options.functionInit.call(self.$el,self.$el,self.Content)
+void 0!==c&&self._content_set(c)
+self.$el.removeAttr("title").addClass("tooltipstered")
+if(!deviceHasTouchCapability&&self.options.iconDesktop||deviceHasTouchCapability&&self.options.iconTouch){if("string"==typeof self.options.icon){self.$elProxy=$('<span class="'+self.options.iconTheme+'"></span>')
+self.$elProxy.text(self.options.icon)}else self.options.iconCloning?self.$elProxy=self.options.icon.clone(!0):self.$elProxy=self.options.icon
+self.$elProxy.insertAfter(self.$el)}else self.$elProxy=self.$el
+if("hover"==self.options.trigger){self.$elProxy.on("mouseenter."+self.namespace,function(){if(!deviceIsPureTouch()||self.options.touchDevices){self.mouseIsOverProxy=!0
+self._show()}}).on("mouseleave."+self.namespace,function(){deviceIsPureTouch()&&!self.options.touchDevices||(self.mouseIsOverProxy=!1)})
+deviceHasTouchCapability&&self.options.touchDevices&&self.$elProxy.on("touchstart."+self.namespace,function(){self._showNow()})}else"click"==self.options.trigger&&self.$elProxy.on("click."+self.namespace,function(){deviceIsPureTouch()&&!self.options.touchDevices||self._show()})}},_show:function(){var self=this
+"shown"!=self.Status&&"appearing"!=self.Status&&(self.options.delay?self.timerShow=setTimeout(function(){("click"==self.options.trigger||"hover"==self.options.trigger&&self.mouseIsOverProxy)&&self._showNow()},self.options.delay):self._showNow())},_showNow:function(callback){var self=this
+self.options.functionBefore.call(self.$el,self.$el,function(){if(self.enabled&&null!==self.Content){callback&&self.callbacks.show.push(callback)
+self.callbacks.hide=[]
+clearTimeout(self.timerShow)
+self.timerShow=null
+clearTimeout(self.timerHide)
+self.timerHide=null
+self.options.onlyOne&&$(".tooltipstered").not(self.$el).each(function(i,el){var $el=$(el),nss=$el.data("tooltipster-ns")
+$.each(nss,function(i,ns){var instance=$el.data(ns),s=instance.status(),ac=instance.option("autoClose")
+"hidden"!==s&&"disappearing"!==s&&ac&&instance.hide()})})
+function finish(){self.Status="shown"
+$.each(self.callbacks.show,function(i,c){c.call(self.$el)})
+self.callbacks.show=[]}if("hidden"!==self.Status){var extraTime=0
+if("disappearing"===self.Status){self.Status="appearing"
+if(supportsTransitions()){self.$tooltip.clearQueue().removeClass("tooltipster-dying").addClass("tooltipster-"+self.options.animation+"-show")
+0<self.options.speed&&self.$tooltip.delay(self.options.speed)
+self.$tooltip.queue(finish)}else self.$tooltip.stop().fadeIn(finish)}else"shown"===self.Status&&finish()}else{self.Status="appearing"
+extraTime=self.options.speed
+self.bodyOverflowX=$("body").css("overflow-x")
+$("body").css("overflow-x","hidden")
+var animation="tooltipster-"+self.options.animation,animationSpeed="-webkit-transition-duration: "+self.options.speed+"ms; -webkit-animation-duration: "+self.options.speed+"ms; -moz-transition-duration: "+self.options.speed+"ms; -moz-animation-duration: "+self.options.speed+"ms; -o-transition-duration: "+self.options.speed+"ms; -o-animation-duration: "+self.options.speed+"ms; -ms-transition-duration: "+self.options.speed+"ms; -ms-animation-duration: "+self.options.speed+"ms; transition-duration: "+self.options.speed+"ms; animation-duration: "+self.options.speed+"ms;",minWidth=self.options.minWidth?"min-width:"+Math.round(self.options.minWidth)+"px;":"",maxWidth=self.options.maxWidth?"max-width:"+Math.round(self.options.maxWidth)+"px;":"",pointerEvents=self.options.interactive?"pointer-events: auto;":""
+self.$tooltip=$('<div class="tooltipster-base '+self.options.theme+'" style="'+minWidth+" "+maxWidth+" "+pointerEvents+" "+animationSpeed+'"><div class="tooltipster-content"></div></div>')
+supportsTransitions()&&self.$tooltip.addClass(animation)
+self._content_insert()
+self.$tooltip.appendTo("body")
+self.reposition()
+self.options.functionReady.call(self.$el,self.$el,self.$tooltip)
+if(supportsTransitions()){self.$tooltip.addClass(animation+"-show")
+0<self.options.speed&&self.$tooltip.delay(self.options.speed)
+self.$tooltip.queue(finish)}else self.$tooltip.css("display","none").fadeIn(self.options.speed,finish)
+self._interval_set()
+$(window).on("scroll."+self.namespace+" resize."+self.namespace,function(){self.reposition()})
+if(self.options.autoClose){$("body").off("."+self.namespace)
+if("hover"==self.options.trigger){deviceHasTouchCapability&&setTimeout(function(){$("body").on("touchstart."+self.namespace,function(){self.hide()})},0)
+if(self.options.interactive){deviceHasTouchCapability&&self.$tooltip.on("touchstart."+self.namespace,function(event){event.stopPropagation()})
+var tolerance=null
+self.$elProxy.add(self.$tooltip).on("mouseleave."+self.namespace+"-autoClose",function(){clearTimeout(tolerance)
+tolerance=setTimeout(function(){self.hide()},self.options.interactiveTolerance)}).on("mouseenter."+self.namespace+"-autoClose",function(){clearTimeout(tolerance)})}else self.$elProxy.on("mouseleave."+self.namespace+"-autoClose",function(){self.hide()})
+self.options.hideOnClick&&self.$elProxy.on("click."+self.namespace+"-autoClose",function(){self.hide()})}else if("click"==self.options.trigger){setTimeout(function(){$("body").on("click."+self.namespace+" touchstart."+self.namespace,function(){self.hide()})},0)
+self.options.interactive&&self.$tooltip.on("click."+self.namespace+" touchstart."+self.namespace,function(event){event.stopPropagation()})}}}0<self.options.timer&&(self.timerHide=setTimeout(function(){self.timerHide=null
+self.hide()},self.options.timer+extraTime))}})},_interval_set:function(){var self=this
+self.checkInterval=setInterval(function(){if(0===$("body").find(self.$el).length||0===$("body").find(self.$elProxy).length||"hidden"==self.Status||0===$("body").find(self.$tooltip).length){"shown"!=self.Status&&"appearing"!=self.Status||self.hide()
+self._interval_cancel()}else if(self.options.positionTracker){var p=self._repositionInfo(self.$elProxy),identical=!1
+areEqual(p.dimension,self.elProxyPosition.dimension)&&("fixed"===self.$elProxy.css("position")?areEqual(p.position,self.elProxyPosition.position)&&(identical=!0):areEqual(p.offset,self.elProxyPosition.offset)&&(identical=!0))
+if(!identical){self.reposition()
+self.options.positionTrackerCallback.call(self,self.$el)}}},200)},_interval_cancel:function(){clearInterval(this.checkInterval)
+this.checkInterval=null},_content_set:function(content){"object"==typeof content&&null!==content&&this.options.contentCloning&&(content=content.clone(!0))
+this.Content=content},_content_insert:function(){var $d=this.$tooltip.find(".tooltipster-content")
+"string"!=typeof this.Content||this.options.contentAsHTML?$d.empty().append(this.Content):$d.text(this.Content)},_update:function(content){var self=this
+self._content_set(content)
+if(null!==self.Content){if("hidden"!==self.Status){self._content_insert()
+self.reposition()
+if(self.options.updateAnimation)if(supportsTransitions()){self.$tooltip.css({width:"","-webkit-transition":"all "+self.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms","-moz-transition":"all "+self.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms","-o-transition":"all "+self.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms","-ms-transition":"all "+self.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms",transition:"all "+self.options.speed+"ms, width 0ms, height 0ms, left 0ms, top 0ms"}).addClass("tooltipster-content-changing")
+setTimeout(function(){if("hidden"!=self.Status){self.$tooltip.removeClass("tooltipster-content-changing")
+setTimeout(function(){"hidden"!==self.Status&&self.$tooltip.css({"-webkit-transition":self.options.speed+"ms","-moz-transition":self.options.speed+"ms","-o-transition":self.options.speed+"ms","-ms-transition":self.options.speed+"ms",transition:self.options.speed+"ms"})},self.options.speed)}},self.options.speed)}else self.$tooltip.fadeTo(self.options.speed,.5,function(){"hidden"!=self.Status&&self.$tooltip.fadeTo(self.options.speed,1)})}}else self.hide()},_repositionInfo:function($el){return{dimension:{height:$el.outerHeight(!1),width:$el.outerWidth(!1)},offset:$el.offset(),position:{left:parseInt($el.css("left")),top:parseInt($el.css("top"))}}},hide:function(callback){var self=this
+callback&&self.callbacks.hide.push(callback)
+self.callbacks.show=[]
+clearTimeout(self.timerShow)
+self.timerShow=null
+clearTimeout(self.timerHide)
+self.timerHide=null
+function finishCallbacks(){$.each(self.callbacks.hide,function(i,c){c.call(self.$el)})
+self.callbacks.hide=[]}if("shown"==self.Status||"appearing"==self.Status){self.Status="disappearing"
+function finish(){self.Status="hidden"
+"object"==typeof self.Content&&null!==self.Content&&self.Content.detach()
+self.$tooltip.remove()
+self.$tooltip=null
+$(window).off("."+self.namespace)
+$("body").off("."+self.namespace).css("overflow-x",self.bodyOverflowX)
+$("body").off("."+self.namespace)
+self.$elProxy.off("."+self.namespace+"-autoClose")
+self.options.functionAfter.call(self.$el,self.$el)
+finishCallbacks()}if(supportsTransitions()){self.$tooltip.clearQueue().removeClass("tooltipster-"+self.options.animation+"-show").addClass("tooltipster-dying")
+0<self.options.speed&&self.$tooltip.delay(self.options.speed)
+self.$tooltip.queue(finish)}else self.$tooltip.stop().fadeOut(self.options.speed,finish)}else"hidden"==self.Status&&finishCallbacks()
+return self},show:function(callback){this._showNow(callback)
+return this},update:function(c){return this.content(c)},content:function(c){if(void 0===c)return this.Content
+this._update(c)
+return this},reposition:function(){if(0!==$("body").find(this.$tooltip).length){this.$tooltip.css("width","")
+this.elProxyPosition=this._repositionInfo(this.$elProxy)
+var arrowReposition=null,windowWidth=$(window).width(),proxy=this.elProxyPosition,tooltipWidth=this.$tooltip.outerWidth(!1),tooltipHeight=(this.$tooltip.innerWidth(),this.$tooltip.outerHeight(!1))
+if(this.$elProxy.is("area")){var areaShape=this.$elProxy.attr("shape"),mapName=this.$elProxy.parent().attr("name"),map=$('img[usemap="#'+mapName+'"]'),mapOffsetLeft=map.offset().left,mapOffsetTop=map.offset().top,areaMeasurements=void 0!==this.$elProxy.attr("coords")?this.$elProxy.attr("coords").split(","):void 0
+if("circle"==areaShape){var areaLeft=parseInt(areaMeasurements[0]),areaTop=parseInt(areaMeasurements[1]),areaWidth=parseInt(areaMeasurements[2])
+proxy.dimension.height=2*areaWidth
+proxy.dimension.width=2*areaWidth
+proxy.offset.top=mapOffsetTop+areaTop-areaWidth
+proxy.offset.left=mapOffsetLeft+areaLeft-areaWidth}else if("rect"==areaShape){areaLeft=parseInt(areaMeasurements[0]),areaTop=parseInt(areaMeasurements[1])
+var areaRight=parseInt(areaMeasurements[2]),areaBottom=parseInt(areaMeasurements[3])
+proxy.dimension.height=areaBottom-areaTop
+proxy.dimension.width=areaRight-areaLeft
+proxy.offset.top=mapOffsetTop+areaTop
+proxy.offset.left=mapOffsetLeft+areaLeft}else if("poly"==areaShape){for(var areaSmallestX=0,areaSmallestY=0,areaGreatestX=0,areaGreatestY=0,arrayAlternate="even",i=0;i<areaMeasurements.length;i++){var areaNumber=parseInt(areaMeasurements[i])
+if("even"==arrayAlternate){if(areaGreatestX<areaNumber){areaGreatestX=areaNumber
+0===i&&(areaSmallestX=areaGreatestX)}areaNumber<areaSmallestX&&(areaSmallestX=areaNumber)
+arrayAlternate="odd"}else{if(areaGreatestY<areaNumber){areaGreatestY=areaNumber
+1==i&&(areaSmallestY=areaGreatestY)}areaNumber<areaSmallestY&&(areaSmallestY=areaNumber)
+arrayAlternate="even"}}proxy.dimension.height=areaGreatestY-areaSmallestY
+proxy.dimension.width=areaGreatestX-areaSmallestX
+proxy.offset.top=mapOffsetTop+areaSmallestY
+proxy.offset.left=mapOffsetLeft+areaSmallestX}else{proxy.dimension.height=map.outerHeight(!1)
+proxy.dimension.width=map.outerWidth(!1)
+proxy.offset.top=mapOffsetTop
+proxy.offset.left=mapOffsetLeft}}var myLeft=0,myLeftMirror=0,myTop=0,offsetY=parseInt(this.options.offsetY),offsetX=parseInt(this.options.offsetX),practicalPosition=this.options.position
+function dontGoOffScreenX(){var windowLeft=$(window).scrollLeft()
+if(myLeft-windowLeft<0){arrowReposition=myLeft-windowLeft
+myLeft=windowLeft}if(windowWidth<myLeft+tooltipWidth-windowLeft){arrowReposition=myLeft-(windowWidth+windowLeft-tooltipWidth)
+myLeft=windowWidth+windowLeft-tooltipWidth}}function dontGoOffScreenY(switchTo,switchFrom){proxy.offset.top-$(window).scrollTop()-tooltipHeight-offsetY-12<0&&-1<switchFrom.indexOf("top")&&(practicalPosition=switchTo)
+if(proxy.offset.top+proxy.dimension.height+tooltipHeight+12+offsetY>$(window).scrollTop()+$(window).height()&&-1<switchFrom.indexOf("bottom")){practicalPosition=switchTo
+myTop=proxy.offset.top-tooltipHeight-offsetY-12}}if("top"==practicalPosition){var leftDifference=proxy.offset.left+tooltipWidth-(proxy.offset.left+proxy.dimension.width)
+myLeft=proxy.offset.left+offsetX-leftDifference/2
+myTop=proxy.offset.top-tooltipHeight-offsetY-12
+dontGoOffScreenX()
+dontGoOffScreenY("bottom","top")}if("top-left"==practicalPosition){myLeft=proxy.offset.left+offsetX
+myTop=proxy.offset.top-tooltipHeight-offsetY-12
+dontGoOffScreenX()
+dontGoOffScreenY("bottom-left","top-left")}if("top-right"==practicalPosition){myLeft=proxy.offset.left+proxy.dimension.width+offsetX-tooltipWidth
+myTop=proxy.offset.top-tooltipHeight-offsetY-12
+dontGoOffScreenX()
+dontGoOffScreenY("bottom-right","top-right")}if("bottom"==practicalPosition){leftDifference=proxy.offset.left+tooltipWidth-(proxy.offset.left+proxy.dimension.width)
+myLeft=proxy.offset.left-leftDifference/2+offsetX
+myTop=proxy.offset.top+proxy.dimension.height+offsetY+12
+dontGoOffScreenX()
+dontGoOffScreenY("top","bottom")}if("bottom-left"==practicalPosition){myLeft=proxy.offset.left+offsetX
+myTop=proxy.offset.top+proxy.dimension.height+offsetY+12
+dontGoOffScreenX()
+dontGoOffScreenY("top-left","bottom-left")}if("bottom-right"==practicalPosition){myLeft=proxy.offset.left+proxy.dimension.width+offsetX-tooltipWidth
+myTop=proxy.offset.top+proxy.dimension.height+offsetY+12
+dontGoOffScreenX()
+dontGoOffScreenY("top-right","bottom-right")}if("left"==practicalPosition){myLeft=proxy.offset.left-offsetX-tooltipWidth-12
+myLeftMirror=proxy.offset.left+offsetX+proxy.dimension.width+12
+var topDifference=proxy.offset.top+tooltipHeight-(proxy.offset.top+proxy.dimension.height)
+myTop=proxy.offset.top-topDifference/2-offsetY
+if(myLeft<0&&windowWidth<myLeftMirror+tooltipWidth){var borderWidth=2*parseFloat(this.$tooltip.css("border-width")),newWidth=tooltipWidth+myLeft-borderWidth
+this.$tooltip.css("width",newWidth+"px")
+tooltipHeight=this.$tooltip.outerHeight(!1)
+myLeft=proxy.offset.left-offsetX-newWidth-12-borderWidth
+topDifference=proxy.offset.top+tooltipHeight-(proxy.offset.top+proxy.dimension.height)
+myTop=proxy.offset.top-topDifference/2-offsetY}else if(myLeft<0){myLeft=proxy.offset.left+offsetX+proxy.dimension.width+12
+arrowReposition="left"}}if("right"==practicalPosition){myLeft=proxy.offset.left+offsetX+proxy.dimension.width+12
+myLeftMirror=proxy.offset.left-offsetX-tooltipWidth-12
+topDifference=proxy.offset.top+tooltipHeight-(proxy.offset.top+proxy.dimension.height)
+myTop=proxy.offset.top-topDifference/2-offsetY
+if(windowWidth<myLeft+tooltipWidth&&myLeftMirror<0){borderWidth=2*parseFloat(this.$tooltip.css("border-width")),newWidth=windowWidth-myLeft-borderWidth
+this.$tooltip.css("width",newWidth+"px")
+tooltipHeight=this.$tooltip.outerHeight(!1)
+topDifference=proxy.offset.top+tooltipHeight-(proxy.offset.top+proxy.dimension.height)
+myTop=proxy.offset.top-topDifference/2-offsetY}else if(windowWidth<myLeft+tooltipWidth){myLeft=proxy.offset.left-offsetX-tooltipWidth-12
+arrowReposition="right"}}if(this.options.arrow){var arrowClass="tooltipster-arrow-"+practicalPosition
+if(this.options.arrowColor.length<1)var arrowColor=this.$tooltip.css("background-color")
+else arrowColor=this.options.arrowColor
+if(arrowReposition)if("left"==arrowReposition){arrowClass="tooltipster-arrow-right"
+arrowReposition=""}else if("right"==arrowReposition){arrowClass="tooltipster-arrow-left"
+arrowReposition=""}else arrowReposition="left:"+Math.round(arrowReposition)+"px;"
+else arrowReposition=""
+if("top"==practicalPosition||"top-left"==practicalPosition||"top-right"==practicalPosition)var tooltipBorderWidth=parseFloat(this.$tooltip.css("border-bottom-width")),tooltipBorderColor=this.$tooltip.css("border-bottom-color")
+else if("bottom"==practicalPosition||"bottom-left"==practicalPosition||"bottom-right"==practicalPosition)tooltipBorderWidth=parseFloat(this.$tooltip.css("border-top-width")),tooltipBorderColor=this.$tooltip.css("border-top-color")
+else if("left"==practicalPosition)tooltipBorderWidth=parseFloat(this.$tooltip.css("border-right-width")),tooltipBorderColor=this.$tooltip.css("border-right-color")
+else if("right"==practicalPosition)tooltipBorderWidth=parseFloat(this.$tooltip.css("border-left-width")),tooltipBorderColor=this.$tooltip.css("border-left-color")
+else tooltipBorderWidth=parseFloat(this.$tooltip.css("border-bottom-width")),tooltipBorderColor=this.$tooltip.css("border-bottom-color")
+1<tooltipBorderWidth&&tooltipBorderWidth++
+var arrowBorder=""
+if(0!==tooltipBorderWidth){var arrowBorderSize="",arrowBorderColor="border-color: "+tooltipBorderColor+";";-1!==arrowClass.indexOf("bottom")?arrowBorderSize="margin-top: -"+Math.round(tooltipBorderWidth)+"px;":-1!==arrowClass.indexOf("top")?arrowBorderSize="margin-bottom: -"+Math.round(tooltipBorderWidth)+"px;":-1!==arrowClass.indexOf("left")?arrowBorderSize="margin-right: -"+Math.round(tooltipBorderWidth)+"px;":-1!==arrowClass.indexOf("right")&&(arrowBorderSize="margin-left: -"+Math.round(tooltipBorderWidth)+"px;")
+arrowBorder='<span class="tooltipster-arrow-border" style="'+arrowBorderSize+" "+arrowBorderColor+';"></span>'}this.$tooltip.find(".tooltipster-arrow").remove()
+var arrowConstruct='<div class="'+arrowClass+' tooltipster-arrow" style="'+arrowReposition+'">'+arrowBorder+'<span style="border-color:'+arrowColor+';"></span></div>'
+this.$tooltip.append(arrowConstruct)}this.$tooltip.css({top:Math.round(myTop)+"px",left:Math.round(myLeft)+"px"})}return this},enable:function(){this.enabled=!0
+return this},disable:function(){this.hide()
+this.enabled=!1
+return this},destroy:function(){var self=this
+self.hide()
+self.$el[0]!==self.$elProxy[0]&&self.$elProxy.remove()
+self.$el.removeData(self.namespace).off("."+self.namespace)
+var ns=self.$el.data("tooltipster-ns")
+if(1===ns.length){var title=null
+"previous"===self.options.restoration?title=self.$el.data("tooltipster-initialTitle"):"current"===self.options.restoration&&(title="string"==typeof self.Content?self.Content:$("<div></div>").append(self.Content).html())
+title&&self.$el.attr("title",title)
+self.$el.removeClass("tooltipstered").removeData("tooltipster-ns").removeData("tooltipster-initialTitle")}else{ns=$.grep(ns,function(el,i){return el!==self.namespace})
+self.$el.data("tooltipster-ns",ns)}return self},elementIcon:function(){return this.$el[0]!==this.$elProxy[0]?this.$elProxy[0]:void 0},elementTooltip:function(){return this.$tooltip?this.$tooltip[0]:void 0},option:function(o,val){if(void 0===val)return this.options[o]
+this.options[o]=val
+return this},status:function(){return this.Status}}
+$.fn.tooltipster=function(){var args=arguments
+if(0===this.length){if("string"!=typeof args[0])return this
+var methodIsStatic=!0
+switch(args[0]){case"setDefaults":$.extend(defaults,args[1])
+break
+default:methodIsStatic=!1}return!!methodIsStatic||this}if("string"==typeof args[0]){var v="#*$~&"
+this.each(function(){var ns=$(this).data("tooltipster-ns"),self=ns?$(this).data(ns[0]):null
+if(!self)throw new Error("You called Tooltipster's \""+args[0]+'" method on an uninitialized element')
+if("function"!=typeof self[args[0]])throw new Error('Unknown method .tooltipster("'+args[0]+'")')
+var resp=self[args[0]](args[1],args[2])
+if(resp!==self){v=resp
+return!1}})
+return"#*$~&"!==v?v:this}var instances=[],multipleIsSet=args[0]&&void 0!==args[0].multiple,multiple=multipleIsSet&&args[0].multiple||!multipleIsSet&&defaults.multiple,debugIsSet=args[0]&&void 0!==args[0].debug,debug=debugIsSet&&args[0].debug||!debugIsSet&&defaults.debug
+this.each(function(){var go=!1,ns=$(this).data("tooltipster-ns"),instance=null
+!ns||multiple?go=!0:debug&&console.log('Tooltipster: one or more tooltips are already attached to this element: ignoring. Use the "multiple" option to attach more tooltips.')
+if(go){instance=new Plugin(this,args[0]);(ns=ns||[]).push(instance.namespace)
+$(this).data("tooltipster-ns",ns)
+$(this).data(instance.namespace,instance)}instances.push(instance)})
+return multiple?instances:this}
+function areEqual(a,b){var same=!0
+$.each(a,function(i,el){if(void 0===b[i]||a[i]!==b[i])return same=!1})
+return same}var deviceHasTouchCapability=!!("ontouchstart"in window),deviceHasMouse=!1
+$("body").one("mousemove",function(){deviceHasMouse=!0})
+function deviceIsPureTouch(){return!deviceHasMouse&&deviceHasTouchCapability}function supportsTransitions(){var s=(document.body||document.documentElement).style,p="transition"
+if("string"==typeof s[p])return 1
+v=["Moz","Webkit","Khtml","O","ms"],p=p.charAt(0).toUpperCase()+p.substr(1)
+for(var i=0;i<v.length;i++)if("string"==typeof s[v[i]+p])return 1}}(jQuery,window,document)
