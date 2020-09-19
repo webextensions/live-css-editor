@@ -316,8 +316,7 @@
             },
             "to": {
                 "default": {
-                    "dest": "extension/scripts/3rdparty/sass/sass.sync.min.js",
-                    "uglifyJs": true
+                    "dest": "extension/scripts/3rdparty/sass/sass.sync.min.js"
                 }
             }
         },

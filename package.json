@@ -13,22 +13,23 @@
     "zip-firefox-extension": "node ./zip-extension.js firefox",
     "zip-opera-extension": "node ./zip-extension.js opera",
     "zip-extension": "npm run zip-chrome-extension && npm run zip-edge-extension && npm run zip-firefox-extension && npm run zip-opera-extension",
-    "all-is-well": "./scripts/all-is-well.sh"
+    "all-is-well": "./scripts/all-is-well.sh",
+    "test": "npm run all-is-well"
   },
   "dependencies": {
     "codemirror": "=5.34.0",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.1",
     "socket.io": "^2.3.0",
     "toastr": "^2.1.4"
   },
   "devDependencies": {
-    "archiver": "^3.1.1",
-    "chalk": "^3.0.0",
-    "copy-files-from-to": "^2.3.0",
+    "archiver": "^5.0.2",
+    "chalk": "^4.1.0",
+    "copy-files-from-to": "^3.2.0",
     "cp-file": "^9.0.0",
     "del": "^5.1.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.9.0",
     "git-hooks": "^1.1.10",
     "jsonfile": "^6.0.1",
     "note-down": "^0.2.3"
