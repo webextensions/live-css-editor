@@ -1336,6 +1336,17 @@ html .magicss-mouse-over-dom-element {
     box-shadow: none;
 }
 
+/* https://assets.ctl.io/chi/3.0.0/getting-started/ - Fix for too much whitespace */
+#MagiCSS-bookmarklet .CodeMirror pre {
+    padding: 0 4px;
+    margin: 0;
+}
+
+/* https://assets.ctl.io/chi/3.0.0/getting-started/ - Fix for selection background not showing up */
+#MagiCSS-bookmarklet .CodeMirror pre {
+    background-color: transparent;
+}
+
 /* http://www.phpied.com/cssmin-js/ */
 #MagiCSS-bookmarklet .more-icons {
     background-repeat: no-repeat !important;
