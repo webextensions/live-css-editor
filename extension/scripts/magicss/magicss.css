@@ -1436,6 +1436,12 @@ html .magicss-mouse-over-dom-element {
     margin: 0;
 }
 
+/* http://smietnik.w3wg.com/ (See: https://github.com/webextensions/live-css-editor/issues/58) */
+#MagiCSS-bookmarklet,
+#MagiCSS-bookmarklet * {
+    scroll-behavior: auto !important;
+}
+
 /* Some other sites */
 .magic-css-back-end-connectivity-options {
     color: #000;
