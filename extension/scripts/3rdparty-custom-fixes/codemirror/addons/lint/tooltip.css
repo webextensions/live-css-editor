@@ -1,3 +1,4 @@
-.CodeMirror-lint-tooltip {
+/* Increased CSS specificity by including "html" in the CSS selector to override site-specific CSS for https://github.com/webextensions/live-css-editor */
+html .CodeMirror-lint-tooltip {
     z-index: 2147483600;
 }

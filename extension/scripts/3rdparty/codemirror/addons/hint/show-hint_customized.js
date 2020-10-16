@@ -206,7 +206,8 @@
     var widget = this, cm = completion.cm;
 
     var hints = this.hints = document.createElement("ul");
-    hints.className = "CodeMirror-hints";
+    // hints.className = "CodeMirror-hints";
+    hints.className = "CodeMirror-hints " + (completion.options.className || '');
     this.selectedHint = data.selectedHint || 0;
 
     var completions = data.list;

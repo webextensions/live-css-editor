@@ -2601,6 +2601,7 @@ var const_rateUsUsageCounterFrom = 20,
                             ('Write CSS/Less/Sass code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}' + '\n\nShortcut: Alt + Shift + C')
                     ),
                     codemirrorOptions: {
+                        // theme: 'ambiance',
                         colorpicker: {
                             mode: 'edit'
                         },
@@ -2665,8 +2666,8 @@ var const_rateUsUsageCounterFrom = 20,
                                 options.mode = 'text/css';
                             }
 
-
                             options.hintOptions = {
+                                // className: 'cm-s-ambiance',
                                 completeSingle: false,
                                 // closeCharacters: /[\s()\[\]{};:>,]/,     // This is the default value defined in show-hint.js
                                 closeCharacters: /[(){};:,]/,               // Custom override

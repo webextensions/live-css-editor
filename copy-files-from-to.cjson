@@ -186,6 +186,15 @@
         {
             "from": {
                 "default": {
+                    "src": "node_modules/codemirror/theme/ambiance.css",
+                    "latest": "https://unpkg.com/codemirror/theme/ambiance.css"
+                }
+            },
+            "to": "extension/scripts/3rdparty/codemirror/theme/ambiance.css"
+        },
+        {
+            "from": {
+                "default": {
                     "src": "node_modules/codemirror/lib/codemirror.js",
                     "latest": "https://unpkg.com/codemirror/lib/codemirror.js"
                 }

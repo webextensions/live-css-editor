@@ -276,6 +276,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             path3rdparty + 'css.escape.js',
 
             pathCodeMirror + 'codemirror.css',
+            pathCodeMirror + 'theme/ambiance.css',
             path3rdpartyCustomFixes + 'codemirror/magicss-codemirror.css',
             pathCodeMirror + 'codemirror.js',
             pathCodeMirror + 'mode/css.js',

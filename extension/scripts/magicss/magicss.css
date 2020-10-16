@@ -659,8 +659,9 @@
 #MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se {
     width: 15px !important;     /* !important is useful to avoid FOUC kind of effect when re-initializing Magic CSS */
     height: 15px !important;    /* !important is useful to avoid FOUC kind of effect when re-initializing Magic CSS */
-    background-color: #fff;
+    background-color: transparent;
 }
+
 .indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .CodeMirror,
 .indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .CodeMirror,
 .indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .CodeMirror,
@@ -670,6 +671,16 @@
 .indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se,
 .magic-css-live-css-server-is-not-connected.magicss-selected-mode-file#MagiCSS-bookmarklet .ui-icon-gripsmall-diagonal-se {
     background-color: #bbb;
+}
+.indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance,
+.indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance,
+.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance,
+.magic-css-live-css-server-is-not-connected.magicss-selected-mode-file#MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance,
+.indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .cm-s-ambiance .ui-icon-gripsmall-diagonal-se,
+.indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .cm-s-ambiance .ui-icon-gripsmall-diagonal-se,
+.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .cm-s-ambiance .ui-icon-gripsmall-diagonal-se,
+.magic-css-live-css-server-is-not-connected.magicss-selected-mode-file#MagiCSS-bookmarklet .cm-s-ambiance .ui-icon-gripsmall-diagonal-se {
+    background-color: #333;
 }
 
 .indicate-disabled#MagiCSS-bookmarklet .magicss-mode-css,
@@ -1261,6 +1272,36 @@ html .magicss-mouse-over-dom-element {
     line-height: 22px;
 }
 
+/* Begin: Dark theme support */
+#MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance {
+    background-color: #202020;
+}
+
+#MagiCSS-bookmarklet .cm-s-ambiance ::-webkit-scrollbar {
+    background: rgba(0, 0, 0, 0.9);
+}
+#MagiCSS-bookmarklet .cm-s-ambiance ::-webkit-scrollbar-thumb {
+    background: rgba(51, 51, 51, 0.5);
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.9);
+}
+
+#MagiCSS-bookmarklet .cm-s-ambiance .ui-icon {
+    background-color: transparent;
+}
+
+#MagiCSS-bookmarklet .cm-s-ambiance .CodeMirror-scrollbar-filler {
+    background-color: #202020;
+}
+html .cm-s-ambiance.CodeMirror-hints {
+    background-color: #222;
+}
+html .cm-s-ambiance .CodeMirror-hint {
+    color: #fff;
+}
+html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
+    background-color: #444;
+}
+/* End: Dark theme support */
 
 /*
     Begin: Site-specific / CSS-style-specific fixes
@@ -1366,7 +1407,7 @@ html .magicss-mouse-over-dom-element {
     background-color: #fff;
 }
 #MagiCSS-bookmarklet .CodeMirror-selected {
-    background-color: #d9d9d9;
+    background-color: rgba(128, 128, 128, 0.25);
 }
 .indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .CodeMirror-selected,
 .indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .CodeMirror-selected,
@@ -1374,8 +1415,17 @@ html .magicss-mouse-over-dom-element {
 .magic-css-live-css-server-is-not-connected.magicss-selected-mode-file#MagiCSS-bookmarklet .CodeMirror-selected {
     background-color: #eee;
 }
+.indicate-disabled.magicss-selected-mode-css#MagiCSS-bookmarklet .cm-s-ambiance .CodeMirror-selected,
+.indicate-disabled.magicss-selected-mode-less#MagiCSS-bookmarklet .cm-s-ambiance .CodeMirror-selected,
+.indicate-disabled.magicss-selected-mode-sass#MagiCSS-bookmarklet .cm-s-ambiance .CodeMirror-selected,
+.magic-css-live-css-server-is-not-connected.magicss-selected-mode-file#MagiCSS-bookmarklet .cm-s-ambiance .CodeMirror-selected {
+    background-color: #000;
+}
 #MagiCSS-bookmarklet .CodeMirror-cursor {
     border-left-color: #000;
+}
+#MagiCSS-bookmarklet .cm-s-ambiance .CodeMirror-cursor {
+    border-left-color: #fff;
 }
 
 /* http://stackoverflow.com/ */

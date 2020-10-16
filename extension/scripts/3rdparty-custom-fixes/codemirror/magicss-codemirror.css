@@ -19,7 +19,7 @@
 }
 
 #MagiCSS-bookmarklet .CodeMirror-activeline-background {
-    background: rgba(232, 242, 255, 0.5);
+    background: rgba(128, 128, 128, 0.15);
 }
 
 html .CodeMirror-hints {
