@@ -10,6 +10,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
     // USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
+    USER_PREFERENCE_THEME = 'theme',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 var const_rateUsUsageCounterFrom = 20,
@@ -2601,7 +2602,6 @@ var const_rateUsUsageCounterFrom = 20,
                             ('Write CSS/Less/Sass code here.\nThe code gets applied immediately.\n\nExample:' + '\nimg {\n    opacity: 0.5;\n}' + '\n\nShortcut: Alt + Shift + C')
                     ),
                     codemirrorOptions: {
-                        // theme: 'ambiance',
                         colorpicker: {
                             mode: 'edit'
                         },
@@ -2666,8 +2666,31 @@ var const_rateUsUsageCounterFrom = 20,
                                 options.mode = 'text/css';
                             }
 
+                            const getExtensionDataAsync = function (property) {
+                                return new Promise(function (resolve) {
+                                    chromeStorageForExtensionData.get(property, function (values) {
+                                        resolve(values[property]);
+                                    });
+                                });
+                            };
+
+                            var theme = await getExtensionDataAsync(USER_PREFERENCE_THEME);
+                            options.theme = (function () {
+                                if (theme === 'dark') {
+                                    return 'ambiance';
+                                } else {
+                                    return undefined;
+                                }
+                            }());
+
                             options.hintOptions = {
-                                // className: 'cm-s-ambiance',
+                                className: (function () {
+                                    if (theme === 'dark') {
+                                        return 'cm-s-ambiance';
+                                    } else {
+                                        return undefined;
+                                    }
+                                }()),
                                 completeSingle: false,
                                 // closeCharacters: /[\s()\[\]{};:>,]/,     // This is the default value defined in show-hint.js
                                 closeCharacters: /[(){};:,]/,               // Custom override

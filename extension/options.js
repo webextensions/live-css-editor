@@ -9,6 +9,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_STORAGE_MODE = 'storage-mode',
+    USER_PREFERENCE_THEME = 'theme',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 jQuery(function ($) {
@@ -153,7 +154,6 @@ jQuery(function ($) {
         notifyUser();
     });
 
-
     chromeStorageForExtensionData.get('default-language-mode', function (values) {
         if (values && values['default-language-mode'] === 'less') {
             RadionButtonSelectedValueSet('default-language-mode', 'less');
@@ -174,6 +174,25 @@ jQuery(function ($) {
             valueToSet = 'css';
         }
         chromeStorageForExtensionData.set({'default-language-mode': valueToSet});
+        notifyUser();
+    });
+
+    chromeStorageForExtensionData.get(USER_PREFERENCE_THEME, function (values) {
+        if (values && values[USER_PREFERENCE_THEME] === 'dark') {
+            RadionButtonSelectedValueSet(USER_PREFERENCE_THEME, 'dark');
+        } else {
+            RadionButtonSelectedValueSet(USER_PREFERENCE_THEME, 'light');
+        }
+    });
+    $('input[name=theme]').change(function () {
+        var value = $(this).val(),
+            valueToSet;
+        if (value === 'dark') {
+            valueToSet = 'dark';
+        } else {
+            valueToSet = 'light';
+        }
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_THEME]: valueToSet});
         notifyUser();
     });
 
