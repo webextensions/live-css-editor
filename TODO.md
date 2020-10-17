@@ -9,6 +9,7 @@
 * Allow moving editor to external window and/or in a separate panel along with the extension icon.
 
 #### Improvements
+* Support for a different extension icon color for use with dark web browser themes (black icon is almost invisible when using a dark browser theme). (Reported in https://github.com/webextensions/live-css-editor/issues/45)
 * Change the background color to neutral dark-gray with appropriate shadow
 * Use black-and-white/grayscale + transparent/translucent for all icons under "+"
 * "Reload CSS resources" feature should try to detect and reload `@import` instructions through `<style>` and `<link>` tags
