@@ -585,20 +585,6 @@ var const_rateUsUsageCounterFrom = 20,
         });
     };
 
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttributeNames
-    // Polyfill required for Microsoft Edge (eg: Microsoft Edge version 38.14393.0.0 needs the polyfill)
-    if (Element.prototype.getAttributeNames == undefined) {
-        Element.prototype.getAttributeNames = function () {
-            var attributes = this.attributes;
-            var length = attributes.length;
-            var result = new Array(length);
-            for (var i = 0; i < length; i++) {
-                result[i] = attributes[i].name;
-            }
-            return result;
-        };
-    }
-
     var recreateNodeCustomized = function (node, options) {
         options = options || {};
         var skipAttributes = options.skipAttributes || [];
@@ -686,60 +672,18 @@ var const_rateUsUsageCounterFrom = 20,
 
                 $link.after($newLink);
 
-                // Note:
-                //     Apparently, in Microsoft Edge, onload gets fired even if the CSS resource end with a 404 page.
-                //     The failure seems to be undetectable.
-                //     A workaround can be attempted (reference: https://stackoverflow.com/questions/30171270/link-onerror-do-not-work-in-ie/43357862#43357862).
-                //     Note that this workaround would not work perfectly for all possible scenarios (for example if the stylesheet contains no CSS styles).
-                var didLinkTagLoadSuccessfully = function (linkTag) {
-                    var cssRules;
-                    try {
-                        cssRules = linkTag.sheet && linkTag.sheet.cssRules;
-                    } catch (e) {
-                        cssRules = { length: 0 };
-                    }
-
-                    if (cssRules && cssRules.length) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                };
-
                 newLink.onload = function (evt) {   // eslint-disable-line no-unused-vars
-                    // There seems to be a bug in Microsoft Edge which makes a CSS file load twice in some scenarios.
-                    // Considering that it would be safe to assume that if the first load worked fine,
-                    // the second load would also go on to be fine (similarly, if the first load failed, the second one too would fail).
-                    // See: https://github.com/filamentgroup/loadCSS/issues/222#issuecomment-306622674
-                    if (newLink.onloadAlreadyCalled) {
-                        return;
-                    } else {
-                        newLink.onloadAlreadyCalled = true;
-
-                        delete newLink.reloadingActiveWithMagicCSS;
-                        delete link.reloadingActiveWithMagicCSS;
-
-                        var wasSuccessful = true;
-                        if (isEdge && !didLinkTagLoadSuccessfully(newLink)) {
-                            wasSuccessful = false;
-                            console.log(newHref);
-                        }
-
-                        if (wasSuccessful) {
-                            successCount++;
-                            $link.remove();
-                        } else {
-                            errorCount++;
-                            $newLink.remove();
-                        }
-                        checkCompletion();
-                    }
+                    delete newLink.reloadingActiveWithMagicCSS;
+                    delete link.reloadingActiveWithMagicCSS;
+                    successCount++;
+                    $link.remove();
+                    checkCompletion();
                 };
                 newLink.onerror = function (evt) {  // eslint-disable-line no-unused-vars
                     delete newLink.reloadingActiveWithMagicCSS;
                     delete link.reloadingActiveWithMagicCSS;
-                    $newLink.remove();
                     errorCount++;
+                    $newLink.remove();
                     checkCompletion();
                 };
 
@@ -894,7 +838,9 @@ var const_rateUsUsageCounterFrom = 20,
         isEdge = false,
         isFirefox = false,
         isOpera = false;
-    if (/Edge/.test(navigator.appVersion)) {            // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
+
+    // Note that we are checking for "Edg/" which is the test required for identifying Chromium based Edge browser
+    if (/Edg\//.test(navigator.appVersion)) {           // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
         isEdge = true;
     } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
         isOpera = true;
@@ -1516,6 +1462,7 @@ var const_rateUsUsageCounterFrom = 20,
 
     var noteForUndo = '<br />Note: You may press ' + (isMac ? 'Cmd' : 'Ctrl') + ' + Z to undo the change';
 
+    // TODO: CLEANUP: This might not be required with Chromium based Edge
     // Seems to be required to unblock Ctrl-T in Microsoft Edge
     delete CodeMirror.keyMap.emacsy['Ctrl-T'];
     delete CodeMirror.keyMap.sublime['Ctrl-T'];
