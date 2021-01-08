@@ -4,8 +4,6 @@
 **/node_modules
 
 extension/scripts/3rdparty/
-extension/backgroundScriptsAPIBridge.js
-extension/contentScriptsAPIBridge.js
 
 extension-chrome/
 extension-edge/

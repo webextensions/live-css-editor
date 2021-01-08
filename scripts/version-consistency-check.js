@@ -39,18 +39,12 @@ var mismatchFound = matchVersions(
         '../live-css/package-lock.json',
         '../extension/manifest.json',
         '../extension/manifest-chrome.json',
+        '../extension/manifest-edge.json',
         '../extension/manifest-firefox.json',
         '../extension/manifest-opera.json',
         '../live-css/default.live-css.config.js'
     ]
 );
-
-mismatchFound = matchVersions(
-    extensionPackageJson.version + '.0',
-    [
-        '../extension/manifest-edge.json'
-    ]
-) || mismatchFound;
 
 if (mismatchFound) {
     logger.warn('\n ✗ Version numbers in some of the files do not match');

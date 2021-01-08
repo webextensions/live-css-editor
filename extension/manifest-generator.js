@@ -9,7 +9,7 @@ var chalk = require("chalk"),
 var generateManifest = function (whichBrowser) {
     var version = require("../package.json").version;
     var manifest = {
-        "version": whichBrowser === "edge" ? version + ".0" : version,
+        "version": version,
         "manifest_version": 2,
         "author": "Priyank Parashar",
         "default_locale": "en",
@@ -32,7 +32,7 @@ var generateManifest = function (whichBrowser) {
                 "storage",
                 "unlimitedStorage"
             ];
-            if (whichBrowser === "edge" || whichBrowser === "firefox") {
+            if (whichBrowser === "firefox") {
                 permissions.push("webNavigation");
                 permissions.push("<all_urls>");
             }
@@ -40,7 +40,7 @@ var generateManifest = function (whichBrowser) {
         }()),
         "optional_permissions": (function () {
             var optional_permissions = [];
-            if (whichBrowser !== "edge" && whichBrowser !== "firefox") {
+            if (whichBrowser !== "firefox") {
                 optional_permissions.push("webNavigation");
                 optional_permissions.push("<all_urls>");
             }
@@ -67,6 +67,10 @@ var generateManifest = function (whichBrowser) {
                     "default": "Alt+Shift+C"
                 }
             }
+        },
+        "options_ui": {
+            "page": "options.html",
+            "chrome_style": true
         }
         /*
         // "web_accessible_resources" might be required on some platforms (but currently we are using data-uri for images, so no need yet)
@@ -76,15 +80,6 @@ var generateManifest = function (whichBrowser) {
         ]
         /* */
     };
-
-    if (whichBrowser === "edge") {
-        manifest["options_page"] = "options.html";
-    } else {
-        manifest["options_ui"] = {
-            "page": "options.html",
-            "chrome_style": true
-        };
-    }
 
     if (whichBrowser !== "firefox") {
         manifest["offline_enabled"] = true;
@@ -96,13 +91,6 @@ var generateManifest = function (whichBrowser) {
                 "id": "{a42eb16c-2fab-4c06-b1f3-5f15adebb0e3}",
                 "strict_min_version": "48.0"
             }
-        };
-    }
-
-    if (whichBrowser === "edge") {
-        manifest["-ms-preload"] = {
-            "backgroundScript": "backgroundScriptsAPIBridge.js",
-            "contentScript": "contentScriptsAPIBridge.js"
         };
     }
 

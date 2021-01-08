@@ -96,10 +96,6 @@ try {
                 'ui-images/**/*.*',     // Exclude files in "ui-images" folder
                 'ui-images'             // Avoid "ui-images" folder from getting created
             ];
-            if (whichBrowser !== 'edge') {
-                pathsToIgnore.push('backgroundScriptsAPIBridge.js');
-                pathsToIgnore.push('contentScriptsAPIBridge.js');
-            }
             if (whichBrowser !== 'opera' && whichBrowser !== 'firefox') {
                 pathsToIgnore.push('scripts/3rdparty/sass/**');
             }

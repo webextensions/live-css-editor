@@ -7,8 +7,7 @@ var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
 var TR = extLib.TR;
 
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
-
-var runningInChromeLikeEnvironment = function () {
+var runningInChromiumLikeEnvironment = function () {
     if (window.location.href.indexOf('chrome-extension://') === 0) {
         return true;
     } else {
@@ -24,7 +23,7 @@ var runningInFirefoxLikeEnvironment = function () {
     }
 };
 
-var runningInEdgeLikeEnvironment = function () {
+var runningInOldEdgeLikeEnvironment = function () {
     if (window.location.href.indexOf('ms-browser-extension://') === 0) {
         return true;
     } else {
@@ -54,7 +53,7 @@ var informUser = function (config) {
     // Note:
     //     alert() does not work on Firefox
     //     https://bugzilla.mozilla.org/show_bug.cgi?id=1203394
-    if (runningInChromeLikeEnvironment()) {
+    if (runningInChromiumLikeEnvironment()) {
         alert(message);
     }
 };
@@ -116,8 +115,8 @@ if (!window.loadRemoteJsListenerAdded) {
                     // Need to return true from the event listener to indicate that we wish to send a response asynchronously
                     return true;
                 } else if (request.requestPermissions) {
-                    if (runningInEdgeLikeEnvironment()) {
-                        // We are using full permissions on Microsoft Edge
+                    if (runningInOldEdgeLikeEnvironment()) {
+                        // We use full permissions on old Microsoft Edge
                         sendResponse('request-granted');
                         onDOMContentLoadedHandler();
                     } else {
@@ -479,7 +478,7 @@ var prerequisitesReady = function (main) {
             if (url.indexOf('file:///') === 0) {
                 if (runningInFirefoxLikeEnvironment()) {
                     goAhead();
-                } else if (runningInChromeLikeEnvironment()) {
+                } else if (runningInChromiumLikeEnvironment()) {
                     chrome.extension.isAllowedFileSchemeAccess(function (isAllowedAccess) {
                         if (isAllowedAccess) {
                             goAhead();
@@ -552,9 +551,9 @@ var onDOMContentLoadedHandler = function () {
     if (!window.onDOMContentLoadedListenerAdded) {
         if (chrome.webNavigation) {
             (function () {
-                if (runningInEdgeLikeEnvironment()) {
-                    // .onDOMContentLoaded() appears to work better for Microsoft Edge
-                    // .onCommitted() on Microsoft Edge seems to be not loading the styles under some situations
+                if (runningInOldEdgeLikeEnvironment()) {
+                    // .onDOMContentLoaded() appears to work better for old Microsoft Edge
+                    // .onCommitted() on old Microsoft Edge seems to be not loading the styles under some situations
                     return chrome.webNavigation.onDOMContentLoaded;
                 } else {
                     return chrome.webNavigation.onCommitted;
@@ -571,7 +570,7 @@ var onDOMContentLoadedHandler = function () {
                         // do nothing
                     } else {
                         // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
-                        if (runningInEdgeLikeEnvironment()) {
+                        if (runningInOldEdgeLikeEnvironment()) {
                             reapplyCss(tabId);
                         } else if (runningInFirefoxLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
                             reapplyCss(tabId);
