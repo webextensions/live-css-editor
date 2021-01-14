@@ -47,6 +47,12 @@ logo-microsoft-edge.svg
 logo-microsoft-edge_edited.svg
     Slightly edited version of "logo-microsoft-edge.svg"
 
+logo-microsoft-edge-chromium.svg
+    https://en.wikipedia.org/wiki/File:Microsoft_Edge_logo_(2019).svg
+
+logo-microsoft-edge-chromium_edited.svg
+    Slightly edited version of "logo-microsoft-edge-chromium.svg"
+
 logo-mozilla-add-ons.svg
     chrome://mozapps/skin/extensions/category-extensions.svg (in Mozilla Firefox browser)
 

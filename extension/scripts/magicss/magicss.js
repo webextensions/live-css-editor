@@ -852,7 +852,7 @@ var const_rateUsUsageCounterFrom = 20,
 
     var extensionUrl = {
         chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
-        edge: 'https://www.microsoft.com/store/p/live-editor-for-css-and-less-magic-css/9nzmvhmw5md1',
+        edge: 'https://microsoftedge.microsoft.com/addons/detail/live-editor-for-css-less/ahibbdhoijcafelmfepfpcmmdifchpdg',
         firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/',
         opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
     };
@@ -2317,7 +2317,7 @@ var const_rateUsUsageCounterFrom = 20,
                 };
 
                 var getMagicCSSForChrome = null,
-                    // getMagicCSSForEdge = null,
+                    getMagicCSSForEdge = null,
                     getMagicCSSForFirefox = null;
 
                 if (!isChrome) {
@@ -2329,14 +2329,14 @@ var const_rateUsUsageCounterFrom = 20,
                     };
                 }
 
-                // if (!isEdge) {
-                //     getMagicCSSForEdge = {
-                //         name: 'get-magic-css-for-edge',
-                //         title: 'Magic CSS for Edge',
-                //         uniqCls: 'get-magic-css-for-edge',
-                //         href: extensionUrl.edge
-                //     };
-                // }
+                if (!isEdge) {
+                    getMagicCSSForEdge = {
+                        name: 'get-magic-css-for-edge',
+                        title: 'Magic CSS for Edge',
+                        uniqCls: 'get-magic-css-for-edge',
+                        href: extensionUrl.edge
+                    };
+                }
 
                 // if (!isFirefox) {
                 getMagicCSSForFirefox = {
@@ -2366,7 +2366,7 @@ var const_rateUsUsageCounterFrom = 20,
                                 title: 'Rate us on Microsoft Store',
                                 cls: 'magicss-rate-on-webstore',
                                 uniqCls: 'icon-microsoft-store',
-                                href: extensionUrl.edge + '#ratings-reviews'
+                                href: extensionUrl.edge
                             };
                         } else if (isFirefox) {
                             icon = {
@@ -2881,7 +2881,7 @@ var const_rateUsUsageCounterFrom = 20,
                             }
                         }()),
                         getMagicCSSForChrome,
-                        // getMagicCSSForEdge,
+                        getMagicCSSForEdge,
                         getMagicCSSForFirefox,
                         {
                             name: 'less-or-sass-to-css',
