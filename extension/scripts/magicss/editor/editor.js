@@ -422,7 +422,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                         '',
                                         'Error message: ' + (lastError && lastError.message),
                                         '',
-                                        'If you are using chrome.storage.sync mode, kindly refer to https://developer.chrome.com/apps/storage#property-sync',
+                                        'If you are using browser.storage.sync mode, kindly refer to https://developer.chrome.com/docs/extensions/reference/storage/#property-sync',
                                         '',
                                         'Most likely, it is not a bug in the extension.',
                                         'If you think it is a bug in the extension, kindly report this issue at https://github.com/webextensions/live-css-editor/issues'
