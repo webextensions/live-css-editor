@@ -13,6 +13,29 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 jQuery(function ($) {
+    // TODO: DUPLICATE: Code duplication for browser detection in magicss.js and options.js
+    var isChrome = false,
+        isEdge = false,
+        isFirefox = false,
+        isOpera = false;
+
+    // Note that we are checking for "Edg/" which is the test required for identifying Chromium based Edge browser
+    if (/Edg\//.test(navigator.appVersion)) {           // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
+        isEdge = true; // eslint-disable-line no-unused-vars
+    } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
+        isOpera = true; // eslint-disable-line no-unused-vars
+    } else if (/Chrome/.test(navigator.appVersion)) {
+        isChrome = true; // eslint-disable-line no-unused-vars
+    } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
+        isFirefox = true;
+    }
+
+    const flagAllowSassUi = isFirefox ? false : true;
+
+    if (!flagAllowSassUi) {
+        $('body').addClass('do-not-allow-sass-ui');
+    }
+
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
     var RadionButtonSelectedValueSet = function (name, SelectedValue) {

@@ -57,10 +57,15 @@ var generateManifest = function (whichBrowser) {
                 "256": "icons/icon-256.png"
             }
         },
-        "background": {
-            "persistent": false,
-            "page": "background-magicss.html"
-        },
+        "background": (function () {
+            const background = {
+                "page": "background-magicss.html"
+            };
+            if (whichBrowser !== "firefox") {
+                background.persistent = false;
+            }
+            return background;
+        }()),
         "commands": {
             "_execute_browser_action": {
                 "suggested_key": {

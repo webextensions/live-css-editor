@@ -43,6 +43,10 @@
         .option-value {
             padding-bottom: 3px;
         }
+
+        body.do-not-allow-sass-ui .sass-ui {
+            display: none;
+        }
     </style>
 </head>
 
@@ -57,7 +61,7 @@
                 <div class="option-value">
                     <label><input type="radio" name="default-language-mode" value="less" /> Less</label>
                 </div>
-                <div class="option-value">
+                <div class="option-value sass-ui">
                     <label><input type="radio" name="default-language-mode" value="sass" /> Sass</label>
                 </div>
             </div>

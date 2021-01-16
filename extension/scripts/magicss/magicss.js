@@ -850,6 +850,8 @@ var const_rateUsUsageCounterFrom = 20,
         isFirefox = true;
     }
 
+    const flagAllowSassUi = isFirefox ? false : true;
+
     var extensionUrl = {
         chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
         edge: 'https://microsoftedge.microsoft.com/addons/detail/live-editor-for-css-less/ahibbdhoijcafelmfepfpcmmdifchpdg',
@@ -2521,7 +2523,7 @@ var const_rateUsUsageCounterFrom = 20,
                             '</div>' +
                             '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>' +
                             '<div class="magicss-mode-button magicss-mode-less" title="Less mode">less</div>' +
-                            '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>'
+                            (flagAllowSassUi ? '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>' : '')
                         );
 
                         $(document).on('click', '.magicss-mode-css', async function () {
@@ -2885,7 +2887,7 @@ var const_rateUsUsageCounterFrom = 20,
                         getMagicCSSForFirefox,
                         {
                             name: 'less-or-sass-to-css',
-                            title: 'Convert this code from Less/Sass to CSS',
+                            title: flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
                             uniqCls: 'magicss-less-or-sass-to-css',
                             onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'less') {

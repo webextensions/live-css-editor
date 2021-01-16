@@ -36,8 +36,8 @@
         }
     },
     "background": {
-        "persistent": false,
-        "page": "background-magicss.html"
+        "page": "background-magicss.html",
+        "persistent": false
     },
     "commands": {
         "_execute_browser_action": {
