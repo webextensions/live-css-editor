@@ -79,8 +79,8 @@
             "to": {
                 "default": {
                     "dest": "extension/scripts/3rdparty/codemirror/addons/emmet/emmet-codemirror-plugin.js",
-                    "removeSourceMappingURL": true,
-                    "uglifyJs": true
+                    "removeSourceMappingURL": true
+                    // "uglifyJs": true
                 }
             }
         },
@@ -243,8 +243,8 @@
             },
             "to": {
                 "default": {
-                    "dest": "extension/scripts/3rdparty/tooltipster/jquery.tooltipster.js",
-                    "uglifyJs": true
+                    "dest": "extension/scripts/3rdparty/tooltipster/jquery.tooltipster.js"
+                    // "uglifyJs": true
                 }
             }
         },
@@ -275,8 +275,8 @@
             },
             "to": {
                 "default": {
-                    "dest": "extension/scripts/3rdparty/magicsuggest/magicsuggest.js",
-                    "uglifyJs": true
+                    "dest": "extension/scripts/3rdparty/magicsuggest/magicsuggest.js"
+                    // "uglifyJs": true
                 }
             }
         },
@@ -383,7 +383,7 @@
             "to": {
                 "default": {
                     "dest": "extension/scripts/3rdparty/source-map.js",
-                    "uglifyJs": true,
+                    // "uglifyJs": true
                     "removeSourceMappingURL": true
                 }
             }

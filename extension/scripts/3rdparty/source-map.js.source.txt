@@ -1,10 +1,3 @@
 https://raw.githubusercontent.com/mozilla/source-map/0.6.1/dist/source-map.debug.js
 
 Note: Removed "sourceMappingURL"
-
-$ uglifyjs <source> --compress sequences=false --beautify beautify=false,semicolons=false,comments=some --output <destination>
-
-Where:
-    uglifyjs = npm install -g uglify-js@^3.10.4
-    <source> = File https://raw.githubusercontent.com/mozilla/source-map/0.6.1/dist/source-map.debug.js
-    <destination> = File ./source-map.js

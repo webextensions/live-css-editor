@@ -1,8 +1,1 @@
 https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.js
-
-$ uglifyjs <source> --compress sequences=false --beautify beautify=false,semicolons=false,comments=some --output <destination>
-
-Where:
-    uglifyjs = npm install -g uglify-js@^3.10.4
-    <source> = File https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.js
-    <destination> = File ./jquery.tooltipster.js
