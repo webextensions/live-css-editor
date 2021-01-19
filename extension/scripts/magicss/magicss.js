@@ -834,6 +834,7 @@ var const_rateUsUsageCounterFrom = 20,
     };
     updateExistingCSSSelectorsAndAutocomplete();
 
+    // TODO: DUPLICATE: Code duplication for browser detection in magicss.js and options.js
     var isChrome = false,
         isEdge = false,
         isFirefox = false,
