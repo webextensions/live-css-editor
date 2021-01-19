@@ -267,11 +267,6 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             pathScripts + 'utils.js',
             pathScripts + 'loading-magic-css.js',
 
-            {
-                src: path3rdparty + 'async.js',
-                skip: typeof async === "undefined" || runningInBrowserExtension ? false : true
-            },
-
             path3rdparty + 'css.escape.js',
 
             pathCodeMirror + 'codemirror.css',

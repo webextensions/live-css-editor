@@ -269,25 +269,6 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.js",
-                    "latest": "https://raw.githubusercontent.com/caolan/async/master/dist/async.js"
-                },
-                "dev": {
-                    "src": "https://raw.githubusercontent.com/caolan/async/3d1781cbb9a215b30fc03c2135309fe3579e5689/dist/async.js",
-                    "latest": "https://raw.githubusercontent.com/caolan/async/master/dist/async.js"
-                }
-            },
-            "to": {
-                "default": {
-                    "dest": "extension/scripts/3rdparty/async.js",
-                    "removeSourceMappingURL": true,
-                    "uglifyJs": true
-                }
-            }
-        },
-        {
-            "from": {
-                "default": {
                     "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.js",
                     "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest.js"
                 }
