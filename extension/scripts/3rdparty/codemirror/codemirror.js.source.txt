@@ -1,8 +1,1 @@
 node_modules/codemirror/lib/codemirror.js
-
-$ uglifyjs <source> --compress sequences=false --beautify beautify=false,semicolons=false,comments=some --output <destination>
-
-Where:
-    uglifyjs = npm install -g uglify-js@3.0.26
-    <source> = File node_modules/codemirror/lib/codemirror.js
-    <destination> = File ./codemirror.js

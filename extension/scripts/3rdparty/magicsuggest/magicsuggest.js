@@ -1,5 +1,5 @@
 !function($){"use strict"
-function MagicSuggest(element,options){var ms=this,conf=$.extend({},options),cfg=$.extend(!0,{},{allowFreeEntries:!0,allowDuplicates:!1,ajaxConfig:{},autoSelect:!0,selectFirst:!1,queryParam:"query",beforeSend:function(){},cls:"",data:null,dataUrlParams:{},disabled:!1,disabledField:null,displayField:"name",editable:!0,expanded:!1,expandOnFocus:!1,groupBy:null,hideTrigger:!1,highlight:!0,id:null,infoMsgCls:"",inputCfg:{},invalidCls:"ms-inv",matchCase:!1,maxDropHeight:290,maxEntryLength:null,maxEntryRenderer:function(v){return"Please reduce your entry by "+v+" character"+(1<v?"s":"")},maxSuggestions:null,maxSelection:10,maxSelectionRenderer:function(v){return"You cannot choose more than "+v+" item"+(1<v?"s":"")},method:"POST",minChars:0,minCharsRenderer:function(v){return"Please type "+v+" more character"+(1<v?"s":"")},mode:"local",name:null,noSuggestionText:"No suggestions",placeholder:"Type or click here",renderer:null,required:!1,resultAsString:!1,resultAsStringDelimiter:",",resultsField:"results",selectionCls:"",selectionContainer:null,selectionPosition:"inner",selectionRenderer:null,selectionStacked:!1,sortDir:"asc",sortOrder:null,strictSuggest:!1,style:"",toggleOnClick:!1,typeDelay:400,useTabKey:!1,useCommaKey:!0,useZebraStyle:!1,value:null,valueField:"id",vregex:null,vtype:null},conf)
+function MagicSuggest(element,conf){var ms=this,conf=$.extend({},conf),cfg=$.extend(!0,{},{allowFreeEntries:!0,allowDuplicates:!1,ajaxConfig:{},autoSelect:!0,selectFirst:!1,queryParam:"query",beforeSend:function(){},cls:"",data:null,dataUrlParams:{},disabled:!1,disabledField:null,displayField:"name",editable:!0,expanded:!1,expandOnFocus:!1,groupBy:null,hideTrigger:!1,highlight:!0,id:null,infoMsgCls:"",inputCfg:{},invalidCls:"ms-inv",matchCase:!1,maxDropHeight:290,maxEntryLength:null,maxEntryRenderer:function(v){return"Please reduce your entry by "+v+" character"+(1<v?"s":"")},maxSuggestions:null,maxSelection:10,maxSelectionRenderer:function(v){return"You cannot choose more than "+v+" item"+(1<v?"s":"")},method:"POST",minChars:0,minCharsRenderer:function(v){return"Please type "+v+" more character"+(1<v?"s":"")},mode:"local",name:null,noSuggestionText:"No suggestions",placeholder:"Type or click here",renderer:null,required:!1,resultAsString:!1,resultAsStringDelimiter:",",resultsField:"results",selectionCls:"",selectionContainer:null,selectionPosition:"inner",selectionRenderer:null,selectionStacked:!1,sortDir:"asc",sortOrder:null,strictSuggest:!1,style:"",toggleOnClick:!1,typeDelay:400,useTabKey:!1,useCommaKey:!0,useZebraStyle:!1,value:null,valueField:"id",vregex:null,vtype:null},conf)
 this.addToSelection=function(items,isSilent){if(!cfg.maxSelection||_selection.length<cfg.maxSelection){$.isArray(items)||(items=[items])
 var valuechanged=!1
 $.each(items,function(index,json){if(cfg.allowDuplicates||-1===$.inArray(json[cfg.valueField],ms.getValue())){_selection.push(json)
@@ -32,7 +32,7 @@ this.getRawValue=function(){return ms.input.val()}
 this.getValue=function(){return $.map(_selection,function(o){return o[cfg.valueField]})}
 this.removeFromSelection=function(items,isSilent){$.isArray(items)||(items=[items])
 var valuechanged=!1
-$.each(items,function(index,json){var i=$.inArray(json[cfg.valueField],ms.getValue())
+$.each(items,function(index,i){i=$.inArray(i[cfg.valueField],ms.getValue())
 if(-1<i){_selection.splice(i,1)
 valuechanged=!0}})
 if(!0===valuechanged){self._renderSelection()
@@ -59,16 +59,15 @@ items.push(json)}})
 this.setDataUrlParams=function(params){cfg.dataUrlParams=$.extend({},params)}
 var _timer,_selection=[],_comboItemHeight=0,_hasFocus=!1,_groups=null,_cbData=[],_ctrlDown=!1,KEYCODES_BACKSPACE=8,KEYCODES_TAB=9,KEYCODES_ENTER=13,KEYCODES_CTRL=17,KEYCODES_ESC=27,KEYCODES_SPACE=32,KEYCODES_UPARROW=38,KEYCODES_DOWNARROW=40,KEYCODES_COMMA=188,self={_displaySuggestions:function(data){ms.combobox.show()
 ms.combobox.empty()
-var resHeight=0,nbGroups=0
+var noSuggestionText=0,nbGroups=0
 if(null===_groups){self._renderComboItems(data)
-resHeight=_comboItemHeight*data.length}else{for(var grpName in _groups){nbGroups+=1
+noSuggestionText=_comboItemHeight*data.length}else{for(var grpName in _groups){nbGroups+=1
 $("<div/>",{class:"ms-res-group",html:grpName}).appendTo(ms.combobox)
-self._renderComboItems(_groups[grpName].items,!0)}var _groupItemHeight=ms.combobox.find(".ms-res-group").outerHeight()
-if(null!==_groupItemHeight){var tmpResHeight=nbGroups*_groupItemHeight
-resHeight=_comboItemHeight*data.length+tmpResHeight}else resHeight=_comboItemHeight*(data.length+nbGroups)}resHeight<ms.combobox.height()||resHeight<=cfg.maxDropHeight?ms.combobox.height(resHeight):resHeight>=ms.combobox.height()&&resHeight>cfg.maxDropHeight&&ms.combobox.height(cfg.maxDropHeight)
+self._renderComboItems(_groups[grpName].items,!0)}var tmpResHeight=ms.combobox.find(".ms-res-group").outerHeight()
+noSuggestionText=null!==tmpResHeight?(tmpResHeight=nbGroups*tmpResHeight,_comboItemHeight*data.length+tmpResHeight):_comboItemHeight*(data.length+nbGroups)}noSuggestionText<ms.combobox.height()||noSuggestionText<=cfg.maxDropHeight?ms.combobox.height(noSuggestionText):noSuggestionText>=ms.combobox.height()&&noSuggestionText>cfg.maxDropHeight&&ms.combobox.height(cfg.maxDropHeight)
 1===data.length&&!0===cfg.autoSelect&&ms.combobox.children().filter(":not(.ms-res-item-disabled):last").addClass("ms-res-item-active")
 !0===cfg.selectFirst&&ms.combobox.children().filter(":not(.ms-res-item-disabled):first").addClass("ms-res-item-active")
-if(0===data.length&&""!==ms.getRawValue()){var noSuggestionText=cfg.noSuggestionText.replace(/\{\{.*\}\}/,ms.input.val())
+if(0===data.length&&""!==ms.getRawValue()){noSuggestionText=cfg.noSuggestionText.replace(/\{\{.*\}\}/,ms.input.val())
 self._updateHelper(noSuggestionText)
 ms.collapse()}if(!1===cfg.allowFreeEntries)if(0===data.length){$(ms.input).addClass(cfg.invalidCls)
 ms.combobox.hide()}else $(ms.input).removeClass(cfg.invalidCls)},_getEntriesFromStringArray:function(data){var json=[]
@@ -79,30 +78,27 @@ return json},_highlightSuggestion:function(html){var q=ms.input.val()
 $.each(["^","$","*","+","?",".","(",")",":","!","|","{","}","[","]"],function(index,value){q=q.replace(value,"\\"+value)})
 if(0===q.length)return html
 var glob=!0===cfg.matchCase?"g":"gi"
-return html.replace(new RegExp("("+q+")(?!([^<]+)?>)",glob),"<em>$1</em>")},_moveSelectedRow:function(dir){cfg.expanded||ms.expand()
-var list,start,active,scrollPos
-list=ms.combobox.find(".ms-res-item:not(.ms-res-item-disabled)")
-start="down"===dir?list.eq(0):list.filter(":last")
-if(0<(active=ms.combobox.find(".ms-res-item-active:not(.ms-res-item-disabled):first")).length)if("down"===dir){0===(start=active.nextAll(".ms-res-item:not(.ms-res-item-disabled)").first()).length&&(start=list.eq(0))
+return html.replace(new RegExp("("+q+")(?!([^<]+)?>)",glob),"<em>$1</em>")},_moveSelectedRow:function(scrollPos){cfg.expanded||ms.expand()
+var list=ms.combobox.find(".ms-res-item:not(.ms-res-item-disabled)"),start="down"===scrollPos?list.eq(0):list.filter(":last"),active=ms.combobox.find(".ms-res-item-active:not(.ms-res-item-disabled):first")
+if(0<active.length)if("down"===scrollPos){0===(start=active.nextAll(".ms-res-item:not(.ms-res-item-disabled)").first()).length&&(start=list.eq(0))
 scrollPos=ms.combobox.scrollTop()
 ms.combobox.scrollTop(0)
 start[0].offsetTop+start.outerHeight()>ms.combobox.height()&&ms.combobox.scrollTop(scrollPos+_comboItemHeight)}else{if(0===(start=active.prevAll(".ms-res-item:not(.ms-res-item-disabled)").first()).length){start=list.filter(":last")
 ms.combobox.scrollTop(_comboItemHeight*list.length)}start[0].offsetTop<ms.combobox.scrollTop()&&ms.combobox.scrollTop(ms.combobox.scrollTop()-_comboItemHeight)}list.removeClass("ms-res-item-active")
-start.addClass("ms-res-item-active")},_processSuggestions:function(source){var json=null,data=source||cfg.data
+start.addClass("ms-res-item-active")},_processSuggestions:function(data){var json,data=data||cfg.data
 if(null!==data){"function"==typeof data&&(data=data.call(ms,ms.getRawValue()))
-if("string"==typeof data){$(ms).trigger("beforeload",[ms])
-var queryParams={}
-queryParams[cfg.queryParam]=ms.input.val()
-var params=$.extend(queryParams,cfg.dataUrlParams)
+if("string"!=typeof data){_cbData=0<data.length&&"string"==typeof data[0]?self._getEntriesFromStringArray(data):data[cfg.resultsField]||data
+var params="remote"===cfg.mode?_cbData:self._sortAndTrim(_cbData)
+self._displaySuggestions(self._group(params))}else{$(ms).trigger("beforeload",[ms])
+params={}
+params[cfg.queryParam]=ms.input.val()
+params=$.extend(params,cfg.dataUrlParams)
 $.ajax($.extend({type:cfg.method,url:data,data:params,beforeSend:cfg.beforeSend,success:function(asyncData){json="string"==typeof asyncData?JSON.parse(asyncData):asyncData
 self._processSuggestions(json)
 $(ms).trigger("load",[ms,json])
 if(self._asyncValues){ms.setValue("string"==typeof self._asyncValues?JSON.parse(self._asyncValues):self._asyncValues)
 self._renderSelection()
-delete self._asyncValues}},error:function(){throw"Could not reach server"}},cfg.ajaxConfig))
-return}_cbData=0<data.length&&"string"==typeof data[0]?self._getEntriesFromStringArray(data):data[cfg.resultsField]||data
-var sortedData="remote"===cfg.mode?_cbData:self._sortAndTrim(_cbData)
-self._displaySuggestions(self._group(sortedData))}},_render:function(el){ms.setName(cfg.name)
+delete self._asyncValues}},error:function(){throw"Could not reach server"}},cfg.ajaxConfig))}}},_render:function(el){ms.setName(cfg.name)
 ms.container=$("<div/>",{class:"ms-ctn form-control "+(cfg.resultAsString?"ms-as-string ":"")+cfg.cls+($(el).hasClass("input-lg")?" input-lg":"")+($(el).hasClass("input-sm")?" input-sm":"")+(!0===cfg.disabled?" ms-ctn-disabled":"")+(!0===cfg.editable?"":" ms-ctn-readonly")+(!1===cfg.hideTrigger?"":" ms-no-trigger"),style:cfg.style,id:cfg.id})
 ms.container.focus($.proxy(handlers._onFocus,this))
 ms.container.blur($.proxy(handlers._onBlur,this))
@@ -116,8 +112,7 @@ ms.combobox.on("click","div.ms-res-item",$.proxy(handlers._onComboItemSelected,t
 ms.combobox.on("mouseover","div.ms-res-item",$.proxy(handlers._onComboItemMouseOver,this))
 if(cfg.selectionContainer){ms.selectionContainer=cfg.selectionContainer
 $(ms.selectionContainer).addClass("ms-sel-ctn")}else ms.selectionContainer=$("<div/>",{class:"ms-sel-ctn"})
-ms.selectionContainer.click($.proxy(handlers._onFocus,this))
-"inner"!==cfg.selectionPosition||cfg.selectionContainer?ms.container.append(ms.input):ms.selectionContainer.append(ms.input)
+ms.selectionContainer.click($.proxy(handlers._onFocus,this));("inner"!==cfg.selectionPosition||cfg.selectionContainer?ms.container:ms.selectionContainer).append(ms.input)
 ms.helper=$("<span/>",{class:"ms-helper "+cfg.infoMsgCls})
 self._updateHelper()
 ms.container.append(ms.helper)
@@ -137,10 +132,10 @@ if(null!==cfg.value){ms.setValue(cfg.value)
 self._renderSelection()}}$("body").click(function(e){ms.container.hasClass("ms-ctn-focus")&&0===ms.container.has(e.target).length&&e.target.className.indexOf("ms-res-item")<0&&e.target.className.indexOf("ms-close-btn")<0&&ms.container[0]!==e.target&&handlers._onBlur()})
 if(!0===cfg.expanded){cfg.expanded=!1
 ms.expand()}},_renderComboItems:function(items,isGrouped){var ref=this,html=""
-$.each(items,function(index,value){var displayed=null!==cfg.renderer?cfg.renderer.call(ref,value):value[cfg.displayField],disabled=null!==cfg.disabledField&&!0===value[cfg.disabledField],resultItemEl=$("<div/>",{class:"ms-res-item "+(isGrouped?"ms-res-item-grouped ":"")+(disabled?"ms-res-item-disabled ":"")+(index%2==1&&!0===cfg.useZebraStyle?"ms-res-odd":""),html:!0===cfg.highlight?self._highlightSuggestion(displayed):displayed,"data-json":JSON.stringify(value)})
+$.each(items,function(index,resultItemEl){var displayed=null!==cfg.renderer?cfg.renderer.call(ref,resultItemEl):resultItemEl[cfg.displayField],disabled=null!==cfg.disabledField&&!0===resultItemEl[cfg.disabledField],resultItemEl=$("<div/>",{class:"ms-res-item "+(isGrouped?"ms-res-item-grouped ":"")+(disabled?"ms-res-item-disabled ":"")+(index%2==1&&!0===cfg.useZebraStyle?"ms-res-odd":""),html:!0===cfg.highlight?self._highlightSuggestion(displayed):displayed,"data-json":JSON.stringify(resultItemEl)})
 html+=$("<div/>").append(resultItemEl).html()})
 ms.combobox.append(html)
-_comboItemHeight=ms.combobox.find(".ms-res-item:first").outerHeight()},_renderSelection:function(){var ref=this,w=0,inputOffset=0,items=[],asText=!0===cfg.resultAsString&&!_hasFocus
+_comboItemHeight=ms.combobox.find(".ms-res-item:first").outerHeight()},_renderSelection:function(){var w,inputOffset,ref=this,items=[],asText=!0===cfg.resultAsString&&!_hasFocus
 ms.selectionContainer.find(".ms-sel-item").remove()
 void 0!==ms._valueContainer&&ms._valueContainer.remove()
 $.each(_selection,function(index,value){var selectedItemEl,selectedItemHtml=null!==cfg.selectionRenderer?cfg.selectionRenderer.call(ref,value):value[cfg.displayField],validCls=self._validateSingleItem(value[cfg.displayField])?"":" ms-sel-invalid"
@@ -181,7 +176,7 @@ obj[cfg.displayField]=obj[cfg.valueField]=ms.getRawValue().trim()
 ms.addToSelection(obj)}self._renderSelection()
 if(!1===ms.isValid())ms.container.addClass(cfg.invalidCls)
 else if(""!==ms.input.val()&&!1===cfg.allowFreeEntries){ms.empty()
-self._updateHelper("")}$(ms).trigger("blur",[ms])},_onComboItemMouseOver:function(e){var target=$(e.currentTarget)
+self._updateHelper("")}$(ms).trigger("blur",[ms])},_onComboItemMouseOver:function(target){target=$(target.currentTarget)
 if(!target.hasClass("ms-res-item-disabled")){ms.combobox.children().removeClass("ms-res-item-active")
 target.addClass("ms-res-item-active")}},_onComboItemSelected:function(e){$(e.currentTarget).hasClass("ms-res-item-disabled")||self._selectItem($(e.currentTarget))},_onFocus:function(){ms.input.focus()},_onInputClick:function(){!1===ms.isDisabled()&&_hasFocus&&!0===cfg.toggleOnClick&&(cfg.expanded?ms.collapse():ms.expand())},_onInputFocus:function(){if(!1===ms.isDisabled()&&!_hasFocus){_hasFocus=!0
 ms.container.addClass("ms-ctn-focus")

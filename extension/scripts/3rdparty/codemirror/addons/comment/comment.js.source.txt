@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/codemirror/CodeMirror/5.30.0/addon/comment/comment.js
+https://raw.githubusercontent.com/codemirror/CodeMirror/5.34.0/addon/comment/comment.js
