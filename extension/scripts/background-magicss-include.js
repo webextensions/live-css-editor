@@ -647,3 +647,7 @@ var onDOMContentLoadedHandler = function () {
 };
 
 onDOMContentLoadedHandler();
+
+if (window.flagEditorInExternalWindow) {
+    main();
+}
