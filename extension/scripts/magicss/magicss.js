@@ -2813,6 +2813,12 @@ if (window.flagEditorInExternalWindow) {
                                                                 await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                                                 await fnApplyTextAsCSS(editor);
                                                             });
+                                                        } else if (request.subType === 'update-code-and-apply-css') {
+                                                            setTimeout(async () => {
+                                                                await editor.setTextValue(request.payload.cssCodeToUse);
+                                                                await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                                await fnApplyTextAsCSS(editor);
+                                                            });
                                                         } else if (request.subType === 'enableCss') {
                                                             setTimeout(async () => {
                                                                 await editor.disableEnableCSS('enable');
@@ -3147,6 +3153,14 @@ if (window.flagEditorInExternalWindow) {
                                     if (textValue.trim() !== beautifiedCSS.trim()) {
                                         await editor.setTextValue(beautifiedCSS);
                                         await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        chromeRuntimeMessageIfRequired({
+                                            type: 'magicss',
+                                            subType: 'update-code-and-apply-css',
+                                            payload: {
+                                                cssCodeToUse: beautifiedCSS
+                                            }
+                                        });
+
                                         utils.alertNote('Your code has been beautified :-)', 5000);
                                     } else {
                                         utils.alertNote('Your code already looks beautiful :-)', 5000);
@@ -3164,12 +3178,30 @@ if (window.flagEditorInExternalWindow) {
                                 if (!textValue.trim()) {
                                     await editor.setTextValue('');
                                     await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'update-code-and-apply-css',
+                                        payload: {
+                                            cssCodeToUse: ''
+                                        }
+                                    });
+
                                     utils.alertNote('Please type some code to be minified', 5000);
                                 } else {
                                     var minifiedCSS = utils.minifyCSS(textValue);
                                     if (textValue !== minifiedCSS) {
                                         await editor.setTextValue(minifiedCSS);
                                         await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                                        chromeRuntimeMessageIfRequired({
+                                            type: 'magicss',
+                                            subType: 'update-code-and-apply-css',
+                                            payload: {
+                                                cssCodeToUse: minifiedCSS
+                                            }
+                                        });
+
                                         utils.alertNote('Your code has been minified' + noteForUndo, 5000);
                                     } else {
                                         utils.alertNote('Your code is already minified', 5000);
