@@ -6,6 +6,38 @@ var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
 
 var TR = extLib.TR;
 
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+        if (request.openExternalEditor) {
+            window
+                .open(
+                    `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}`,
+                    "Magic CSS",
+                    "height=400,width=400,scrollbars=yes,resizable=yes" // scrollbars=yes is required for some browsers (like FF & IE)
+                )
+                .focus();
+        }
+    }
+);
+
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+        if (request.type === 'magicss') {
+            chrome.tabs.sendMessage(
+                request.tabId,
+                {
+                    type: request.type,
+                    subType: request.subType,
+                    payload: request.payload
+                },
+                function(response) { // eslint-disable-line no-unused-vars
+                    // Currently doing nothing
+                }
+            );
+        }
+    }
+);
+
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
 var runningInChromiumLikeEnvironment = function () {
     if (window.location.href.indexOf('chrome-extension://') === 0) {
@@ -203,7 +235,7 @@ var reapplyCss = function (tabId) {
                 arrScripts.push(pathScripts + 'reapply-css.js');
                 extLib.loadJSCSS(
                     {
-                        treatAsNormalWebpage: false
+                        treatAsNormalWebpage: window.treatAsNormalWebpage
                     },
                     arrScripts,
                     allFrames,
@@ -255,7 +287,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
         extLib.loadJSCSS({
-            treatAsNormalWebpage: false
+            treatAsNormalWebpage: window.treatAsNormalWebpage
         }, [
             pathScripts + 'appVersion.js',
             // {

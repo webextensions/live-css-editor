@@ -183,6 +183,15 @@
     display: block;
 }
 
+.magicss-external-window {
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/link-external_edited-yellow.svg */
+    background-image: url(
+        "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxMDI0IiB3aWR0aD0iNzY4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiNGQ0Q2NEQiIGQ9Ik02NDAgNzY4SDEyOFYyNTcuOTA1OTk5OTk5OTk5OTVMMjU2IDI1NlYxMjhIMHY3NjhoNzY4VjU3Nkg2NDBWNzY4ek0zODQgMTI4bDEyOCAxMjhMMzIwIDQ0OGwxMjggMTI4IDE5Mi0xOTIgMTI4IDEyOFYxMjhIMzg0eiIvPjwvc3ZnPg=="
+    ) !important;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
 .magicss-disable-css {
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited-yellow.svg */
     background-image: url(

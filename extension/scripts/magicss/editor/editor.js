@@ -650,6 +650,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         }
 
         _makeDraggable() {
+            if (document.documentElement.classList.contains('full-screen-editor')) {
+                return;
+            }
+
             var thisOb = this,
                 options = thisOb.options;
 
@@ -855,37 +859,41 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             });
 
             $(cm.getWrapperElement()).addClass('cancelDragHandle');
-            $(cm.getWrapperElement()).resizable({
-                handles: 'se',
-                minWidth: CONSTANTS.EDITOR_MIN_WIDTH,
-                minHeight: CONSTANTS.EDITOR_MIN_HEIGHT,
-                start: function () {
-                    setTimeout(async function () {
-                        // Save editor's position.
-                        // It is useful when the user is resizing, but the position
-                        // is out of sync with the value in userPreference (this
-                        // out-of-sync is deliberate and useful for auto-positioning
-                        // on window resize)
-                        await thisOb.savePosition({
-                            top: parseInt(thisOb.container.style.top, 10),
-                            left: parseInt(thisOb.container.style.left, 10)
+            if (document.documentElement.classList.contains('full-screen-editor')) {
+                // do nothing
+            } else {
+                $(cm.getWrapperElement()).resizable({
+                    handles: 'se',
+                    minWidth: CONSTANTS.EDITOR_MIN_WIDTH,
+                    minHeight: CONSTANTS.EDITOR_MIN_HEIGHT,
+                    start: function () {
+                        setTimeout(async function () {
+                            // Save editor's position.
+                            // It is useful when the user is resizing, but the position
+                            // is out of sync with the value in userPreference (this
+                            // out-of-sync is deliberate and useful for auto-positioning
+                            // on window resize)
+                            await thisOb.savePosition({
+                                top: parseInt(thisOb.container.style.top, 10),
+                                left: parseInt(thisOb.container.style.left, 10)
+                            });
                         });
-                    });
-                },
-                stop: function (event, ui) {
-                    setTimeout(async function () {
-                        await thisOb.setTextContainerDimensions(
-                            {
-                                width: ui.size.width,
-                                height: ui.size.height
-                            },
-                            {
-                                propagateTo: 'codemirror'
-                            }
-                        );
-                    });
-                }
-            });
+                    },
+                    stop: function (event, ui) {
+                        setTimeout(async function () {
+                            await thisOb.setTextContainerDimensions(
+                                {
+                                    width: ui.size.width,
+                                    height: ui.size.height
+                                },
+                                {
+                                    propagateTo: 'codemirror'
+                                }
+                            );
+                        });
+                    }
+                });
+            }
         }
 
         async _addChildComponents() {

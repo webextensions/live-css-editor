@@ -16,6 +16,21 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 var const_rateUsUsageCounterFrom = 20,
     const_rateUsUsageCounterTo = 100;
 
+// TODO: Read "tabId" query parameter in standard way
+const tabId = parseInt(window.location.search.replace('?tabId=', ''), 10);
+
+const chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
+    // TODO: FIXME: This if condition should probably be changed to something more robust
+    if (tabId) {
+        chrome.runtime.sendMessage({
+            tabId,
+            type,
+            subType,
+            payload
+        });
+    }
+};
+
 (function($){
     var runningInAndroidFirefox = false;
     if (window.platformInfoOs === 'android') {
@@ -2018,6 +2033,14 @@ var const_rateUsUsageCounterFrom = 20,
                         newStyleTag.disabled = disabled;
                         let appliedCssText = newStyleTag.applyTag();
                         await rememberLastAppliedCss(appliedCssText);
+
+                        chromeRuntimeMessageIfRequired({
+                            type: 'magicss',
+                            subType: 'magicss-apply-css',
+                            payload: {
+                                cssCodeTypedByUser: cssCode
+                            }
+                        });
                     }
                 };
 
@@ -2749,13 +2772,69 @@ var const_rateUsUsageCounterFrom = 20,
                         }()),
                         {
                             name: 'disable',
+                            title: 'Edit in external window',
+                            cls: 'magicss-external-window editor-gray-out',
+                            onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                try {
+                                    chrome.runtime.sendMessage({
+                                        openExternalEditor: true,
+                                        tabTitle: document.title
+                                    });
+
+                                    if (!window.openExternalEditorListenerAdded) {
+                                        if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
+                                            chrome.runtime.onMessage.addListener(
+                                                function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+                                                    if (request.type === 'magicss') {
+                                                        setTimeout(async () => {
+                                                            if (request.subType === 'magicss-apply-css') {
+                                                                await editor.setTextValue(request.payload.cssCodeTypedByUser);
+                                                                await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                                await fnApplyTextAsCSS(editor);
+                                                            } else if (request.subType === 'enableCss') {
+                                                                await editor.disableEnableCSS('enable');
+                                                            } else if (request.subType === 'disableCss') {
+                                                                await editor.disableEnableCSS('disable');
+                                                            } else if (request.subType === 'showLineNumbers') {
+                                                                editor.cm.setOption('lineNumbers', true);
+                                                                await editor.userPreference('show-line-numbers', 'yes');
+                                                            } else if (request.subType === 'hideLineNumbers') {
+                                                                editor.cm.setOption('lineNumbers', false);
+                                                                await editor.userPreference('show-line-numbers', 'no');
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            );
+                                            window.openExternalEditorListenerAdded = true;
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log('Error message reported by Magic CSS:', e);
+                                    utils.alertNote(
+                                        'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                        10000
+                                    );
+                                }
+                            }
+                        },
+                        {
+                            name: 'disable',
                             title: 'Deactivate code',
                             cls: 'magicss-disable-css editor-gray-out',
                             onclick: async function (evt, editor, divIcon) {
                                 if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
                                     await editor.disableEnableCSS('enable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'enableCss'
+                                    });
                                 } else {
                                     await editor.disableEnableCSS('disable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'disableCss'
+                                    });
                                 }
 
                                 if (!runningInAndroidFirefox) {
@@ -3058,6 +3137,12 @@ var const_rateUsUsageCounterFrom = 20,
                             onclick: async function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', true);
                                 await editor.userPreference('show-line-numbers', 'yes');
+
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'showLineNumbers'
+                                });
+
                                 editor.focus();
                             }
                         },
@@ -3068,6 +3153,12 @@ var const_rateUsUsageCounterFrom = 20,
                             onclick: async function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', false);
                                 await editor.userPreference('show-line-numbers', 'no');
+
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'hideLineNumbers'
+                                });
+
                                 editor.focus();
                             }
                         },
