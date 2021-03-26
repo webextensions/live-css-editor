@@ -20,8 +20,7 @@ var const_rateUsUsageCounterFrom = 20,
 const tabId = parseInt(window.location.search.replace('?tabId=', ''), 10);
 
 const chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
-    // TODO: FIXME: This if condition should probably be changed to something more robust
-    if (tabId) {
+    if (window.flagEditorInExternalWindow) {
         chrome.runtime.sendMessage({
             tabId,
             type,
@@ -30,6 +29,14 @@ const chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
         });
     }
 };
+if (window.flagEditorInExternalWindow) {
+    window.onbeforeunload = function () {
+        chromeRuntimeMessageIfRequired({
+            type: 'magicss',
+            subType: 'external-editor-window-is-closing'
+        });
+    };
+}
 
 (function($){
     var runningInAndroidFirefox = false;
@@ -2553,14 +2560,26 @@ const chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
                         $(document).on('click', '.magicss-mode-css', async function () {
                             await setLanguageMode('css', editor);
                             editor.focus();
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'set-language-mode-to-css'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-less', async function () {
                             await setLanguageMode('less', editor);
                             editor.focus();
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'set-language-mode-to-less'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-sass', async function () {
                             await setLanguageMode('sass', editor);
                             editor.focus();
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'set-language-mode-to-sass'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-file', async function () {
                             await setLanguageMode('file', editor);
@@ -2781,28 +2800,57 @@ const chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
                                         tabTitle: document.title
                                     });
 
+                                    editor.container.classList.add('external-editor-also-exists');
+
                                     if (!window.openExternalEditorListenerAdded) {
                                         if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
                                             chrome.runtime.onMessage.addListener(
                                                 function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
                                                     if (request.type === 'magicss') {
-                                                        setTimeout(async () => {
-                                                            if (request.subType === 'magicss-apply-css') {
+                                                        if (request.subType === 'magicss-apply-css') {
+                                                            setTimeout(async () => {
                                                                 await editor.setTextValue(request.payload.cssCodeTypedByUser);
                                                                 await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                                                 await fnApplyTextAsCSS(editor);
-                                                            } else if (request.subType === 'enableCss') {
+                                                            });
+                                                        } else if (request.subType === 'enableCss') {
+                                                            setTimeout(async () => {
                                                                 await editor.disableEnableCSS('enable');
-                                                            } else if (request.subType === 'disableCss') {
+                                                            });
+                                                        } else if (request.subType === 'disableCss') {
+                                                            setTimeout(async () => {
                                                                 await editor.disableEnableCSS('disable');
-                                                            } else if (request.subType === 'showLineNumbers') {
+                                                            });
+                                                        } else if (request.subType === 'showLineNumbers') {
+                                                            setTimeout(async () => {
                                                                 editor.cm.setOption('lineNumbers', true);
                                                                 await editor.userPreference('show-line-numbers', 'yes');
-                                                            } else if (request.subType === 'hideLineNumbers') {
+                                                            });
+                                                        } else if (request.subType === 'hideLineNumbers') {
+                                                            setTimeout(async () => {
                                                                 editor.cm.setOption('lineNumbers', false);
                                                                 await editor.userPreference('show-line-numbers', 'no');
-                                                            }
-                                                        });
+                                                            });
+                                                        } else if (
+                                                            request.subType === 'magicss-closed-editor' ||
+                                                            request.subType === 'external-editor-window-is-closing'
+                                                        ) {
+                                                            editor.container.classList.remove('external-editor-also-exists');
+                                                        } else if (request.subType === 'set-language-mode-to-css') {
+                                                            setTimeout(async () => {
+                                                                await setLanguageMode('css', editor);
+                                                            });
+                                                        } else if (request.subType === 'set-language-mode-to-less') {
+                                                            setTimeout(async () => {
+                                                                await setLanguageMode('less', editor);
+                                                            });
+                                                        } else if (request.subType === 'set-language-mode-to-sass') {
+                                                            setTimeout(async () => {
+                                                                await setLanguageMode('sass', editor);
+                                                            });
+                                                        } else {
+                                                            console.log(`Received an unexpected event with subType: ${request.subType}`);
+                                                        }
                                                     }
                                                 }
                                             );
@@ -3568,6 +3616,15 @@ const chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
                         },
                         afterhide: function () {
                             // currently doing nothing
+                        },
+                        onClose: async function () {
+                            if (window.flagEditorInExternalWindow) {
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'magicss-closed-editor'
+                                });
+                                window.close();
+                            }
                         },
                         delayedcursormove: function (editor) {
                             var cssClass = processSplitText(editor.splitTextByCursor());

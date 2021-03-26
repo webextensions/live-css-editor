@@ -192,6 +192,10 @@
     background-repeat: no-repeat;
 }
 
+.external-editor-also-exists {
+    opacity: 0.3 !important;
+}
+
 .magicss-disable-css {
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited-yellow.svg */
     background-image: url(

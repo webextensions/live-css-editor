@@ -7,5 +7,6 @@
         // do nothing
     }
 
+    window.flagEditorInExternalWindow = true;
     window.treatAsNormalWebpage = true;
 })();

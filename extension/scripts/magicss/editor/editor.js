@@ -998,6 +998,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     cls: 'editor-close',
                     onclick: async function (evt, editor) {
                         await editor.hide();
+                        await thisOb.triggerEvent('onClose');
                     }
                 });
             }
@@ -1276,6 +1277,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 case 'afterhide':
                     if (events.afterhide) {
                         events.afterhide(thisOb);
+                    }
+                    break;
+                case 'onClose':
+                    if (events.onClose) {
+                        events.onClose(thisOb);
                     }
                     break;
                 case 'clear':
