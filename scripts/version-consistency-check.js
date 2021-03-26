@@ -42,7 +42,8 @@ var mismatchFound = matchVersions(
         '../extension/manifest-edge.json',
         '../extension/manifest-firefox.json',
         '../extension/manifest-opera.json',
-        '../live-css/default.live-css.config.js'
+        '../live-css/default.live-css.config.js',
+        '../extension/scripts/appVersion.js'
     ]
 );
 

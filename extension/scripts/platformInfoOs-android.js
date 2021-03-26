@@ -1,0 +1,1 @@
+window.platformInfoOs = 'android';

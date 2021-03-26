@@ -60,7 +60,7 @@ var extLib = {
 
     // allFrames: true
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
-    insertCSS: function (options, cb) {
+    insertCSS: function ({ treatAsNormalWebpage }, options, cb) {
         var file = options.file,
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
@@ -68,7 +68,12 @@ var extLib = {
             advancedConfig = options.advancedConfig || {},
             runAt = advancedConfig.runAt || 'document_idle';
 
-        if (typeof chrome !== "undefined" && chrome && chrome.tabs) {
+        if (
+            !treatAsNormalWebpage &&
+            typeof chrome !== "undefined" &&
+            chrome &&
+            chrome.tabs
+        ) {
             chrome.tabs.insertCSS(tabId, {file: file, code: code, allFrames: allFrames, runAt: runAt}, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
@@ -105,14 +110,20 @@ var extLib = {
 
     // allFrames: true
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
-    executeScript: function (options, cb) {
+    executeScript: function ({ treatAsNormalWebpage }, options, cb) {
         var file = options.file,
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
             advancedConfig = options.advancedConfig || {},
             runAt = advancedConfig.runAt || 'document_idle';
-        if (typeof chrome !== "undefined" && chrome && chrome.tabs) {
+
+        if (
+            !treatAsNormalWebpage &&
+            typeof chrome !== "undefined" &&
+            chrome &&
+            chrome.tabs
+        ) {
             chrome.tabs.executeScript(tabId, {file: file, code: code, allFrames: allFrames, runAt: runAt}, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
@@ -132,7 +143,7 @@ var extLib = {
         }
     },
 
-    loadJSCSS: function (arrSources, allFrames, tabId, advancedConfig, done) {
+    loadJSCSS: function ({ treatAsNormalWebpage }, arrSources, allFrames, tabId, advancedConfig, done) {
         asyncEachSeries(
             arrSources,
             function (source, cb) {
@@ -150,18 +161,18 @@ var extLib = {
                 }
                 if (type && sourceText) {
                     if (type === 'js') {
-                        extLib.executeScript({code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.executeScript({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
                     } else if (type === 'css') {
-                        extLib.insertCSS({code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.insertCSS({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
                     } else {
                         console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJSCSS(). Please check the "type" for the "sourceText".');
                         cb();
                     }
                 } else if (source) {
                     if (source.match('.js$')) {
-                        extLib.executeScript({file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.executeScript({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
                     } else if (source.match('.css$')) {
-                        extLib.insertCSS({file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.insertCSS({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
                     } else {
                         console.log('Error - Loading files like ' + source + ' is not supported by loadJSCSS(). Please check the file extension.');
                         cb();

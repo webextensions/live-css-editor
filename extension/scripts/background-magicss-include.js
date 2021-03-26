@@ -201,9 +201,17 @@ var reapplyCss = function (tabId) {
                 arrScripts.push(pathScripts + 'utils.js');
                 arrScripts.push(pathScripts + 'migrate-storage.js');
                 arrScripts.push(pathScripts + 'reapply-css.js');
-                extLib.loadJSCSS(arrScripts, allFrames, tabId, {
-                    runAt: 'document_start'
-                });
+                extLib.loadJSCSS(
+                    {
+                        treatAsNormalWebpage: false
+                    },
+                    arrScripts,
+                    allFrames,
+                    tabId,
+                    {
+                        runAt: 'document_start'
+                    }
+                );
             });
         });
     });
@@ -246,15 +254,25 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
         // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
-        extLib.loadJSCSS([
-            {
-                type: 'js',
-                sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
-            },
-            {
-                type: 'js',
-                sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
-            },
+        extLib.loadJSCSS({
+            treatAsNormalWebpage: false
+        }, [
+            pathScripts + 'appVersion.js',
+            // {
+            //     type: 'js',
+            //     sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
+            // },
+
+            (
+                platformInfoOs === 'android' ?
+                    pathScripts + 'platformInfoOs-android.js' :
+                    pathScripts + 'platformInfoOs-non-android.js'
+            ),
+            // {
+            //     type: 'js',
+            //     sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
+            // },
+
             {
                 src: path3rdparty + 'jquery.js',
                 skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
