@@ -2789,89 +2789,95 @@ if (window.flagEditorInExternalWindow) {
                                 return null;
                             }
                         }()),
-                        {
-                            name: 'disable',
-                            title: 'Edit in external window',
-                            cls: 'magicss-external-window editor-gray-out',
-                            onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
-                                try {
-                                    chrome.runtime.sendMessage({
-                                        openExternalEditor: true,
-                                        tabTitle: document.title
-                                    });
+                        (function () {
+                            if (window.flagEditorInExternalWindow) {
+                                return null;
+                            }
 
-                                    editor.container.classList.add('external-editor-also-exists');
+                            return {
+                                name: 'edit-in-external',
+                                title: 'Edit in external window',
+                                cls: 'magicss-external-window editor-gray-out',
+                                onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                    try {
+                                        chrome.runtime.sendMessage({
+                                            openExternalEditor: true,
+                                            tabTitle: document.title
+                                        });
 
-                                    if (!window.openExternalEditorListenerAdded) {
-                                        if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
-                                            chrome.runtime.onMessage.addListener(
-                                                function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
-                                                    if (request.type === 'magicss') {
-                                                        if (request.subType === 'magicss-apply-css') {
-                                                            setTimeout(async () => {
-                                                                await editor.setTextValue(request.payload.cssCodeTypedByUser);
-                                                                await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                                await fnApplyTextAsCSS(editor);
-                                                            });
-                                                        } else if (request.subType === 'update-code-and-apply-css') {
-                                                            setTimeout(async () => {
-                                                                await editor.setTextValue(request.payload.cssCodeToUse);
-                                                                await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                                await fnApplyTextAsCSS(editor);
-                                                            });
-                                                        } else if (request.subType === 'enableCss') {
-                                                            setTimeout(async () => {
-                                                                await editor.disableEnableCSS('enable');
-                                                            });
-                                                        } else if (request.subType === 'disableCss') {
-                                                            setTimeout(async () => {
-                                                                await editor.disableEnableCSS('disable');
-                                                            });
-                                                        } else if (request.subType === 'showLineNumbers') {
-                                                            setTimeout(async () => {
-                                                                editor.cm.setOption('lineNumbers', true);
-                                                                await editor.userPreference('show-line-numbers', 'yes');
-                                                            });
-                                                        } else if (request.subType === 'hideLineNumbers') {
-                                                            setTimeout(async () => {
-                                                                editor.cm.setOption('lineNumbers', false);
-                                                                await editor.userPreference('show-line-numbers', 'no');
-                                                            });
-                                                        } else if (
-                                                            request.subType === 'magicss-closed-editor' ||
-                                                            request.subType === 'external-editor-window-is-closing'
-                                                        ) {
-                                                            editor.container.classList.remove('external-editor-also-exists');
-                                                        } else if (request.subType === 'set-language-mode-to-css') {
-                                                            setTimeout(async () => {
-                                                                await setLanguageMode('css', editor);
-                                                            });
-                                                        } else if (request.subType === 'set-language-mode-to-less') {
-                                                            setTimeout(async () => {
-                                                                await setLanguageMode('less', editor);
-                                                            });
-                                                        } else if (request.subType === 'set-language-mode-to-sass') {
-                                                            setTimeout(async () => {
-                                                                await setLanguageMode('sass', editor);
-                                                            });
-                                                        } else {
-                                                            console.log(`Received an unexpected event with subType: ${request.subType}`);
+                                        editor.container.classList.add('external-editor-also-exists');
+
+                                        if (!window.openExternalEditorListenerAdded) {
+                                            if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
+                                                chrome.runtime.onMessage.addListener(
+                                                    function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+                                                        if (request.type === 'magicss') {
+                                                            if (request.subType === 'magicss-apply-css') {
+                                                                setTimeout(async () => {
+                                                                    await editor.setTextValue(request.payload.cssCodeTypedByUser);
+                                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                                    await fnApplyTextAsCSS(editor);
+                                                                });
+                                                            } else if (request.subType === 'update-code-and-apply-css') {
+                                                                setTimeout(async () => {
+                                                                    await editor.setTextValue(request.payload.cssCodeToUse);
+                                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                                    await fnApplyTextAsCSS(editor);
+                                                                });
+                                                            } else if (request.subType === 'enableCss') {
+                                                                setTimeout(async () => {
+                                                                    await editor.disableEnableCSS('enable');
+                                                                });
+                                                            } else if (request.subType === 'disableCss') {
+                                                                setTimeout(async () => {
+                                                                    await editor.disableEnableCSS('disable');
+                                                                });
+                                                            } else if (request.subType === 'showLineNumbers') {
+                                                                setTimeout(async () => {
+                                                                    editor.cm.setOption('lineNumbers', true);
+                                                                    await editor.userPreference('show-line-numbers', 'yes');
+                                                                });
+                                                            } else if (request.subType === 'hideLineNumbers') {
+                                                                setTimeout(async () => {
+                                                                    editor.cm.setOption('lineNumbers', false);
+                                                                    await editor.userPreference('show-line-numbers', 'no');
+                                                                });
+                                                            } else if (
+                                                                request.subType === 'magicss-closed-editor' ||
+                                                                request.subType === 'external-editor-window-is-closing'
+                                                            ) {
+                                                                editor.container.classList.remove('external-editor-also-exists');
+                                                            } else if (request.subType === 'set-language-mode-to-css') {
+                                                                setTimeout(async () => {
+                                                                    await setLanguageMode('css', editor);
+                                                                });
+                                                            } else if (request.subType === 'set-language-mode-to-less') {
+                                                                setTimeout(async () => {
+                                                                    await setLanguageMode('less', editor);
+                                                                });
+                                                            } else if (request.subType === 'set-language-mode-to-sass') {
+                                                                setTimeout(async () => {
+                                                                    await setLanguageMode('sass', editor);
+                                                                });
+                                                            } else {
+                                                                console.log(`Received an unexpected event with subType: ${request.subType}`);
+                                                            }
                                                         }
                                                     }
-                                                }
-                                            );
-                                            window.openExternalEditorListenerAdded = true;
+                                                );
+                                                window.openExternalEditorListenerAdded = true;
+                                            }
                                         }
+                                    } catch (e) {
+                                        console.log('Error message reported by Magic CSS:', e);
+                                        utils.alertNote(
+                                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                            10000
+                                        );
                                     }
-                                } catch (e) {
-                                    console.log('Error message reported by Magic CSS:', e);
-                                    utils.alertNote(
-                                        'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                        10000
-                                    );
                                 }
-                            }
-                        },
+                            };
+                        })(),
                         {
                             name: 'disable',
                             title: 'Deactivate code',
