@@ -1,8 +1,13 @@
 (function () {
     try {
-        // TODO: Read "tabTitle" query parameter in standard way
-        const tabTitle = decodeURIComponent(window.location.search.split('&tabTitle=')[1]);
-        document.title = 'Magic CSS: ' + tabTitle;
+        const
+            urlParams = new URLSearchParams(window.location.search),
+            tabTitle = urlParams.get('tabTitle');
+        if (tabTitle) {
+            document.title = 'Magic CSS: ' + tabTitle;
+        } else {
+            document.title = 'Magic CSS';
+        }
     } catch (e) {
         // do nothing
     }

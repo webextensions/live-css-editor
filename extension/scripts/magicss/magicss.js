@@ -16,8 +16,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 var const_rateUsUsageCounterFrom = 20,
     const_rateUsUsageCounterTo = 100;
 
-// TODO: Read "tabId" query parameter in standard way
-const tabId = parseInt(window.location.search.replace('?tabId=', ''), 10);
+const tabId = (function () {
+    const
+        urlParams = new URLSearchParams(window.location.search),
+        tabId = urlParams.get('tabId');
+
+    return parseInt(tabId);
+})();
 
 const chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
     if (window.flagEditorInExternalWindow) {
@@ -37,6 +42,24 @@ if (window.flagEditorInExternalWindow) {
         });
     };
 }
+
+const chromePermissionsContains = function ({ permissions, origins }) {
+    return new Promise((resolve) => {
+        chrome.permissions.contains(
+            {
+                permissions,
+                origins
+            },
+            function(result) {
+                if (result) {
+                    return resolve(true);
+                } else {
+                    return resolve(false);
+                }
+            }
+        );
+    });
+};
 
 (function($){
     var runningInAndroidFirefox = false;
@@ -2742,44 +2765,104 @@ if (window.flagEditorInExternalWindow) {
                                     title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
                                     cls: 'magicss-reapply-styles editor-gray-out',
                                     onclick: async function (evt, editor, divIcon) {
+                                        let tabOriginWithSlash;
+                                        if (window.flagEditorInExternalWindow) {
+                                            const urlParams = new URLSearchParams(window.location.search);
+                                            tabOriginWithSlash = urlParams.get('tabOriginWithSlash');
+                                        } else {
+                                            tabOriginWithSlash = (
+                                                // Even though the chrome.permissions.request API parameter is called "origins",
+                                                // it doesn't respect the origins without trailing slash. Hence, we append a slash, if required.
+                                                window.location.origin.match(/\/$/) ?
+                                                    window.location.origin :
+                                                    window.location.origin + '/'
+                                            );
+                                        }
+
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
                                             await markAsPinnedOrNotPinned(editor, 'not-pinned');
                                             utils.alertNote(
-                                                '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                 5000
                                             );
+
+                                            if (window.flagEditorInExternalWindow) {
+                                                chromeRuntimeMessageIfRequired({
+                                                    type: 'magicss',
+                                                    subType: 'click-on-pin-unpin'
+                                                });
+                                                return;
+                                            }
                                         } else {
                                             if (isFirefox) {
                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
                                                 utils.alertNote(
-                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                     10000
                                                 );
+
+                                                if (window.flagEditorInExternalWindow) {
+                                                    chromeRuntimeMessageIfRequired({
+                                                        type: 'magicss',
+                                                        subType: 'click-on-pin-unpin'
+                                                    });
+                                                    return;
+                                                }
                                             } else {
-                                                chrome.runtime.sendMessage(
-                                                    {
-                                                        requestPermissions: true,
-                                                        url: window.location.href
-                                                    },
-                                                    async function asyncCallback(status) {
-                                                        if (chrome.runtime.lastError) {
-                                                            console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                            utils.alertNote(
-                                                                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                                10000
-                                                            );
+                                                // If the editor is in external window, then we may want to resize the window before requesting for permissions
+                                                if (window.flagEditorInExternalWindow) {
+                                                    const flagPermissions = await chromePermissionsContains({
+                                                        permissions: ['webNavigation'],
+                                                        origins: [tabOriginWithSlash]
+                                                    });
+                                                    if (flagPermissions) {
+                                                        // do nothing
+                                                    } else {
+                                                        let targetWidth = window.outerWidth;
+                                                        let targetHeight = window.outerHeight;
+                                                        let doResize = false;
+                                                        if (targetWidth < 500) {
+                                                            targetWidth = 500;
+                                                            doResize = true;
                                                         }
-                                                        if (status === 'request-granted') {
-                                                            await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                            utils.alertNote(
-                                                                '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
-                                                                10000
-                                                            );
-                                                        } else if (status === 'request-not-granted') {
-                                                            utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                        if (targetHeight < 300) {
+                                                            targetHeight = 300;
+                                                            doResize = true;
+                                                        }
+                                                        if (doResize) {
+                                                            window.resizeTo(targetWidth, targetHeight);
                                                         }
                                                     }
-                                                );
+                                                }
+
+                                                if (document.querySelector('.external-editor-also-exists')) {
+                                                    await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                } else {
+                                                    chrome.runtime.sendMessage(
+                                                        {
+                                                            requestPermissions: true,
+                                                            tabOriginWithSlash
+                                                        },
+                                                        async function asyncCallback(status) {
+                                                            if (chrome.runtime.lastError) {
+                                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                                utils.alertNote(
+                                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                                    10000
+                                                                );
+                                                            }
+                                                            if (status === 'request-granted') {
+                                                                await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                                utils.alertNote(
+                                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
+                                                                    10000
+                                                                );
+                                                            } else if (status === 'request-not-granted') {
+                                                                utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                            }
+                                                        }
+                                                    );
+                                                }
                                             }
                                         }
                                         editor.focus();
@@ -2802,7 +2885,9 @@ if (window.flagEditorInExternalWindow) {
                                     try {
                                         chrome.runtime.sendMessage({
                                             openExternalEditor: true,
-                                            tabTitle: document.title
+                                            tabTitle: document.title,
+                                            width: editor.container.clientWidth,
+                                            height: editor.container.clientHeight
                                         });
 
                                         editor.container.classList.add('external-editor-also-exists');
@@ -2859,6 +2944,8 @@ if (window.flagEditorInExternalWindow) {
                                                                 setTimeout(async () => {
                                                                     await setLanguageMode('sass', editor);
                                                                 });
+                                                            } else if (request.subType === 'click-on-pin-unpin') {
+                                                                $(editor.container).find('.magicss-reapply-styles').eq(0).trigger('click');
                                                             } else {
                                                                 console.log(`Received an unexpected event with subType: ${request.subType}`);
                                                             }

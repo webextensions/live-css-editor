@@ -9,11 +9,21 @@ var TR = extLib.TR;
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
         if (request.openExternalEditor) {
+            const tabOriginWithSlash = (
+                // Even though the chrome.permissions.request API parameter is called "origins",
+                // it doesn't respect the origins without trailing slash. Hence, we append a slash, if required.
+                sender.origin.match(/\/$/) ?
+                    sender.origin :
+                    sender.origin + '/'
+            );
+
+            let width = request.width || 400,
+                height = request.height || 400;
             window
                 .open(
-                    `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}`,
+                    `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}`,
                     "Magic CSS",
-                    "height=400,width=400,scrollbars=yes,resizable=yes" // scrollbars=yes is required for some browsers (like FF & IE)
+                    `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
                 )
                 .focus();
         }
@@ -147,16 +157,19 @@ if (!window.loadRemoteJsListenerAdded) {
                     // Need to return true from the event listener to indicate that we wish to send a response asynchronously
                     return true;
                 } else if (request.requestPermissions) {
+                    if (window.flagEditorInExternalWindow) {
+                        return;
+                    }
                     if (runningInOldEdgeLikeEnvironment()) {
                         // We use full permissions on old Microsoft Edge
                         sendResponse('request-granted');
                         onDOMContentLoadedHandler();
                     } else {
-                        var url = request.url;
+                        var tabOriginWithSlash = request.tabOriginWithSlash;
                         chrome.permissions.request(
                             {
                                 permissions: ['webNavigation'],
-                                origins: [url]
+                                origins: [tabOriginWithSlash]
                             },
                             function (granted) {
                                 if (granted) {
