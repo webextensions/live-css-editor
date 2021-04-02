@@ -239,6 +239,10 @@
     background-repeat: no-repeat;
 }
 
+.full-screen-editor .magicss-watch-and-reload-link-tags {
+    display: none !important;
+}
+
 .magicss-watch-and-reload-link-tags {
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/watch.svg */
     background-image: url(
