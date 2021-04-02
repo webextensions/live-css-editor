@@ -2963,6 +2963,18 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     editor.cm.setOption('lineNumbers', false);
                                                                     await editor.userPreference('show-line-numbers', 'no');
                                                                 });
+                                                            } else if (request.subType === 'enable-css-linting') {
+                                                                if (getLanguageMode() === 'css') {
+                                                                    setTimeout(async () => {
+                                                                        await setCodeMirrorCSSLinting(editor, 'enable');
+                                                                    });
+                                                                }
+                                                            } else if (request.subType === 'disable-css-linting') {
+                                                                if (getLanguageMode() === 'css') {
+                                                                    setTimeout(async () => {
+                                                                        await setCodeMirrorCSSLinting(editor, 'disable');
+                                                                    });
+                                                                }
                                                             } else if (
                                                                 request.subType === 'magicss-closed-editor' ||
                                                                 request.subType === 'external-editor-window-is-closing'
@@ -3387,6 +3399,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
                                     await setCodeMirrorCSSLinting(editor, 'enable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'enable-css-linting'
+                                    });
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
@@ -3400,6 +3416,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
                                     await setCodeMirrorCSSLinting(editor, 'disable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'disable-css-linting'
+                                    });
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
