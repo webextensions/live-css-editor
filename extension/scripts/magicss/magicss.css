@@ -191,6 +191,9 @@
     background-size: contain;
     background-repeat: no-repeat;
 }
+.magicss-selected-mode-file .magicss-external-window {
+    display: none;
+}
 
 .external-editor-also-exists {
     opacity: 0.3 !important;
