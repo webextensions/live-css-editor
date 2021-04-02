@@ -183,6 +183,10 @@
     display: block;
 }
 
+.full-screen-editor .magicss-mode-file {
+    display: none !important;
+}
+
 .magicss-external-window {
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/link-external_edited-yellow.svg */
     background-image: url(
