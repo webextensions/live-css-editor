@@ -8,7 +8,7 @@
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
-    // USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
+    USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_THEME = 'theme',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
@@ -3560,7 +3560,12 @@ const chromePermissionsContains = function ({ permissions, origins }) {
 
                             // Need to add font-styling before CodeMirror is instantiated
                             // if (await editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
-                            var userPrefFontSizeInPx = parseInt(await editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                            var userPrefFontSizeInPx;
+                            if (await editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
+                                userPrefFontSizeInPx = parseInt(await editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                            } else {
+                                userPrefFontSizeInPx = 12;
+                            }
                             // if (userPrefFontSizeInPx !== 12) {
                             var cssLintErrorWarningMarkerSize = 16;
                             if (userPrefFontSizeInPx < 12) {
