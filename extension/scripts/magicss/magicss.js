@@ -2926,6 +2926,33 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 setTimeout(async () => {
                                                                     await editor.disableEnableCSS('disable');
                                                                 });
+                                                            } else if (request.subType === 'magicss-handle-delayedcursormove') {
+                                                                var cssClass = processSplitText(request.payload.theSplittedText);
+                                                                // debugger;
+                                                                // const cssClass = request.payload.cssSelector;
+                                                                if (!cssClass) {
+                                                                    utils.alertNote.hide();
+                                                                }
+
+                                                                if (!editor.styleHighlightingSelector) {
+                                                                    editor.styleHighlightingSelector = new utils.StyleTag({
+                                                                        id: 'magicss-highlight-by-selector',
+                                                                        parentTag: 'body',
+                                                                        attributes: [{
+                                                                            name: 'data-style-created-by',
+                                                                            value: 'magicss'
+                                                                        }],
+                                                                        overwriteExistingStyleTagWithSameId: true
+                                                                    });
+                                                                }
+
+                                                                if (cssClass) {
+                                                                    // Helps in highlighting SVG elements
+                                                                    editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important; fill: red !important; }';
+                                                                } else {
+                                                                    editor.styleHighlightingSelector.cssText = '';
+                                                                }
+                                                                editor.styleHighlightingSelector.applyTag();
                                                             } else if (request.subType === 'showLineNumbers') {
                                                                 setTimeout(async () => {
                                                                     editor.cm.setOption('lineNumbers', true);
@@ -3772,30 +3799,43 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         },
                         delayedcursormove: function (editor) {
-                            var cssClass = processSplitText(editor.splitTextByCursor());
-                            if (!cssClass) {
-                                utils.alertNote.hide();
-                            }
-
-                            if (!editor.styleHighlightingSelector) {
-                                editor.styleHighlightingSelector = new utils.StyleTag({
-                                    id: 'magicss-highlight-by-selector',
-                                    parentTag: 'body',
-                                    attributes: [{
-                                        name: 'data-style-created-by',
-                                        value: 'magicss'
-                                    }],
-                                    overwriteExistingStyleTagWithSameId: true
+                            if (window.flagEditorInExternalWindow) {
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'magicss-handle-delayedcursormove',
+                                    payload: {
+                                        theSplittedText: editor.splitTextByCursor()
+                                    }
                                 });
-                            }
-
-                            if (cssClass) {
-                                // Helps in highlighting SVG elements
-                                editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important; fill: red !important; }';
                             } else {
-                                editor.styleHighlightingSelector.cssText = '';
+                                // TODO: FIXME: Currently, we do the "alertNote" for the matches for the selector inside processSplitText.
+                                //              We need to refactor it so that it becomes easier to manage with cross-window / cross-context
+                                //              communication.
+                                var cssClass = processSplitText(editor.splitTextByCursor());
+                                if (!cssClass) {
+                                    utils.alertNote.hide();
+                                }
+
+                                if (!editor.styleHighlightingSelector) {
+                                    editor.styleHighlightingSelector = new utils.StyleTag({
+                                        id: 'magicss-highlight-by-selector',
+                                        parentTag: 'body',
+                                        attributes: [{
+                                            name: 'data-style-created-by',
+                                            value: 'magicss'
+                                        }],
+                                        overwriteExistingStyleTagWithSameId: true
+                                    });
+                                }
+
+                                if (cssClass) {
+                                    // Helps in highlighting SVG elements
+                                    editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important; fill: red !important; }';
+                                } else {
+                                    editor.styleHighlightingSelector.cssText = '';
+                                }
+                                editor.styleHighlightingSelector.applyTag();
                             }
-                            editor.styleHighlightingSelector.applyTag();
                         },
                         keyup: function () {
                             // Currently doing nothing
