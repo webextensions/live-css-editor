@@ -229,6 +229,9 @@
     background-position: 2px 2px;
     opacity: 0.85;
 }
+.full-screen-editor .magicss-point-and-click {
+    display: none !important;
+}
 
 .magicss-watch-and-reload-link-tags,
 .magicss-stop-watch-and-reload-link-tags {
