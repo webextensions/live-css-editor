@@ -378,6 +378,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
             path3rdparty + 'tooltipster/tooltipster.css',
             path3rdparty + 'tooltipster/jquery.tooltipster.js',
+            path3rdparty + 'tooltipster/tooltipster-scrollableTip.js',
 
             path3rdparty + 'toastr/toastr.css',
             path3rdparty + 'toastr/toastr_customized.js',

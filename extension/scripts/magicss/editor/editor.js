@@ -962,21 +962,23 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         });
                         tooltipContent.push('</ul>');
                         $moreIcon.tooltipster({
+                            plugins: ['tooltipster.sideTip', 'laa.scrollableTip'],
                             content: tooltipContent.join(''),
                             contentAsHTML: true,
-                            position: 'bottom',
+                            side: ['top', 'bottom'],
                             // https://github.com/iamceege/tooltipster/blob/3.3.0/js/jquery.tooltipster.js#L338
                             theme: 'tooltipster-default magic-css-tooltipster',
                             interactive: true,
                             interactiveTolerance: 350,
-                            functionReady: function (origin, tooltip) {
+                            functionReady: function (instance, helper) {
                                 setTimeout(async function () {
                                     for (var i = 0; i < options.headerOtherIcons.length; i++) {
                                         var ico = options.headerOtherIcons[i];
                                         if (ico && ico.beforeShow) {
-                                            await ico.beforeShow(origin, tooltip, editor);
+                                            await ico.beforeShow(helper.origin, $(helper.tooltip), editor);
                                         }
                                     }
+
                                     // The tooltip would have rendered in hidden mode, but its width might have changed
                                     // due to some changes via .beforeShow(), so, we need to reposition it
                                     $moreIcon.tooltipster('reposition');
@@ -1049,17 +1051,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             $divIcon.tooltipster({
                                 content: tooltipContent.join(''),
                                 contentAsHTML: true,
-                                position: 'bottom',
+                                side: ['top', 'bottom'],
                                 // https://github.com/iamceege/tooltipster/blob/3.3.0/js/jquery.tooltipster.js#L338
                                 theme: 'tooltipster-default magic-css-tooltipster',
                                 interactive: true,
                                 interactiveTolerance: 350,
-                                functionReady: function (origin, tooltip) {
+                                functionReady: function (instance, helper) {
                                     setTimeout(async function () {
                                         for (var i = 0; i < iconOptions.icons.length; i++) {
                                             var ico = iconOptions.icons[i];
                                             if (ico && ico.beforeShow) {
-                                                await ico.beforeShow(origin, tooltip, editor);
+                                                await ico.beforeShow(helper.origin, $(helper.tooltip), editor);
                                             }
                                         }
                                         // The tooltip would have rendered in hidden mode, but its width might have changed

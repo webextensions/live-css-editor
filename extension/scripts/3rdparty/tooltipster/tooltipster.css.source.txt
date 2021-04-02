@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/css/tooltipster.css
+https://raw.githubusercontent.com/iamceege/tooltipster/4.2.8/dist/css/tooltipster.bundle.css
