@@ -16,7 +16,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 var const_rateUsUsageCounterFrom = 20,
     const_rateUsUsageCounterTo = 100;
 
-const tabId = (function () {
+var tabId = (function () {
     const
         urlParams = new URLSearchParams(window.location.search),
         tabId = urlParams.get('tabId');
@@ -24,7 +24,7 @@ const tabId = (function () {
     return parseInt(tabId);
 })();
 
-const chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
+var chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
     if (window.flagEditorInExternalWindow) {
         chrome.runtime.sendMessage({
             tabId,
@@ -43,7 +43,7 @@ if (window.flagEditorInExternalWindow) {
     };
 }
 
-const chromePermissionsContains = function ({ permissions, origins }) {
+var chromePermissionsContains = function ({ permissions, origins }) {
     return new Promise((resolve) => {
         chrome.permissions.contains(
             {
