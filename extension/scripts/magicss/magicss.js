@@ -43,6 +43,15 @@ if (window.flagEditorInExternalWindow) {
     };
 }
 
+if (window.flagEditorInExternalWindow) {
+    utils.alertNote.setup({
+        paddingRight: '25px',
+        paddingBottom: '25px',
+        verticalAlignment: 'bottom',
+        horizontalAlignment: 'right'
+    });
+}
+
 var chromePermissionsContains = function ({ permissions, origins }) {
     return new Promise((resolve) => {
         chrome.permissions.contains(
