@@ -2982,6 +2982,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 });
                                                             } else if (request.subType === 'click-on-pin-unpin') {
                                                                 $(editor.container).find('.magicss-reapply-styles').eq(0).trigger('click');
+                                                            } else if (request.subType === 'magicss-reload-all-css-resources') {
+                                                                reloadAllCSSResourcesInPage();
                                                             } else {
                                                                 console.log(`Received an unexpected event with subType: ${request.subType}`);
                                                             }
@@ -3117,7 +3119,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     cls: 'magicss-reload-all-css-resources',
                                     uniqCls: 'magicss-reload-all-css-resources',
                                     onclick: function (evt, editor) {
-                                        reloadAllCSSResourcesInPage();
+                                        if (window.flagEditorInExternalWindow) {
+                                            chromeRuntimeMessageIfRequired({
+                                                type: 'magicss',
+                                                subType: 'magicss-reload-all-css-resources'
+                                            });
+                                        } else {
+                                            reloadAllCSSResourcesInPage();
+                                        }
                                         editor.focus();
                                     }
                                 }
