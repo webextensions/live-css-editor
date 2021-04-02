@@ -3577,6 +3577,12 @@ const chromePermissionsContains = function ({ permissions, origins }) {
                                     value: 'magicss'
                                 }],
                                 cssText: [
+                                    `.full-screen-editor #${id} .CodeMirror {`,
+                                    '    width: calc(100vw - 14px) !important;',
+                                    // ' height: calc(100vh - 34px) !important;',
+                                    `    height: calc(100vh - 34px - ((${userPrefFontSizeInPx}px - 12px) * 1.7) ) !important;`,
+                                    '}',
+                                    '',
                                     '#' + id + ' *,',
                                     '.alert-note-text,',
                                     '.alert-note-text *,',

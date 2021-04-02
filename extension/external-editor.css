@@ -8,8 +8,3 @@
     left: 0 !important;
     top: 0 !important;
 }
-
-.full-screen-editor #MagiCSS-bookmarklet .CodeMirror {
-    width: calc(100vw - 14px) !important;
-    height: calc(100vh - 34px) !important;
-}
