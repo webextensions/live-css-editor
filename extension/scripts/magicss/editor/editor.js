@@ -467,15 +467,45 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             } else {
                 let prefix = 'MagiCSS-bookmarklet-';
-                return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-                    var propertyName = `${prefix}${pref}`;
-                    if (value === undefined) {
-                        resolve(amplify.store(propertyName) || _this.defaultPreference(pref));
-                    } else {
-                        amplify.store(propertyName, value);
-                        resolve(_this);
-                    }
-                });
+                var propertyName = `${prefix}${pref}`;
+
+                if (whichStoreToUse === 'sessionStorage') {
+                    return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+                        if (value === undefined) {
+                            let dataToReturn;
+                            try {
+                                const valueFromStorage = sessionStorage.getItem(propertyName);
+                                dataToReturn = JSON.parse(valueFromStorage).data;
+                            } catch (e) {
+                                // Do nothing as such if an error happens
+                                // TODO: Add appropriate logging, if required
+                            }
+                            if (typeof dataToReturn === 'undefined') {
+                                dataToReturn = _this.defaultPreference(pref);
+                            }
+                            resolve(dataToReturn);
+                        } else {
+                            try {
+                                const dataToSet = JSON.stringify({ data: value });
+                                sessionStorage.setItem(propertyName, dataToSet);
+                            } catch (e) {
+                                // Do nothing as such if an error happens
+                                // TODO: Add appropriate logging, if required
+                            }
+                            resolve(_this);
+                        }
+                    });
+                } else {
+                    return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+                        if (value === undefined) {
+                            const dataToReturn = amplify.store(propertyName) || _this.defaultPreference(pref);
+                            resolve(dataToReturn);
+                        } else {
+                            amplify.store(propertyName, value);
+                            resolve(_this);
+                        }
+                    });
+                }
             }
         }
 
@@ -1575,6 +1605,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
+                if (window.flagEditorInExternalWindow) {
+                    whichStoreToUse = 'sessionStorage';
+                    return callback(null);
+                }
+
                 // TODO: The check for storage mode should be moved to the beginning of execution of this file
                 chromeStorageForExtensionData.get(USER_PREFERENCE_STORAGE_MODE, function (values) {
                     if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'localStorage') {

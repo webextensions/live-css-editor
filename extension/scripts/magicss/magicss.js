@@ -13,6 +13,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_THEME = 'theme',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
+var
+    USER_PREFERENCE_LAST_APPLIED_CSS = 'last-applied-css',
+    USER_PREFERENCE_USE_CSS_LINTING = 'use-css-linting',
+    USER_PREFERENCE_SHOW_LINE_NUMBERS = 'show-line-numbers',
+    USER_PREFERENCE_APPLY_STYLES_AUTOMATICALLY = 'apply-styles-automatically',
+    USER_PREFERENCE_LANGUAGE_MODE_NON_FILE = 'language-mode-non-file',
+    USER_PREFERENCE_LANGUAGE_MODE = 'language-mode',
+    USER_PREFERENCE_TEXTAREA_VALUE = 'textarea-value',
+    USER_PREFERENCE_DISABLE_STYLES = 'disable-styles';
+
 var const_rateUsUsageCounterFrom = 20,
     const_rateUsUsageCounterTo = 100;
 
@@ -24,15 +34,25 @@ var tabId = (function () {
     return parseInt(tabId);
 })();
 
-var chromeRuntimeMessageIfRequired = function ({ type, subType, payload }) {
-    if (window.flagEditorInExternalWindow) {
-        chrome.runtime.sendMessage({
-            tabId,
-            type,
-            subType,
-            payload
-        });
-    }
+var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload }) {
+    return new Promise((resolve) => {
+        if (window.flagEditorInExternalWindow) {
+            chrome.runtime.sendMessage(
+                {
+                    tabId,
+                    type,
+                    subType,
+                    payload
+                },
+                undefined,
+                function (data) {
+                    return resolve(data);
+                }
+            );
+        } else {
+            return resolve();
+        }
+    });
 };
 if (window.flagEditorInExternalWindow) {
     window.onbeforeunload = function () {
@@ -1529,6 +1549,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
     CodeMirror.keyMap.sublime['Alt-Up'] = 'swapLineUp';
 
     var main = async function () {
+        let sessionStorageDataForInitialization = null;
+        if (window.flagEditorInExternalWindow) {
+            const sessionStorageData = await chromeRuntimeMessageIfRequired({
+                type: 'magicss',
+                subType: 'storage-data-to-initialize'
+            });
+            sessionStorageDataForInitialization = sessionStorageData;
+        }
+
         await utils.delayFunctionUntilTestFunction({
             tryLimit: 100,
             waitFor: 500,
@@ -2912,6 +2941,25 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                                                     await fnApplyTextAsCSS(editor);
                                                                 });
+                                                            } else if (request.subType === 'storage-data-to-initialize') {
+                                                                setTimeout(async () => {
+                                                                    const propsToSync = [
+                                                                        USER_PREFERENCE_LAST_APPLIED_CSS,
+                                                                        USER_PREFERENCE_USE_CSS_LINTING,
+                                                                        USER_PREFERENCE_SHOW_LINE_NUMBERS,
+                                                                        USER_PREFERENCE_APPLY_STYLES_AUTOMATICALLY,
+                                                                        USER_PREFERENCE_LANGUAGE_MODE_NON_FILE,
+                                                                        USER_PREFERENCE_LANGUAGE_MODE,
+                                                                        USER_PREFERENCE_TEXTAREA_VALUE,
+                                                                        USER_PREFERENCE_DISABLE_STYLES
+                                                                    ];
+
+                                                                    const responseToSend = {};
+                                                                    for (const prop of propsToSync) {
+                                                                        responseToSend[prop] = await editor.userPreference(prop);
+                                                                    }
+                                                                    sendResponse(responseToSend);
+                                                                });
                                                             } else if (request.subType === 'update-code-and-apply-css') {
                                                                 setTimeout(async () => {
                                                                     await editor.setTextValue(request.payload.cssCodeToUse);
@@ -2999,6 +3047,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                             } else {
                                                                 console.log(`Received an unexpected event with subType: ${request.subType}`);
                                                             }
+
+                                                            // Need to return true to run "sendResponse" in async manner
+                                                            // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                                                            return true;
                                                         }
                                                     }
                                                 );
@@ -4093,6 +4145,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
+
+                // "window.flagEditorInExternalWindow" would also be true when "sessionStorageDataForInitialization" is truthy
+                if (sessionStorageDataForInitialization) {
+                    for (const prop in sessionStorageDataForInitialization) {
+                        await window.MagiCSSEditor.userPreference(prop, sessionStorageDataForInitialization[prop]);
+                    }
+                }
+
                 await window.MagiCSSEditor.create();
 
                 checkIfMagicCssLoadedFine(window.MagiCSSEditor);

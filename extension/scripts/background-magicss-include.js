@@ -40,10 +40,14 @@ chrome.runtime.onMessage.addListener(
                     subType: request.subType,
                     payload: request.payload
                 },
-                function(response) { // eslint-disable-line no-unused-vars
-                    // Currently doing nothing
+                function(response) {
+                    sendResponse(response);
                 }
             );
+
+            // Need to return true to run "sendResponse" in async manner
+            // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+            return true;
         }
     }
 );
