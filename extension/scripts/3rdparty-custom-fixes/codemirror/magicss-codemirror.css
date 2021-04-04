@@ -1,16 +1,16 @@
-#MagiCSS-bookmarklet .CodeMirror-hscrollbar {
+html:not(.full-screen-editor) #MagiCSS-bookmarklet .CodeMirror-hscrollbar {
     right: 15px !important;
 }
-#MagiCSS-bookmarklet .CodeMirror-vscrollbar {
+html:not(.full-screen-editor) #MagiCSS-bookmarklet .CodeMirror-vscrollbar {
     bottom: 0px !important;
     margin-bottom: 15px;
     padding-right: 15px;
 }
 
-#MagiCSS-bookmarklet .codemirror-hscrollbar {
+html:not(.full-screen-editor) #MagiCSS-bookmarklet .codemirror-hscrollbar {
   	overflow-x: auto;
 }
-#MagiCSS-bookmarklet .codemirror-vscrollbar {
+html:not(.full-screen-editor) #MagiCSS-bookmarklet .codemirror-vscrollbar {
   	overflow-y: auto;
 }
 
