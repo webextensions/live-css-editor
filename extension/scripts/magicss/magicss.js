@@ -2923,6 +2923,21 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                             return {
                                 name: 'edit-in-external',
+                                title: 'Edit in external window\n\nNote: Available in CSS or Less mode',
+                                cls: 'magicss-external-window-is-not-available-for-mode editor-gray-out-as-disabled',
+                                onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                    utils.alertNote('Please switch to editing code in CSS or Less mode to enable this feature', 5000);
+                                    editor.focus();
+                                }
+                            };
+                        }()),
+                        (function () {
+                            if (window.flagEditorInExternalWindow) {
+                                return null;
+                            }
+
+                            return {
+                                name: 'edit-in-external',
                                 title: 'Edit in external window',
                                 cls: 'magicss-external-window editor-gray-out',
                                 onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
