@@ -54,7 +54,13 @@ var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload })
         }
     });
 };
+
 if (window.flagEditorInExternalWindow) {
+    chromeRuntimeMessageIfRequired({
+        type: 'magicss',
+        subType: 'external-editor-window-is-loading'
+    });
+
     window.onbeforeunload = function () {
         chromeRuntimeMessageIfRequired({
             type: 'magicss',
@@ -3024,6 +3030,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                         await setCodeMirrorCSSLinting(editor, 'disable');
                                                                     });
                                                                 }
+                                                            } else if (request.subType === 'external-editor-window-is-loading') {
+                                                                editor.container.classList.add('external-editor-also-exists');
                                                             } else if (
                                                                 request.subType === 'magicss-closed-editor' ||
                                                                 request.subType === 'external-editor-window-is-closing'
