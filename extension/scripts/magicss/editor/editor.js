@@ -1450,6 +1450,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 await this.userPreference('textarea-value', val);
             }
             this.textValue = val;
+
+            var events = (this.options || {}).events || {};
+            if (events.onSetTextValue) {
+                events.onSetTextValue(val);
+            }
+
             return this;
         }
 

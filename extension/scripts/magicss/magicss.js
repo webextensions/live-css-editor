@@ -2101,15 +2101,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         newStyleTag.disabled = disabled;
                         let appliedCssText = newStyleTag.applyTag();
                         await rememberLastAppliedCss(appliedCssText);
-
-                        chromeRuntimeMessageIfRequired({
-                            type: 'magicss',
-                            subType: 'magicss-apply-css',
-                            payload: {
-                                cssCodeTypedByUser: cssCode
-                            }
-                        });
                     }
+
+                    chromeRuntimeMessageIfRequired({
+                        type: 'magicss',
+                        subType: 'magicss-fnApplyTextAsCSS',
+                        payload: {
+                            options
+                        }
+                    });
                 };
 
                 var showFileEditOptions = async function (editor, callback) {
@@ -2935,11 +2935,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 chrome.runtime.onMessage.addListener(
                                                     function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
                                                         if (request.type === 'magicss') {
-                                                            if (request.subType === 'magicss-apply-css') {
+                                                            if (request.subType === 'magicss-set-text-value') {
                                                                 setTimeout(async () => {
-                                                                    await editor.setTextValue(request.payload.cssCodeTypedByUser);
+                                                                    await editor.setTextValue(request.payload);
                                                                     await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                                    await fnApplyTextAsCSS(editor);
+                                                                });
+                                                            } else if (request.subType === 'magicss-fnApplyTextAsCSS') {
+                                                                setTimeout(async () => {
+                                                                    await fnApplyTextAsCSS(editor, (request.payload || {}).options);
                                                                 });
                                                             } else if (request.subType === 'storage-data-to-initialize') {
                                                                 setTimeout(async () => {
@@ -2976,8 +2979,6 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 });
                                                             } else if (request.subType === 'magicss-handle-delayedcursormove') {
                                                                 var cssClass = processSplitText(request.payload.theSplittedText);
-                                                                // debugger;
-                                                                // const cssClass = request.payload.cssSelector;
                                                                 if (!cssClass) {
                                                                     utils.alertNote.hide();
                                                                 }
@@ -3877,6 +3878,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     subType: 'magicss-closed-editor'
                                 });
                                 window.close();
+                            }
+                        },
+                        onSetTextValue: function (val) {
+                            if (window.flagEditorInExternalWindow) {
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'magicss-set-text-value',
+                                    payload: val
+                                });
                             }
                         },
                         delayedcursormove: function (editor) {
