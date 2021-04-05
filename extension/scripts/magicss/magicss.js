@@ -2617,11 +2617,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 '<span class="file-mode-is-beta">' +
                                     '&nbsp;This is a BETA feature&nbsp;' +
                                 '</span>' +
-                                'file' +
+                                'f<span class="hide-when-magicss-editor-is-small">ile</span>' +
                             '</div>' +
-                            '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>' +
-                            '<div class="magicss-mode-button magicss-mode-less" title="Less mode">less</div>' +
-                            (flagAllowSassUi ? '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>' : '')
+                            '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">c<span class="hide-when-magicss-editor-is-small">ss</span></div>' +
+                            '<div class="magicss-mode-button magicss-mode-less" title="Less mode">l<span class="hide-when-magicss-editor-is-small">ess</span></div>' +
+                            (flagAllowSassUi ? '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">s<span class="hide-when-magicss-editor-is-small">ass</span></div>' : '')
                         );
 
                         $(document).on('click', '.magicss-mode-css', async function () {

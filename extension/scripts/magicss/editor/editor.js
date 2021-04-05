@@ -22,9 +22,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     }
 
     var CONSTANTS = {
-        EDITOR_MIN_WIDTH: 326,
+        USE_NORMAL_SIZE_EDITOR: 350,
+        EDITOR_MIN_WIDTH: 291,
         EDITOR_MIN_HEIGHT: 40,
-        EDITOR_DEFAULT_WIDTH: 326,
+        EDITOR_DEFAULT_WIDTH: 351,
         EDITOR_DEFAULT_HEIGHT: runningInAndroidFirefox ? 140 : 249
     };
 
@@ -909,6 +910,13 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             });
                         });
                     },
+                    resize: function (event, ui) {
+                        if (ui.size.width < CONSTANTS.USE_NORMAL_SIZE_EDITOR) {
+                            thisOb.container.classList.add('magicss-editor-is-small');
+                        } else {
+                            thisOb.container.classList.remove('magicss-editor-is-small');
+                        }
+                    },
                     stop: function (event, ui) {
                         setTimeout(async function () {
                             await thisOb.setTextContainerDimensions(
@@ -1158,6 +1166,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             } else {
                 textarea.style.width = await thisOb.defaultPreference('ui-size-width') + 'px';
                 textarea.style.height = await thisOb.defaultPreference('ui-size-height') + 'px';
+            }
+
+            if (parseInt(textarea.style.width, 10) < CONSTANTS.USE_NORMAL_SIZE_EDITOR) {
+                thisOb.container.classList.add('magicss-editor-is-small');
             }
 
             var textareaWrapAttr = 'off';

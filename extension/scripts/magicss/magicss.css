@@ -126,6 +126,13 @@
     cursor: default;
 }
 
+.magicss-editor-is-small .magicss-title {
+    text-transform: uppercase;
+}
+.magicss-editor-is-small .hide-when-magicss-editor-is-small {
+    display: none;
+}
+
 .magicss-mode-button {
     float: left;
     cursor: pointer;
