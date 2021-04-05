@@ -146,6 +146,10 @@
     -webkit-transform: translateZ(0);   /* https://stackoverflow.com/questions/7582567/css-opacity-change-on-hover-flickering/7623025#7623025 */
 }
 
+.full-screen-editor .magicss-mode-sass {
+    display: none !important;
+}
+
 .magicss-mode-css:hover,
 .magicss-mode-less:hover,
 .magicss-mode-sass:hover,
@@ -195,7 +199,8 @@
     background-size: contain;
     background-repeat: no-repeat;
 }
-.magicss-selected-mode-file .magicss-external-window {
+.magicss-selected-mode-file .magicss-external-window,
+.magicss-selected-mode-sass .magicss-external-window {
     display: none;
 }
 
