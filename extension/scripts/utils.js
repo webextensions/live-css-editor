@@ -204,6 +204,12 @@ if (!utils.defined) {
         parentEl.appendChild(styleNode);
 
         var disabled = config.disabled;
+
+        // TODO: FIXME: HACK: This 'if' condition should be converted into some standard implementation
+        if (window.flagEditorInExternalWindow && id === 'MagiCSS-bookmarklet-html-id') {
+            disabled = true;
+        }
+
         if (disabled) {
             styleNode.disabled = true;
         } else {
