@@ -67,6 +67,12 @@ if (window.flagEditorInExternalWindow) {
             subType: 'external-editor-window-is-closing'
         });
     };
+} else {
+    window.onbeforeunload = function () {
+        chrome.runtime.sendMessage({
+            closeExternalEditor: true
+        });
+    };
 }
 
 if (window.flagEditorInExternalWindow) {

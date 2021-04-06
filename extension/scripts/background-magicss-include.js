@@ -6,6 +6,7 @@ var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
 
 var TR = extLib.TR;
 
+const tabConnectivityMap = {};
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
         if (request.openExternalEditor) {
@@ -19,13 +20,20 @@ chrome.runtime.onMessage.addListener(
 
             let width = request.width || 400,
                 height = request.height || 400;
-            window
-                .open(
-                    `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}`,
-                    "Magic CSS",
-                    `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
-                )
-                .focus();
+            const newWindow = (
+                window
+                    .open(
+                        `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}`,
+                        `Magic CSS (Random Name: ${Math.random()})`,
+                        `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
+                    )
+            );
+            newWindow.focus();
+
+            tabConnectivityMap[sender.tab.id] = newWindow;
+        } else if (request.closeExternalEditor) {
+            tabConnectivityMap[sender.tab.id].close();
+            delete tabConnectivityMap[sender.tab.id];
         }
     }
 );
