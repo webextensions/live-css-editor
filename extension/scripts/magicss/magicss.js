@@ -2847,7 +2847,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             if (isFirefox) {
                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
                                                 utils.alertNote(
-                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
+                                                    '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically  <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                     10000
                                                 );
 
@@ -2904,7 +2904,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                             if (status === 'request-granted') {
                                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
                                                                 utils.alertNote(
-                                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
+                                                                    '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                                     10000
                                                                 );
                                                             } else if (status === 'request-not-granted') {
