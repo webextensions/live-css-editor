@@ -7,61 +7,65 @@ var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
 var TR = extLib.TR;
 
 const tabConnectivityMap = {};
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
-        if (request.openExternalEditor) {
-            const tabOriginWithSlash = (
-                // Even though the chrome.permissions.request API parameter is called "origins",
-                // it doesn't respect the origins without trailing slash. Hence, we append a slash, if required.
-                sender.origin.match(/\/$/) ?
-                    sender.origin :
-                    sender.origin + '/'
-            );
+if (window.flagEditorInExternalWindow) {
+    // do nothing
+} else {
+    chrome.runtime.onMessage.addListener(
+        function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+            if (request.openExternalEditor) {
+                const tabOriginWithSlash = (
+                    // Even though the chrome.permissions.request API parameter is called "origins",
+                    // it doesn't respect the origins without trailing slash. Hence, we append a slash, if required.
+                    sender.origin.match(/\/$/) ?
+                        sender.origin :
+                        sender.origin + '/'
+                );
 
-            let width = request.width || 400,
-                height = request.height || 400;
-            const windowForExternalEditor = (
-                window
-                    .open(
-                        `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}`,
-                        `Magic CSS (Random Name: ${Math.random()})`,
-                        `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
-                    )
-            );
-            windowForExternalEditor.focus();
+                let width = request.width || 400,
+                    height = request.height || 400;
+                const windowForExternalEditor = (
+                    window
+                        .open(
+                            `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}`,
+                            `Magic CSS (Random Name: ${Math.random()})`,
+                            `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
+                        )
+                );
+                windowForExternalEditor.focus();
 
-            tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
-        } else if (request.closeExternalEditor) {
-            const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
-            if (windowForExternalEditor) {
-                windowForExternalEditor.close();
-            }
-            delete tabConnectivityMap[sender.tab.id];
-        }
-    }
-);
-
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
-        if (request.type === 'magicss') {
-            chrome.tabs.sendMessage(
-                request.tabId,
-                {
-                    type: request.type,
-                    subType: request.subType,
-                    payload: request.payload
-                },
-                function(response) {
-                    sendResponse(response);
+                tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
+            } else if (request.closeExternalEditor) {
+                const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
+                if (windowForExternalEditor) {
+                    windowForExternalEditor.close();
                 }
-            );
-
-            // Need to return true to run "sendResponse" in async manner
-            // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
-            return true;
+                delete tabConnectivityMap[sender.tab.id];
+            }
         }
-    }
-);
+    );
+
+    chrome.runtime.onMessage.addListener(
+        function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+            if (request.type === 'magicss') {
+                chrome.tabs.sendMessage(
+                    request.tabId,
+                    {
+                        type: request.type,
+                        subType: request.subType,
+                        payload: request.payload
+                    },
+                    function(response) {
+                        sendResponse(response);
+                    }
+                );
+
+                // Need to return true to run "sendResponse" in async manner
+                // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                return true;
+            }
+        }
+    );
+}
 
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
 var runningInChromiumLikeEnvironment = function () {
@@ -597,9 +601,13 @@ var prerequisitesReady = function (main) {
     }
 };
 
-prerequisitesReady(function (tab) {
-    main(tab);
-});
+if (window.flagEditorInExternalWindow) {
+    main();
+} else {
+    prerequisitesReady(function (tab) {
+        main(tab);
+    });
+}
 
 var parseUrl = function(href) {
     var l = document.createElement("a");
@@ -675,8 +683,8 @@ var onDOMContentLoadedHandler = function () {
     }
 };
 
-onDOMContentLoadedHandler();
-
 if (window.flagEditorInExternalWindow) {
-    main();
+    // do nothing
+} else {
+    onDOMContentLoadedHandler();
 }
