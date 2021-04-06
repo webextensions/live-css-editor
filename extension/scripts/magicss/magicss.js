@@ -453,6 +453,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 await window.MagiCSSEditor.reposition(function () {
                     checkIfMagicCssLoadedFine(window.MagiCSSEditor);
                 });
+
+                chrome.runtime.sendMessage({
+                    closeExternalEditor: true
+                });
             });
         }
         return;
