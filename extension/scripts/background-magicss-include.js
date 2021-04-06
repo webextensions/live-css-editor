@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener(
 
             let width = request.width || 400,
                 height = request.height || 400;
-            const newWindow = (
+            const windowForExternalEditor = (
                 window
                     .open(
                         `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}`,
@@ -28,11 +28,14 @@ chrome.runtime.onMessage.addListener(
                         `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
                     )
             );
-            newWindow.focus();
+            windowForExternalEditor.focus();
 
-            tabConnectivityMap[sender.tab.id] = newWindow;
+            tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
         } else if (request.closeExternalEditor) {
-            tabConnectivityMap[sender.tab.id].close();
+            const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
+            if (windowForExternalEditor) {
+                windowForExternalEditor.close();
+            }
             delete tabConnectivityMap[sender.tab.id];
         }
     }
