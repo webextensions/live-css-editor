@@ -25,3 +25,15 @@ html:not(.full-screen-editor) #MagiCSS-bookmarklet .codemirror-vscrollbar {
 html .CodeMirror-hints {
     z-index: 2147483600;
 }
+
+.full-screen-editor .CodeMirror-hints {
+    /*
+        Overriding:
+            .CodeMirror-hints { max-height: 20em; }
+        Details:
+            To avoid scrollbar going beyond the window size.
+            Applicable when the window size is particularly small.
+            Without this, in full-screen-editor (external editor window), these hints may lead to scrollbar in page overall.
+    */
+    max-height: min(40vh, 20em);
+}
