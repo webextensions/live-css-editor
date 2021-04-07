@@ -793,6 +793,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         } else {
                             if (closeOnEscapeKey) {
                                 await thisOb.hide();
+                                await thisOb.triggerEvent('onClose');
                             }
                         }
                     },
@@ -1038,7 +1039,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     cls: 'editor-close',
                     onclick: async function (evt, editor) {
                         await editor.hide();
-                        await thisOb.triggerEvent('onClose');
+                        await editor.triggerEvent('onClose');
                     }
                 });
             }
