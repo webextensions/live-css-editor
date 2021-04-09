@@ -3012,10 +3012,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     await editor.disableEnableCSS('disable');
                                                                 });
                                                             } else if (request.subType === 'magicss-handle-delayedcursormove') {
-                                                                var cssClass = processSplitText({
-                                                                    splitText: request.payload.theSplittedText
+                                                                var cssSelector = processSplitText({
+                                                                    splitText: request.payload.theSplittedText,
+                                                                    useAlertNote: true
                                                                 });
-                                                                if (!cssClass) {
+                                                                if (!cssSelector) {
                                                                     utils.alertNote.hide();
                                                                 }
 
@@ -3031,13 +3032,25 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     });
                                                                 }
 
-                                                                if (cssClass) {
+                                                                if (cssSelector) {
                                                                     // Helps in highlighting SVG elements
-                                                                    editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important; fill: red !important; }';
+                                                                    editor.styleHighlightingSelector.cssText = cssSelector + '{outline: 1px dashed red !important; fill: red !important; }';
                                                                 } else {
                                                                     editor.styleHighlightingSelector.cssText = '';
                                                                 }
                                                                 editor.styleHighlightingSelector.applyTag();
+                                                            } else if (request.subType === 'magicss-get-selector-match-count') {
+                                                                flagAsyncResponse = true;
+                                                                setTimeout(async () => {
+                                                                    var count = null;
+                                                                    try {
+                                                                        const { cssSelector } = request.payload;
+                                                                        count = $(cssSelector).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
+                                                                    } catch (e) {
+                                                                        // do nothing
+                                                                    }
+                                                                    return sendResponse(count);
+                                                                });
                                                             } else if (request.subType === 'showLineNumbers') {
                                                                 setTimeout(async () => {
                                                                     editor.cm.setOption('lineNumbers', true);
@@ -3929,6 +3942,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         },
                         delayedcursormove: function (editor) {
                             if (window.flagEditorInExternalWindow) {
+                                let cssSelector = processSplitText({
+                                    splitText: editor.splitTextByCursor(),
+                                    useAlertNote: false
+                                });
                                 chromeRuntimeMessageIfRequired({
                                     type: 'magicss',
                                     subType: 'magicss-handle-delayedcursormove',
@@ -3936,12 +3953,40 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         theSplittedText: editor.splitTextByCursor()
                                     }
                                 });
+                                if (cssSelector) {
+                                    setTimeout(async () => {
+                                        var selectorMatchCount = await chromeRuntimeMessageIfRequired({
+                                            type: 'magicss',
+                                            subType: 'magicss-get-selector-match-count',
+                                            payload: {
+                                                cssSelector
+                                            }
+                                        });
+                                        if (selectorMatchCount === null) {
+                                            // do nothing
+                                        } else {
+                                            var trunc = function (str, limit) {
+                                                if (str.length > limit) {
+                                                    var separator = ' ... ';
+                                                    str = str.substr(0, limit / 2) + separator + str.substr(separator.length + str.length - limit / 2);
+                                                }
+                                                return str;
+                                            };
+                                            if (selectorMatchCount) {
+                                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>', 2500);
+                                            } else {
+                                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+                                            }
+                                        }
+                                    });
+                                }
                             } else {
                                 // TODO: FIXME: Currently, we do the "alertNote" for the matches for the selector inside processSplitText.
                                 //              We need to refactor it so that it becomes easier to manage with cross-window / cross-context
                                 //              communication.
-                                var cssClass = processSplitText({
-                                    splitText: editor.splitTextByCursor()
+                                let cssClass = processSplitText({
+                                    splitText: editor.splitTextByCursor(),
+                                    useAlertNote: true
                                 });
                                 if (!cssClass) {
                                     utils.alertNote.hide();
@@ -4049,14 +4094,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }
                     }
 
-                    var cssClass = strBeforeCursor.substring(i) + strAfterCursor.substring(0, j - 1);
-                    cssClass = jQuery.trim(cssClass);
+                    var cssSelector = strBeforeCursor.substring(i) + strAfterCursor.substring(0, j - 1);
+                    cssSelector = jQuery.trim(cssSelector);
 
-                    if (cssClass) {
+                    if (cssSelector) {
                         var count;
 
                         try {
-                            count = $(cssClass).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
+                            count = $(cssSelector).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
                         } catch (e) {
                             return '';
                         }
@@ -4071,17 +4116,17 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                         if (useAlertNote) {
                             if (count) {
-                                utils.alertNote(trunc(cssClass, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
+                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
                             } else {
-                                utils.alertNote(trunc(cssClass, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
                             }
                         }
                     }
 
-                    return cssClass;
+                    return cssSelector;
                 };
 
-                var processSplitText = function ({ splitText }) {
+                var processSplitText = function ({ splitText, useAlertNote }) {
                     if (getLanguageMode() === 'sass' || getLanguageMode() === 'less') {
                         if (!smc) {
                             return '';
@@ -4111,7 +4156,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     strBeforeCursor: strFirstPart,
                                     strAfterCursor: strLastPart
                                 },
-                                useAlertNote: true
+                                useAlertNote
                             });
                         } else {
                             return '';
@@ -4119,7 +4164,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     } else {
                         return fnReturnClass({
                             splitText,
-                            useAlertNote: true
+                            useAlertNote
                         });
                     }
                 };
