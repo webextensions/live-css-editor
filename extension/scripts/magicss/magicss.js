@@ -3066,6 +3066,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 });
                                                             } else if (request.subType === 'reopen-main-editor') {
                                                                 flagAsyncResponse = true;
+                                                                window.focus();
                                                                 setTimeout(async () => {
                                                                     await window.MagiCSSEditor.reposition(function () {
                                                                         checkIfMagicCssLoadedFine(window.MagiCSSEditor);
