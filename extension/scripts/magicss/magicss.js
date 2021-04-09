@@ -922,7 +922,17 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             };
         });
     };
-    updateExistingCSSSelectorsAndAutocomplete();
+    if (window.flagEditorInExternalWindow) {
+        setTimeout(async () => {
+            const cssSelectorsAutocompleteObjects = await chromeRuntimeMessageIfRequired({
+                type: 'magicss',
+                subType: 'get-css-selectors-autocomplete-objects'
+            });
+            existingCSSSelectorsWithAutocompleteObjects = JSON.parse(JSON.stringify(cssSelectorsAutocompleteObjects));
+        });
+    } else {
+        updateExistingCSSSelectorsAndAutocomplete();
+    }
 
     // TODO: DUPLICATE: Code duplication for browser detection in magicss.js and options.js
     var isChrome = false,
@@ -3050,6 +3060,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                         // do nothing
                                                                     }
                                                                     return sendResponse(count);
+                                                                });
+                                                            } else if (request.subType === 'get-css-selectors-autocomplete-objects') {
+                                                                flagAsyncResponse = true;
+                                                                setTimeout(async () => {
+                                                                    return sendResponse(existingCSSSelectorsWithAutocompleteObjects);
                                                                 });
                                                             } else if (request.subType === 'showLineNumbers') {
                                                                 setTimeout(async () => {
