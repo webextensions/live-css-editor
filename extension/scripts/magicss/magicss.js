@@ -2819,10 +2819,13 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     }
                                                     return str;
                                                 };
+
+                                                var cssSelectorToShow = htmlEscape(trunc(cssSelector, 100));
+                                                var sourcesToShow = (selectedText && selectedText.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(decodeURIComponent(selectedText.sources)) + '</span></span>') : '';
                                                 if (selectorMatchCount) {
-                                                    utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>', 2500);
+                                                    utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
                                                 } else {
-                                                    utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
+                                                    utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>' + sourcesToShow, 2500);
                                                 }
                                             }
                                         });
