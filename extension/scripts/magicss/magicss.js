@@ -3012,7 +3012,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     await editor.disableEnableCSS('disable');
                                                                 });
                                                             } else if (request.subType === 'magicss-handle-delayedcursormove') {
-                                                                var cssClass = processSplitText(request.payload.theSplittedText);
+                                                                var cssClass = processSplitText({
+                                                                    splitText: request.payload.theSplittedText
+                                                                });
                                                                 if (!cssClass) {
                                                                     utils.alertNote.hide();
                                                                 }
@@ -3938,7 +3940,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 // TODO: FIXME: Currently, we do the "alertNote" for the matches for the selector inside processSplitText.
                                 //              We need to refactor it so that it becomes easier to manage with cross-window / cross-context
                                 //              communication.
-                                var cssClass = processSplitText(editor.splitTextByCursor());
+                                var cssClass = processSplitText({
+                                    splitText: editor.splitTextByCursor()
+                                });
                                 if (!cssClass) {
                                     utils.alertNote.hide();
                                 }
@@ -3996,7 +4000,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     }
                 };
 
-                var fnReturnClass = function (splitText) {
+                var fnReturnClass = function ({ splitText, useAlertNote }) {
                     var strBeforeCursor = splitText.strBeforeCursor,
                         strAfterCursor = splitText.strAfterCursor;
 
@@ -4065,17 +4069,19 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             return str;
                         };
 
-                        if (count) {
-                            utils.alertNote(trunc(cssClass, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
-                        } else {
-                            utils.alertNote(trunc(cssClass, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+                        if (useAlertNote) {
+                            if (count) {
+                                utils.alertNote(trunc(cssClass, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
+                            } else {
+                                utils.alertNote(trunc(cssClass, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+                            }
                         }
                     }
 
                     return cssClass;
                 };
 
-                var processSplitText = function (splitText) {
+                var processSplitText = function ({ splitText }) {
                     if (getLanguageMode() === 'sass' || getLanguageMode() === 'less') {
                         if (!smc) {
                             return '';
@@ -4101,14 +4107,20 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             strFirstPart = cssTextInLines.join('\n');
                             strLastPart = newStyleTag.cssText.substr(strFirstPart.length);
                             return fnReturnClass({
-                                strBeforeCursor: strFirstPart,
-                                strAfterCursor: strLastPart
+                                splitText: {
+                                    strBeforeCursor: strFirstPart,
+                                    strAfterCursor: strLastPart
+                                },
+                                useAlertNote: true
                             });
                         } else {
                             return '';
                         }
                     } else {
-                        return fnReturnClass(splitText);
+                        return fnReturnClass({
+                            splitText,
+                            useAlertNote: true
+                        });
                     }
                 };
 
