@@ -2966,6 +2966,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
                                                 chrome.runtime.onMessage.addListener(
                                                     function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+                                                        let flagAsyncResponse = false;
                                                         if (request.type === 'magicss') {
                                                             if (request.subType === 'magicss-set-text-value') {
                                                                 setTimeout(async () => {
@@ -2977,6 +2978,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     await fnApplyTextAsCSS(editor, (request.payload || {}).options);
                                                                 });
                                                             } else if (request.subType === 'storage-data-to-initialize') {
+                                                                flagAsyncResponse = true;
                                                                 setTimeout(async () => {
                                                                     const propsToSync = [
                                                                         USER_PREFERENCE_LAST_APPLIED_CSS,
@@ -2993,7 +2995,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     for (const prop of propsToSync) {
                                                                         responseToSend[prop] = await editor.userPreference(prop);
                                                                     }
-                                                                    sendResponse(responseToSend);
+                                                                    return sendResponse(responseToSend);
                                                                 });
                                                             } else if (request.subType === 'update-code-and-apply-css') {
                                                                 setTimeout(async () => {
@@ -3085,7 +3087,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                                                             // Need to return true to run "sendResponse" in async manner
                                                             // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
-                                                            return true;
+                                                            return flagAsyncResponse;
                                                         }
                                                     }
                                                 );
