@@ -2799,7 +2799,36 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 ),
                                 onCssHintSelectForSelector: function (selectedText) {
                                     var editor = window.MagiCSSEditor;
-                                    showCSSSelectorMatches(selectedText, editor);
+                                    if (window.flagEditorInExternalWindow) {
+                                        setTimeout(async () => {
+                                            const cssSelector = selectedText.originalSelector;
+                                            var selectorMatchCount = await chromeRuntimeMessageIfRequired({
+                                                type: 'magicss',
+                                                subType: 'magicss-get-selector-match-count',
+                                                payload: {
+                                                    cssSelector
+                                                }
+                                            });
+                                            if (selectorMatchCount === null) {
+                                                // do nothing
+                                            } else {
+                                                var trunc = function (str, limit) {
+                                                    if (str.length > limit) {
+                                                        var separator = ' ... ';
+                                                        str = str.substr(0, limit / 2) + separator + str.substr(separator.length + str.length - limit / 2);
+                                                    }
+                                                    return str;
+                                                };
+                                                if (selectorMatchCount) {
+                                                    utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>', 2500);
+                                                } else {
+                                                    utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        showCSSSelectorMatches(selectedText, editor);
+                                    }
                                 },
                                 onCssHintShownForSelector: function () {    /* As per current CodeMirror/css-hint architecture,
                                                                                "select" is called before "shown".
