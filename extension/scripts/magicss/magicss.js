@@ -1104,7 +1104,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             if (count) {
                 utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
             } else {
-                utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>' + sourcesToShow, 2500);
+                utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>' + sourcesToShow, 2500);
             }
         }
     };
@@ -3975,7 +3975,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             if (selectorMatchCount) {
                                                 utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>', 2500);
                                             } else {
-                                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+                                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
                                             }
                                         }
                                     });
@@ -4118,7 +4118,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (count) {
                                 utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
                             } else {
-                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
                             }
                         }
                     }
