@@ -3984,11 +3984,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 // TODO: FIXME: Currently, we do the "alertNote" for the matches for the selector inside processSplitText.
                                 //              We need to refactor it so that it becomes easier to manage with cross-window / cross-context
                                 //              communication.
-                                let cssClass = processSplitText({
+                                let cssSelector = processSplitText({
                                     splitText: editor.splitTextByCursor(),
                                     useAlertNote: true
                                 });
-                                if (!cssClass) {
+                                if (!cssSelector) {
                                     utils.alertNote.hide();
                                 }
 
@@ -4004,9 +4004,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     });
                                 }
 
-                                if (cssClass) {
+                                if (cssSelector) {
                                     // Helps in highlighting SVG elements
-                                    editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important; fill: red !important; }';
+                                    editor.styleHighlightingSelector.cssText = cssSelector + '{outline: 1px dashed red !important; fill: red !important; }';
                                 } else {
                                     editor.styleHighlightingSelector.cssText = '';
                                 }
@@ -4045,7 +4045,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     }
                 };
 
-                var fnReturnClass = function ({ splitText, useAlertNote }) {
+                var fnReturnCssSelector = function ({ splitText, useAlertNote }) {
                     var strBeforeCursor = splitText.strBeforeCursor,
                         strAfterCursor = splitText.strAfterCursor;
 
@@ -4151,7 +4151,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             cssTextInLines[cssTextInLines.length - 1] = lastItem.substr(0, generatedPosition.column);
                             strFirstPart = cssTextInLines.join('\n');
                             strLastPart = newStyleTag.cssText.substr(strFirstPart.length);
-                            return fnReturnClass({
+                            return fnReturnCssSelector({
                                 splitText: {
                                     strBeforeCursor: strFirstPart,
                                     strAfterCursor: strLastPart
@@ -4162,7 +4162,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             return '';
                         }
                     } else {
-                        return fnReturnClass({
+                        return fnReturnCssSelector({
                             splitText,
                             useAlertNote
                         });
