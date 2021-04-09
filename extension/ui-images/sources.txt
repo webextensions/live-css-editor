@@ -19,6 +19,13 @@ hash.svg
 hash_edited.svg
     Slightly edited version of "hash.svg"
 
+link-external.svg
+    https://github.com/primer/octicons/blob/bb60b8475dd1e03041416c406007a625d50a64d1/svg/link-external.svg
+link-external_edited-yellow.svg
+    Slightly edited version of "link-external.svg"
+link-internal_edited-yellow.svg
+    Slightly edited version of "link-external_edited-yellow.svg"
+
 logo-facebook.svg
     https://upload.wikimedia.org/wikipedia/commons/c/c2/F_icon.svg
 

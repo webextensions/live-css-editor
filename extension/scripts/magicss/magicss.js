@@ -2970,6 +2970,25 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }()),
                         (function () {
                             if (window.flagEditorInExternalWindow) {
+                                return {
+                                    name: 'edit-in-internal',
+                                    title: 'Move editor inside page',
+                                    cls: 'magicss-internal-window editor-gray-out',
+                                    onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                        await chromeRuntimeMessageIfRequired({
+                                            type: 'magicss',
+                                            subType: 'reopen-main-editor'
+                                        });
+
+                                        window.close();
+                                    }
+                                };
+                            } else {
+                                return null;
+                            }
+                        }()),
+                        (function () {
+                            if (window.flagEditorInExternalWindow) {
                                 return null;
                             }
 
@@ -3044,6 +3063,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     await editor.setTextValue(request.payload.cssCodeToUse);
                                                                     await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                                                                     await fnApplyTextAsCSS(editor);
+                                                                });
+                                                            } else if (request.subType === 'reopen-main-editor') {
+                                                                flagAsyncResponse = true;
+                                                                setTimeout(async () => {
+                                                                    await window.MagiCSSEditor.reposition(function () {
+                                                                        checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+                                                                        sendResponse(); // Note: This "sendResponse()" call is for indicating that the execution if this part is complete and we are not sending any data in the response
+                                                                    });
                                                                 });
                                                             } else if (request.subType === 'enableCss') {
                                                                 setTimeout(async () => {
