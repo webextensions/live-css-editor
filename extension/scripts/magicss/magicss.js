@@ -2959,6 +2959,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             height: editor.container.clientHeight
                                         });
 
+                                        await editor.hide();
                                         editor.container.classList.add('external-editor-also-exists');
 
                                         if (!window.openExternalEditorListenerAdded) {
