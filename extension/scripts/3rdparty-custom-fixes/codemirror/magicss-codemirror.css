@@ -36,4 +36,8 @@ html .CodeMirror-hints {
             Without this, in full-screen-editor (external editor window), these hints may lead to scrollbar in page overall.
     */
     max-height: min(40vh, 20em);
+
+    /* Useful in avoiding full page horizontal scrollbar when editor is open in external window and the autocomplete
+       suggestions list is too wide */
+    max-width: 90vw;
 }
