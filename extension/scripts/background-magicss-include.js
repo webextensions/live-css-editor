@@ -62,6 +62,12 @@ if (window.flagEditorInExternalWindow) {
                         payload: request.payload
                     },
                     function(response) {
+                        // This if condition check is required to avoid unwanted warnings
+                        // TODO: FIXME: Is there some better solution possible?
+                        if (chrome.runtime.lastError) {
+                            // Currently doing nothing
+                        }
+
                         sendResponse(response);
                     }
                 );
