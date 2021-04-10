@@ -34,12 +34,33 @@ var tabId = (function () {
     return parseInt(tabId);
 })();
 
+// https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid/2117523#2117523
+var uuidv4 = function () {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+};
+
+window.magicssHostSessionUuid = (
+    window.magicssHostSessionUuid ||
+    (function () {
+        const
+            urlParams = new URLSearchParams(window.location.search),
+            magicssHostSessionUuid = urlParams.get('magicssHostSessionUuid');
+
+        return magicssHostSessionUuid;
+    })() ||
+    uuidv4()
+);
+
 var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload }) {
     return new Promise((resolve) => {
         if (window.flagEditorInExternalWindow) {
             chrome.runtime.sendMessage(
                 {
                     tabId,
+                    magicssHostSessionUuid: window.magicssHostSessionUuid,
                     type,
                     subType,
                     payload
@@ -3015,6 +3036,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     try {
                                         chrome.runtime.sendMessage({
                                             openExternalEditor: true,
+                                            magicssHostSessionUuid: window.magicssHostSessionUuid,
                                             tabTitle: document.title,
                                             width: editor.container.clientWidth,
                                             height: editor.container.clientHeight
@@ -3028,7 +3050,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 chrome.runtime.onMessage.addListener(
                                                     function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
                                                         let flagAsyncResponse = false;
-                                                        if (request.type === 'magicss') {
+                                                        if (
+                                                            request.magicssHostSessionUuid === window.magicssHostSessionUuid &&
+                                                            request.type === 'magicss'
+                                                        ) {
                                                             if (request.subType === 'magicss-set-text-value') {
                                                                 setTimeout(async () => {
                                                                     await editor.setTextValue(request.payload);

@@ -26,7 +26,13 @@ if (window.flagEditorInExternalWindow) {
                 const windowForExternalEditor = (
                     window
                         .open(
-                            `${chrome.runtime.getURL('external-editor.html')}?tabId=${sender.tab.id}&tabTitle=${encodeURIComponent(request.tabTitle)}&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}`,
+                            (
+                                `${chrome.runtime.getURL('external-editor.html')}` +
+                                `?tabId=${sender.tab.id}` +
+                                `&tabTitle=${encodeURIComponent(request.tabTitle)}` +
+                                `&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}` +
+                                `&magicssHostSessionUuid=${encodeURIComponent(request.magicssHostSessionUuid)}`
+                            ),
                             `Magic CSS (Random Name: ${Math.random()})`,
                             `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
                         )
@@ -50,6 +56,7 @@ if (window.flagEditorInExternalWindow) {
                 chrome.tabs.sendMessage(
                     request.tabId,
                     {
+                        magicssHostSessionUuid: request.magicssHostSessionUuid,
                         type: request.type,
                         subType: request.subType,
                         payload: request.payload
