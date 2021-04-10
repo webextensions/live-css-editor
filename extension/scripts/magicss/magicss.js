@@ -4056,6 +4056,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     splitText: editor.splitTextByCursor(),
                                     useAlertNote: false
                                 });
+                                if (!cssSelector) {
+                                    utils.alertNote.hide();
+                                }
+
                                 chromeRuntimeMessageIfRequired({
                                     type: 'magicss',
                                     subType: 'magicss-handle-delayedcursormove',
