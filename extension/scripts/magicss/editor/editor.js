@@ -793,7 +793,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         } else {
                             if (closeOnEscapeKey) {
                                 await thisOb.hide();
-                                await thisOb.triggerEvent('onClose');
+                                await thisOb.triggerEvent('onClose', { closeByKeyPress: true });
                             }
                         }
                     },
@@ -1326,7 +1326,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     break;
                 case 'onClose':
                     if (events.onClose) {
-                        events.onClose(thisOb);
+                        events.onClose(thisOb, config);
                     }
                     break;
                 case 'clear':

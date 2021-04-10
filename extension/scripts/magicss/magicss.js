@@ -4025,12 +4025,19 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         afterhide: function () {
                             // currently doing nothing
                         },
-                        onClose: async function () {
+                        onClose: async function (editor, config) {
                             if (window.flagEditorInExternalWindow) {
-                                chromeRuntimeMessageIfRequired({
-                                    type: 'magicss',
-                                    subType: 'magicss-closed-editor'
-                                });
+                                if (config && config.closeByKeyPress) {
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'reopen-main-editor'
+                                    });
+                                } else {
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'magicss-closed-editor'
+                                    });
+                                }
                                 window.close();
                             }
                         },
