@@ -3094,6 +3094,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 window.focus();
                                                                 setTimeout(async () => {
                                                                     await window.MagiCSSEditor.reposition(function () {
+                                                                        // Since the editor would have been hidden, upon showing it again, it wouldn't have updated. Hence, this refresh is required, otherwise, the view would get updated upon clicking inside the editor in host tab.
+                                                                        window.MagiCSSEditor.cm.refresh();
+
                                                                         checkIfMagicCssLoadedFine(window.MagiCSSEditor);
                                                                         sendResponse(); // Note: This "sendResponse()" call is for indicating that the execution if this part is complete and we are not sending any data in the response
                                                                     });
