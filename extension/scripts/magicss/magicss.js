@@ -2953,7 +2953,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 }
 
                                                 if (document.querySelector('.external-editor-also-exists')) {
-                                                    await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                    // do nothing
                                                 } else {
                                                     chrome.runtime.sendMessage(
                                                         {
