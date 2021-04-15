@@ -2898,33 +2898,29 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
                                             await markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                            if (window.flagEditorInExternalWindow) {
+                                                chromeRuntimeMessageIfRequired({
+                                                    type: 'magicss',
+                                                    subType: 'mark-as-not-pinned-without-notification'
+                                                });
+                                            }
                                             utils.alertNote(
                                                 '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                 5000
                                             );
-
-                                            if (window.flagEditorInExternalWindow) {
-                                                chromeRuntimeMessageIfRequired({
-                                                    type: 'magicss',
-                                                    subType: 'click-on-pin-unpin'
-                                                });
-                                                return;
-                                            }
                                         } else {
                                             if (isFirefox) {
                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                if (window.flagEditorInExternalWindow) {
+                                                    chromeRuntimeMessageIfRequired({
+                                                        type: 'magicss',
+                                                        subType: 'mark-as-pinned-without-notification'
+                                                    });
+                                                }
                                                 utils.alertNote(
                                                     '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically  <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                     10000
                                                 );
-
-                                                if (window.flagEditorInExternalWindow) {
-                                                    chromeRuntimeMessageIfRequired({
-                                                        type: 'magicss',
-                                                        subType: 'click-on-pin-unpin'
-                                                    });
-                                                    return;
-                                                }
                                             } else {
                                                 // If the editor is in external window, then we may want to resize the window before requesting for permissions
                                                 if (window.flagEditorInExternalWindow) {
@@ -2952,34 +2948,36 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     }
                                                 }
 
-                                                if (document.querySelector('.external-editor-also-exists')) {
-                                                    // do nothing
-                                                } else {
-                                                    chrome.runtime.sendMessage(
-                                                        {
-                                                            requestPermissions: true,
-                                                            tabOriginWithSlash
-                                                        },
-                                                        async function asyncCallback(status) {
-                                                            if (chrome.runtime.lastError) {
-                                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                                utils.alertNote(
-                                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                                    10000
-                                                                );
-                                                            }
-                                                            if (status === 'request-granted') {
-                                                                await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                                utils.alertNote(
-                                                                    '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
-                                                                    10000
-                                                                );
-                                                            } else if (status === 'request-not-granted') {
-                                                                utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
-                                                            }
+                                                chrome.runtime.sendMessage(
+                                                    {
+                                                        requestPermissions: true,
+                                                        tabOriginWithSlash
+                                                    },
+                                                    async function asyncCallback(status) {
+                                                        if (chrome.runtime.lastError) {
+                                                            console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                            utils.alertNote(
+                                                                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                                10000
+                                                            );
                                                         }
-                                                    );
-                                                }
+                                                        if (status === 'request-granted') {
+                                                            await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                            if (window.flagEditorInExternalWindow) {
+                                                                chromeRuntimeMessageIfRequired({
+                                                                    type: 'magicss',
+                                                                    subType: 'mark-as-pinned-without-notification'
+                                                                });
+                                                            }
+                                                            utils.alertNote(
+                                                                '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
+                                                                10000
+                                                            );
+                                                        } else if (status === 'request-not-granted') {
+                                                            utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                        }
+                                                    }
+                                                );
                                             }
                                         }
                                         editor.focus();
@@ -3195,8 +3193,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 setTimeout(async () => {
                                                                     await setLanguageMode('sass', editor);
                                                                 });
-                                                            } else if (request.subType === 'click-on-pin-unpin') {
-                                                                $(editor.container).find('.magicss-reapply-styles').eq(0).trigger('click');
+                                                            } else if (request.subType === 'mark-as-pinned-without-notification') {
+                                                                setTimeout(async () => {
+                                                                    await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                                });
+                                                            } else if (request.subType === 'mark-as-not-pinned-without-notification') {
+                                                                setTimeout(async () => {
+                                                                    await markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                                                });
                                                             } else if (request.subType === 'magicss-reload-all-css-resources') {
                                                                 reloadAllCSSResourcesInPage();
                                                             } else {
