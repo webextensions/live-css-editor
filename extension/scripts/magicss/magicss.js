@@ -3183,15 +3183,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 editor.container.classList.remove('external-editor-also-exists');
                                                             } else if (request.subType === 'set-language-mode-to-css') {
                                                                 setTimeout(async () => {
-                                                                    await setLanguageMode('css', editor);
+                                                                    await setLanguageMode('css', editor, { skipNotifications: true });
                                                                 });
                                                             } else if (request.subType === 'set-language-mode-to-less') {
                                                                 setTimeout(async () => {
-                                                                    await setLanguageMode('less', editor);
+                                                                    await setLanguageMode('less', editor, { skipNotifications: true });
                                                                 });
                                                             } else if (request.subType === 'set-language-mode-to-sass') {
                                                                 setTimeout(async () => {
-                                                                    await setLanguageMode('sass', editor);
+                                                                    await setLanguageMode('sass', editor, { skipNotifications: true });
                                                                 });
                                                             } else if (request.subType === 'mark-as-pinned-without-notification') {
                                                                 setTimeout(async () => {
