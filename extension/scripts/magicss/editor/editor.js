@@ -22,9 +22,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     }
 
     var CONSTANTS = {
-        EDITOR_MIN_WIDTH: 326,
+        USE_NORMAL_SIZE_EDITOR: 350,
+        EDITOR_MIN_WIDTH: 291,
         EDITOR_MIN_HEIGHT: 40,
-        EDITOR_DEFAULT_WIDTH: 326,
+        EDITOR_DEFAULT_WIDTH: 351,
         EDITOR_DEFAULT_HEIGHT: runningInAndroidFirefox ? 140 : 249
     };
 
@@ -467,15 +468,45 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             } else {
                 let prefix = 'MagiCSS-bookmarklet-';
-                return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-                    var propertyName = `${prefix}${pref}`;
-                    if (value === undefined) {
-                        resolve(amplify.store(propertyName) || _this.defaultPreference(pref));
-                    } else {
-                        amplify.store(propertyName, value);
-                        resolve(_this);
-                    }
-                });
+                var propertyName = `${prefix}${pref}`;
+
+                if (whichStoreToUse === 'sessionStorage') {
+                    return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+                        if (value === undefined) {
+                            let dataToReturn;
+                            try {
+                                const valueFromStorage = sessionStorage.getItem(propertyName);
+                                dataToReturn = JSON.parse(valueFromStorage).data;
+                            } catch (e) {
+                                // Do nothing as such if an error happens
+                                // TODO: Add appropriate logging, if required
+                            }
+                            if (typeof dataToReturn === 'undefined') {
+                                dataToReturn = _this.defaultPreference(pref);
+                            }
+                            resolve(dataToReturn);
+                        } else {
+                            try {
+                                const dataToSet = JSON.stringify({ data: value });
+                                sessionStorage.setItem(propertyName, dataToSet);
+                            } catch (e) {
+                                // Do nothing as such if an error happens
+                                // TODO: Add appropriate logging, if required
+                            }
+                            resolve(_this);
+                        }
+                    });
+                } else {
+                    return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+                        if (value === undefined) {
+                            const dataToReturn = amplify.store(propertyName) || _this.defaultPreference(pref);
+                            resolve(dataToReturn);
+                        } else {
+                            amplify.store(propertyName, value);
+                            resolve(_this);
+                        }
+                    });
+                }
             }
         }
 
@@ -650,6 +681,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         }
 
         _makeDraggable() {
+            if (document.documentElement.classList.contains('full-screen-editor')) {
+                return;
+            }
+
             var thisOb = this,
                 options = thisOb.options;
 
@@ -758,6 +793,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         } else {
                             if (closeOnEscapeKey) {
                                 await thisOb.hide();
+                                await thisOb.triggerEvent('onClose', { closeByKeyPress: true });
                             }
                         }
                     },
@@ -855,37 +891,48 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             });
 
             $(cm.getWrapperElement()).addClass('cancelDragHandle');
-            $(cm.getWrapperElement()).resizable({
-                handles: 'se',
-                minWidth: CONSTANTS.EDITOR_MIN_WIDTH,
-                minHeight: CONSTANTS.EDITOR_MIN_HEIGHT,
-                start: function () {
-                    setTimeout(async function () {
-                        // Save editor's position.
-                        // It is useful when the user is resizing, but the position
-                        // is out of sync with the value in userPreference (this
-                        // out-of-sync is deliberate and useful for auto-positioning
-                        // on window resize)
-                        await thisOb.savePosition({
-                            top: parseInt(thisOb.container.style.top, 10),
-                            left: parseInt(thisOb.container.style.left, 10)
+            if (document.documentElement.classList.contains('full-screen-editor')) {
+                // do nothing
+            } else {
+                $(cm.getWrapperElement()).resizable({
+                    handles: 'se',
+                    minWidth: CONSTANTS.EDITOR_MIN_WIDTH,
+                    minHeight: CONSTANTS.EDITOR_MIN_HEIGHT,
+                    start: function () {
+                        setTimeout(async function () {
+                            // Save editor's position.
+                            // It is useful when the user is resizing, but the position
+                            // is out of sync with the value in userPreference (this
+                            // out-of-sync is deliberate and useful for auto-positioning
+                            // on window resize)
+                            await thisOb.savePosition({
+                                top: parseInt(thisOb.container.style.top, 10),
+                                left: parseInt(thisOb.container.style.left, 10)
+                            });
                         });
-                    });
-                },
-                stop: function (event, ui) {
-                    setTimeout(async function () {
-                        await thisOb.setTextContainerDimensions(
-                            {
-                                width: ui.size.width,
-                                height: ui.size.height
-                            },
-                            {
-                                propagateTo: 'codemirror'
-                            }
-                        );
-                    });
-                }
-            });
+                    },
+                    resize: function (event, ui) {
+                        if (ui.size.width < CONSTANTS.USE_NORMAL_SIZE_EDITOR) {
+                            thisOb.container.classList.add('magicss-editor-is-small');
+                        } else {
+                            thisOb.container.classList.remove('magicss-editor-is-small');
+                        }
+                    },
+                    stop: function (event, ui) {
+                        setTimeout(async function () {
+                            await thisOb.setTextContainerDimensions(
+                                {
+                                    width: ui.size.width,
+                                    height: ui.size.height
+                                },
+                                {
+                                    propagateTo: 'codemirror'
+                                }
+                            );
+                        });
+                    }
+                });
+            }
         }
 
         async _addChildComponents() {
@@ -954,21 +1001,23 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         });
                         tooltipContent.push('</ul>');
                         $moreIcon.tooltipster({
+                            plugins: ['tooltipster.sideTip', 'laa.scrollableTip'],
                             content: tooltipContent.join(''),
                             contentAsHTML: true,
-                            position: 'bottom',
+                            side: ['top', 'bottom'],
                             // https://github.com/iamceege/tooltipster/blob/3.3.0/js/jquery.tooltipster.js#L338
                             theme: 'tooltipster-default magic-css-tooltipster',
                             interactive: true,
                             interactiveTolerance: 350,
-                            functionReady: function (origin, tooltip) {
+                            functionReady: function (instance, helper) {
                                 setTimeout(async function () {
                                     for (var i = 0; i < options.headerOtherIcons.length; i++) {
                                         var ico = options.headerOtherIcons[i];
                                         if (ico && ico.beforeShow) {
-                                            await ico.beforeShow(origin, tooltip, editor);
+                                            await ico.beforeShow(helper.origin, $(helper.tooltip), editor);
                                         }
                                     }
+
                                     // The tooltip would have rendered in hidden mode, but its width might have changed
                                     // due to some changes via .beforeShow(), so, we need to reposition it
                                     $moreIcon.tooltipster('reposition');
@@ -990,6 +1039,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     cls: 'editor-close',
                     onclick: async function (evt, editor) {
                         await editor.hide();
+                        await editor.triggerEvent('onClose');
                     }
                 });
             }
@@ -1040,17 +1090,17 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                             $divIcon.tooltipster({
                                 content: tooltipContent.join(''),
                                 contentAsHTML: true,
-                                position: 'bottom',
+                                side: ['top', 'bottom'],
                                 // https://github.com/iamceege/tooltipster/blob/3.3.0/js/jquery.tooltipster.js#L338
                                 theme: 'tooltipster-default magic-css-tooltipster',
                                 interactive: true,
                                 interactiveTolerance: 350,
-                                functionReady: function (origin, tooltip) {
+                                functionReady: function (instance, helper) {
                                     setTimeout(async function () {
                                         for (var i = 0; i < iconOptions.icons.length; i++) {
                                             var ico = iconOptions.icons[i];
                                             if (ico && ico.beforeShow) {
-                                                await ico.beforeShow(origin, tooltip, editor);
+                                                await ico.beforeShow(helper.origin, $(helper.tooltip), editor);
                                             }
                                         }
                                         // The tooltip would have rendered in hidden mode, but its width might have changed
@@ -1117,6 +1167,10 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             } else {
                 textarea.style.width = await thisOb.defaultPreference('ui-size-width') + 'px';
                 textarea.style.height = await thisOb.defaultPreference('ui-size-height') + 'px';
+            }
+
+            if (parseInt(textarea.style.width, 10) < CONSTANTS.USE_NORMAL_SIZE_EDITOR) {
+                thisOb.container.classList.add('magicss-editor-is-small');
             }
 
             var textareaWrapAttr = 'off';
@@ -1270,6 +1324,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         events.afterhide(thisOb);
                     }
                     break;
+                case 'onClose':
+                    if (events.onClose) {
+                        events.onClose(thisOb, config);
+                    }
+                    break;
                 case 'clear':
                     if (events.clear) {
                         events.clear(thisOb);
@@ -1404,6 +1463,12 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 await this.userPreference('textarea-value', val);
             }
             this.textValue = val;
+
+            var events = (this.options || {}).events || {};
+            if (events.onSetTextValue) {
+                events.onSetTextValue(val);
+            }
+
             return this;
         }
 
@@ -1559,6 +1624,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 });
             },
             function (callback) {
+                if (window.flagEditorInExternalWindow) {
+                    whichStoreToUse = 'sessionStorage';
+                    return callback(null);
+                }
+
                 // TODO: The check for storage mode should be moved to the beginning of execution of this file
                 chromeStorageForExtensionData.get(USER_PREFERENCE_STORAGE_MODE, function (values) {
                     if (values && values[USER_PREFERENCE_STORAGE_MODE] === 'localStorage') {

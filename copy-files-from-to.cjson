@@ -234,11 +234,8 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.js",
-                    "latest": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/js/tooltipster.main.js"
-                },
-                "dev": {
-                    "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/js/jquery.tooltipster.js"
+                    "src": "https://raw.githubusercontent.com/iamceege/tooltipster/4.2.8/dist/js/tooltipster.bundle.js",
+                    "latest": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/js/tooltipster.bundle.js"
                 }
             },
             "to": {
@@ -251,11 +248,20 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/iamceege/tooltipster/3.3.0/css/tooltipster.css",
-                    "latest": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/css/tooltipster.main.css"
+                    "src": "https://raw.githubusercontent.com/iamceege/tooltipster/4.2.8/dist/css/tooltipster.bundle.css",
+                    "latest": "https://raw.githubusercontent.com/iamceege/tooltipster/master/dist/css/tooltipster.bundle.css"
                 }
             },
             "to": "extension/scripts/3rdparty/tooltipster/tooltipster.css"
+        },
+        {
+            "from": {
+                "default": {
+                    "src": "https://raw.githubusercontent.com/louisameline/tooltipster-scrollableTip/1.0.0/tooltipster-scrollableTip.js",
+                    "latest": "https://raw.githubusercontent.com/louisameline/tooltipster-scrollableTip/master/tooltipster-scrollableTip.js"
+                }
+            },
+            "to": "extension/scripts/3rdparty/tooltipster/tooltipster-scrollableTip.js"
         },
         {
             "from": {

@@ -1,16 +1,16 @@
-#MagiCSS-bookmarklet .CodeMirror-hscrollbar {
+html:not(.full-screen-editor) #MagiCSS-bookmarklet .CodeMirror-hscrollbar {
     right: 15px !important;
 }
-#MagiCSS-bookmarklet .CodeMirror-vscrollbar {
+html:not(.full-screen-editor) #MagiCSS-bookmarklet .CodeMirror-vscrollbar {
     bottom: 0px !important;
     margin-bottom: 15px;
     padding-right: 15px;
 }
 
-#MagiCSS-bookmarklet .codemirror-hscrollbar {
+html:not(.full-screen-editor) #MagiCSS-bookmarklet .codemirror-hscrollbar {
   	overflow-x: auto;
 }
-#MagiCSS-bookmarklet .codemirror-vscrollbar {
+html:not(.full-screen-editor) #MagiCSS-bookmarklet .codemirror-vscrollbar {
   	overflow-y: auto;
 }
 
@@ -24,4 +24,20 @@
 
 html .CodeMirror-hints {
     z-index: 2147483600;
+}
+
+.full-screen-editor .CodeMirror-hints {
+    /*
+        Overriding:
+            .CodeMirror-hints { max-height: 20em; }
+        Details:
+            To avoid scrollbar going beyond the window size.
+            Applicable when the window size is particularly small.
+            Without this, in full-screen-editor (external editor window), these hints may lead to scrollbar in page overall.
+    */
+    max-height: min(40vh, 20em);
+
+    /* Useful in avoiding full page horizontal scrollbar when editor is open in external window and the autocomplete
+       suggestions list is too wide */
+    max-width: 90vw;
 }

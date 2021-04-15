@@ -6,6 +6,80 @@ var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
 
 var TR = extLib.TR;
 
+const tabConnectivityMap = {};
+if (window.flagEditorInExternalWindow) {
+    // do nothing
+} else {
+    chrome.runtime.onMessage.addListener(
+        function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+            if (request.openExternalEditor) {
+                const tabOriginWithSlash = (
+                    // Even though the chrome.permissions.request API parameter is called "origins",
+                    // it doesn't respect the origins without trailing slash. Hence, we append a slash, if required.
+                    sender.origin.match(/\/$/) ?
+                        sender.origin :
+                        sender.origin + '/'
+                );
+
+                let width = request.width || 400,
+                    height = request.height || 400;
+                const windowForExternalEditor = (
+                    window
+                        .open(
+                            (
+                                `${chrome.runtime.getURL('external-editor.html')}` +
+                                `?tabId=${sender.tab.id}` +
+                                `&tabTitle=${encodeURIComponent(request.tabTitle)}` +
+                                `&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}` +
+                                `&magicssHostSessionUuid=${encodeURIComponent(request.magicssHostSessionUuid)}`
+                            ),
+                            `Magic CSS (Random Name: ${Math.random()})`,
+                            `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
+                        )
+                );
+                windowForExternalEditor.focus();
+
+                tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
+            } else if (request.closeExternalEditor) {
+                const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
+                if (windowForExternalEditor) {
+                    windowForExternalEditor.close();
+                }
+                delete tabConnectivityMap[sender.tab.id];
+            }
+        }
+    );
+
+    chrome.runtime.onMessage.addListener(
+        function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+            if (request.type === 'magicss') {
+                chrome.tabs.sendMessage(
+                    request.tabId,
+                    {
+                        magicssHostSessionUuid: request.magicssHostSessionUuid,
+                        type: request.type,
+                        subType: request.subType,
+                        payload: request.payload
+                    },
+                    function(response) {
+                        // This if condition check is required to avoid unwanted warnings
+                        // TODO: FIXME: Is there some better solution possible?
+                        if (chrome.runtime.lastError) {
+                            // Currently doing nothing
+                        }
+
+                        sendResponse(response);
+                    }
+                );
+
+                // Need to return true to run "sendResponse" in async manner
+                // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                return true;
+            }
+        }
+    );
+}
+
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
 var runningInChromiumLikeEnvironment = function () {
     if (window.location.href.indexOf('chrome-extension://') === 0) {
@@ -115,16 +189,19 @@ if (!window.loadRemoteJsListenerAdded) {
                     // Need to return true from the event listener to indicate that we wish to send a response asynchronously
                     return true;
                 } else if (request.requestPermissions) {
+                    if (window.flagEditorInExternalWindow) {
+                        return;
+                    }
                     if (runningInOldEdgeLikeEnvironment()) {
                         // We use full permissions on old Microsoft Edge
                         sendResponse('request-granted');
                         onDOMContentLoadedHandler();
                     } else {
-                        var url = request.url;
+                        var tabOriginWithSlash = request.tabOriginWithSlash;
                         chrome.permissions.request(
                             {
                                 permissions: ['webNavigation'],
-                                origins: [url]
+                                origins: [tabOriginWithSlash]
                             },
                             function (granted) {
                                 if (granted) {
@@ -203,7 +280,7 @@ var reapplyCss = function (tabId) {
                 arrScripts.push(pathScripts + 'reapply-css.js');
                 extLib.loadJSCSS(
                     {
-                        treatAsNormalWebpage: false
+                        treatAsNormalWebpage: window.treatAsNormalWebpage
                     },
                     arrScripts,
                     allFrames,
@@ -255,7 +332,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
         extLib.loadJSCSS({
-            treatAsNormalWebpage: false
+            treatAsNormalWebpage: window.treatAsNormalWebpage
         }, [
             pathScripts + 'appVersion.js',
             // {
@@ -333,6 +410,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
             path3rdparty + 'tooltipster/tooltipster.css',
             path3rdparty + 'tooltipster/jquery.tooltipster.js',
+            path3rdparty + 'tooltipster/tooltipster-scrollableTip.js',
 
             path3rdparty + 'toastr/toastr.css',
             path3rdparty + 'toastr/toastr_customized.js',
@@ -536,9 +614,13 @@ var prerequisitesReady = function (main) {
     }
 };
 
-prerequisitesReady(function (tab) {
-    main(tab);
-});
+if (window.flagEditorInExternalWindow) {
+    main();
+} else {
+    prerequisitesReady(function (tab) {
+        main(tab);
+    });
+}
 
 var parseUrl = function(href) {
     var l = document.createElement("a");
@@ -614,4 +696,8 @@ var onDOMContentLoadedHandler = function () {
     }
 };
 
-onDOMContentLoadedHandler();
+if (window.flagEditorInExternalWindow) {
+    // do nothing
+} else {
+    onDOMContentLoadedHandler();
+}

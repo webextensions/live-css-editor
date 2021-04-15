@@ -204,6 +204,12 @@ if (!utils.defined) {
         parentEl.appendChild(styleNode);
 
         var disabled = config.disabled;
+
+        // TODO: FIXME: HACK: This 'if' condition should be converted into some standard implementation
+        if (window.flagEditorInExternalWindow && id === 'MagiCSS-bookmarklet-html-id') {
+            disabled = true;
+        }
+
         if (disabled) {
             styleNode.disabled = true;
         } else {
@@ -397,14 +403,27 @@ if (!utils.defined) {
             w.clearTimeout(t);
         };
 
+        const defaults = {
+            paddingTop: '',
+            paddingRight: '',
+            paddingBottom: '',
+            paddingLeft: '',
+            verticalAlignment: 'top',
+            horizontalAlignment: 'center'
+        };
+
         var alertNote = function (msg, hideDelay, options) {
             options = options || {};
-            var verticalAlignment = options.verticalAlignment || 'top',
-                horizontalAlignment = options.horizontalAlignment || 'center',
+            var verticalAlignment = options.verticalAlignment || defaults.verticalAlignment || 'top',
+                horizontalAlignment = options.horizontalAlignment || defaults.horizontalAlignment || 'center',
                 textAlignment = options.textAlignment || horizontalAlignment,
                 backgroundColor = options.backgroundColor || '#f9edbe',
                 borderColor = options.borderColor || '#eb7',
                 opacity = options.opacity || '1',
+                paddingTop    = options.paddingTop    || defaults.paddingTop    || '',
+                paddingRight  = options.paddingRight  || defaults.paddingRight  || '',
+                paddingBottom = options.paddingBottom || defaults.paddingBottom || '',
+                paddingLeft   = options.paddingLeft   || defaults.paddingLeft   || '',
                 unobtrusive = options.unobtrusive || false;
             // TODO:
             // - Apply !important for various inline styles (otherwise, it might get over-ridden by some previously present !important CSS styles)
@@ -416,6 +435,8 @@ if (!utils.defined) {
                     'style="' +
                         'pointer-events:none;' +    // To avoid it from stealing hover (the pointer-events will be enabled for a child element)
                         'position:fixed;width:100%;z-index:2147483600;' +
+                        (paddingTop    ? `padding-top:   ${paddingTop   };` : '') +
+                        (paddingBottom ? `padding-bottom:${paddingBottom};` : '') +
                         (verticalAlignment === 'bottom' ? 'bottom:0;' : 'top:0;') +
                         (function () {
                             if (horizontalAlignment === 'left') {
@@ -435,6 +456,8 @@ if (!utils.defined) {
                     '<div ' +
                         'style="' +
                             'display:flex;width:auto;margin:0;padding:0;border:0;' +
+                            (paddingRight ? `padding-right:${paddingRight};` : '') +
+                            (paddingLeft  ? `padding-left: ${paddingLeft };` : '') +
                             (function () {
                                 if (horizontalAlignment === 'left') {
                                     return 'justify-content:flex-start;';
@@ -495,6 +518,15 @@ if (!utils.defined) {
         alertNote.hide = function () {
             h(div);
             clearTimeout();
+        };
+
+        alertNote.setup = function (defaultsToSet) {
+            if (typeof defaultsToSet.verticalAlignment   !== 'undefined' ) { defaults.verticalAlignment   = defaultsToSet.verticalAlignment;   }
+            if (typeof defaultsToSet.horizontalAlignment !== 'undefined' ) { defaults.horizontalAlignment = defaultsToSet.horizontalAlignment; }
+            if (typeof defaultsToSet.paddingTop          !== 'undefined' ) { defaults.paddingTop          = defaultsToSet.paddingTop;          }
+            if (typeof defaultsToSet.paddingRight        !== 'undefined' ) { defaults.paddingRight        = defaultsToSet.paddingRight;        }
+            if (typeof defaultsToSet.paddingBottom       !== 'undefined' ) { defaults.paddingBottom       = defaultsToSet.paddingBottom;       }
+            if (typeof defaultsToSet.paddingLeft         !== 'undefined' ) { defaults.paddingLeft         = defaultsToSet.paddingLeft;         }
         };
 
         return alertNote;

@@ -1,0 +1,10 @@
+.full-screen-editor {
+    background-color: rgb(99, 113, 186);
+}
+
+.full-screen-editor #MagiCSS-bookmarklet {
+    border-radius: 0 !important;
+
+    left: 0 !important;
+    top: 0 !important;
+}

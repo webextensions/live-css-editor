@@ -8,13 +8,120 @@
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
-    // USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
+    USER_PREFERENCE_USE_CUSTOM_FONT_SIZE = 'use-custom-font-size',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_THEME = 'theme',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
+var
+    USER_PREFERENCE_LAST_APPLIED_CSS = 'last-applied-css',
+    USER_PREFERENCE_USE_CSS_LINTING = 'use-css-linting',
+    USER_PREFERENCE_SHOW_LINE_NUMBERS = 'show-line-numbers',
+    USER_PREFERENCE_APPLY_STYLES_AUTOMATICALLY = 'apply-styles-automatically',
+    USER_PREFERENCE_LANGUAGE_MODE_NON_FILE = 'language-mode-non-file',
+    USER_PREFERENCE_LANGUAGE_MODE = 'language-mode',
+    USER_PREFERENCE_TEXTAREA_VALUE = 'textarea-value',
+    USER_PREFERENCE_DISABLE_STYLES = 'disable-styles';
+
 var const_rateUsUsageCounterFrom = 20,
     const_rateUsUsageCounterTo = 100;
+
+var tabId = (function () {
+    const
+        urlParams = new URLSearchParams(window.location.search),
+        tabId = urlParams.get('tabId');
+
+    return parseInt(tabId);
+})();
+
+// https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid/2117523#2117523
+var uuidv4 = function () {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+};
+
+window.magicssHostSessionUuid = (
+    window.magicssHostSessionUuid ||
+    (function () {
+        const
+            urlParams = new URLSearchParams(window.location.search),
+            magicssHostSessionUuid = urlParams.get('magicssHostSessionUuid');
+
+        return magicssHostSessionUuid;
+    })() ||
+    uuidv4()
+);
+
+var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload }) {
+    return new Promise((resolve) => {
+        if (window.flagEditorInExternalWindow) {
+            chrome.runtime.sendMessage(
+                {
+                    tabId,
+                    magicssHostSessionUuid: window.magicssHostSessionUuid,
+                    type,
+                    subType,
+                    payload
+                },
+                undefined,
+                function (data) {
+                    return resolve(data);
+                }
+            );
+        } else {
+            return resolve();
+        }
+    });
+};
+
+if (window.flagEditorInExternalWindow) {
+    chromeRuntimeMessageIfRequired({
+        type: 'magicss',
+        subType: 'external-editor-window-is-loading'
+    });
+
+    window.onbeforeunload = function () {
+        chromeRuntimeMessageIfRequired({
+            type: 'magicss',
+            subType: 'external-editor-window-is-closing'
+        });
+    };
+} else {
+    window.onbeforeunload = function () {
+        chrome.runtime.sendMessage({
+            closeExternalEditor: true
+        });
+    };
+}
+
+if (window.flagEditorInExternalWindow) {
+    utils.alertNote.setup({
+        paddingRight: '25px',
+        paddingBottom: '25px',
+        verticalAlignment: 'bottom',
+        horizontalAlignment: 'right'
+    });
+}
+
+var chromePermissionsContains = function ({ permissions, origins }) {
+    return new Promise((resolve) => {
+        chrome.permissions.contains(
+            {
+                permissions,
+                origins
+            },
+            function(result) {
+                if (result) {
+                    return resolve(true);
+                } else {
+                    return resolve(false);
+                }
+            }
+        );
+    });
+};
 
 (function($){
     var runningInAndroidFirefox = false;
@@ -366,6 +473,10 @@ var const_rateUsUsageCounterFrom = 20,
                 // 'Magic CSS window is already there. Repositioning it.'
                 await window.MagiCSSEditor.reposition(function () {
                     checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+                });
+
+                chrome.runtime.sendMessage({
+                    closeExternalEditor: true
                 });
             });
         }
@@ -832,7 +943,17 @@ var const_rateUsUsageCounterFrom = 20,
             };
         });
     };
-    updateExistingCSSSelectorsAndAutocomplete();
+    if (window.flagEditorInExternalWindow) {
+        setTimeout(async () => {
+            const cssSelectorsAutocompleteObjects = await chromeRuntimeMessageIfRequired({
+                type: 'magicss',
+                subType: 'get-css-selectors-autocomplete-objects'
+            });
+            existingCSSSelectorsWithAutocompleteObjects = JSON.parse(JSON.stringify(cssSelectorsAutocompleteObjects));
+        });
+    } else {
+        updateExistingCSSSelectorsAndAutocomplete();
+    }
 
     // TODO: DUPLICATE: Code duplication for browser detection in magicss.js and options.js
     var isChrome = false,
@@ -1014,7 +1135,7 @@ var const_rateUsUsageCounterFrom = 20,
             if (count) {
                 utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
             } else {
-                utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>' + sourcesToShow, 2500);
+                utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>' + sourcesToShow, 2500);
             }
         }
     };
@@ -1475,6 +1596,15 @@ var const_rateUsUsageCounterFrom = 20,
     CodeMirror.keyMap.sublime['Alt-Up'] = 'swapLineUp';
 
     var main = async function () {
+        let sessionStorageDataForInitialization = null;
+        if (window.flagEditorInExternalWindow) {
+            const sessionStorageData = await chromeRuntimeMessageIfRequired({
+                type: 'magicss',
+                subType: 'storage-data-to-initialize'
+            });
+            sessionStorageDataForInitialization = sessionStorageData;
+        }
+
         await utils.delayFunctionUntilTestFunction({
             tryLimit: 100,
             waitFor: 500,
@@ -2019,6 +2149,14 @@ var const_rateUsUsageCounterFrom = 20,
                         let appliedCssText = newStyleTag.applyTag();
                         await rememberLastAppliedCss(appliedCssText);
                     }
+
+                    chromeRuntimeMessageIfRequired({
+                        type: 'magicss',
+                        subType: 'magicss-fnApplyTextAsCSS',
+                        payload: {
+                            options
+                        }
+                    });
                 };
 
                 var showFileEditOptions = async function (editor, callback) {
@@ -2520,24 +2658,36 @@ var const_rateUsUsageCounterFrom = 20,
                                 '<span class="file-mode-is-beta">' +
                                     '&nbsp;This is a BETA feature&nbsp;' +
                                 '</span>' +
-                                'file' +
+                                'f<span class="hide-when-magicss-editor-is-small">ile</span>' +
                             '</div>' +
-                            '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">css</div>' +
-                            '<div class="magicss-mode-button magicss-mode-less" title="Less mode">less</div>' +
-                            (flagAllowSassUi ? '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">sass</div>' : '')
+                            '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">c<span class="hide-when-magicss-editor-is-small">ss</span></div>' +
+                            '<div class="magicss-mode-button magicss-mode-less" title="Less mode">l<span class="hide-when-magicss-editor-is-small">ess</span></div>' +
+                            (flagAllowSassUi ? '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">s<span class="hide-when-magicss-editor-is-small">ass</span></div>' : '')
                         );
 
                         $(document).on('click', '.magicss-mode-css', async function () {
                             await setLanguageMode('css', editor);
                             editor.focus();
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'set-language-mode-to-css'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-less', async function () {
                             await setLanguageMode('less', editor);
                             editor.focus();
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'set-language-mode-to-less'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-sass', async function () {
                             await setLanguageMode('sass', editor);
                             editor.focus();
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'set-language-mode-to-sass'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-file', async function () {
                             await setLanguageMode('file', editor);
@@ -2670,7 +2820,39 @@ var const_rateUsUsageCounterFrom = 20,
                                 ),
                                 onCssHintSelectForSelector: function (selectedText) {
                                     var editor = window.MagiCSSEditor;
-                                    showCSSSelectorMatches(selectedText, editor);
+                                    if (window.flagEditorInExternalWindow) {
+                                        setTimeout(async () => {
+                                            const cssSelector = selectedText.originalSelector;
+                                            var selectorMatchCount = await chromeRuntimeMessageIfRequired({
+                                                type: 'magicss',
+                                                subType: 'magicss-get-selector-match-count',
+                                                payload: {
+                                                    cssSelector
+                                                }
+                                            });
+                                            if (selectorMatchCount === null) {
+                                                // do nothing
+                                            } else {
+                                                var trunc = function (str, limit) {
+                                                    if (str.length > limit) {
+                                                        var separator = ' ... ';
+                                                        str = str.substr(0, limit / 2) + separator + str.substr(separator.length + str.length - limit / 2);
+                                                    }
+                                                    return str;
+                                                };
+
+                                                var cssSelectorToShow = htmlEscape(trunc(cssSelector, 100));
+                                                var sourcesToShow = (selectedText && selectedText.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(decodeURIComponent(selectedText.sources)) + '</span></span>') : '';
+                                                if (selectorMatchCount) {
+                                                    utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
+                                                } else {
+                                                    utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>' + sourcesToShow, 2500);
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        showCSSSelectorMatches(selectedText, editor);
+                                    }
                                 },
                                 onCssHintShownForSelector: function () {    /* As per current CodeMirror/css-hint architecture,
                                                                                "select" is called before "shown".
@@ -2700,24 +2882,76 @@ var const_rateUsUsageCounterFrom = 20,
                                     title: 'Apply styles automatically\n(without loading this extension, for pages on this domain)',
                                     cls: 'magicss-reapply-styles editor-gray-out',
                                     onclick: async function (evt, editor, divIcon) {
+                                        let tabOriginWithSlash;
+                                        if (window.flagEditorInExternalWindow) {
+                                            const urlParams = new URLSearchParams(window.location.search);
+                                            tabOriginWithSlash = urlParams.get('tabOriginWithSlash');
+                                        } else {
+                                            tabOriginWithSlash = (
+                                                // Even though the chrome.permissions.request API parameter is called "origins",
+                                                // it doesn't respect the origins without trailing slash. Hence, we append a slash, if required.
+                                                window.location.origin.match(/\/$/) ?
+                                                    window.location.origin :
+                                                    window.location.origin + '/'
+                                            );
+                                        }
+
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
                                             await markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                            if (window.flagEditorInExternalWindow) {
+                                                chromeRuntimeMessageIfRequired({
+                                                    type: 'magicss',
+                                                    subType: 'mark-as-not-pinned-without-notification'
+                                                });
+                                            }
                                             utils.alertNote(
-                                                '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                 5000
                                             );
                                         } else {
                                             if (isFirefox) {
                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                if (window.flagEditorInExternalWindow) {
+                                                    chromeRuntimeMessageIfRequired({
+                                                        type: 'magicss',
+                                                        subType: 'mark-as-pinned-without-notification'
+                                                    });
+                                                }
                                                 utils.alertNote(
-                                                    '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                    '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically  <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                     10000
                                                 );
                                             } else {
+                                                // If the editor is in external window, then we may want to resize the window before requesting for permissions
+                                                if (window.flagEditorInExternalWindow) {
+                                                    const flagPermissions = await chromePermissionsContains({
+                                                        permissions: ['webNavigation'],
+                                                        origins: [tabOriginWithSlash]
+                                                    });
+                                                    if (flagPermissions) {
+                                                        // do nothing
+                                                    } else {
+                                                        let targetWidth = window.outerWidth;
+                                                        let targetHeight = window.outerHeight;
+                                                        let doResize = false;
+                                                        if (targetWidth < 500) {
+                                                            targetWidth = 500;
+                                                            doResize = true;
+                                                        }
+                                                        if (targetHeight < 300) {
+                                                            targetHeight = 300;
+                                                            doResize = true;
+                                                        }
+                                                        if (doResize) {
+                                                            window.resizeTo(targetWidth, targetHeight);
+                                                        }
+                                                    }
+                                                }
+
                                                 chrome.runtime.sendMessage(
                                                     {
                                                         requestPermissions: true,
-                                                        url: window.location.href
+                                                        tabOriginWithSlash
                                                     },
                                                     async function asyncCallback(status) {
                                                         if (chrome.runtime.lastError) {
@@ -2729,8 +2963,14 @@ var const_rateUsUsageCounterFrom = 20,
                                                         }
                                                         if (status === 'request-granted') {
                                                             await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                            if (window.flagEditorInExternalWindow) {
+                                                                chromeRuntimeMessageIfRequired({
+                                                                    type: 'magicss',
+                                                                    subType: 'mark-as-pinned-without-notification'
+                                                                });
+                                                            }
                                                             utils.alertNote(
-                                                                '<span style="font-weight:normal;">Now onwards, </span>apply styles automatically <span style="font-weight:normal;">without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + window.location.origin + '</span>)</span>',
+                                                                '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                                 10000
                                                             );
                                                         } else if (status === 'request-not-granted') {
@@ -2747,6 +2987,245 @@ var const_rateUsUsageCounterFrom = 20,
                                 return null;
                             }
                         }()),
+                        (function () {
+                            if (window.flagEditorInExternalWindow) {
+                                return {
+                                    name: 'edit-in-internal',
+                                    title: 'Move editor inside page',
+                                    cls: 'magicss-internal-window editor-gray-out',
+                                    onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                        await chromeRuntimeMessageIfRequired({
+                                            type: 'magicss',
+                                            subType: 'reopen-main-editor'
+                                        });
+
+                                        window.close();
+                                    }
+                                };
+                            } else {
+                                return null;
+                            }
+                        }()),
+                        (function () {
+                            if (window.flagEditorInExternalWindow) {
+                                return null;
+                            }
+
+                            return {
+                                name: 'edit-in-external',
+                                title: 'Edit in external window\n\nNote: Available in CSS or Less mode',
+                                cls: 'magicss-external-window-is-not-available-for-mode editor-gray-out-as-disabled',
+                                onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                    utils.alertNote('Please switch to editing code in CSS or Less mode to enable this feature', 5000);
+                                    editor.focus();
+                                }
+                            };
+                        }()),
+                        (function () {
+                            if (window.flagEditorInExternalWindow) {
+                                return null;
+                            }
+
+                            return {
+                                name: 'edit-in-external',
+                                title: 'Edit in external window',
+                                cls: 'magicss-external-window editor-gray-out',
+                                onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                    try {
+                                        chrome.runtime.sendMessage({
+                                            openExternalEditor: true,
+                                            magicssHostSessionUuid: window.magicssHostSessionUuid,
+                                            tabTitle: document.title,
+                                            width: editor.container.clientWidth,
+                                            height: editor.container.clientHeight
+                                        });
+
+                                        await editor.hide();
+                                        editor.container.classList.add('external-editor-also-exists');
+
+                                        if (!window.openExternalEditorListenerAdded) {
+                                            if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
+                                                chrome.runtime.onMessage.addListener(
+                                                    function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+                                                        let flagAsyncResponse = false;
+                                                        if (
+                                                            request.magicssHostSessionUuid === window.magicssHostSessionUuid &&
+                                                            request.type === 'magicss'
+                                                        ) {
+                                                            if (request.subType === 'magicss-set-text-value') {
+                                                                setTimeout(async () => {
+                                                                    await editor.setTextValue(request.payload);
+                                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                                });
+                                                            } else if (request.subType === 'magicss-fnApplyTextAsCSS') {
+                                                                setTimeout(async () => {
+                                                                    await fnApplyTextAsCSS(editor, (request.payload || {}).options);
+                                                                });
+                                                            } else if (request.subType === 'storage-data-to-initialize') {
+                                                                flagAsyncResponse = true;
+                                                                setTimeout(async () => {
+                                                                    const propsToSync = [
+                                                                        USER_PREFERENCE_LAST_APPLIED_CSS,
+                                                                        USER_PREFERENCE_USE_CSS_LINTING,
+                                                                        USER_PREFERENCE_SHOW_LINE_NUMBERS,
+                                                                        USER_PREFERENCE_APPLY_STYLES_AUTOMATICALLY,
+                                                                        USER_PREFERENCE_LANGUAGE_MODE_NON_FILE,
+                                                                        USER_PREFERENCE_LANGUAGE_MODE,
+                                                                        USER_PREFERENCE_TEXTAREA_VALUE,
+                                                                        USER_PREFERENCE_DISABLE_STYLES
+                                                                    ];
+
+                                                                    const responseToSend = {};
+                                                                    for (const prop of propsToSync) {
+                                                                        responseToSend[prop] = await editor.userPreference(prop);
+                                                                    }
+                                                                    return sendResponse(responseToSend);
+                                                                });
+                                                            } else if (request.subType === 'update-code-and-apply-css') {
+                                                                setTimeout(async () => {
+                                                                    await editor.setTextValue(request.payload.cssCodeToUse);
+                                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                                    await fnApplyTextAsCSS(editor);
+                                                                });
+                                                            } else if (request.subType === 'reopen-main-editor') {
+                                                                flagAsyncResponse = true;
+                                                                window.focus();
+                                                                setTimeout(async () => {
+                                                                    await window.MagiCSSEditor.reposition(function () {
+                                                                        // Since the editor would have been hidden, upon showing it again, it wouldn't have updated. Hence, this refresh is required, otherwise, the view would get updated upon clicking inside the editor in host tab.
+                                                                        window.MagiCSSEditor.cm.refresh();
+
+                                                                        checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+                                                                        sendResponse(); // Note: This "sendResponse()" call is for indicating that the execution if this part is complete and we are not sending any data in the response
+                                                                    });
+                                                                });
+                                                            } else if (request.subType === 'enableCss') {
+                                                                setTimeout(async () => {
+                                                                    await editor.disableEnableCSS('enable');
+                                                                });
+                                                            } else if (request.subType === 'disableCss') {
+                                                                setTimeout(async () => {
+                                                                    await editor.disableEnableCSS('disable');
+                                                                });
+                                                            } else if (request.subType === 'magicss-handle-delayedcursormove') {
+                                                                var cssSelector = processSplitText({
+                                                                    splitText: request.payload.theSplittedText,
+                                                                    useAlertNote: true
+                                                                });
+                                                                if (!cssSelector) {
+                                                                    utils.alertNote.hide();
+                                                                }
+
+                                                                if (!editor.styleHighlightingSelector) {
+                                                                    editor.styleHighlightingSelector = new utils.StyleTag({
+                                                                        id: 'magicss-highlight-by-selector',
+                                                                        parentTag: 'body',
+                                                                        attributes: [{
+                                                                            name: 'data-style-created-by',
+                                                                            value: 'magicss'
+                                                                        }],
+                                                                        overwriteExistingStyleTagWithSameId: true
+                                                                    });
+                                                                }
+
+                                                                if (cssSelector) {
+                                                                    // Helps in highlighting SVG elements
+                                                                    editor.styleHighlightingSelector.cssText = cssSelector + '{outline: 1px dashed red !important; fill: red !important; }';
+                                                                } else {
+                                                                    editor.styleHighlightingSelector.cssText = '';
+                                                                }
+                                                                editor.styleHighlightingSelector.applyTag();
+                                                            } else if (request.subType === 'magicss-get-selector-match-count') {
+                                                                flagAsyncResponse = true;
+                                                                setTimeout(async () => {
+                                                                    var count = null;
+                                                                    try {
+                                                                        const { cssSelector } = request.payload;
+                                                                        count = $(cssSelector).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
+                                                                    } catch (e) {
+                                                                        // do nothing
+                                                                    }
+                                                                    return sendResponse(count);
+                                                                });
+                                                            } else if (request.subType === 'get-css-selectors-autocomplete-objects') {
+                                                                flagAsyncResponse = true;
+                                                                setTimeout(async () => {
+                                                                    return sendResponse(existingCSSSelectorsWithAutocompleteObjects);
+                                                                });
+                                                            } else if (request.subType === 'showLineNumbers') {
+                                                                setTimeout(async () => {
+                                                                    editor.cm.setOption('lineNumbers', true);
+                                                                    await editor.userPreference('show-line-numbers', 'yes');
+                                                                });
+                                                            } else if (request.subType === 'hideLineNumbers') {
+                                                                setTimeout(async () => {
+                                                                    editor.cm.setOption('lineNumbers', false);
+                                                                    await editor.userPreference('show-line-numbers', 'no');
+                                                                });
+                                                            } else if (request.subType === 'enable-css-linting') {
+                                                                if (getLanguageMode() === 'css') {
+                                                                    setTimeout(async () => {
+                                                                        await setCodeMirrorCSSLinting(editor, 'enable');
+                                                                    });
+                                                                }
+                                                            } else if (request.subType === 'disable-css-linting') {
+                                                                if (getLanguageMode() === 'css') {
+                                                                    setTimeout(async () => {
+                                                                        await setCodeMirrorCSSLinting(editor, 'disable');
+                                                                    });
+                                                                }
+                                                            } else if (request.subType === 'external-editor-window-is-loading') {
+                                                                editor.container.classList.add('external-editor-also-exists');
+                                                            } else if (
+                                                                request.subType === 'magicss-closed-editor' ||
+                                                                request.subType === 'external-editor-window-is-closing'
+                                                            ) {
+                                                                editor.container.classList.remove('external-editor-also-exists');
+                                                            } else if (request.subType === 'set-language-mode-to-css') {
+                                                                setTimeout(async () => {
+                                                                    await setLanguageMode('css', editor, { skipNotifications: true });
+                                                                });
+                                                            } else if (request.subType === 'set-language-mode-to-less') {
+                                                                setTimeout(async () => {
+                                                                    await setLanguageMode('less', editor, { skipNotifications: true });
+                                                                });
+                                                            } else if (request.subType === 'set-language-mode-to-sass') {
+                                                                setTimeout(async () => {
+                                                                    await setLanguageMode('sass', editor, { skipNotifications: true });
+                                                                });
+                                                            } else if (request.subType === 'mark-as-pinned-without-notification') {
+                                                                setTimeout(async () => {
+                                                                    await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                                });
+                                                            } else if (request.subType === 'mark-as-not-pinned-without-notification') {
+                                                                setTimeout(async () => {
+                                                                    await markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                                                });
+                                                            } else if (request.subType === 'magicss-reload-all-css-resources') {
+                                                                reloadAllCSSResourcesInPage();
+                                                            } else {
+                                                                console.log(`Received an unexpected event with subType: ${request.subType}`);
+                                                            }
+
+                                                            // Need to return true to run "sendResponse" in async manner
+                                                            // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                                                            return flagAsyncResponse;
+                                                        }
+                                                    }
+                                                );
+                                                window.openExternalEditorListenerAdded = true;
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.log('Error message reported by Magic CSS:', e);
+                                        utils.alertNote(
+                                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                            10000
+                                        );
+                                    }
+                                }
+                            };
+                        })(),
                         {
                             name: 'disable',
                             title: 'Deactivate code',
@@ -2754,8 +3233,16 @@ var const_rateUsUsageCounterFrom = 20,
                             onclick: async function (evt, editor, divIcon) {
                                 if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
                                     await editor.disableEnableCSS('enable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'enableCss'
+                                    });
                                 } else {
                                     await editor.disableEnableCSS('disable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'disableCss'
+                                    });
                                 }
 
                                 if (!runningInAndroidFirefox) {
@@ -2855,7 +3342,14 @@ var const_rateUsUsageCounterFrom = 20,
                                     cls: 'magicss-reload-all-css-resources',
                                     uniqCls: 'magicss-reload-all-css-resources',
                                     onclick: function (evt, editor) {
-                                        reloadAllCSSResourcesInPage();
+                                        if (window.flagEditorInExternalWindow) {
+                                            chromeRuntimeMessageIfRequired({
+                                                type: 'magicss',
+                                                subType: 'magicss-reload-all-css-resources'
+                                            });
+                                        } else {
+                                            reloadAllCSSResourcesInPage();
+                                        }
                                         editor.focus();
                                     }
                                 }
@@ -3020,6 +3514,14 @@ var const_rateUsUsageCounterFrom = 20,
                                     if (textValue.trim() !== beautifiedCSS.trim()) {
                                         await editor.setTextValue(beautifiedCSS);
                                         await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        chromeRuntimeMessageIfRequired({
+                                            type: 'magicss',
+                                            subType: 'update-code-and-apply-css',
+                                            payload: {
+                                                cssCodeToUse: beautifiedCSS
+                                            }
+                                        });
+
                                         utils.alertNote('Your code has been beautified :-)', 5000);
                                     } else {
                                         utils.alertNote('Your code already looks beautiful :-)', 5000);
@@ -3037,12 +3539,30 @@ var const_rateUsUsageCounterFrom = 20,
                                 if (!textValue.trim()) {
                                     await editor.setTextValue('');
                                     await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'update-code-and-apply-css',
+                                        payload: {
+                                            cssCodeToUse: ''
+                                        }
+                                    });
+
                                     utils.alertNote('Please type some code to be minified', 5000);
                                 } else {
                                     var minifiedCSS = utils.minifyCSS(textValue);
                                     if (textValue !== minifiedCSS) {
                                         await editor.setTextValue(minifiedCSS);
                                         await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                                        chromeRuntimeMessageIfRequired({
+                                            type: 'magicss',
+                                            subType: 'update-code-and-apply-css',
+                                            payload: {
+                                                cssCodeToUse: minifiedCSS
+                                            }
+                                        });
+
                                         utils.alertNote('Your code has been minified' + noteForUndo, 5000);
                                     } else {
                                         utils.alertNote('Your code is already minified', 5000);
@@ -3058,6 +3578,12 @@ var const_rateUsUsageCounterFrom = 20,
                             onclick: async function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', true);
                                 await editor.userPreference('show-line-numbers', 'yes');
+
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'showLineNumbers'
+                                });
+
                                 editor.focus();
                             }
                         },
@@ -3068,6 +3594,12 @@ var const_rateUsUsageCounterFrom = 20,
                             onclick: async function (evt, editor) {
                                 editor.cm.setOption('lineNumbers', false);
                                 await editor.userPreference('show-line-numbers', 'no');
+
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'hideLineNumbers'
+                                });
+
                                 editor.focus();
                             }
                         },
@@ -3078,6 +3610,10 @@ var const_rateUsUsageCounterFrom = 20,
                             onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
                                     await setCodeMirrorCSSLinting(editor, 'enable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'enable-css-linting'
+                                    });
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
@@ -3091,6 +3627,10 @@ var const_rateUsUsageCounterFrom = 20,
                             onclick: async function (evt, editor) {
                                 if (getLanguageMode() === 'css') {
                                     await setCodeMirrorCSSLinting(editor, 'disable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'disable-css-linting'
+                                    });
                                 } else {
                                     utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                                 }
@@ -3296,7 +3836,12 @@ var const_rateUsUsageCounterFrom = 20,
 
                             // Need to add font-styling before CodeMirror is instantiated
                             // if (await editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
-                            var userPrefFontSizeInPx = parseInt(await editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                            var userPrefFontSizeInPx;
+                            if (await editor.userPreference(USER_PREFERENCE_USE_CUSTOM_FONT_SIZE) === 'yes') {
+                                userPrefFontSizeInPx = parseInt(await editor.userPreference(USER_PREFERENCE_FONT_SIZE_IN_PX), 10);
+                            } else {
+                                userPrefFontSizeInPx = 12;
+                            }
                             // if (userPrefFontSizeInPx !== 12) {
                             var cssLintErrorWarningMarkerSize = 16;
                             if (userPrefFontSizeInPx < 12) {
@@ -3308,6 +3853,12 @@ var const_rateUsUsageCounterFrom = 20,
                                     value: 'magicss'
                                 }],
                                 cssText: [
+                                    `.full-screen-editor #${id} .CodeMirror {`,
+                                    '    width: calc(100vw - 14px) !important;',
+                                    // ' height: calc(100vh - 34px) !important;',
+                                    `    height: calc(100vh - 34px - ((${userPrefFontSizeInPx}px - 12px) * 1.7) ) !important;`,
+                                    '}',
+                                    '',
                                     '#' + id + ' *,',
                                     '.alert-note-text,',
                                     '.alert-note-text *,',
@@ -3478,31 +4029,107 @@ var const_rateUsUsageCounterFrom = 20,
                         afterhide: function () {
                             // currently doing nothing
                         },
-                        delayedcursormove: function (editor) {
-                            var cssClass = processSplitText(editor.splitTextByCursor());
-                            if (!cssClass) {
-                                utils.alertNote.hide();
+                        onClose: async function (editor, config) {
+                            if (window.flagEditorInExternalWindow) {
+                                if (config && config.closeByKeyPress) {
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'reopen-main-editor'
+                                    });
+                                } else {
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'magicss-closed-editor'
+                                    });
+                                }
+                                window.close();
                             }
-
-                            if (!editor.styleHighlightingSelector) {
-                                editor.styleHighlightingSelector = new utils.StyleTag({
-                                    id: 'magicss-highlight-by-selector',
-                                    parentTag: 'body',
-                                    attributes: [{
-                                        name: 'data-style-created-by',
-                                        value: 'magicss'
-                                    }],
-                                    overwriteExistingStyleTagWithSameId: true
+                        },
+                        onSetTextValue: function (val) {
+                            if (window.flagEditorInExternalWindow) {
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'magicss-set-text-value',
+                                    payload: val
                                 });
                             }
+                        },
+                        delayedcursormove: function (editor) {
+                            if (window.flagEditorInExternalWindow) {
+                                let cssSelector = processSplitText({
+                                    splitText: editor.splitTextByCursor(),
+                                    useAlertNote: false
+                                });
+                                if (!cssSelector) {
+                                    utils.alertNote.hide();
+                                }
 
-                            if (cssClass) {
-                                // Helps in highlighting SVG elements
-                                editor.styleHighlightingSelector.cssText = cssClass + '{outline: 1px dashed red !important; fill: red !important; }';
+                                chromeRuntimeMessageIfRequired({
+                                    type: 'magicss',
+                                    subType: 'magicss-handle-delayedcursormove',
+                                    payload: {
+                                        theSplittedText: editor.splitTextByCursor()
+                                    }
+                                });
+                                if (cssSelector) {
+                                    setTimeout(async () => {
+                                        var selectorMatchCount = await chromeRuntimeMessageIfRequired({
+                                            type: 'magicss',
+                                            subType: 'magicss-get-selector-match-count',
+                                            payload: {
+                                                cssSelector
+                                            }
+                                        });
+                                        if (selectorMatchCount === null) {
+                                            // do nothing
+                                        } else {
+                                            var trunc = function (str, limit) {
+                                                if (str.length > limit) {
+                                                    var separator = ' ... ';
+                                                    str = str.substr(0, limit / 2) + separator + str.substr(separator.length + str.length - limit / 2);
+                                                }
+                                                return str;
+                                            };
+                                            if (selectorMatchCount) {
+                                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>', 2500);
+                                            } else {
+                                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
+                                            }
+                                        }
+                                    });
+                                }
                             } else {
-                                editor.styleHighlightingSelector.cssText = '';
+                                // TODO: FIXME: Currently, we do the "alertNote" for the matches for the selector inside processSplitText.
+                                //              We need to refactor it so that it becomes easier to manage with cross-window / cross-context
+                                //              communication.
+                                let cssSelector = processSplitText({
+                                    splitText: editor.splitTextByCursor(),
+                                    useAlertNote: true
+                                });
+                                if (!cssSelector) {
+                                    utils.alertNote.hide();
+                                }
+
+                                if (!editor.styleHighlightingSelector) {
+                                    editor.styleHighlightingSelector = new utils.StyleTag({
+                                        id: 'magicss-highlight-by-selector',
+                                        parentTag: 'body',
+                                        attributes: [{
+                                            name: 'data-style-created-by',
+                                            value: 'magicss'
+                                        }],
+                                        overwriteExistingStyleTagWithSameId: true
+                                    });
+                                }
+
+                                if (cssSelector) {
+                                    // Helps in highlighting SVG elements
+                                    editor.styleHighlightingSelector.cssText = cssSelector + '{outline: 1px dashed red !important; fill: red !important; }';
+                                } else {
+                                    editor.styleHighlightingSelector.cssText = '';
+                                }
+                                editor.styleHighlightingSelector.applyTag();
                             }
-                            editor.styleHighlightingSelector.applyTag();
                         },
                         keyup: function () {
                             // Currently doing nothing
@@ -3536,7 +4163,7 @@ var const_rateUsUsageCounterFrom = 20,
                     }
                 };
 
-                var fnReturnClass = function (splitText) {
+                var fnReturnCssSelector = function ({ splitText, useAlertNote }) {
                     var strBeforeCursor = splitText.strBeforeCursor,
                         strAfterCursor = splitText.strAfterCursor;
 
@@ -3585,14 +4212,14 @@ var const_rateUsUsageCounterFrom = 20,
                         }
                     }
 
-                    var cssClass = strBeforeCursor.substring(i) + strAfterCursor.substring(0, j - 1);
-                    cssClass = jQuery.trim(cssClass);
+                    var cssSelector = strBeforeCursor.substring(i) + strAfterCursor.substring(0, j - 1);
+                    cssSelector = jQuery.trim(cssSelector);
 
-                    if (cssClass) {
+                    if (cssSelector) {
                         var count;
 
                         try {
-                            count = $(cssClass).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
+                            count = $(cssSelector).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
                         } catch (e) {
                             return '';
                         }
@@ -3605,17 +4232,19 @@ var const_rateUsUsageCounterFrom = 20,
                             return str;
                         };
 
-                        if (count) {
-                            utils.alertNote(trunc(cssClass, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
-                        } else {
-                            utils.alertNote(trunc(cssClass, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No matches)</span>', 2500);
+                        if (useAlertNote) {
+                            if (count) {
+                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
+                            } else {
+                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
+                            }
                         }
                     }
 
-                    return cssClass;
+                    return cssSelector;
                 };
 
-                var processSplitText = function (splitText) {
+                var processSplitText = function ({ splitText, useAlertNote }) {
                     if (getLanguageMode() === 'sass' || getLanguageMode() === 'less') {
                         if (!smc) {
                             return '';
@@ -3640,15 +4269,21 @@ var const_rateUsUsageCounterFrom = 20,
                             cssTextInLines[cssTextInLines.length - 1] = lastItem.substr(0, generatedPosition.column);
                             strFirstPart = cssTextInLines.join('\n');
                             strLastPart = newStyleTag.cssText.substr(strFirstPart.length);
-                            return fnReturnClass({
-                                strBeforeCursor: strFirstPart,
-                                strAfterCursor: strLastPart
+                            return fnReturnCssSelector({
+                                splitText: {
+                                    strBeforeCursor: strFirstPart,
+                                    strAfterCursor: strLastPart
+                                },
+                                useAlertNote
                             });
                         } else {
                             return '';
                         }
                     } else {
-                        return fnReturnClass(splitText);
+                        return fnReturnCssSelector({
+                            splitText,
+                            useAlertNote
+                        });
                     }
                 };
 
@@ -3731,6 +4366,14 @@ var const_rateUsUsageCounterFrom = 20,
 
                 utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
+
+                // "window.flagEditorInExternalWindow" would also be true when "sessionStorageDataForInitialization" is truthy
+                if (sessionStorageDataForInitialization) {
+                    for (const prop in sessionStorageDataForInitialization) {
+                        await window.MagiCSSEditor.userPreference(prop, sessionStorageDataForInitialization[prop]);
+                    }
+                }
+
                 await window.MagiCSSEditor.create();
 
                 checkIfMagicCssLoadedFine(window.MagiCSSEditor);
