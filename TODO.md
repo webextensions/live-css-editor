@@ -6,7 +6,7 @@
 * Anonymous GitHub gists do not work anymore (https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/). Hence, "Mail code (via Gist)" feature has been disabled. Analyze if that feature can/should be brought back in some form.
 * Optimize the data structure for improved usage of chrome.storage.sync
 * Provide a scalable way to share CSS across computers. The current approach of chrome.storage.sync is limited. May use a solution via a custom or third-party service like "GitHub Gist".
-* Allow moving editor to external window and/or in a separate panel along with the extension icon.
+* If technically possible, allow loading editor in a separate panel along with the extension icon.
 
 #### Improvements
 * Support for a different extension icon color for use with dark web browser themes (black icon is almost invisible when using a dark browser theme). (Reported in https://github.com/webextensions/live-css-editor/issues/45)
