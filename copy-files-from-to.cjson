@@ -275,7 +275,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.js",
+                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/2.1.4/magicsuggest.js",
                     "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest.js"
                 }
             },
@@ -289,7 +289,7 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/d6343c40f853608bfa57bbab70b9840912941611/magicsuggest.css",
+                    "src": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/2.1.4/magicsuggest.css",
                     "latest": "https://raw.githubusercontent.com/nicolasbize/magicsuggest/master/magicsuggest.css"
                 }
             },
