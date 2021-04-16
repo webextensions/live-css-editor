@@ -48,7 +48,7 @@ if (/Edg\//.test(navigator.appVersion)) {           // Test for "Edge" before Ch
     isFirefox = true;
 }
 if (isEdge || isOpera || isChrome) {
-    isChromiumBased = true;
+    isChromiumBased = true; // eslint-disable-line no-unused-vars
 }
 
 var extLib = {

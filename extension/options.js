@@ -31,7 +31,7 @@ jQuery(function ($) {
         isFirefox = true;
     }
     if (isEdge || isOpera || isChrome) {
-        isChromiumBased = true;
+        isChromiumBased = true; // eslint-disable-line no-unused-vars
     }
 
     const flagAllowSassUi = isFirefox ? false : true;
