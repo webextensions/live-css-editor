@@ -1,0 +1,1 @@
+Slightly customized version of ./colorview.js
