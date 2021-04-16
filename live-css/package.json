@@ -16,9 +16,9 @@
     "test": "echo \"Warning: no test specified\""
   },
   "dependencies": {
-    "anymatch": "^3.1.1",
+    "anymatch": "^3.1.2",
     "body-parser": "^1.19.0",
-    "boxen": "^5.0.0",
+    "boxen": "^5.0.1",
     "chokidar-webextensions": "^2.0.4",
     "express": "^4.17.1",
     "find-free-port": "^2.0.0",
@@ -28,7 +28,7 @@
     "socket.io": "^2.3.0",
     "tiny-emitter": "^2.1.0",
     "unused-filename": "^2.1.0",
-    "update-notifier": "^5.0.1",
+    "update-notifier": "^5.1.0",
     "yargs": "^16.2.0"
   },
   "devDependencies": {

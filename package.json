@@ -19,17 +19,17 @@
   "dependencies": {
     "codemirror": "=5.34.0",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
-    "jquery": "^3.5.1",
+    "jquery": "^3.6.0",
     "socket.io": "^2.3.0",
     "toastr": "^2.1.4"
   },
   "devDependencies": {
-    "archiver": "^5.2.0",
+    "archiver": "^5.3.0",
     "chalk": "^4.1.0",
     "copy-files-from-to": "^3.2.0",
     "cp-file": "^9.0.0",
     "del": "^6.0.0",
-    "eslint": "^7.17.0",
+    "eslint": "^7.24.0",
     "git-hooks": "^1.1.10",
     "jsonfile": "^6.1.0",
     "note-down": "^0.2.3"
