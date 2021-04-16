@@ -35,7 +35,7 @@ Please note that:
 
 3rdparty code which is compiled/minified with minor customization (after forking from the official GitHub repository)
 ---------------------------------------------------------------------------------------------------------------------
-The file, `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js`, has been fetched from https://github.com/webextensions/less.js which is a fork of a popular open-source library (https://github.com/less/less.js/). More details about those minor changes can be found in `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js.source.description.txt`
+The file, `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.js`, has been fetched from https://github.com/webextensions/less.js which is a fork of a popular open-source library (https://github.com/less/less.js/). More details about those minor changes can be found in `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.js.source.description.txt`
 
 3rdparty code which is used "as-is" from other sources
 ------------------------------------------------------

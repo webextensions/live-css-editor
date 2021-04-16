@@ -298,11 +298,11 @@
         {
             "from": {
                 "default": {
-                    "src": "https://raw.githubusercontent.com/webextensions/less.js/ffd4f094cff8288e0fc5155b6e299e5699b890e9/dist/basic-less-with-sourcemap-support.browserified.uglified.js",
-                    "latest": "https://raw.githubusercontent.com/webextensions/less.js/build-less-for-magic-css/dist/basic-less-with-sourcemap-support.browserified.uglified.js"
+                    "src": "https://raw.githubusercontent.com/webextensions/less.js/ffd4f094cff8288e0fc5155b6e299e5699b890e9/dist/basic-less-with-sourcemap-support.browserified.js",
+                    "latest": "https://raw.githubusercontent.com/webextensions/less.js/build-less-for-magic-css/dist/basic-less-with-sourcemap-support.browserified.js"
                 }
             },
-            "to": "extension/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.uglified.js"
+            "to": "extension/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.js"
         },
         {
             "from": {

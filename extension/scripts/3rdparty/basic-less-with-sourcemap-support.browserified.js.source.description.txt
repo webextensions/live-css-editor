@@ -1,5 +1,5 @@
-Steps to manually generate basic-less-with-sourcemap-support.browserified.uglified.js
-=====================================================================================
+Steps to manually generate basic-less-with-sourcemap-support.browserified.js
+============================================================================
 
     # Clone GitHub repository of webextensions/less.js which is a fork of GitHub repository less/less.js
     #     Notes about the GitHub repository https://github.com/webextensions/less.js.git :
@@ -24,10 +24,10 @@ Steps to manually generate basic-less-with-sourcemap-support.browserified.uglifi
     $ rm dist/basic-less-with-sourcemap-support.browserified.js
     $ rm dist/basic-less-with-sourcemap-support.browserified.uglified.js
 
-    # Generate basic-less-with-sourcemap-support.browserified.uglified.js inside "dist" directory using an npm script
+    # Generate basic-less-with-sourcemap-support.browserified.js inside "dist" directory using an npm script
     # This npm script would basically run two commands:
     #     > browserify --entry lib/less-node/index-basic-less-with-sourcemap-support.js --outfile dist/basic-less-with-sourcemap-support.browserified.js --standalone less
     #     > uglifyjs dist/basic-less-with-sourcemap-support.browserified.js --compress sequences=false --beautify beautify=false,semicolons=false,comments=some --output dist/basic-less-with-sourcemap-support.browserified.uglified.js
     $ npm run build-less-for-magic-css
 
-    # Done! Now, the file is available at dist/basic-less-with-sourcemap-support.browserified.uglified.js
+    # Done! Now, the file is available at dist/basic-less-with-sourcemap-support.browserified.js

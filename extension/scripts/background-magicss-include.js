@@ -426,7 +426,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
             // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
             // path3rdparty + 'less.js',
-            path3rdparty + 'basic-less-with-sourcemap-support.browserified.uglified.js',
+            path3rdparty + 'basic-less-with-sourcemap-support.browserified.js',
 
             {
                 src: path3rdparty + 'sass/sass.sync.min.js',
