@@ -1,4 +1,4 @@
-/* global chrome */
+/* global browser, chrome */
 
 // https://github.com/coderaiser/itchy/blob/master/lib/itchy.js
 var asyncEachSeries = (array, iterator, done) => {
@@ -28,6 +28,27 @@ function check(array, iterator, done) {
 
     if (done && typeof done !== 'function')
         throw Error('done should be a function (when available)!');
+}
+
+// TODO: DUPLICATE: Code duplication for browser detection in ext-lib.js, magicss.js and options.js
+var isChrome = false,
+    isEdge = false,
+    isFirefox = false,
+    isOpera = false,
+    isChromiumBased = false;
+
+// Note that we are checking for "Edg/" which is the test required for identifying Chromium based Edge browser
+if (/Edg\//.test(navigator.appVersion)) {           // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
+    isEdge = true;
+} else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
+    isOpera = true;
+} else if (/Chrome/.test(navigator.appVersion)) {
+    isChrome = true;
+} else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
+    isFirefox = true;
+}
+if (isEdge || isOpera || isChrome) {
+    isChromiumBased = true;
 }
 
 var extLib = {
@@ -124,9 +145,16 @@ var extLib = {
             chrome &&
             chrome.tabs
         ) {
-            chrome.tabs.executeScript(tabId, {file: file, code: code, allFrames: allFrames, runAt: runAt}, function () {
-                cb();       // Somehow this callback is not getting called without this anonymous function wrapper
-            });
+            if (isFirefox) {
+                const executing = browser.tabs.executeScript(tabId, { file: file, code: code, allFrames: allFrames, runAt: runAt });
+                executing.then(function () {
+                    cb();
+                });
+            } else {
+                chrome.tabs.executeScript(tabId, { file: file, code: code, allFrames: allFrames, runAt: runAt }, function () {
+                    cb();       // Somehow this callback is not getting called without this anonymous function wrapper
+                });
+            }
         } else {
             if (file) {
                 extLib.loadJS(file, function (err) {

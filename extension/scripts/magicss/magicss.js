@@ -955,11 +955,12 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         updateExistingCSSSelectorsAndAutocomplete();
     }
 
-    // TODO: DUPLICATE: Code duplication for browser detection in magicss.js and options.js
+    // TODO: DUPLICATE: Code duplication for browser detection in ext-lib.js, magicss.js and options.js
     var isChrome = false,
         isEdge = false,
         isFirefox = false,
-        isOpera = false;
+        isOpera = false,
+        isChromiumBased = false;
 
     // Note that we are checking for "Edg/" which is the test required for identifying Chromium based Edge browser
     if (/Edg\//.test(navigator.appVersion)) {           // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
@@ -970,6 +971,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         isChrome = true;
     } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
         isFirefox = true;
+    }
+    if (isEdge || isOpera || isChrome) {
+        isChromiumBased = true;
     }
 
     const flagAllowSassUi = isFirefox ? false : true;
@@ -3010,6 +3014,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (window.flagEditorInExternalWindow) {
                                 return null;
                             }
+                            if (isFirefox) {
+                                return null;
+                            }
 
                             return {
                                 name: 'edit-in-external',
@@ -3023,6 +3030,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }()),
                         (function () {
                             if (window.flagEditorInExternalWindow) {
+                                return null;
+                            }
+                            if (isFirefox) {
                                 return null;
                             }
 
