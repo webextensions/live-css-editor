@@ -430,7 +430,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
             {
                 src: path3rdparty + 'sass/sass.sync.min.js',
-                skip: (runningInBrowserExtension && (isOpera || isFirefox)) ? false : true
+                skip: (runningInBrowserExtension && isOpera) ? false : true
             },
 
             path3rdparty + 'source-map.js',
