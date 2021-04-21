@@ -139,6 +139,6 @@ module.exports = {                          // Learn more about "module.exports"
                                             // false: Does not log the extra debugging related information
 
 
-    "version": "8.10.1"                     // This represents the version of the live-css server which was used for generating this configuration file
+    "version": "8.10.2"                     // This represents the version of the live-css server which was used for generating this configuration file
                                             // This may be helpful while debugging some issues and informing users about new features
 };
