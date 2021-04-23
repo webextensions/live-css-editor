@@ -1,4 +1,4 @@
-/* global jQuery, less, Sass, utils, sourceMap, chrome, CodeMirror, io, toastr, extLib */
+/* global jQuery, Sass, utils, sourceMap, chrome, CodeMirror, io, toastr, extLib */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
