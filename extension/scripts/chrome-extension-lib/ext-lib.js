@@ -171,7 +171,14 @@ var extLib = {
         }
     },
 
-    loadJSCSS: function ({ treatAsNormalWebpage }, arrSources, allFrames, tabId, advancedConfig, done) {
+    loadJSCSS: function ({
+        treatAsNormalWebpage,
+        arrSources,
+        allFrames,
+        tabId,
+        advancedConfig,
+        done
+    }) {
         asyncEachSeries(
             arrSources,
             function (source, cb) {

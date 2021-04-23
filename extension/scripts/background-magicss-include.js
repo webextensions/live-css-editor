@@ -278,17 +278,16 @@ var reapplyCss = function (tabId) {
                 arrScripts.push(pathScripts + 'utils.js');
                 arrScripts.push(pathScripts + 'migrate-storage.js');
                 arrScripts.push(pathScripts + 'reapply-css.js');
-                extLib.loadJSCSS(
-                    {
-                        treatAsNormalWebpage: window.treatAsNormalWebpage
-                    },
-                    arrScripts,
+
+                extLib.loadJSCSS({
+                    treatAsNormalWebpage: window.treatAsNormalWebpage,
+                    arrSources: arrScripts,
                     allFrames,
                     tabId,
-                    {
+                    advancedConfig: {
                         runAt: 'document_start'
                     }
-                );
+                });
             });
         });
     });
@@ -316,7 +315,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
     } else if (/Chrome/.test(navigator.appVersion)) {
         isChrome = true;        // eslint-disable-line no-unused-vars
     } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
-        isFirefox = true;
+        isFirefox = true;       // eslint-disable-line no-unused-vars
     }
 
     getAllFrames(function (allFrames) {
@@ -332,121 +331,126 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
         extLib.loadJSCSS({
-            treatAsNormalWebpage: window.treatAsNormalWebpage
-        }, [
-            pathScripts + 'appVersion.js',
-            // {
-            //     type: 'js',
-            //     sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
-            // },
+            treatAsNormalWebpage: window.treatAsNormalWebpage,
+            arrSources: [
+                pathScripts + 'appVersion.js',
+                // {
+                //     type: 'js',
+                //     sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
+                // },
 
-            (
-                platformInfoOs === 'android' ?
-                    pathScripts + 'platformInfoOs-android.js' :
-                    pathScripts + 'platformInfoOs-non-android.js'
-            ),
-            // {
-            //     type: 'js',
-            //     sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
-            // },
+                (
+                    platformInfoOs === 'android' ?
+                        pathScripts + 'platformInfoOs-android.js' :
+                        pathScripts + 'platformInfoOs-non-android.js'
+                ),
+                // {
+                //     type: 'js',
+                //     sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
+                // },
 
-            {
-                src: path3rdparty + 'jquery.js',
-                skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
-            },
-            {
-                src: pathScripts + 'chrome-extension-lib/ext-lib.js',
-                skip: typeof extLib !== "undefined" || runningInBrowserExtension ? false : true
-            },
+                {
+                    src: path3rdparty + 'jquery.js',
+                    skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
+                },
+                {
+                    src: pathScripts + 'chrome-extension-lib/ext-lib.js',
+                    skip: typeof extLib !== "undefined" || runningInBrowserExtension ? false : true
+                },
 
-            pathScripts + 'utils.js',
-            pathScripts + 'loading-magic-css.js',
+                pathScripts + 'utils.js',
+                pathScripts + 'loading-magic-css.js',
 
-            path3rdparty + 'css.escape.js',
+                path3rdparty + 'css.escape.js',
 
-            pathCodeMirror + 'codemirror.css',
-            pathCodeMirror + 'theme/ambiance.css',
-            path3rdpartyCustomFixes + 'codemirror/magicss-codemirror.css',
-            pathCodeMirror + 'codemirror.js',
-            pathCodeMirror + 'mode/css.js',
-            pathCodeMirror + 'addons/display/placeholder.js',
-            pathCodeMirror + 'addons/selection/active-line.js',
-            pathCodeMirror + 'addons/edit/closebrackets.js',
-            pathCodeMirror + 'addons/edit/matchbrackets.js',
+                pathCodeMirror + 'codemirror.css',
+                pathCodeMirror + 'theme/ambiance.css',
+                path3rdpartyCustomFixes + 'codemirror/magicss-codemirror.css',
+                pathCodeMirror + 'codemirror.js',
+                pathCodeMirror + 'mode/css.js',
+                pathCodeMirror + 'addons/display/placeholder.js',
+                pathCodeMirror + 'addons/selection/active-line.js',
+                pathCodeMirror + 'addons/edit/closebrackets.js',
+                pathCodeMirror + 'addons/edit/matchbrackets.js',
 
-            // This is required for some cases in multi-selection (using Ctrl+D)
-            pathCodeMirror + 'addons/search/searchcursor.js',
+                // This is required for some cases in multi-selection (using Ctrl+D)
+                pathCodeMirror + 'addons/search/searchcursor.js',
 
-            pathCodeMirror + 'addons/comment/comment.js',
+                pathCodeMirror + 'addons/comment/comment.js',
 
-            path3rdparty + 'csslint/csslint.js',
-            path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
-            pathCodeMirror + 'addons/lint/lint.css',
-            path3rdpartyCustomFixes + 'codemirror/addons/lint/tooltip.css',
-            pathCodeMirror + 'addons/lint/lint.js',
-            pathCodeMirror + 'addons/lint/css-lint_customized.js',
+                path3rdparty + 'csslint/csslint.js',
+                path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
+                pathCodeMirror + 'addons/lint/lint.css',
+                path3rdpartyCustomFixes + 'codemirror/addons/lint/tooltip.css',
+                pathCodeMirror + 'addons/lint/lint.js',
+                pathCodeMirror + 'addons/lint/css-lint_customized.js',
 
-            pathCodeMirror + 'addons/hint/show-hint.css',
-            pathCodeMirror + 'addons/hint/show-hint_customized.js',
-            pathCodeMirror + 'addons/hint/css-hint_customized.js',
+                pathCodeMirror + 'addons/hint/show-hint.css',
+                pathCodeMirror + 'addons/hint/show-hint_customized.js',
+                pathCodeMirror + 'addons/hint/css-hint_customized.js',
 
-            // https://github.com/easylogic/codemirror-colorpicker
-            pathCodeMirror + 'addons/colorpicker/colorpicker.css',
-            pathCodeMirror + 'addons/colorpicker/colorview_customized.js',
-            pathCodeMirror + 'addons/colorpicker/colorpicker.js',
+                // https://github.com/easylogic/codemirror-colorpicker
+                pathCodeMirror + 'addons/colorpicker/colorpicker.css',
+                pathCodeMirror + 'addons/colorpicker/colorview_customized.js',
+                pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
-            pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
+                pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
 
-            pathCodeMirror + 'keymap/sublime.js',
+                pathCodeMirror + 'keymap/sublime.js',
 
-            path3rdparty + 'jquery-ui_customized.css',
-            path3rdparty + 'jquery-ui.js',
-            path3rdparty + 'jquery.ui.touch-punch_customized.js',
+                path3rdparty + 'jquery-ui_customized.css',
+                path3rdparty + 'jquery-ui.js',
+                path3rdparty + 'jquery.ui.touch-punch_customized.js',
 
-            path3rdparty + 'socket.io/socket.io.slim.js',
+                path3rdparty + 'socket.io/socket.io.slim.js',
 
-            path3rdparty + 'amplify-store.js',
-            pathScripts + 'migrate-storage.js',
+                path3rdparty + 'amplify-store.js',
+                pathScripts + 'migrate-storage.js',
 
-            path3rdparty + 'tooltipster/tooltipster.css',
-            path3rdparty + 'tooltipster/jquery.tooltipster.js',
-            path3rdparty + 'tooltipster/tooltipster-scrollableTip.js',
+                path3rdparty + 'tooltipster/tooltipster.css',
+                path3rdparty + 'tooltipster/jquery.tooltipster.js',
+                path3rdparty + 'tooltipster/tooltipster-scrollableTip.js',
 
-            path3rdparty + 'toastr/toastr.css',
-            path3rdparty + 'toastr/toastr_customized.js',
+                path3rdparty + 'toastr/toastr.css',
+                path3rdparty + 'toastr/toastr_customized.js',
 
-            path3rdparty + 'magicsuggest/magicsuggest.css',
-            path3rdparty + 'magicsuggest/magicsuggest.js',
+                path3rdparty + 'magicsuggest/magicsuggest.css',
+                path3rdparty + 'magicsuggest/magicsuggest.js',
 
-            path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
-            path3rdparty + 'csspretty/csspretty.js',
-            // Alternatively, use cssbeautify & Yahoo's CSS Min libraries
-            // path3rdparty + 'cssbeautify/cssbeautify.js',
-            // path3rdparty + 'yui-cssmin/cssmin.js',
+                path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
+                path3rdparty + 'csspretty/csspretty.js',
+                // Alternatively, use cssbeautify & Yahoo's CSS Min libraries
+                // path3rdparty + 'cssbeautify/cssbeautify.js',
+                // path3rdparty + 'yui-cssmin/cssmin.js',
 
-            // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
-            // path3rdparty + 'less.js',
-            path3rdparty + 'basic-less-with-sourcemap-support.browserified.js',
+                // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
+                // path3rdparty + 'less.js',
+                path3rdparty + 'basic-less-with-sourcemap-support.browserified.js',
 
-            {
-                src: path3rdparty + 'sass/sass.sync.min.js',
-                skip: (runningInBrowserExtension && isOpera) ? false : true
-            },
+                {
+                    src: path3rdparty + 'sass/sass.sync.min.js',
+                    skip: (runningInBrowserExtension && isOpera) ? false : true
+                },
 
-            path3rdparty + 'source-map.js',
+                path3rdparty + 'source-map.js',
 
-            // http://www.miyconst.com/Blog/View/14/conver-css-to-less-with-css2less-js
-            // path3rdparty + 'css2less/linq.js',
-            // path3rdparty + 'css2less/css2less.js',
+                // http://www.miyconst.com/Blog/View/14/conver-css-to-less-with-css2less-js
+                // path3rdparty + 'css2less/linq.js',
+                // path3rdparty + 'css2less/css2less.js',
 
-            pathEditor + 'editor.css',
-            pathEditor + 'editor.js',
+                pathEditor + 'editor.css',
+                pathEditor + 'editor.js',
 
-            pathMagicss + 'magicss.css',
-            pathMagicss + 'generate-selector.js',
-            pathMagicss + 'magicss.js'
-        ], allFrames, undefined /* tabId */, {}, function () {
-            // Currently doing nothing
+                pathMagicss + 'magicss.css',
+                pathMagicss + 'generate-selector.js',
+                pathMagicss + 'magicss.js'
+            ],
+            allFrames,
+            tabId: undefined,
+            advancedConfig: {},
+            done: function () {
+                // Currently doing nothing
+            }
         });
     });
 };
