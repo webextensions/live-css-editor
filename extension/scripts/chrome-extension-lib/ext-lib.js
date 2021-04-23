@@ -81,12 +81,14 @@ var extLib = {
 
     // allFrames: true
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
-    insertCss: function ({ treatAsNormalWebpage }, options, cb) {
-        var file = options.file,
+    insertCss: function (options) {
+        var treatAsNormalWebpage = options.treatAsNormalWebpage,
+            file = options.file,
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
-            runAt = options.runAt || 'document_idle';
+            runAt = options.runAt || 'document_idle',
+            cb = options.cb;
 
         if (
             !treatAsNormalWebpage &&
@@ -147,12 +149,14 @@ var extLib = {
 
     // allFrames: true
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
-    executeScript: function ({ treatAsNormalWebpage }, options, cb) {
-        var file = options.file,
+    executeScript: function (options) {
+        var treatAsNormalWebpage = options.treatAsNormalWebpage,
+            file = options.file,
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
-            runAt = options.runAt || 'document_idle';
+            runAt = options.runAt || 'document_idle',
+            cb = options.cb;
 
         if (
             !treatAsNormalWebpage &&
@@ -211,18 +215,18 @@ var extLib = {
                 }
                 if (type && sourceText) {
                     if (type === 'js') {
-                        extLib.executeScript({ treatAsNormalWebpage }, { code: sourceText, allFrames, tabId, runAt }, cb);
+                        extLib.executeScript({ treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, cb });
                     } else if (type === 'css') {
-                        extLib.insertCss({ treatAsNormalWebpage }, { code: sourceText, allFrames, tabId, runAt }, cb);
+                        extLib.insertCss({     treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, cb });
                     } else {
                         console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJsCss(). Please check the "type" for the "sourceText".');
                         cb();
                     }
                 } else if (source) {
                     if (source.match('.js$')) {
-                        extLib.executeScript({ treatAsNormalWebpage }, { file: source, allFrames, tabId, runAt }, cb);
+                        extLib.executeScript({ treatAsNormalWebpage, file: source, allFrames, tabId, runAt, cb });
                     } else if (source.match('.css$')) {
-                        extLib.insertCss({ treatAsNormalWebpage }, { file: source, allFrames, tabId, runAt }, cb);
+                        extLib.insertCss({     treatAsNormalWebpage, file: source, allFrames, tabId, runAt, cb });
                     } else {
                         console.log('Error - Loading files like ' + source + ' is not supported by loadJsCss(). Please check the file extension.');
                         cb();
