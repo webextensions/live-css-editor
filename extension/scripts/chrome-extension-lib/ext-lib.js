@@ -66,16 +66,19 @@ var extLib = {
     },
 
     loadCss: function (href) {
-        var link = document.createElement('link');
+        const link = document.createElement('link');
+
         link.setAttribute('rel', 'stylesheet');
         link.setAttribute('type', 'text/css');
         link.setAttribute('href', href);
+
         // link.onload = function() {
         //     cb();
         // };
         // link.onerror = function() {
         //     cb('Could not load: ' + link);
         // };
+
         document.body.appendChild(link);
     },
 
@@ -117,16 +120,22 @@ var extLib = {
     },
 
     loadJs: function({ src, callback }) {
-        callback = callback || function () {};
-        var script = document.createElement('script');
+        const script = document.createElement('script');
+
         script.type = 'text/javascript';
         script.src = src;
+
         script.onload = function() {
-            callback();
+            if (callback) {
+                callback();
+            }
         };
         script.onerror = function() {
-            callback('Could not load: ' + src);
+            if (callback) {
+                callback('Could not load: ' + src);
+            }
         };
+
         document.body.appendChild(script);
     },
 
