@@ -200,6 +200,21 @@ var extLib = {
         }
     },
 
+    executeScriptAsync: async function (options) {
+        return new Promise(function (resolve, reject) { // eslint-disable-line no-unused-vars
+            extLib.executeScript({
+                ...options,
+                cb: function (err) {
+                    if (err) {
+                        resolve([err]);
+                    } else {
+                        resolve([null]);
+                    }
+                }
+            });
+        });
+    },
+
     loadJsCss: function ({
         treatAsNormalWebpage,
         arrSources,
