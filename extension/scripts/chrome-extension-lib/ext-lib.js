@@ -116,16 +116,16 @@ var extLib = {
         }
     },
 
-    loadJs: function(src, cb) {
-        cb = cb || function () {};
+    loadJs: function({ src, callback }) {
+        callback = callback || function () {};
         var script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = src;
         script.onload = function() {
-            cb();
+            callback();
         };
         script.onerror = function() {
-            cb('Could not load: ' + src);
+            callback('Could not load: ' + src);
         };
         document.body.appendChild(script);
     },
@@ -176,11 +176,14 @@ var extLib = {
             }
         } else {
             if (file) {
-                extLib.loadJs(file, function (err) {
-                    if (err) {
-                        console.error(err);
-                    } else {
-                        cb();
+                extLib.loadJs({
+                    src: file,
+                    callback: function (err) {
+                        if (err) {
+                            console.error(err);
+                        } else {
+                            cb();
+                        }
                     }
                 });
             } else {
