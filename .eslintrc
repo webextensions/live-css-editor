@@ -1,6 +1,13 @@
 {
     // http://eslint.org/docs/user-guide/configuring.html
-    // http://bl.ocks.org/cletusw/e01a85e399ab563b1236
+    // https://gist.github.com/cletusw/e01a85e399ab563b1236
+    "env": {
+        "es2021": true, // https://eslint.org/docs/user-guide/configuring/language-options#specifying-environments
+                        // This automatically sets the ecmaVersion parser option (parserOptions) to 12
+        "browser": true,
+        "node": false
+    },
+
     "rules": {
         "indent": ["error", 4, { "SwitchCase": 1, "ignoreComments": true }],
         "linebreak-style": ["error", "unix"],
@@ -10,14 +17,6 @@
         "no-console": "off",
         "no-debugger": "off",
         "no-shadow": "off"
-    },
-    "env": {
-        "es6": true,
-        "node": false,
-        "browser": true
-    },
-    "parserOptions": {
-        "ecmaVersion": 2017
     },
     "extends": "eslint:recommended",
     "plugins": []
