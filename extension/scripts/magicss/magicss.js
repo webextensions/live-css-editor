@@ -61,11 +61,18 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
 
     if (dependencyToLoad === 'less') {
         if (typeof window.less === 'undefined') {
-            await chromeRuntimeMessageToBackgroundScript({
-                type: 'magicss-dependency',
-                subType: 'load-dependency',
-                payload: path3rdparty + 'basic-less-with-sourcemap-support.browserified.js'
-            });
+            if (window.treatAsNormalWebpage) {
+                const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
+                    treatAsNormalWebpage: true,
+                    source: path3rdparty + 'basic-less-with-sourcemap-support.browserified.js'
+                });
+            } else {
+                await chromeRuntimeMessageToBackgroundScript({
+                    type: 'magicss-dependency',
+                    subType: 'load-dependency',
+                    payload: path3rdparty + 'basic-less-with-sourcemap-support.browserified.js'
+                });
+            }
         }
         return window.less;
     }
