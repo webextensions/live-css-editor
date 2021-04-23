@@ -90,6 +90,7 @@ var extLib = {
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
+            frameId = options.frameId,
             runAt = options.runAt || 'document_idle',
             callback = options.callback;
 
@@ -99,7 +100,7 @@ var extLib = {
             chrome &&
             chrome.tabs
         ) {
-            chrome.tabs.insertCSS(tabId, { file, code, allFrames, runAt }, function () {
+            chrome.tabs.insertCSS(tabId, { file, code, allFrames, frameId, runAt }, function () {
                 callback();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {
@@ -162,6 +163,7 @@ var extLib = {
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
+            frameId = options.frameId,
             runAt = options.runAt || 'document_idle',
             callback = options.callback;
 
@@ -172,12 +174,12 @@ var extLib = {
             chrome.tabs
         ) {
             if (isFirefox) {
-                const executing = browser.tabs.executeScript(tabId, { file, code, allFrames, runAt });
+                const executing = browser.tabs.executeScript(tabId, { file, code, allFrames, frameId, runAt });
                 executing.then(function () {
                     callback();
                 });
             } else {
-                chrome.tabs.executeScript(tabId, { file, code, allFrames, runAt }, function () {
+                chrome.tabs.executeScript(tabId, { file, code, allFrames, frameId, runAt }, function () {
                     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
                 });
             }
@@ -220,6 +222,7 @@ var extLib = {
         source,
         allFrames,
         tabId,
+        frameId,
         runAt,
         callback
     }) {
@@ -237,18 +240,18 @@ var extLib = {
         }
         if (type && sourceText) {
             if (type === 'js') {
-                extLib.executeScript({ treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, callback });
+                extLib.executeScript({ treatAsNormalWebpage, code: sourceText, allFrames, tabId, frameId, runAt, callback });
             } else if (type === 'css') {
-                extLib.insertCss({     treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, callback });
+                extLib.insertCss({     treatAsNormalWebpage, code: sourceText, allFrames, tabId, frameId, runAt, callback });
             } else {
                 console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadMultipleJsCss(). Please check the "type" for the "sourceText".');
                 callback();
             }
         } else if (source) {
             if (source.match('.js$')) {
-                extLib.executeScript({ treatAsNormalWebpage, file: source, allFrames, tabId, runAt, callback });
+                extLib.executeScript({ treatAsNormalWebpage, file: source, allFrames, tabId, frameId, runAt, callback });
             } else if (source.match('.css$')) {
-                extLib.insertCss({     treatAsNormalWebpage, file: source, allFrames, tabId, runAt, callback });
+                extLib.insertCss({     treatAsNormalWebpage, file: source, allFrames, tabId, frameId, runAt, callback });
             } else {
                 console.log('Error - Loading files like ' + source + ' is not supported by loadMultipleJsCss(). Please check the file extension.');
                 callback();
@@ -263,6 +266,7 @@ var extLib = {
         source,
         allFrames,
         tabId,
+        frameId,
         runAt
     }) {
         return new Promise(function (resolve, reject) { // eslint-disable-line no-unused-vars
@@ -271,6 +275,7 @@ var extLib = {
                 source,
                 allFrames,
                 tabId,
+                frameId,
                 runAt,
                 callback: function (err) {
                     if (err) {
@@ -288,6 +293,7 @@ var extLib = {
         arrSources,
         allFrames,
         tabId,
+        frameId,
         runAt,
         done
     }) {
@@ -299,6 +305,7 @@ var extLib = {
                     source,
                     allFrames,
                     tabId,
+                    frameId,
                     runAt,
                     callback: function () {
                         callback();
