@@ -53,7 +53,7 @@ if (isEdge || isOpera || isChrome) {
 
 var extLib = {
     TR: function (key, defaultValue) {
-        if (typeof chrome !== "undefined" && chrome && chrome.i18n) {
+        if (typeof chrome !== 'undefined' && chrome && chrome.i18n) {
             return chrome.i18n.getMessage(key);
         } else {
             if (defaultValue) {
@@ -66,10 +66,10 @@ var extLib = {
     },
 
     loadCss: function (href) {
-        var link = document.createElement("link");
-        link.setAttribute("rel", "stylesheet");
-        link.setAttribute("type", "text/css");
-        link.setAttribute("href", href);
+        var link = document.createElement('link');
+        link.setAttribute('rel', 'stylesheet');
+        link.setAttribute('type', 'text/css');
+        link.setAttribute('href', href);
         // link.onload = function() {
         //     cb();
         // };
@@ -90,7 +90,7 @@ var extLib = {
 
         if (
             !treatAsNormalWebpage &&
-            typeof chrome !== "undefined" &&
+            typeof chrome !== 'undefined' &&
             chrome &&
             chrome.tabs
         ) {
@@ -116,8 +116,8 @@ var extLib = {
 
     loadJs: function(src, cb) {
         cb = cb || function () {};
-        var script = document.createElement("script");
-        script.type = "text/javascript";
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
         script.src = src;
         script.onload = function() {
             cb();
@@ -156,7 +156,7 @@ var extLib = {
 
         if (
             !treatAsNormalWebpage &&
-            typeof chrome !== "undefined" &&
+            typeof chrome !== 'undefined' &&
             chrome &&
             chrome.tabs
         ) {
@@ -199,7 +199,7 @@ var extLib = {
             function (source, cb) {
                 var sourceText, type;
                 // source can also be an object and can have "src" and "skip" parameters
-                if (typeof source === "object") {
+                if (typeof source === 'object') {
                     if (source.skip) {
                         source = null;
                     } else if (source.sourceText && source.type) {
