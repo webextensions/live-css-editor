@@ -258,6 +258,31 @@ var extLib = {
         }
     },
 
+    loadJsCssAsync: async function({
+        treatAsNormalWebpage,
+        source,
+        allFrames,
+        tabId,
+        runAt
+    }) {
+        return new Promise(function (resolve, reject) { // eslint-disable-line no-unused-vars
+            extLib.loadJsCss({
+                treatAsNormalWebpage,
+                source,
+                allFrames,
+                tabId,
+                runAt,
+                callback: function (err) {
+                    if (err) {
+                        resolve([err]);
+                    } else {
+                        resolve([null]);
+                    }
+                }
+            });
+        });
+    },
+
     loadMultipleJsCss: function ({
         treatAsNormalWebpage,
         arrSources,
