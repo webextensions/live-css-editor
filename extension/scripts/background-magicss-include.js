@@ -78,6 +78,31 @@ if (window.flagEditorInExternalWindow) {
             }
         }
     );
+
+    if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener(
+            function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+                if (request.type === 'magicss-dependency') {
+                    if (request.subType === 'load-dependency') {
+                        setTimeout(async () => {
+                            const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
+                                source: request.payload,
+                                tabId: sender.tab.id,
+                                frameId: sender.frameId,
+                                allFrames: false
+                            });
+
+                            sendResponse();
+                        });
+
+                        // Need to return true to run "sendResponse" in async manner
+                        // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                        return true;
+                    }
+                }
+            }
+        );
+    }
 }
 
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
@@ -423,7 +448,8 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
                 // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
                 // path3rdparty + 'less.js',
-                path3rdparty + 'basic-less-with-sourcemap-support.browserified.js',
+                // // TODO: Remove this piece of commented out code. Now loading 'less' dynamically via `loadIfNotAvailable`
+                // path3rdparty + 'basic-less-with-sourcemap-support.browserified.js',
 
                 {
                     src: path3rdparty + 'sass/sass.sync.min.js',

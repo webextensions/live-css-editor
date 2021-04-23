@@ -54,6 +54,23 @@ window.magicssHostSessionUuid = (
     uuidv4()
 );
 
+var loadIfNotAvailable = async function (dependencyToLoad) {
+    const
+        pathScripts = 'scripts/',
+        path3rdparty = pathScripts + '3rdparty/';
+
+    if (dependencyToLoad === 'less') {
+        if (typeof window.less === 'undefined') {
+            await chromeRuntimeMessageToBackgroundScript({
+                type: 'magicss-dependency',
+                subType: 'load-dependency',
+                payload: path3rdparty + 'basic-less-with-sourcemap-support.browserified.js'
+            });
+        }
+        return window.less;
+    }
+};
+
 var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload }) {
     return new Promise((resolve) => {
         if (window.flagEditorInExternalWindow) {
@@ -73,6 +90,22 @@ var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload })
         } else {
             return resolve();
         }
+    });
+};
+
+var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, payload }) {
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+            {
+                type,
+                subType,
+                payload
+            },
+            undefined,
+            function (data) {
+                return resolve(data);
+            }
+        );
     });
 };
 
@@ -2011,6 +2044,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
 
+                        const less = await loadIfNotAvailable('less');
                         less.render(lessCode, lessOptions, async function asyncCallback(err, output) {
                             smc = null;     // Unset old SourceMapConsumer
 
