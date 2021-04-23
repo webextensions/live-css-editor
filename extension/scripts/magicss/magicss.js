@@ -130,9 +130,13 @@ if (window.flagEditorInExternalWindow) {
     };
 } else {
     window.onbeforeunload = function () {
-        chrome.runtime.sendMessage({
-            closeExternalEditor: true
-        });
+        // https://stackoverflow.com/questions/53939205/how-to-avoid-extension-context-invalidated-errors-when-messaging-after-an-exte/54740757#54740757
+        // This `if` condition is required for ignoring some unwanted errors (or rather error like warnings, eg: When this code gets executed from within a webpage after the extension is refreshed from chrome://extensions/)
+        if (chrome.app && typeof chrome.app.isInstalled !== 'undefined') {
+            chrome.runtime.sendMessage({
+                closeExternalEditor: true
+            });
+        }
     };
 }
 
