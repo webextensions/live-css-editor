@@ -279,7 +279,7 @@ var reapplyCss = function (tabId) {
                 arrScripts.push(pathScripts + 'migrate-storage.js');
                 arrScripts.push(pathScripts + 'reapply-css.js');
 
-                extLib.loadJSCSS({
+                extLib.loadJsCss({
                     treatAsNormalWebpage: window.treatAsNormalWebpage,
                     arrSources: arrScripts,
                     allFrames,
@@ -330,7 +330,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
         // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
-        extLib.loadJSCSS({
+        extLib.loadJsCss({
             treatAsNormalWebpage: window.treatAsNormalWebpage,
             arrSources: [
                 pathScripts + 'appVersion.js',

@@ -65,7 +65,7 @@ var extLib = {
         }
     },
 
-    loadCSS: function (href) {
+    loadCss: function (href) {
         var link = document.createElement("link");
         link.setAttribute("rel", "stylesheet");
         link.setAttribute("type", "text/css");
@@ -81,7 +81,7 @@ var extLib = {
 
     // allFrames: true
     // to support webpages structured using <frameset> (eg: http://www.w3schools.com/tags/tryhtml_frame_cols.htm)
-    insertCSS: function ({ treatAsNormalWebpage }, options, cb) {
+    insertCss: function ({ treatAsNormalWebpage }, options, cb) {
         var file = options.file,
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
@@ -100,12 +100,12 @@ var extLib = {
             });
         } else {
             if (file) {
-                extLib.loadCSS(file);
+                extLib.loadCss(file);
             } else {
                 console.log('Error: It appears that you are in normal webpage mode while trying to load CSS "code". Currently, that works only in extension mode.');
             }
             cb();
-            // extLib.loadCSS(file, function (err) {
+            // extLib.loadCss(file, function (err) {
             //     if (err) {
             //         console.error(err);
             //     } else {
@@ -115,7 +115,7 @@ var extLib = {
         }
     },
 
-    loadJS: function(src, cb) {
+    loadJs: function(src, cb) {
         cb = cb || function () {};
         var script = document.createElement("script");
         script.type = "text/javascript";
@@ -157,7 +157,7 @@ var extLib = {
             }
         } else {
             if (file) {
-                extLib.loadJS(file, function (err) {
+                extLib.loadJs(file, function (err) {
                     if (err) {
                         console.error(err);
                     } else {
@@ -171,7 +171,7 @@ var extLib = {
         }
     },
 
-    loadJSCSS: function ({
+    loadJsCss: function ({
         treatAsNormalWebpage,
         arrSources,
         allFrames,
@@ -198,18 +198,18 @@ var extLib = {
                     if (type === 'js') {
                         extLib.executeScript({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
                     } else if (type === 'css') {
-                        extLib.insertCSS({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.insertCss({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
                     } else {
-                        console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJSCSS(). Please check the "type" for the "sourceText".');
+                        console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJsCss(). Please check the "type" for the "sourceText".');
                         cb();
                     }
                 } else if (source) {
                     if (source.match('.js$')) {
                         extLib.executeScript({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
                     } else if (source.match('.css$')) {
-                        extLib.insertCSS({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.insertCss({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
                     } else {
-                        console.log('Error - Loading files like ' + source + ' is not supported by loadJSCSS(). Please check the file extension.');
+                        console.log('Error - Loading files like ' + source + ' is not supported by loadJsCss(). Please check the file extension.');
                         cb();
                     }
                 } else {
