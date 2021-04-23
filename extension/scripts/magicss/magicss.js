@@ -2659,9 +2659,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         $outer.append($titleItems);
                         $titleItems.append(
                             '<div class="magicss-mode-button magicss-mode-file" title="File mode">' +
-                                '<span class="file-mode-is-beta">' +
-                                    '&nbsp;This is a BETA feature&nbsp;' +
-                                '</span>' +
+                                // '<span class="file-mode-is-beta">' +
+                                //     '&nbsp;This is a BETA feature&nbsp;' +
+                                // '</span>' +
                                 'f<span class="hide-when-magicss-editor-is-small">ile</span>' +
                             '</div>' +
                             '<div class="magicss-mode-button magicss-mode-css" title="CSS mode">c<span class="hide-when-magicss-editor-is-small">ss</span></div>' +
