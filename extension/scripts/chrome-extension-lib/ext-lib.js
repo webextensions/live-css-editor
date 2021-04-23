@@ -215,7 +215,7 @@ var extLib = {
         });
     },
 
-    loadJsCss: function ({
+    loadMultipleJsCss: function ({
         treatAsNormalWebpage,
         arrSources,
         allFrames,
@@ -244,7 +244,7 @@ var extLib = {
                     } else if (type === 'css') {
                         extLib.insertCss({     treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, callback });
                     } else {
-                        console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJsCss(). Please check the "type" for the "sourceText".');
+                        console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadMultipleJsCss(). Please check the "type" for the "sourceText".');
                         callback();
                     }
                 } else if (source) {
@@ -253,7 +253,7 @@ var extLib = {
                     } else if (source.match('.css$')) {
                         extLib.insertCss({     treatAsNormalWebpage, file: source, allFrames, tabId, runAt, callback });
                     } else {
-                        console.log('Error - Loading files like ' + source + ' is not supported by loadJsCss(). Please check the file extension.');
+                        console.log('Error - Loading files like ' + source + ' is not supported by loadMultipleJsCss(). Please check the file extension.');
                         callback();
                     }
                 } else {
