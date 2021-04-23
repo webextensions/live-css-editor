@@ -94,7 +94,7 @@ var extLib = {
             chrome &&
             chrome.tabs
         ) {
-            chrome.tabs.insertCSS(tabId, {file: file, code: code, allFrames: allFrames, runAt: runAt}, function () {
+            chrome.tabs.insertCSS(tabId, { file, code, allFrames, runAt }, function () {
                 cb();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {
@@ -161,12 +161,12 @@ var extLib = {
             chrome.tabs
         ) {
             if (isFirefox) {
-                const executing = browser.tabs.executeScript(tabId, { file: file, code: code, allFrames: allFrames, runAt: runAt });
+                const executing = browser.tabs.executeScript(tabId, { file, code, allFrames, runAt });
                 executing.then(function () {
                     cb();
                 });
             } else {
-                chrome.tabs.executeScript(tabId, { file: file, code: code, allFrames: allFrames, runAt: runAt }, function () {
+                chrome.tabs.executeScript(tabId, { file, code, allFrames, runAt }, function () {
                     cb();       // Somehow this callback is not getting called without this anonymous function wrapper
                 });
             }
@@ -211,18 +211,18 @@ var extLib = {
                 }
                 if (type && sourceText) {
                     if (type === 'js') {
-                        extLib.executeScript({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, runAt: runAt}, cb);
+                        extLib.executeScript({ treatAsNormalWebpage }, { code: sourceText, allFrames, tabId, runAt }, cb);
                     } else if (type === 'css') {
-                        extLib.insertCss({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, runAt: runAt}, cb);
+                        extLib.insertCss({ treatAsNormalWebpage }, { code: sourceText, allFrames, tabId, runAt }, cb);
                     } else {
                         console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJsCss(). Please check the "type" for the "sourceText".');
                         cb();
                     }
                 } else if (source) {
                     if (source.match('.js$')) {
-                        extLib.executeScript({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, runAt: runAt}, cb);
+                        extLib.executeScript({ treatAsNormalWebpage }, { file: source, allFrames, tabId, runAt }, cb);
                     } else if (source.match('.css$')) {
-                        extLib.insertCss({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, runAt: runAt}, cb);
+                        extLib.insertCss({ treatAsNormalWebpage }, { file: source, allFrames, tabId, runAt }, cb);
                     } else {
                         console.log('Error - Loading files like ' + source + ' is not supported by loadJsCss(). Please check the file extension.');
                         cb();
