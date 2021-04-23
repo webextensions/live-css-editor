@@ -73,10 +73,10 @@ var extLib = {
         link.setAttribute('href', href);
 
         // link.onload = function() {
-        //     cb();
+        //     callback();
         // };
         // link.onerror = function() {
-        //     cb('Could not load: ' + link);
+        //     callback('Could not load: ' + link);
         // };
 
         document.body.appendChild(link);
@@ -91,7 +91,7 @@ var extLib = {
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
             runAt = options.runAt || 'document_idle',
-            cb = options.cb;
+            callback = options.callback;
 
         if (
             !treatAsNormalWebpage &&
@@ -100,7 +100,7 @@ var extLib = {
             chrome.tabs
         ) {
             chrome.tabs.insertCSS(tabId, { file, code, allFrames, runAt }, function () {
-                cb();       // Somehow this callback is not getting called without this anonymous function wrapper
+                callback();       // Somehow this callback is not getting called without this anonymous function wrapper
             });
         } else {
             if (file) {
@@ -108,12 +108,12 @@ var extLib = {
             } else {
                 console.log('Error: It appears that you are in normal webpage mode while trying to load CSS "code". Currently, that works only in extension mode.');
             }
-            cb();
+            callback();
             // extLib.loadCss(file, function (err) {
             //     if (err) {
             //         console.error(err);
             //     } else {
-            //         cb();
+            //         callback();
             //     }
             // });
         }
@@ -163,7 +163,7 @@ var extLib = {
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
             runAt = options.runAt || 'document_idle',
-            cb = options.cb;
+            callback = options.callback;
 
         if (
             !treatAsNormalWebpage &&
@@ -174,11 +174,11 @@ var extLib = {
             if (isFirefox) {
                 const executing = browser.tabs.executeScript(tabId, { file, code, allFrames, runAt });
                 executing.then(function () {
-                    cb();
+                    callback();
                 });
             } else {
                 chrome.tabs.executeScript(tabId, { file, code, allFrames, runAt }, function () {
-                    cb();       // Somehow this callback is not getting called without this anonymous function wrapper
+                    callback();       // Somehow this callback is not getting called without this anonymous function wrapper
                 });
             }
         } else {
@@ -189,13 +189,13 @@ var extLib = {
                         if (err) {
                             console.error(err);
                         } else {
-                            cb();
+                            callback();
                         }
                     }
                 });
             } else {
                 console.log('Error: It appears that you are in normal webpage mode while trying to execute JS "code". Currently, that works only in extension mode.');
-                cb();
+                callback();
             }
         }
     },
@@ -204,7 +204,7 @@ var extLib = {
         return new Promise(function (resolve, reject) { // eslint-disable-line no-unused-vars
             extLib.executeScript({
                 ...options,
-                cb: function (err) {
+                callback: function (err) {
                     if (err) {
                         resolve([err]);
                     } else {
@@ -225,7 +225,7 @@ var extLib = {
     }) {
         asyncEachSeries(
             arrSources,
-            function (source, cb) {
+            function (source, callback) {
                 var sourceText, type;
                 // source can also be an object and can have "src" and "skip" parameters
                 if (typeof source === 'object') {
@@ -240,24 +240,24 @@ var extLib = {
                 }
                 if (type && sourceText) {
                     if (type === 'js') {
-                        extLib.executeScript({ treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, cb });
+                        extLib.executeScript({ treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, callback });
                     } else if (type === 'css') {
-                        extLib.insertCss({     treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, cb });
+                        extLib.insertCss({     treatAsNormalWebpage, code: sourceText, allFrames, tabId, runAt, callback });
                     } else {
                         console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJsCss(). Please check the "type" for the "sourceText".');
-                        cb();
+                        callback();
                     }
                 } else if (source) {
                     if (source.match('.js$')) {
-                        extLib.executeScript({ treatAsNormalWebpage, file: source, allFrames, tabId, runAt, cb });
+                        extLib.executeScript({ treatAsNormalWebpage, file: source, allFrames, tabId, runAt, callback });
                     } else if (source.match('.css$')) {
-                        extLib.insertCss({     treatAsNormalWebpage, file: source, allFrames, tabId, runAt, cb });
+                        extLib.insertCss({     treatAsNormalWebpage, file: source, allFrames, tabId, runAt, callback });
                     } else {
                         console.log('Error - Loading files like ' + source + ' is not supported by loadJsCss(). Please check the file extension.');
-                        cb();
+                        callback();
                     }
                 } else {
-                    cb();
+                    callback();
                 }
             },
             function () {
