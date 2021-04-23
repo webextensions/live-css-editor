@@ -132,18 +132,16 @@ var extLib = {
 
     loadJsAsync: async function({ src }) {
         return new Promise(function (resolve, reject) { // eslint-disable-line no-unused-vars
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = src;
-
-            script.onload = function() {
-                resolve([null]);
-            };
-            script.onerror = function() {
-                resolve(['Error in loading: ' + src]);
-            };
-
-            document.body.appendChild(script);
+            extLib.loadJs({
+                src,
+                callback: function (err) {
+                    if (err) {
+                        resolve([err]);
+                    } else {
+                        resolve([null]);
+                    }
+                }
+            });
         });
     },
 
