@@ -86,8 +86,7 @@ var extLib = {
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
-            advancedConfig = options.advancedConfig || {},
-            runAt = advancedConfig.runAt || 'document_idle';
+            runAt = options.runAt || 'document_idle';
 
         if (
             !treatAsNormalWebpage &&
@@ -153,8 +152,7 @@ var extLib = {
             code = options.code,
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
-            advancedConfig = options.advancedConfig || {},
-            runAt = advancedConfig.runAt || 'document_idle';
+            runAt = options.runAt || 'document_idle';
 
         if (
             !treatAsNormalWebpage &&
@@ -193,7 +191,7 @@ var extLib = {
         arrSources,
         allFrames,
         tabId,
-        advancedConfig,
+        runAt,
         done
     }) {
         asyncEachSeries(
@@ -213,18 +211,18 @@ var extLib = {
                 }
                 if (type && sourceText) {
                     if (type === 'js') {
-                        extLib.executeScript({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.executeScript({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, runAt: runAt}, cb);
                     } else if (type === 'css') {
-                        extLib.insertCss({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.insertCss({ treatAsNormalWebpage }, {code: sourceText, allFrames: allFrames, tabId: tabId, runAt: runAt}, cb);
                     } else {
                         console.log('Error - Loading scripts like ' + type + '/' + source + ' is not supported by loadJsCss(). Please check the "type" for the "sourceText".');
                         cb();
                     }
                 } else if (source) {
                     if (source.match('.js$')) {
-                        extLib.executeScript({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.executeScript({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, runAt: runAt}, cb);
                     } else if (source.match('.css$')) {
-                        extLib.insertCss({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, advancedConfig: advancedConfig}, cb);
+                        extLib.insertCss({ treatAsNormalWebpage }, {file: source, allFrames: allFrames, tabId: tabId, runAt: runAt}, cb);
                     } else {
                         console.log('Error - Loading files like ' + source + ' is not supported by loadJsCss(). Please check the file extension.');
                         cb();

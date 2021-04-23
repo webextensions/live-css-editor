@@ -284,9 +284,7 @@ var reapplyCss = function (tabId) {
                     arrSources: arrScripts,
                     allFrames,
                     tabId,
-                    advancedConfig: {
-                        runAt: 'document_start'
-                    }
+                    runAt: 'document_start'
                 });
             });
         });
@@ -447,7 +445,6 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             ],
             allFrames,
             tabId: undefined,
-            advancedConfig: {},
             done: function () {
                 // Currently doing nothing
             }
