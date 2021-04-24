@@ -17,11 +17,22 @@
     "test": "npm run all-is-well"
   },
   "dependencies": {
+    "@babel/cli": "^7.13.16",
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-react": "^7.13.13",
+    "babel-loader": "^8.2.2",
     "codemirror": "=5.34.0",
+    "css-loader": "^5.2.4",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
     "jquery": "^3.6.0",
+    "mini-css-extract-plugin": "^1.5.0",
+    "react": "^17.0.2",
+    "react-command-palette": "=0.16.1",
+    "react-dom": "^17.0.2",
     "socket.io": "^2.3.0",
-    "toastr": "^2.1.4"
+    "toastr": "^2.1.4",
+    "webpack-cli": "^4.6.0"
   },
   "devDependencies": {
     "archiver": "^5.3.0",
@@ -32,6 +43,7 @@
     "eslint": "^7.24.0",
     "git-hooks": "^1.1.10",
     "jsonfile": "^6.1.0",
-    "note-down": "^0.2.3"
+    "note-down": "^0.2.3",
+    "webpack": "^5.35.1"
   }
 }
