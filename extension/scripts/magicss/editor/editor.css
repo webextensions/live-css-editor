@@ -35,10 +35,13 @@
 }
 
 .editor-close {
-    /* Source: http://www.iconfinder.com/icondetails/45933/16/button_cross_icon (https://www.iconfinder.com/icons/45933/download/png/16) ; https://creativecommons.org/licenses/by/3.0/ */
+    /* Source: extension/ui-images/link-external_edited-yellow.svg */
     background-image: url(
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAe5JREFUeNqkk89KG1EUxr+ZubnUjJaipgtNtTZKxE1AVIi4yM5tF30Hoe/iA3TnQkTBRbZFKApCAl1142CJqLR0ZUNJJpPJZP70nJvcEK0SpAPfzD3n5vedM2dujCRJ8D+XODIMGMA4aYfibdLkCKZO+kxlP5FcwRla7MytrHxcLhazMp2WT5HcbeB5gVOp5H44Dqd2RdTb217a2Mi6vi/h+6O6lu9WV7M3jsPd7ppsQJqMTVO6rgtWdn8fev1YrpskkhlmzZBuLJ8qN5tNLJfLqgw/OX4sxyaaE2G/L8/z0Gq1cLy4iA+1mjKcOzhQ+RrFpmniy9oaUqkUMpkMNDcwCIIAYRhiwraxNz2NwskJLMtSgJQSZwSr6Xa7aDca/xowHFB7Xr0OO47vwazx4W9PJpozu2xK6hCY3N1hLIqQPz29BwshULq8RJp+x5JUTHODIRpkkKbv/GYI/ra+jq+FgjJgbV5dKYMX1KHmBh1ImgFv3pZKCr4geJZiVjWfV+2e53K9LqiQ5kSnfzwjmuIY+cxT8J3g+aF35nWVYJ1rx3HQ6R1pWNd0ewu8bkdRfkYI2zYMi/8M4oF0juGq7//8FUWHh0DF4L2XwMIW8H4KKFL8asRR/vObwHOg3ACu2YA6x0S/wHMunmHzrwADAPb07huzEp/RAAAAAElFTkSuQmCC"
+        "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMyIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pbllNaW4gbWVldCI+CiAgPGc+CiAgICA8cGF0aCBmaWxsLW9wYWNpdHk9Ii4zNiIgZD0iTTEwIDQuNDNsLS45My0uOTNMNi41IDYuMDcgMy45MyAzLjUgMyA0LjQzIDUuNTcgNyAzIDkuNTdsLjkzLjkzTDYuNSA3LjkzbDIuNTcgMi41Ny45My0uOTNMNy40MyA3IDEwIDQuNDN6Ii8+CiAgICA8cGF0aCBmaWxsPSIjZmNkNjRkIiBkPSJNMTAgMy45M0w5LjA3IDMgNi41IDUuNTcgMy45MyAzIDMgMy45MyA1LjU3IDYuNSAzIDkuMDdsLjkzLjkzTDYuNSA3LjQzIDkuMDcgMTBsLjkzLS45M0w3LjQzIDYuNSAxMCAzLjkzeiIvPgogIDwvZz4KPC9zdmc+Cg=="
     ) !important;
+
+    background-size: 20px 20px;
+    background-position: -3px -2px;
 }
 
 .editor-more-icons {

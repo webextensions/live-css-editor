@@ -1036,7 +1036,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 options.headerIcons.push({
                     name: 'close',
                     title: 'Close',
-                    cls: 'editor-close',
+                    cls: 'editor-close editor-gray-out',
                     onclick: async function (evt, editor) {
                         await editor.hide();
                         await editor.triggerEvent('onClose');

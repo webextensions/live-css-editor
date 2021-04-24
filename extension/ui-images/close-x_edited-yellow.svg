@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" preserveAspectRatio="xMinYMin meet">
+  <g>
+    <path fill-opacity=".36" d="M10 4.43l-.93-.93L6.5 6.07 3.93 3.5 3 4.43 5.57 7 3 9.57l.93.93L6.5 7.93l2.57 2.57.93-.93L7.43 7 10 4.43z"/>
+    <path fill="#fcd64d" d="M10 3.93L9.07 3 6.5 5.57 3.93 3 3 3.93 5.57 6.5 3 9.07l.93.93L6.5 7.43 9.07 10l.93-.93L7.43 6.5 10 3.93z"/>
+  </g>
+</svg>

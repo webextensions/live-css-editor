@@ -8,6 +8,11 @@ ban_edited.svg
 ban_edited-yellow.svg
     Slightly edited version of "ban.svg"
 
+close-x_edited.svg
+    Slightly edited after exporting from "largeIcons.svg" in Google Chrome's directory, resources/inspector/Images/mediumIcons.svg
+close-x_edited-yellow.svg
+    Slightly edited version of "close-x_edited.svg"
+
 compress.svg
     https://www.iconfinder.com/icons/1608651/compress_icon#size=128
     https://www.iconfinder.com/icons/1608651/download/svg/128
