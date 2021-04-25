@@ -255,12 +255,10 @@
 }
 
 .magicss-point-and-click {
-    /* Source: point-and-click_edited.svg */
+    /* Source: point-and-click_edited-yellow.svg */
     background-image: url(
-        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8Zz4KICA8ZyBmaWxsPSJub25lIj4KICAgPHBhdGggb3BhY2l0eT0iMC41IiBkPSJtMCwwbDE2LDBsMCwxNmwtMTYsMGwwLC0xNnoiLz4KICAgPHBhdGggZmlsbD0iI2ZmZiIgZD0ibTYsMTRsLTIuNSwwYy0xLDAgLTEuNSwtMC41IC0xLjUsLTEuNWwwLC05YzAsLTEgMC41LC0xLjUgMS41LC0xLjVsOSwwYzEuNSwwIDEuNSwxLjQ2OCAxLjUsMS41bDAsMi41bC0xLDBsMCwtM2wtMTAsMGwwLDEwbDMsMGwwLDF6bTksLTVsLTMsMmwzLDNsLTEsMWwtMywtM2wtMiwzbC0yLC04bDgsMnoiLz4KICA8L2c+CiA8L2c+Cjwvc3ZnPg=="
+        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8Zz4KICA8ZyBmaWxsPSJub25lIj4KICAgPHBhdGggb3BhY2l0eT0iMC41IiBkPSJtMCwwbDE2LDBsMCwxNmwtMTYsMGwwLC0xNnoiLz4KICAgPHBhdGggZmlsbD0iI0ZDRDY0RCIgZD0ibTYsMTRsLTIuNSwwYy0xLDAgLTEuNSwtMC41IC0xLjUsLTEuNWwwLC05YzAsLTEgMC41LC0xLjUgMS41LC0xLjVsOSwwYzEuNSwwIDEuNSwxLjQ2OCAxLjUsMS41bDAsMi41bC0xLDBsMCwtM2wtMTAsMGwwLDEwbDMsMGwwLDF6bTksLTVsLTMsMmwzLDNsLTEsMWwtMywtM2wtMiwzbC0yLC04bDgsMnoiLz4KICA8L2c+CiA8L2c+Cjwvc3ZnPg=="
     ) !important;
-
-    opacity: 0.85;
 }
 .full-screen-editor .magicss-point-and-click {
     display: none !important;
@@ -303,13 +301,9 @@
 }
 
 .magicss-cache-image-to-prevent-CSP-problem-point-and-click-hover,
-.magicss-point-and-click:hover,
 .magicss-point-and-click-activated .magicss-point-and-click {
-    /* Source: point-and-click_edited-yellow.svg */
-    background-image: url(
-        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8Zz4KICA8ZyBmaWxsPSJub25lIj4KICAgPHBhdGggb3BhY2l0eT0iMC41IiBkPSJtMCwwbDE2LDBsMCwxNmwtMTYsMGwwLC0xNnoiLz4KICAgPHBhdGggZmlsbD0iI0ZDRDY0RCIgZD0ibTYsMTRsLTIuNSwwYy0xLDAgLTEuNSwtMC41IC0xLjUsLTEuNWwwLC05YzAsLTEgMC41LC0xLjUgMS41LC0xLjVsOSwwYzEuNSwwIDEuNSwxLjQ2OCAxLjUsMS41bDAsMi41bC0xLDBsMCwtM2wtMTAsMGwwLDEwbDMsMGwwLDF6bTksLTVsLTMsMmwzLDNsLTEsMWwtMywtM2wtMiwzbC0yLC04bDgsMnoiLz4KICA8L2c+CiA8L2c+Cjwvc3ZnPg=="
-    ) !important;
-    opacity: 1;
+    -webkit-filter: none;
+    filter: none;
 }
 
 .magicss-point-and-click-activated .magicss-point-and-click {

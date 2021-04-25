@@ -3430,7 +3430,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     'Select an element in the page to generate its CSS Selector' :
                                     'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)'
                             ),
-                            cls: 'magicss-point-and-click',
+                            cls: 'magicss-point-and-click editor-gray-out',
                             onclick: function (evt, editor) {
                                 togglePointAndClick(editor);
                                 editor.focus();
