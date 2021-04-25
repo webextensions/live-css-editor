@@ -2924,6 +2924,19 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         }()),
                         (function () {
+                            return {
+                                name: 'command-palette',
+                                title: 'Show all available commands',
+                                cls: 'magicss-command-palette-root magicss-command-palette editor-gray-out',
+                                onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                    // Doing nothing yet
+                                },
+                                afterrender: function () {
+                                    window.reactMain();
+                                }
+                            };
+                        })(),
+                        (function () {
                             // Currently, this feature has been tested only in Chrome, Opera and Edge browsers
                             if (isChrome || isOpera || isEdge || isFirefox) {
                                 return {

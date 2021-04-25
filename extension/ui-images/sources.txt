@@ -119,6 +119,12 @@ settings-server.svg
 settings-server_edited.svg
     Slightly edited version of "settings-server_edited.svg"
 
+triple-dots.svg
+    https://www.iconfinder.com/icons/211866/download/svg/512
+
+triple-dots_edited.svg
+    Slightly edited version of "triple-dots.svg" (with help of https://editor.method.ac/ and https://www.iconfinder.com/editor/)
+
 unordered-list.svg
     https://www.iconfinder.com/icons/383201/list_unordered_icon#size=128
     https://www.iconfinder.com/icons/383201/download/svg/128

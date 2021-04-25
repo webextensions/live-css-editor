@@ -342,7 +342,8 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
     }
 
     getAllFrames(function (allFrames) {
-        var pathScripts = 'scripts/',
+        var pathDist = 'dist/',
+            pathScripts = 'scripts/',
             path3rdparty = pathScripts + '3rdparty/',
             path3rdpartyCustomFixes = pathScripts + '3rdparty-custom-fixes/',
             pathMagicss = pathScripts + 'magicss/',
@@ -467,6 +468,8 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
                 pathMagicss + 'magicss.css',
                 pathMagicss + 'generate-selector.js',
+
+                pathDist + 'main.bundle.js',
                 pathMagicss + 'magicss.js'
             ],
             allFrames,

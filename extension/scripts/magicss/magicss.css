@@ -200,6 +200,17 @@
     display: none !important;
 }
 
+.magicss-command-palette {
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/triple-dots_edited.svg */
+    background-image: url(
+        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzg0IiBoZWlnaHQ9Ijk2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiNmY2Q2NGQiPgogICAgPGc+CiAgICAgIDxwYXRoIGQ9Im00OS43LDk2Yy0yNy41LDAgLTQ5LjcsLTIxLjQgLTQ5LjcsLTQ4YzAsLTI2LjUgMjIuMiwtNDggNDkuNywtNDhjMjcuNiwwIDQ5LjgsMjEuNSA0OS44LDQ4YzAsMjYuNiAtMjIuMiw0OCAtNDkuOCw0OHoiLz4KICAgICAgPHBhdGggZD0ibTE5Miw5NmMtMjcuNSwwIC00OS44LC0yMS40IC00OS44LC00OGMwLC0yNi41IDIyLjMsLTQ4IDQ5LjgsLTQ4YzI3LjUsMCA0OS43LDIxLjUgNDkuNyw0OGMwLDI2LjYgLTIyLjIsNDggLTQ5LjcsNDh6Ii8+CiAgICAgIDxwYXRoIGQ9Im0zMzQuMiw5NmMtMjcuNSwwIC00OS44LC0yMS40IC00OS44LC00OGMwLC0yNi41IDIyLjIsLTQ4IDQ5LjgsLTQ4YzI3LjUsMCA0OS44LDIxLjUgNDkuOCw0OGMwLDI2LjYgLTIyLjIsNDggLTQ5LjgsNDh6Ii8+CiAgICA8L2c+CiAgPC9zdmc+"
+    ) !important;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-size: 16px 4px;
+    background-position: 0px 6px;
+}
+
 .magicss-external-window,
 .magicss-external-window-is-not-available-for-mode {
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/link-external_edited-yellow.svg */
@@ -1579,3 +1590,23 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 }
 
 /* End */
+
+
+/* Begin: Command palette */
+.magicss-command-palette-overlay {
+    z-index: 2147483648;
+}
+
+/* Reference: https://github.com/asabaylus/react-command-palette/issues/257#issuecomment-549096188 */
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen {
+    overflow: auto;
+}
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar {
+    background: rgba(255, 255, 255, 0.15);
+    width: 10px;
+}
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 0 2px rgb(91, 91, 91);
+}
+/* End: Command palette */

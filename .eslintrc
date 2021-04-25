@@ -5,7 +5,14 @@
         "es2021": true, // https://eslint.org/docs/user-guide/configuring/language-options#specifying-environments
                         // This automatically sets the ecmaVersion parser option (parserOptions) to 12
         "browser": true,
-        "node": false
+        "node": true
+    },
+
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
     },
 
     "rules": {
@@ -18,6 +25,9 @@
         "no-debugger": "off",
         "no-shadow": "off"
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended"
+    ],
     "plugins": []
 }
