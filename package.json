@@ -28,6 +28,7 @@
     "css-loader": "^5.2.4",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
     "eslint-loader": "^4.0.2",
+    "hotkeys-js": "^3.8.3",
     "jquery": "^3.6.0",
     "mini-css-extract-plugin": "^1.5.0",
     "react": "^17.0.2",
