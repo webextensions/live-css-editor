@@ -31,6 +31,9 @@ link-external_edited-yellow.svg
 link-internal_edited-yellow.svg
     Slightly edited version of "link-external_edited-yellow.svg"
 
+logo-chrome-web-store.png
+    https://ssl.gstatic.com/chrome/webstore/images/icon_48px.png
+
 logo-facebook.svg
     https://upload.wikimedia.org/wikipedia/commons/c/c2/F_icon.svg
 
