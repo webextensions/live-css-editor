@@ -341,6 +341,12 @@
     background-size: 16px;
 }
 
+.magicss-use-icon-chrome {
+    background-image: url(
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAN2AAADdgF91YLMAAAAB3RJTUUH3wUPDxwNLKX9oQAAAd9JREFUOMulk71rU2EUh5/z3pubEKiJOqgRqpSI4FCh4uQkiEtXoZt/gDgLDtJFpw5SiB0EN10EFx0EoVCFiBTj4iIO0gSS6wemH8ntTe6973scmvpV28G+cJb3nN/D+Z3DgX0+CcNQVXXPor3y/i7JFefcAqAjgBhjrgEndwD+pTbGNCuVytzvf2EYTjvndgCk0+no/7YPYPYj3tUCIlvBzymAjuJvgGwXjoQ2bDOsvyRtLGM/twHFHKkQTJ0nuHARr3L8D5B0u11FFXIBw8XnbD5+iK6vg/erA3UKNkUOlCjOXCV/eRqSBEQwIoIEAVnjDdHCXYj6iG8QEURBth35PkR9otoc2fJrJAgQEXxBaA5WefekxqUgT4KCc3jFIoWJCbxSDhu10CwCBLSIW5xHzp5GvTK+EeHZpzoPzh1kKuwxNrBIqUx0/TaPWseQgseVya9Uo1nEro0Wp8S9FwzKM5jYJrxfbREbZX7yEBLH5G/cYbZR5dVKgaUPOW4+Hef74VuQ9cAl4FL84UdEh5jEZnSTPgBLlQLNM+O85RTf1uyWd+DLhqXerkLh6GivirE90BQTp8N7ngrqHBs54f6JHGMmRdXhnEPVYdRRzKWQbWKdYq2SOYPNBrX9XjM/AFVF4OTTNk73AAAAAElFTkSuQmCC"
+    ) !important;
+}
+
 .icon-chrome-web-store {
     /* Source:
         https://ssl.gstatic.com/chrome/webstore/images/icon_48px.png

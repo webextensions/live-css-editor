@@ -3,9 +3,33 @@ import PropTypes from 'prop-types';
 
 import ReactCommandPalette from 'react-command-palette';
 
+const renderCommand = function (suggestion) {
+    const {
+        name,
+        iconCls,
+        style
+    } = suggestion;
+    return (
+        <div style={{ display: 'flex' }}>
+            <div
+                className={iconCls}
+                style={{
+                    width: 16,
+                    height: 16,
+                    backgroundSize: 'contain',
+                    marginRight: 10,
+                    ...style
+                }}
+            ></div>
+            <div>{name}</div>
+        </div>
+    );
+};
+
 const commands = [
     {
         name: 'Magic CSS for Chrome',
+        iconCls: 'magicss-use-icon-chrome',
         command() {
             window.open('https://chrome.google.com/webstore/detail/live-editor-for-css-less/ifhikkcafabcgolfjegfcgloomalapol');
         }
@@ -134,6 +158,7 @@ const CommandPalette = function (props) {
                     }
                 }}
                 commands={commands}
+                renderCommand={renderCommand}
                 closeOnSelect={true}
                 resetInputOnOpen={true}
                 maxDisplayed={100}
