@@ -56,6 +56,7 @@ window.magicssHostSessionUuid = (
 
 var loadIfNotAvailable = async function (dependencyToLoad) {
     const
+        pathDist = 'dist/',
         pathScripts = 'scripts/',
         path3rdparty = pathScripts + '3rdparty/';
 
@@ -75,6 +76,22 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
             }
         }
         return window.less;
+    } else if (dependencyToLoad === 'main-bundle') {
+        if (typeof window.reactMain === 'undefined') {
+            if (window.treatAsNormalWebpage) {
+                const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
+                    treatAsNormalWebpage: true,
+                    source: pathDist + 'main.bundle.js'
+                });
+            } else {
+                await chromeRuntimeMessageToBackgroundScript({
+                    type: 'magicss-dependency',
+                    subType: 'load-dependency',
+                    payload: pathDist + 'main.bundle.js'
+                });
+            }
+        }
+        return window.reactMain;
     }
 };
 
@@ -2923,19 +2940,58 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 return iconForRateUs({addOpaqueOnHoverClass: true});
                             }
                         }()),
-                        (function () {
-                            return {
-                                name: 'command-palette',
-                                title: 'Show all available commands',
-                                cls: 'magicss-command-palette-root magicss-command-palette editor-gray-out',
-                                onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
-                                    // Doing nothing yet
-                                },
-                                afterrender: function () {
-                                    window.reactMain();
-                                }
-                            };
-                        })(),
+
+                        // Used for mounting the component
+                        {
+                            name: 'command-palette-invisible-root',
+                            cls: 'magicss-command-palette-root',
+                        },
+                        {
+                            name: 'command-palette',
+                            title: 'Show all available commands',
+                            cls: 'magicss-command-palette editor-gray-out',
+                            onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                const reactMain = await loadIfNotAvailable('main-bundle');
+                                reactMain({
+                                    open: true
+                                });
+                            },
+                            afterrender: function () {
+                                document.addEventListener(
+                                    'keydown',
+                                    function(event) {
+                                        if (window.MagiCSSEditor.isVisible()) {
+                                            if (
+                                                (
+                                                    event.ctrlKey ||
+                                                    event.metaKey
+                                                ) &&
+                                                event.shiftKey &&
+                                                (
+                                                    event.key === 'p' ||
+                                                    event.key === 'P' ||
+                                                    event.code === 'KeyP' ||
+                                                    event.keyCode === 80 ||
+                                                    event.which === 80
+                                                )
+                                            ) {
+                                                event.preventDefault();
+
+                                                setTimeout(async () => {
+                                                    const reactMain = await loadIfNotAvailable('main-bundle');
+                                                    reactMain({
+                                                        open: true
+                                                    });
+                                                });
+                                            }
+                                        }
+                                    },
+                                    {
+                                        capture: true
+                                    }
+                                );
+                            }
+                        },
                         (function () {
                             // Currently, this feature has been tested only in Chrome, Opera and Edge browsers
                             if (isChrome || isOpera || isEdge || isFirefox) {
@@ -4397,7 +4453,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             keyCombination === 'Ctrl-P' ||
                             keyCombination === 'Cmd-P' ||
                             keyCombination === 'Ctrl-O' ||
-                            keyCombination === 'Cmd-P'
+                            keyCombination === 'Cmd-O'
                         ) {
                             await setLanguageMode('file', this);
                         }

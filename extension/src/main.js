@@ -1,26 +1,38 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 
 import { Actions } from './actions.js';
 
-class Main extends React.Component {
-    render() {
-        return (
-            <div>
-                <Actions />
-            </div>
-        );
-    }
-}
+const Main = function (props) {
+    return (
+        <div>
+            <Actions
+                open={props.open}
+                onClose={function () {
+                    if (props.onClose) {
+                        props.onClose();
+                    }
+                }}
+            />
+        </div>
+    );
+};
+Main.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func
+};
 
-window.reactMain = function () {
-    if (window.reactMain.loaded) {
-        return;
-    }
-    window.reactMain.loaded = true;
-
+window.reactMain = function (options) {
     ReactDOM.render(
-        <Main />,
+        <Main
+            open={options.open}
+            onClose={function () {
+                window.reactMain({
+                    open: false
+                });
+            }}
+        />,
         document.getElementsByClassName('magicss-command-palette-root')[0]
     );
 };

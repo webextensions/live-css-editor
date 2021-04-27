@@ -1587,8 +1587,35 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 
 
 /* Begin: Command palette */
+.magicss-command-palette-root {
+    display: none !important;
+}
+
 .magicss-command-palette-overlay {
     z-index: 2147483648;
+}
+
+.magicss-command-palette-overlay .atom-suggestion {
+    padding: 7px 10px;
+}
+
+.magicss-command-palette-overlay .atom-modal {
+    max-width: 605px;
+    width: calc(100% - 50px);
+}
+
+.magicss-command-palette-overlay .atom-input {
+    max-width: 605px;
+    width: calc(100%);
+}
+
+.magicss-command-palette-overlay .magicss-palette-header {
+    display: none;
+}
+@media (min-width: 600px) {
+    .magicss-command-palette-overlay .magicss-palette-header {
+        display: unset;
+    }
 }
 
 /* Reference: https://github.com/asabaylus/react-command-palette/issues/257#issuecomment-549096188 */
@@ -1602,5 +1629,9 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 .magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.25);
     box-shadow: inset 0 0 2px rgb(91, 91, 91);
+}
+
+.magicss-command-palette-overlay .atom-suggestion b {
+    font-weight: 100;
 }
 /* End: Command palette */

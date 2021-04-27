@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import ReactCommandPalette from 'react-command-palette';
 
@@ -68,27 +69,29 @@ const styleOb = {
     padding: '2px 4px'
 };
 const header = (
-    <div
-        style={{
-            color: 'rgb(172, 172, 172)',
-            display: 'inline-block',
-            fontFamily: 'arial',
-            fontSize: '12px',
-            marginBottom: '6px'
-        }}
-    >
-        <span style={{ paddingRight: '32px' }}>
-            Search for a tool:
-        </span>
-        <span style={{ paddingRight: '32px' }}>
-            <kbd style={styleOb}>↑↓</kbd>{' '}to navigate
-        </span>
-        <span style={{ paddingRight: '32px' }}>
-            <kbd style={styleOb}>enter</kbd>{' '}to select
-        </span>
-        <span style={{ paddingRight: '32px' }}>
-            <kbd style={styleOb}>esc</kbd>{' '}to dismiss
-        </span>
+    <div className="magicss-palette-header" style={{ display: 'none' }}>
+        <div
+            style={{
+                color: 'rgb(172, 172, 172)',
+                display: 'inline-block',
+                fontFamily: 'arial',
+                fontSize: '12px',
+                marginBottom: '6px'
+            }}
+        >
+            <span style={{ paddingRight: '32px' }}>
+                Search for a tool:
+            </span>
+            <span style={{ paddingRight: '32px' }}>
+                <kbd style={styleOb}>↑↓</kbd>{' '}to navigate
+            </span>
+            <span style={{ paddingRight: '32px' }}>
+                <kbd style={styleOb}>enter</kbd>{' '}to select
+            </span>
+            <span style={{ paddingRight: '32px' }}>
+                <kbd style={styleOb}>esc</kbd>{' '}to dismiss
+            </span>
+        </div>
     </div>
 );
 
@@ -111,11 +114,25 @@ const theme = {
     trigger:                    "atom-trigger"
 };
 
-const CommandPalette = function () {
+const CommandPalette = function (props) {
     return (
         <div className="CommandPalette">
             <ReactCommandPalette
-                hotKeys={['cmd+shift+p', 'ctrl+shift+p']}
+                hotKeys={[]}
+                open={props.open}
+                onRequestClose={function () {
+                    if (props.onClose) {
+                        props.onClose();
+                    }
+                }}
+                onAfterOpen={function () {
+                    const el = document.querySelector('.magicss-command-palette-overlay [role=combobox] .atom-input');
+                    if (el) {
+                        setTimeout(() => {
+                            el.focus();
+                        });
+                    }
+                }}
                 commands={commands}
                 closeOnSelect={true}
                 resetInputOnOpen={true}
@@ -134,6 +151,10 @@ const CommandPalette = function () {
             />
         </div>
     );
+};
+CommandPalette.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func
 };
 
 export { CommandPalette };
