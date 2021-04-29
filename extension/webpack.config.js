@@ -14,8 +14,9 @@ module.exports = {
 
     // https://stackoverflow.com/questions/15097945/do-source-maps-work-for-chrome-extensions/23438324#23438324
     // https://bugs.chromium.org/p/chromium/issues/detail?id=212374
-    // devtool: 'source-map',
-    devtool: false,
+    devtool: false,                             // Recommended for production mode for a WebExtension
+    // devtool: 'eval-cheap-module-source-map', // Recommended for development mode for a webpage/WebExtension
+    // devtool: 'source-map',                   // Recommended for production mode for a webpage (this mode does not work well for a WebExtension)
 
     module: {
         rules: [
@@ -36,6 +37,18 @@ module.exports = {
             '__REACT_DEVTOOLS_GLOBAL_HOOK__': '({ isDisabled: true })'
         }),
 
+        // This plugin is useful for removing (unwanted) sourcemap references. Which otherwise can lead to warnings in
+        // console.
+        // For example:
+        //     When including some libraries, there might be references to "//# sourceMappingURL=..." which might not be
+        //     possible to load / map-into-another-form for WebExtensions (Ref:
+        //     https://bugs.chromium.org/p/chromium/issues/detail?id=212374)
+        //
+        //     Without this plugin, if you import 'react-command-palette' (Ref:
+        //     https://www.unpkg.com/react-command-palette@0.16.2/dist/index.js) and the sourcemap reference from inside
+        //     that library file (eg: "//# sourceMappingURL=index.js.map") is not transformed into another appropriate
+        //     sourcemap (probably because sourcemaps are kept disabled when building for WebExtension), then it would
+        //     attempt to load the sourcemap from an invalid path which would lead to a warning in console.
         new RemoveSourceMapUrlWebpackPlugin({
             test: /main\.bundle\.js$/
         })
