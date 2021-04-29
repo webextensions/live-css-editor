@@ -18,6 +18,7 @@ const renderCommand = function (suggestion) {
                 style={{
                     marginRight: 10,
                     width: 16,
+                    minWidth: 16, // Required, because otherwise, since the parent is 'display: flex', this element's `width` alone is not respected when parent's width is reduced a lot
                     height: 16,
                     backgroundSize: 'contain',
                     ...style

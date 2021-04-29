@@ -1579,13 +1579,25 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     z-index: 2147483648;
 }
 
+/* Note: Somehow, the default box-sizing for some of the elements (eg: main input box) for 'react-command-palette' is
+         'content-box' in external editor, while it is 'border-box' for editor inside a normal webpage */
+/* https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
+.magicss-command-palette-overlay *,
+.magicss-command-palette-overlay ::before,
+.magicss-command-palette-overlay ::after {
+    box-sizing: inherit;
+}
+.magicss-command-palette-overlay {
+    box-sizing: border-box;
+}
+
 .magicss-command-palette-overlay .atom-suggestion {
     padding: 7px 10px;
 }
 
 .magicss-command-palette-overlay .atom-modal {
     max-width: 605px;
-    width: calc(100% - 50px);
+    width: calc(100% - 25vw);
 }
 
 .magicss-command-palette-overlay .atom-input {
@@ -1600,6 +1612,23 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     .magicss-command-palette-overlay .magicss-palette-header {
         display: unset;
     }
+}
+
+.magicss-command-palette-overlay {
+    --modal-gap-from-top: 10vh;
+}
+
+.magicss-command-palette-overlay .atom-modal {
+    top: var(--modal-gap-from-top);
+}
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen {
+    max-height: 50px;
+    max-height: calc(
+        100vh -
+        var(--modal-gap-from-top) -
+        var(--modal-gap-from-top) -
+        64px
+    ); /* 64px is the height of elements and whitespace apart from the list inside the suggestions box */
 }
 
 /* Reference: https://github.com/asabaylus/react-command-palette/issues/257#issuecomment-549096188 */
