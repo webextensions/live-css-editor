@@ -2677,6 +2677,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     if (isChrome || isEdge || isFirefox || isOpera) {
                         if (isChrome) {
                             icon = {
+                                skip: true,
                                 name: 'rate-on-webstore',
                                 title: 'Rate us on Chrome Web Store',
                                 cls: 'magicss-rate-on-webstore',
@@ -2685,6 +2686,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             };
                         } else if (isEdge) {
                             icon = {
+                                skip: true,
                                 name: 'rate-on-webstore',
                                 title: 'Rate us on Microsoft Store',
                                 cls: 'magicss-rate-on-webstore',
@@ -2693,6 +2695,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             };
                         } else if (isFirefox) {
                             icon = {
+                                skip: true,
                                 name: 'rate-on-webstore',
                                 title: 'Rate us on Firefox Add-ons Store',
                                 cls: 'magicss-rate-on-webstore',
@@ -2701,6 +2704,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             };
                         } else if (isOpera) {
                             icon = {
+                                skip: true,
                                 name: 'rate-on-webstore',
                                 title: 'Rate us on Opera Add-ons Store',
                                 cls: 'magicss-rate-on-webstore',
@@ -2712,6 +2716,34 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (options.addOpaqueOnHoverClass) {
                                 icon.cls += ' editor-opaque-on-hover';
                             }
+                        }
+                    }
+                    return icon;
+                };
+
+                window.execIconToShowForRateUs = function () {
+                    var icon = null;
+                    if (isChrome || isEdge || isFirefox || isOpera) {
+                        if (isChrome) {
+                            icon = {
+                                browser: 'chrome',
+                                href: extensionUrl.chrome + '/reviews'
+                            };
+                        } else if (isEdge) {
+                            icon = {
+                                browser: 'edge',
+                                href: extensionUrl.edge
+                            };
+                        } else if (isFirefox) {
+                            icon = {
+                                browser: 'firefox',
+                                href: extensionUrl.firefox + 'reviews/'
+                            };
+                        } else if (isOpera) {
+                            icon = {
+                                browser: 'opera',
+                                href: extensionUrl.opera + '#feedback-container'
+                            };
                         }
                     }
                     return icon;

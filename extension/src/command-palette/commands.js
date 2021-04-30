@@ -1,6 +1,55 @@
 /* global extLib */
 
 const commands = [
+    (function () {
+        var editor = window.MagiCSSEditor;
+
+        const iconOb = window.execIconToShowForRateUs(editor);
+
+        const
+            CHROME  = 'chrome',
+            EDGE    = 'edge',
+            FIREFOX = 'firefox',
+            OPERA   = 'opera',
+            handledBrowsers = [CHROME, EDGE, FIREFOX, OPERA];
+        if (
+            iconOb &&
+            handledBrowsers.includes(iconOb.browser) &&
+            iconOb.href
+        ) {
+            const commandOb = {};
+            const {
+                browser,
+                href
+            } = iconOb;
+
+            let name,
+                iconCls;
+            if (browser === 'chrome') {
+                name = 'Rate us on Chrome Web Store';
+                iconCls = 'icon-chrome-web-store';
+            } else if (browser === 'edge') {
+                name = 'Rate us on Microsoft Store';
+                iconCls = 'icon-microsoft-store';
+            } else if (browser === 'firefox') {
+                name = 'Rate us on Firefox Add-ons Store';
+                iconCls = 'icon-firefox-add-ons-store';
+            } else if (browser === 'opera') {
+                name = 'Rate us on Opera Add-ons Store';
+                iconCls = 'icon-opera-add-ons-store';
+            }
+            commandOb.name = name;
+            commandOb.iconCls = iconCls;
+
+            commandOb.command = function () {
+                window.open(href);
+            };
+
+            return commandOb;
+        } else {
+            return null;
+        }
+    })(),
     {
         name: 'Magic CSS for Chrome',
         iconCls: 'magicss-use-icon-chrome',
@@ -116,6 +165,6 @@ const commands = [
             window.open('https://github.com/webextensions/live-css-editor');
         }
     }
-];
+].filter(x => x);
 
 export { commands };
