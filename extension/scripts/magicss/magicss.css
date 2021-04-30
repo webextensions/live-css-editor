@@ -429,6 +429,18 @@
     background-image: var(--icon-compress) !important;
 }
 
+.magicss-use-icon-show-line-numbers-gray {
+    background-image: var(--icon-hash) !important;
+    background-size: 11px !important;
+    background-position: 1px 2px !important;
+}
+
+.magicss-use-icon-hide-line-numbers-gray {
+    background-image: var(--icon-ban), var(--icon-hash) !important;
+    background-position: 8px 7px, 1px 2px !important;
+    background-size: 9px, 11px !important;
+}
+
 .magicss-use-logo-twitter-gray {
     background-image: var(--logo-twitter) !important;
 }

@@ -44,6 +44,30 @@ const commands = [
             });
         }
     },
+
+    {
+        id: 'show-line-numbers',
+        name: 'Show line numbers',
+        iconCls: 'magicss-use-icon-show-line-numbers-gray',
+        command() {
+            setTimeout(async function () {
+                var editor = window.MagiCSSEditor;
+                await window.execShowLineNumbersAction(editor);
+            });
+        }
+    },
+    {
+        id: 'hide-line-numbers',
+        name: 'Hide line numbers',
+        iconCls: 'magicss-use-icon-hide-line-numbers-gray',
+        command() {
+            setTimeout(async function () {
+                var editor = window.MagiCSSEditor;
+                await window.execHideLineNumbersAction(editor);
+            });
+        }
+    },
+
     {
         name: 'Tweet',
         iconCls: 'magicss-use-logo-twitter-gray',

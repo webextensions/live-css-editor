@@ -84,6 +84,20 @@ const theme = {
 };
 
 const CommandPalette = function (props) {
+    const editor = window.MagiCSSEditor;
+    const filteredCommands = commands.filter((item) => {
+        if (item.id === 'show-line-numbers') {
+            if (editor.cm.getOption('lineNumbers')) {
+                return false;
+            }
+        } else if (item.id === 'hide-line-numbers') {
+            if (!editor.cm.getOption('lineNumbers')) {
+                return false;
+            }
+        }
+        return true;
+    });
+
     return (
         <div className="CommandPalette">
             <ReactCommandPalette
@@ -102,7 +116,7 @@ const CommandPalette = function (props) {
                         });
                     }
                 }}
-                commands={commands}
+                commands={filteredCommands}
                 renderCommand={renderCommand}
                 closeOnSelect={true}
                 resetInputOnOpen={true}

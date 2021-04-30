@@ -1759,6 +1759,30 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     editor.focus();
                 };
 
+                window.execShowLineNumbersAction = async function (editor) {
+                    editor.cm.setOption('lineNumbers', true);
+                    await editor.userPreference('show-line-numbers', 'yes');
+
+                    chromeRuntimeMessageIfRequired({
+                        type: 'magicss',
+                        subType: 'showLineNumbers'
+                    });
+
+                    editor.focus();
+                };
+
+                window.execHideLineNumbersAction = async function (editor) {
+                    editor.cm.setOption('lineNumbers', false);
+                    await editor.userPreference('show-line-numbers', 'no');
+
+                    chromeRuntimeMessageIfRequired({
+                        type: 'magicss',
+                        subType: 'hideLineNumbers'
+                    });
+
+                    editor.focus();
+                };
+
                 var getMatchingAndSuggestedSelectors = function (targetElement) {
                     var selector = window.generateFullSelector(targetElement);
                     var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
@@ -3710,35 +3734,21 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         },
                         {
+                            skip: true,
                             name: 'showLineNumbers',
                             title: 'Show line numbers',
                             uniqCls: 'magicss-show-line-numbers',
                             onclick: async function (evt, editor) {
-                                editor.cm.setOption('lineNumbers', true);
-                                await editor.userPreference('show-line-numbers', 'yes');
-
-                                chromeRuntimeMessageIfRequired({
-                                    type: 'magicss',
-                                    subType: 'showLineNumbers'
-                                });
-
-                                editor.focus();
+                                await window.execShowLineNumbersAction(editor);
                             }
                         },
                         {
+                            skip: true,
                             name: 'hideLineNumbers',
                             title: 'Hide line numbers',
                             uniqCls: 'magicss-hide-line-numbers',
                             onclick: async function (evt, editor) {
-                                editor.cm.setOption('lineNumbers', false);
-                                await editor.userPreference('show-line-numbers', 'no');
-
-                                chromeRuntimeMessageIfRequired({
-                                    type: 'magicss',
-                                    subType: 'hideLineNumbers'
-                                });
-
-                                editor.focus();
+                                await window.execHideLineNumbersAction(editor);
                             }
                         },
                         {
