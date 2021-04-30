@@ -30,6 +30,17 @@ const commands = [
                 await window.execBeautifyCssAction(editor);
             });
         }
+    },
+    {
+        name: 'Minify code',
+        iconCls: 'magicss-use-icon-minify-gray',
+        command() {
+            setTimeout(async function () {
+                var editor = window.MagiCSSEditor;
+
+                await window.execMinifyCssAction(editor);
+            });
+        }
     }
 ];
 

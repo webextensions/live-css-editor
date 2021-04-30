@@ -1721,6 +1721,43 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     editor.focus();
                 };
 
+                window.execMinifyCssAction = async function (editor) {
+                    var textValue = editor.getTextValue();
+                    if (!textValue.trim()) {
+                        await editor.setTextValue('');
+                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                        chromeRuntimeMessageIfRequired({
+                            type: 'magicss',
+                            subType: 'update-code-and-apply-css',
+                            payload: {
+                                cssCodeToUse: ''
+                            }
+                        });
+
+                        utils.alertNote('Please type some code to be minified', 5000);
+                    } else {
+                        var minifiedCSS = utils.minifyCSS(textValue);
+                        if (textValue !== minifiedCSS) {
+                            await editor.setTextValue(minifiedCSS);
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'update-code-and-apply-css',
+                                payload: {
+                                    cssCodeToUse: minifiedCSS
+                                }
+                            });
+
+                            utils.alertNote('Your code has been minified' + noteForUndo, 5000);
+                        } else {
+                            utils.alertNote('Your code is already minified', 5000);
+                        }
+                    }
+                    editor.focus();
+                };
+
                 var getMatchingAndSuggestedSelectors = function (targetElement) {
                     var selector = window.generateFullSelector(targetElement);
                     var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
@@ -3663,40 +3700,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             title: 'Minify code',
                             uniqCls: 'magicss-minify',
                             onclick: async function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    await editor.setTextValue('');
-                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-
-                                    chromeRuntimeMessageIfRequired({
-                                        type: 'magicss',
-                                        subType: 'update-code-and-apply-css',
-                                        payload: {
-                                            cssCodeToUse: ''
-                                        }
-                                    });
-
-                                    utils.alertNote('Please type some code to be minified', 5000);
-                                } else {
-                                    var minifiedCSS = utils.minifyCSS(textValue);
-                                    if (textValue !== minifiedCSS) {
-                                        await editor.setTextValue(minifiedCSS);
-                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-
-                                        chromeRuntimeMessageIfRequired({
-                                            type: 'magicss',
-                                            subType: 'update-code-and-apply-css',
-                                            payload: {
-                                                cssCodeToUse: minifiedCSS
-                                            }
-                                        });
-
-                                        utils.alertNote('Your code has been minified' + noteForUndo, 5000);
-                                    } else {
-                                        utils.alertNote('Your code is already minified', 5000);
-                                    }
-                                }
-                                editor.focus();
+                                await window.execMinifyCssAction(editor);
                             }
                         },
                         {

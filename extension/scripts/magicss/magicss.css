@@ -421,6 +421,10 @@
     background-image: var(--icon-smile) !important;
 }
 
+.magicss-use-icon-minify-gray {
+    background-image: var(--icon-compress) !important;
+}
+
 .icon-chrome-web-store {
     background-image: var(--logo-chrome-web-store) !important;
 }
