@@ -1,6 +1,39 @@
 const webpack = require('webpack');
 const RemoveSourceMapUrlWebpackPlugin = require('@rbarilani/remove-source-map-url-webpack-plugin');
 
+const BABEL_OPTIONS = {
+    // plugins: ['transform-es2015-modules-commonjs'],
+
+    presets: [
+        [
+            "@babel/preset-env",
+            {
+                // Webpack understands the native import syntax, and uses it for tree shaking
+                // https://babeljs.io/docs/en/babel-preset-env#modules
+                // https://webhint.io/docs/user-guide/hints/hint-webpack-config/modules-false-babel/
+                modules: false,
+
+                // Currently, we wish to keep the transpilation to minimum, hence we are using this configuration for "browsers"
+                // https://babeljs.io/docs/en/babel-preset-env#targets
+                targets: {
+                    // firefox: '68',
+                    // chrome: '83'
+
+                    browsers: [
+                        "last 7 chrome versions",
+                        "last 10 firefox versions",
+                        "firefox esr"
+                    ]
+                    // "browsers": ["> 0.5%, last 2 versions, Firefox ESR, not dead"]
+                    // Online REPL:
+                    //     https://browserl.ist/
+                }
+            }
+        ],
+        '@babel/preset-react'
+    ]
+};
+
 module.exports = {
     watch: true,
     mode: 'development',
@@ -24,7 +57,10 @@ module.exports = {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: [
-                    'babel-loader' //,
+                    {
+                        loader: 'babel-loader',
+                        options: BABEL_OPTIONS
+                    }
                     // 'eslint-loader'
                 ]
             }
