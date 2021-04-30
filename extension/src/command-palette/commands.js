@@ -164,6 +164,14 @@ const commands = [
         command() {
             window.open('https://github.com/webextensions/live-css-editor');
         }
+    },
+    {
+        name: 'More options',
+        iconCls: 'magicss-options',
+        command() {
+            var editor = window.MagiCSSEditor;
+            window.execMoreOptionsAction(editor);
+        }
     }
 ].filter(x => x);
 

@@ -1809,6 +1809,30 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     editor.focus();
                 };
 
+                window.execMoreOptionsAction = function (editor) {
+                    try {
+                        chrome.runtime.sendMessage({openOptionsPage: true});
+                    } catch (e) {
+                        console.log('Error message reported by Magic CSS:', e);
+                        utils.alertNote(
+                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                            10000
+                        );
+                        try {
+                            var href = chrome.runtime.getURL('options.html');
+                            if (href) {
+                                utils.alertNote(
+                                    'Configure more options for Magic CSS by going to the following address in a new tab:<br />' + href,
+                                    15000
+                                );
+                            }
+                        } catch (e) {
+                            // do nothing
+                        }
+                    }
+                    editor.focus();
+                };
+
                 var getMatchingAndSuggestedSelectors = function (targetElement) {
                     var selector = window.generateFullSelector(targetElement);
                     var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
@@ -3861,31 +3885,12 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             href: 'https://github.com/webextensions/live-css-editor'
                         },
                         {
+                            skip: true,
                             name: 'options',
                             title: 'More options',
                             uniqCls: 'magicss-options',
                             onclick: function (evt, editor) {
-                                try {
-                                    chrome.runtime.sendMessage({openOptionsPage: true});
-                                } catch (e) {
-                                    console.log('Error message reported by Magic CSS:', e);
-                                    utils.alertNote(
-                                        'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                        10000
-                                    );
-                                    try {
-                                        var href = chrome.runtime.getURL('options.html');
-                                        if (href) {
-                                            utils.alertNote(
-                                                'Configure more options for Magic CSS by going to the following address in a new tab:<br />' + href,
-                                                15000
-                                            );
-                                        }
-                                    } catch (e) {
-                                        // do nothing
-                                    }
-                                }
-                                editor.focus();
+                                window.execMoreOptionsAction(editor);
                             }
                         }
                     ],
