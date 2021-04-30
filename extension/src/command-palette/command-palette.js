@@ -94,6 +94,14 @@ const CommandPalette = function (props) {
             if (!editor.cm.getOption('lineNumbers')) {
                 return false;
             }
+        } else if (item.id === 'enable-css-linting') {
+            if (editor.cm.getOption('lint')) {
+                return false;
+            }
+        } else if (item.id === 'disable-css-linting') {
+            if (!editor.cm.getOption('lint')) {
+                return false;
+            }
         }
         return true;
     });

@@ -69,6 +69,29 @@ const commands = [
     },
 
     {
+        id: 'enable-css-linting',
+        name: 'Enable CSS linting',
+        iconCls: 'magicss-use-icon-enable-css-linting-gray',
+        command() {
+            setTimeout(async function () {
+                var editor = window.MagiCSSEditor;
+                await window.execEnableCssLintingAction(editor);
+            });
+        }
+    },
+    {
+        id: 'disable-css-linting',
+        name: 'Disable CSS linting',
+        iconCls: 'magicss-use-icon-disable-css-linting-gray',
+        command() {
+            setTimeout(async function () {
+                var editor = window.MagiCSSEditor;
+                await window.execDisableCssLintingAction(editor);
+            });
+        }
+    },
+
+    {
         name: 'Tweet',
         iconCls: 'magicss-use-logo-twitter-gray',
         command() {

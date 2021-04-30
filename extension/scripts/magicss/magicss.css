@@ -441,6 +441,16 @@
     background-size: 9px, 11px !important;
 }
 
+.magicss-use-icon-enable-css-linting-gray {
+    background-image: var(--icon-warning) !important;
+}
+
+.magicss-use-icon-disable-css-linting-gray {
+    background-image: var(--icon-ban), var(--icon-warning) !important;
+    background-position: 8px 7px, 0px 0px !important;
+    background-size: 9px, 16px !important;
+}
+
 .magicss-use-logo-twitter-gray {
     background-image: var(--logo-twitter) !important;
 }

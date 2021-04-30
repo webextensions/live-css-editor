@@ -1783,6 +1783,32 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     editor.focus();
                 };
 
+                window.execEnableCssLintingAction = async function (editor) {
+                    if (getLanguageMode() === 'css') {
+                        await setCodeMirrorCSSLinting(editor, 'enable');
+                        chromeRuntimeMessageIfRequired({
+                            type: 'magicss',
+                            subType: 'enable-css-linting'
+                        });
+                    } else {
+                        utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                    }
+                    editor.focus();
+                };
+
+                window.execDisableCssLintingAction = async function (editor) {
+                    if (getLanguageMode() === 'css') {
+                        await setCodeMirrorCSSLinting(editor, 'disable');
+                        chromeRuntimeMessageIfRequired({
+                            type: 'magicss',
+                            subType: 'disable-css-linting'
+                        });
+                    } else {
+                        utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                    }
+                    editor.focus();
+                };
+
                 var getMatchingAndSuggestedSelectors = function (targetElement) {
                     var selector = window.generateFullSelector(targetElement);
                     var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
@@ -3752,37 +3778,21 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         },
                         {
+                            skip: true,
                             name: 'enableCSSLinting',
                             title: 'Enable CSS linting',
                             uniqCls: 'magicss-enable-css-linting',
                             onclick: async function (evt, editor) {
-                                if (getLanguageMode() === 'css') {
-                                    await setCodeMirrorCSSLinting(editor, 'enable');
-                                    chromeRuntimeMessageIfRequired({
-                                        type: 'magicss',
-                                        subType: 'enable-css-linting'
-                                    });
-                                } else {
-                                    utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
-                                }
-                                editor.focus();
+                                await window.execEnableCssLintingAction(editor);
                             }
                         },
                         {
+                            skip: true,
                             name: 'disableCSSLinting',
                             title: 'Disable CSS linting',
                             uniqCls: 'magicss-disable-css-linting',
                             onclick: async function (evt, editor) {
-                                if (getLanguageMode() === 'css') {
-                                    await setCodeMirrorCSSLinting(editor, 'disable');
-                                    chromeRuntimeMessageIfRequired({
-                                        type: 'magicss',
-                                        subType: 'disable-css-linting'
-                                    });
-                                } else {
-                                    utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
-                                }
-                                editor.focus();
+                                await window.execDisableCssLintingAction(editor);
                             }
                         },
                         /*
