@@ -417,6 +417,10 @@
     background-image: var(--logo-mozilla-addons-gray) !important;
 }
 
+.magicss-use-icon-beautify-gray {
+    background-image: var(--icon-smile) !important;
+}
+
 .icon-chrome-web-store {
     background-image: var(--logo-chrome-web-store) !important;
 }

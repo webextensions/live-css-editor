@@ -19,6 +19,17 @@ const commands = [
         command() {
             window.open('https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/');
         }
+    },
+    {
+        name: 'Beautify code',
+        iconCls: 'magicss-use-icon-beautify-gray',
+        command() {
+            setTimeout(async function () {
+                var editor = window.MagiCSSEditor;
+
+                await window.execBeautifyCssAction(editor);
+            });
+        }
     }
 ];
 

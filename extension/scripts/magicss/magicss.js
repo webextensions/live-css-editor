@@ -1696,6 +1696,31 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     return utils.beautifyCSS(cssCode, options);
                 };
 
+                window.execBeautifyCssAction = async function (editor) {
+                    var textValue = editor.getTextValue();
+                    if (!textValue.trim()) {
+                        utils.alertNote('Please type some code to be beautified', 5000);
+                    } else {
+                        var beautifiedCSS = await beautifyCSS(textValue);
+                        if (textValue.trim() !== beautifiedCSS.trim()) {
+                            await editor.setTextValue(beautifiedCSS);
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'update-code-and-apply-css',
+                                payload: {
+                                    cssCodeToUse: beautifiedCSS
+                                }
+                            });
+
+                            utils.alertNote('Your code has been beautified :-)', 5000);
+                        } else {
+                            utils.alertNote('Your code already looks beautiful :-)', 5000);
+                        }
+                    }
+                    editor.focus();
+                };
+
                 var getMatchingAndSuggestedSelectors = function (targetElement) {
                     var selector = window.generateFullSelector(targetElement);
                     var workingSetOfSelectors = $.extend({}, window.existingCSSSelectors);
@@ -3630,28 +3655,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             title: 'Beautify code',
                             uniqCls: 'magicss-beautify',
                             onclick: async function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    utils.alertNote('Please type some code to be beautified', 5000);
-                                } else {
-                                    var beautifiedCSS = await beautifyCSS(textValue);
-                                    if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        await editor.setTextValue(beautifiedCSS);
-                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        chromeRuntimeMessageIfRequired({
-                                            type: 'magicss',
-                                            subType: 'update-code-and-apply-css',
-                                            payload: {
-                                                cssCodeToUse: beautifiedCSS
-                                            }
-                                        });
-
-                                        utils.alertNote('Your code has been beautified :-)', 5000);
-                                    } else {
-                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
-                                    }
-                                }
-                                editor.focus();
+                                await window.execBeautifyCssAction(editor);
                             }
                         },
                         {
