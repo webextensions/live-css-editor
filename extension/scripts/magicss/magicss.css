@@ -425,6 +425,10 @@
     background-image: var(--icon-compress) !important;
 }
 
+.magicss-use-icon-github-gray {
+    background-image: var(--logo-github) !important;
+}
+
 .icon-chrome-web-store {
     background-image: var(--logo-chrome-web-store) !important;
 }

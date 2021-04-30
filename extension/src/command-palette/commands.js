@@ -41,6 +41,13 @@ const commands = [
                 await window.execMinifyCssAction(editor);
             });
         }
+    },
+    {
+        name: 'Contribute / Report issue',
+        iconCls: 'magicss-use-icon-github-gray',
+        command() {
+            window.open('https://github.com/webextensions/live-css-editor');
+        }
     }
 ];
 
