@@ -72,6 +72,17 @@ const commands = [
         }
     },
     {
+        name: window.flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
+        iconCls: 'magicss-less-or-sass-to-css',
+        command() {
+            setTimeout(async function () {
+                var editor = window.MagiCSSEditor;
+
+                await window.execConvertToCssAction(editor);
+            });
+        }
+    },
+    {
         name: 'Beautify code',
         iconCls: 'magicss-use-icon-beautify-gray',
         command() {

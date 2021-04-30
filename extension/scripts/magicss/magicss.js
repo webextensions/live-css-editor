@@ -1038,6 +1038,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
     }
 
     const flagAllowSassUi = isFirefox ? false : true;
+    window.flagAllowSassUi = flagAllowSassUi;
 
     var extensionUrl = {
         chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
@@ -1831,6 +1832,77 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }
                     }
                     editor.focus();
+                };
+
+                window.execConvertToCssAction = async function (editor) {
+                    if (getLanguageMode() === 'less') {
+                        var lessCode = editor.getTextValue();
+                        if (!lessCode.trim()) {
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            utils.alertNote('Please type some LESS code to use this feature', 5000);
+                            editor.focus();
+                        } else {
+                            utils.lessToCSS(lessCode, async function asyncCallback(err, cssCode) {
+                                if (err) {
+                                    utils.alertNote(
+                                        'Invalid LESS syntax.' +
+                                        '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                        '<br />Error message: ' + err.message,
+                                        10000
+                                    );
+                                    highlightErroneousLineTemporarily(editor, err.line - 1);
+                                    editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
+                                } else {
+                                    var beautifiedLessCode = await beautifyCSS(utils.minifyCSS(lessCode));
+                                    cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
+
+                                    if (cssCode === beautifiedLessCode) {
+                                        utils.alertNote('Your code is already CSS compatible', 5000);
+                                    } else {
+                                        await editor.setTextValue(cssCode);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
+                                    }
+                                }
+                                editor.focus();
+                            });
+                        }
+                    } else if (getLanguageMode() === 'sass') {
+                        var sassCode = editor.getTextValue();
+                        if (!sassCode.trim()) {
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            utils.alertNote('Please type some SASS code to use this feature', 5000);
+                            editor.focus();
+                        } else {
+                            utils.sassToCSS(sassCode, async function asyncCallback(err, cssCode) {
+                                if (err) {
+                                    utils.alertNote(
+                                        'Invalid SASS syntax.' +
+                                        '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                        '<br />Error message: ' + err.message,
+                                        10000
+                                    );
+                                    highlightErroneousLineTemporarily(editor, err.line - 1);
+                                    editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
+                                } else {
+                                    var beautifiedSassCode = await beautifyCSS(utils.minifyCSS(sassCode));
+                                    cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
+
+                                    if (cssCode === beautifiedSassCode) {
+                                        utils.alertNote('Your code is already CSS compatible', 5000);
+                                    } else {
+                                        await editor.setTextValue(cssCode);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
+                                    }
+                                }
+                                editor.focus();
+                            });
+                        }
+                    } else {
+                        utils.alertNote('Please switch to editing code in Less/Sass mode to enable this feature', 5000);
+                        editor.focus();
+                    }
                 };
 
                 var getMatchingAndSuggestedSelectors = function (targetElement) {
@@ -3681,74 +3753,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             title: flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
                             uniqCls: 'magicss-less-or-sass-to-css',
                             onclick: async function (evt, editor) {
-                                if (getLanguageMode() === 'less') {
-                                    var lessCode = editor.getTextValue();
-                                    if (!lessCode.trim()) {
-                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Please type some LESS code to use this feature', 5000);
-                                        editor.focus();
-                                    } else {
-                                        utils.lessToCSS(lessCode, async function asyncCallback(err, cssCode) {
-                                            if (err) {
-                                                utils.alertNote(
-                                                    'Invalid LESS syntax.' +
-                                                    '<br />Error in line: ' + err.line + ' column: ' + err.column +
-                                                    '<br />Error message: ' + err.message,
-                                                    10000
-                                                );
-                                                highlightErroneousLineTemporarily(editor, err.line - 1);
-                                                editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
-                                            } else {
-                                                var beautifiedLessCode = await beautifyCSS(utils.minifyCSS(lessCode));
-                                                cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
-
-                                                if (cssCode === beautifiedLessCode) {
-                                                    utils.alertNote('Your code is already CSS compatible', 5000);
-                                                } else {
-                                                    await editor.setTextValue(cssCode);
-                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                    utils.alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
-                                                }
-                                            }
-                                            editor.focus();
-                                        });
-                                    }
-                                } else if (getLanguageMode() === 'sass') {
-                                    var sassCode = editor.getTextValue();
-                                    if (!sassCode.trim()) {
-                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Please type some SASS code to use this feature', 5000);
-                                        editor.focus();
-                                    } else {
-                                        utils.sassToCSS(sassCode, async function asyncCallback(err, cssCode) {
-                                            if (err) {
-                                                utils.alertNote(
-                                                    'Invalid SASS syntax.' +
-                                                    '<br />Error in line: ' + err.line + ' column: ' + err.column +
-                                                    '<br />Error message: ' + err.message,
-                                                    10000
-                                                );
-                                                highlightErroneousLineTemporarily(editor, err.line - 1);
-                                                editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
-                                            } else {
-                                                var beautifiedSassCode = await beautifyCSS(utils.minifyCSS(sassCode));
-                                                cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
-
-                                                if (cssCode === beautifiedSassCode) {
-                                                    utils.alertNote('Your code is already CSS compatible', 5000);
-                                                } else {
-                                                    await editor.setTextValue(cssCode);
-                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                    utils.alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
-                                                }
-                                            }
-                                            editor.focus();
-                                        });
-                                    }
-                                } else {
-                                    utils.alertNote('Please switch to editing code in Less/Sass mode to enable this feature', 5000);
-                                    editor.focus();
-                                }
+                                await window.execConvertToCssAction(editor);
                             },
                             beforeShow: async function (origin, tooltip, editor) {
                                 // TODO: Move the .addClass() calls to their corresponding .beforeShow()
