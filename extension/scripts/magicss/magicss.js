@@ -1045,6 +1045,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/',
         opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
     };
+    window.extensionUrl = extensionUrl;
     extensionUrl.forThisBrowser = (function () {
         if (isEdge)         { return extensionUrl.edge;    }
         else if (isFirefox) { return extensionUrl.firefox; }

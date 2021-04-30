@@ -1,3 +1,5 @@
+/* global extLib */
+
 const commands = [
     {
         name: 'Magic CSS for Chrome',
@@ -43,8 +45,26 @@ const commands = [
         }
     },
     {
+        name: 'Tweet',
+        iconCls: 'magicss-use-logo-twitter-gray',
+        command() {
+            const extensionUrl = window.extensionUrl;
+            const url = 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions';
+            window.open(url);
+        }
+    },
+    {
+        name: 'Share',
+        iconCls: 'magicss-use-logo-facebook-gray',
+        command() {
+            const extensionUrl = window.extensionUrl;
+            const url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser);
+            window.open(url);
+        }
+    },
+    {
         name: 'Contribute / Report issue',
-        iconCls: 'magicss-use-icon-github-gray',
+        iconCls: 'magicss-use-logo-github-gray',
         command() {
             window.open('https://github.com/webextensions/live-css-editor');
         }
