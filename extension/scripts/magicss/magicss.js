@@ -2592,6 +2592,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 if (!isChrome) {
                     getMagicCSSForChrome = {
+                        skip: true,
                         name: 'get-magic-css-for-chrome',
                         title: 'Magic CSS for Chrome',
                         uniqCls: 'get-magic-css-for-chrome',
@@ -2601,6 +2602,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 if (!isEdge) {
                     getMagicCSSForEdge = {
+                        skip: true,
                         name: 'get-magic-css-for-edge',
                         title: 'Magic CSS for Edge',
                         uniqCls: 'get-magic-css-for-edge',
@@ -2610,6 +2612,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 // if (!isFirefox) {
                 getMagicCSSForFirefox = {
+                    skip: true,
                     name: 'get-magic-css-for-firefox',
                     // title: 'Magic CSS for Firefox (Android)',
                     title: 'Magic CSS for Android / Firefox',
@@ -3689,6 +3692,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         },
                         /* */
                         {
+                            skip: true,
                             name: 'beautify',
                             title: 'Beautify code',
                             uniqCls: 'magicss-beautify',
@@ -3697,6 +3701,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         },
                         {
+                            skip: true,
                             name: 'minify',
                             title: 'Minify code',
                             uniqCls: 'magicss-minify',
@@ -3783,18 +3788,21 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         },
                         /* */
                         {
+                            skip: true,
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
                             href: 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
                         {
+                            skip: true,
                             name: 'share-on-facebook',
                             title: 'Share',
                             uniqCls: 'magicss-share-on-facebook',
                             href: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser)
                         },
                         {
+                            skip: true,
                             name: 'github-repo',
                             title: 'Contribute / Report issue',
                             uniqCls: 'magicss-github-repo',
