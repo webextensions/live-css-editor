@@ -27,16 +27,16 @@ const commands = [
                 iconCls;
             if (browser === 'chrome') {
                 name = 'Rate us on Chrome Web Store';
-                iconCls = 'icon-chrome-web-store';
+                iconCls = 'magicss-use-icon-chrome';
             } else if (browser === 'edge') {
                 name = 'Rate us on Microsoft Store';
-                iconCls = 'icon-microsoft-store';
+                iconCls = 'magicss-use-logo-microsoft-store-gray';
             } else if (browser === 'firefox') {
                 name = 'Rate us on Firefox Add-ons Store';
-                iconCls = 'icon-firefox-add-ons-store';
+                iconCls = 'magicss-use-logo-firefox-add-ons-store-gray';
             } else if (browser === 'opera') {
                 name = 'Rate us on Opera Add-ons Store';
-                iconCls = 'icon-opera-add-ons-store';
+                iconCls = 'magicss-use-logo-opera-add-ons-store-gray';
             }
             commandOb.name = name;
             commandOb.iconCls = iconCls;

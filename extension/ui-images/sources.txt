@@ -34,6 +34,14 @@ link-internal_edited-yellow.svg
 logo-chrome-web-store.png
     https://ssl.gstatic.com/chrome/webstore/images/icon_48px.png
 
+logo-chrome-web-store.svg
+    From page https://chrome.google.com/webstore/category/extensions
+
+logo-chrome-grayscale.svg
+    https://www.iconfinder.com/icons/2559815/download/svg/512
+logo-chrome-grayscale_edited.svg
+    Slightly edited version of "logo-chrome-grayscale.svg"
+
 logo-facebook.svg
     https://upload.wikimedia.org/wikipedia/commons/c/c2/F_icon.svg
 
