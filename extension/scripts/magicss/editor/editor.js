@@ -976,7 +976,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         }
                     })
             );
-            if (options.headerOtherIcons.length) {
+
+            const useOtherIcons = false;
+            if (useOtherIcons && options.headerOtherIcons.length) {
                 options.headerIcons = options.headerIcons || [];
                 options.headerIcons.unshift({
                     name: 'more',

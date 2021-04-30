@@ -3192,7 +3192,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         },
                         {
                             name: 'command-palette',
-                            title: 'Show all available commands',
+                            // title: 'Show all available commands',
+                            title: 'Show more commands',
                             cls: 'magicss-command-palette editor-gray-out',
                             onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
                                 const reactMain = await loadIfNotAvailable('main-bundle');
@@ -3749,6 +3750,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         getMagicCSSForEdge,
                         getMagicCSSForFirefox,
                         {
+                            skip: true,
                             name: 'less-or-sass-to-css',
                             title: flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
                             uniqCls: 'magicss-less-or-sass-to-css',
