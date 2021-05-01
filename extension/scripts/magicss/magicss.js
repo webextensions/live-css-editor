@@ -3192,8 +3192,21 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         },
                         {
                             name: 'command-palette',
-                            // title: 'Show all available commands',
-                            title: 'Show more commands',
+                            title: (function () {
+                                // const titleText = 'Show all available commands';
+                                const titleText = 'Show more commands';
+                                if (runningInAndroidFirefox) {
+                                    return titleText;
+                                } else {
+                                    const flagMacOs = (navigator.platform || '').toLowerCase().indexOf('mac') >= 0 ? true : false;
+
+                                    if (flagMacOs) {
+                                        return `${titleText}\n\n(Cmd + Shift + P)`;
+                                    } else {
+                                        return `${titleText}\n\n(Ctrl + Shift + P)`;
+                                    }
+                                }
+                            }()),
                             cls: 'magicss-command-palette editor-gray-out',
                             onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
                                 const reactMain = await loadIfNotAvailable('main-bundle');
@@ -3729,7 +3742,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             title: (
                                 runningInAndroidFirefox ?
                                     'Select an element in the page to generate its CSS Selector' :
-                                    'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)'
+                                    'Select an element in the page to generate its CSS Selector\n\n(Alt + Shift + S)'
                             ),
                             cls: 'magicss-point-and-click editor-gray-out',
                             onclick: function (evt, editor) {
