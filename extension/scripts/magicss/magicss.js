@@ -1016,7 +1016,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         updateExistingCSSSelectorsAndAutocomplete();
     }
 
-    // TODO: DUPLICATE: Code duplication for browser detection in ext-lib.js, magicss.js and options.js
+    // TODO: DUPLICATE: Code duplication for browser detection in commands.js, ext-lib.js, magicss.js and options.js
     var isChrome = false,
         isEdge = false,
         isFirefox = false,

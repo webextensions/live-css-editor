@@ -441,6 +441,11 @@
     background-image: var(--logo-mozilla-addons-gray) !important;
 }
 
+.magicss-use-logo-opera-gray {
+    background-image: var(--logo-opera) !important;
+    filter: grayscale(1) brightness(0.8) contrast(1.5);
+}
+
 .magicss-use-icon-beautify-gray {
     background-image: var(--icon-smile) !important;
 }
