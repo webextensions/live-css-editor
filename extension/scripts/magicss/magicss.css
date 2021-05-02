@@ -1620,6 +1620,14 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     scroll-behavior: auto !important;
 }
 
+/* https://sass-lang.com/ */
+.magicss-rate-on-webstore a {
+    border: none;
+}
+.magicss-rate-on-webstore a:hover {
+    background: transparent;
+}
+
 /* Some other sites */
 .magic-css-back-end-connectivity-options {
     color: #000;
@@ -1649,6 +1657,62 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 .magicss-command-palette-overlay {
     z-index: 2147483648;
 }
+
+
+/* Begin: Fixes useful for some sites */
+
+.magicss-command-palette-overlay {
+    line-height: 1.2; /* https://css-tricks.com/ */
+}
+
+.magicss-command-palette-overlay .atom-input {
+    font-family: Arial, sans-serif;         /* https://css-tricks.com/ */
+    font-size: 14px;                        /* https://www.mozilla.org/en-US/ */
+    line-height: normal;                    /* https://www.mozilla.org/en-US/ */
+    padding: 6px;                           /* https://css-tricks.com/ */
+    margin: 0;                              /* https://www.mozilla.org/en-US/ */
+}
+
+.magicss-command-palette-overlay .atom-input {
+    background-color: #202634;            /* https://css-tricks.com/ */
+}
+.magicss-command-palette-overlay .atom-inputFocused:focus {
+    background-color: #1b1d23;            /* https://css-tricks.com/ */
+}
+
+.magicss-command-palette-overlay .atom-input {
+    border: 2px solid #181a1f !important; /* https://css-tricks.com/ */
+}
+.magicss-command-palette-overlay .atom-inputFocused:focus {
+    border: 2px solid #568af2 !important; /* https://css-tricks.com/ */
+}
+
+.magicss-command-palette-overlay .atom-suggestionsList {
+    margin: 0;                              /* https://sass-lang.com/ */
+}
+
+.magicss-command-palette-overlay ::-webkit-input-placeholder,
+.magicss-command-palette-overlay ::-moz-placeholder {
+    color: unset;                          /* https://jquery.com/ */
+}
+
+/*
+    Notes:
+        * Somehow, for Chrome browser, the "::-webkit-input-placeholder" and "::-moz-placeholder" styles don't work
+          together inside a single selector group (for Firefox, that works), hence they have been split.
+        * The default colors are different for different browsers. #777 seems to suit well.
+          Ref: https://stackoverflow.com/questions/41900143/what-is-the-default-color-and-font-for-input-placeholders/41900282#41900282
+*/
+/* https://jquery.com/ */
+.magicss-command-palette-overlay ::-webkit-input-placeholder {
+    color: #777;
+}
+.magicss-command-palette-overlay ::-moz-placeholder {
+    color: #777;
+}
+
+/* End: Fixes useful for some sites */
+
 
 /* Note: Somehow, the default box-sizing for some of the elements (eg: main input box) for 'react-command-palette' is
          'content-box' in external editor, while it is 'border-box' for editor inside a normal webpage */
