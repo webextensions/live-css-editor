@@ -1665,19 +1665,58 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     line-height: 1.2; /* https://css-tricks.com/ */
 }
 
-.magicss-command-palette-overlay .atom-input {
-    font-family: Arial, sans-serif;         /* https://css-tricks.com/ */
-    font-size: 14px;                        /* https://www.mozilla.org/en-US/ */
-    line-height: normal;                    /* https://www.mozilla.org/en-US/ */
-    padding: 6px;                           /* https://css-tricks.com/ */
-    margin: 0;                              /* https://www.mozilla.org/en-US/ */
+.magicss-command-palette-overlay .atom-container * {
+    /* https://code.visualstudio.com/ */
+    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 
 .magicss-command-palette-overlay .atom-input {
-    background-color: #202634;            /* https://css-tricks.com/ */
+    line-height: normal;                    /* https://www.mozilla.org/en-US/ */
 }
-.magicss-command-palette-overlay .atom-inputFocused:focus {
-    background-color: #1b1d23;            /* https://css-tricks.com/ */
+.magicss-command-palette-overlay .atom-input {
+    box-sizing: border-box !important;                 /* https://materializecss.com/ */
+
+    /* https://css-tricks.com/ */
+    /* https://materializecss.com/ */
+    padding: 6px !important;
+
+    /* https://www.smashingmagazine.com/ */
+    /* https://materializecss.com/ */
+    border-radius: 4px !important;
+
+    height: 32px !important;
+    /* https://visualstudio.microsoft.com/ */
+    /* https://materializecss.com/ */
+
+    /* https://www.mozilla.org/en-US/ */
+    /* https://materializecss.com/ */
+    font-size: 14px !important;
+
+    /* https://www.mozilla.org/en-US/ */
+    /* https://materializecss.com/ */
+    margin: 0 !important;
+}
+
+.magicss-command-palette-overlay .atom-input,
+.magicss-command-palette-overlay .atom-input:focus,
+.magicss-command-palette-overlay .atom-input:hover {
+    box-shadow: unset !important;                      /* https://www.linkedin.com/feed/ */
+}
+
+.magicss-command-palette-overlay .atom-input[type=text] {
+    font-family: Arial, sans-serif;         /* https://css-tricks.com/ ,
+                                               https://www.smashingmagazine.com/ */
+}
+
+html body .magicss-command-palette-overlay .atom-input {
+    /* https://css-tricks.com/ */
+    /* https://materializecss.com/ */
+    background-color: #202634 !important;
+}
+html body .magicss-command-palette-overlay .atom-inputFocused:focus {
+    /* https://css-tricks.com/ */
+    /* https://materializecss.com/ */
+    background-color: #1b1d23 !important;
 }
 
 .magicss-command-palette-overlay .atom-input {
@@ -1691,9 +1730,17 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     margin: 0;                              /* https://sass-lang.com/ */
 }
 
-.magicss-command-palette-overlay ::-webkit-input-placeholder,
-.magicss-command-palette-overlay ::-moz-placeholder {
-    color: unset;                          /* https://jquery.com/ */
+.magicss-command-palette-overlay .atom-suggestionsList {
+    font-size: 12px;                        /* https://www.sitepoint.com/ */
+    line-height: unset;                     /* https://www.sitepoint.com/ */
+}
+
+.magicss-command-palette-overlay .atom-suggestion {
+    line-height: unset;                     /* https://www.smashingmagazine.com/ */
+    margin-bottom: 0;                       /* https://www.smashingmagazine.com/ */
+    margin-top: 0;                          /* https://www.udemy.com/ */
+    font-weight: 100;                       /* https://www.udemy.com/ */
+    font-size: 12px;                        /* https://moderncss.dev/ */
 }
 
 /*
@@ -1704,11 +1751,12 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
           Ref: https://stackoverflow.com/questions/41900143/what-is-the-default-color-and-font-for-input-placeholders/41900282#41900282
 */
 /* https://jquery.com/ */
+/* https://visualstudio.microsoft.com/ */
 .magicss-command-palette-overlay ::-webkit-input-placeholder {
-    color: #777;
+    color: #777 !important;
 }
 .magicss-command-palette-overlay ::-moz-placeholder {
-    color: #777;
+    color: #777 !important;
 }
 
 /* End: Fixes useful for some sites */
