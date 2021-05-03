@@ -1812,10 +1812,12 @@ html body .magicss-command-palette-overlay .atom-inputFocused:focus {
 
 .magicss-command-palette-overlay .atom-suggestion {
     line-height: unset;                     /* https://www.smashingmagazine.com/ */
-    margin-bottom: 0;                       /* https://www.smashingmagazine.com/ */
-    margin-top: 0;                          /* https://www.udemy.com/ */
     font-weight: 100;                       /* https://www.udemy.com/ */
     font-size: 12px;                        /* https://moderncss.dev/ */
+
+    /* https://www.smashingmagazine.com/ */
+    /* https://www.udemy.com/ */
+    margin: 0;
 }
 
 /*
