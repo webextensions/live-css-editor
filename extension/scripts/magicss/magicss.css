@@ -1748,10 +1748,14 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 }
 
 .magicss-command-palette-overlay .atom-input {
-    line-height: normal;                    /* https://www.mozilla.org/en-US/ */
-}
-.magicss-command-palette-overlay .atom-input {
-    box-sizing: border-box !important;                 /* https://materializecss.com/ */
+    /* https://www.mozilla.org/en-US/ */
+    line-height: normal;
+
+    /* https://www.google.com/chrome/ */
+    outline-style: unset;
+
+    /* https://materializecss.com/ */
+    box-sizing: border-box !important;
 
     /* https://css-tricks.com/ */
     /* https://materializecss.com/ */
@@ -1761,9 +1765,9 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     /* https://materializecss.com/ */
     border-radius: 4px !important;
 
-    height: 32px !important;
     /* https://visualstudio.microsoft.com/ */
     /* https://materializecss.com/ */
+    height: 32px !important;
 
     /* https://www.mozilla.org/en-US/ */
     /* https://materializecss.com/ */
