@@ -1516,6 +1516,10 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     background-color: transparent;
 }
 
+#MagiCSS-bookmarklet .CodeMirror pre[class]::before {
+    display: none;                      /* https://meyerweb.com/ */
+}
+
 /* http://www.phpied.com/cssmin-js/ */
 #MagiCSS-bookmarklet .more-icons {
     background-repeat: no-repeat !important;
