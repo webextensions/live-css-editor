@@ -1840,6 +1840,7 @@ html body .magicss-command-palette-overlay .atom-inputFocused:focus {
 }
 .magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar-thumb {
     border-radius: 0 !important;    /* https://devdocs.io/css/ */
+    border: none !important;        /* https://bing.com/covid/local/ */
 }
 
 /* End: Command palette fixes useful for some sites */
