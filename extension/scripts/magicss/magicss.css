@@ -1778,6 +1778,9 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     /* https://css-tricks.com/ */
     /* https://www.smashingmagazine.com/ */
     font-family: Arial, sans-serif !important;
+
+    /* https://www.vistaprint.com/ */
+    min-height: unset !important;
 }
 
 html body .magicss-command-palette-overlay .atom-input {
@@ -1822,13 +1825,19 @@ html body .magicss-command-palette-overlay .atom-inputFocused:focus {
         * The default colors are different for different browsers. #777 seems to suit well.
           Ref: https://stackoverflow.com/questions/41900143/what-is-the-default-color-and-font-for-input-placeholders/41900282#41900282
 */
-/* https://jquery.com/ */
-/* https://visualstudio.microsoft.com/ */
 .magicss-command-palette-overlay ::-webkit-input-placeholder {
+    /* https://jquery.com/ */
+    /* https://visualstudio.microsoft.com/ */
     color: #777 !important;
+
+    font-style: unset !important; /* https://www.vistaprint.com/ */
 }
 .magicss-command-palette-overlay ::-moz-placeholder {
+    /* https://jquery.com/ */
+    /* https://visualstudio.microsoft.com/ */
     color: #777 !important;
+
+    font-style: unset !important; /* https://www.vistaprint.com/ */
 }
 
 
