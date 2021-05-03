@@ -1865,3 +1865,17 @@ html body .magicss-command-palette-overlay .atom-inputFocused:focus {
 }
 
 /* End: Command palette fixes useful for some sites */
+
+
+/* Begin: Toaster fixes useful for some sites */
+
+/* https://www.naukrigulf.com/ */
+.magic-css-toastr .toast-message {
+    width: unset;
+    background-color: unset;
+    box-shadow: unset;
+    margin: 0;
+    padding: 0;
+}
+
+/* End: Toaster fixes useful for some sites */
