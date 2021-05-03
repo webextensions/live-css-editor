@@ -1658,8 +1658,79 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     z-index: 2147483648;
 }
 
+/* Note: Somehow, the default box-sizing for some of the elements (eg: main input box) for 'react-command-palette' is
+         'content-box' in external editor, while it is 'border-box' for editor inside a normal webpage */
+/* https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
+.magicss-command-palette-overlay *,
+.magicss-command-palette-overlay ::before,
+.magicss-command-palette-overlay ::after {
+    box-sizing: inherit;
+}
+.magicss-command-palette-overlay {
+    box-sizing: border-box;
+}
 
-/* Begin: Fixes useful for some sites */
+.magicss-command-palette-overlay .atom-suggestion {
+    padding: 7px 10px;
+}
+
+.magicss-command-palette-overlay .atom-modal {
+    max-width: 605px;
+    width: calc(100% - 25vw);
+}
+
+.magicss-command-palette-overlay .atom-input {
+    max-width: 605px;
+    width: calc(100%);
+}
+
+.magicss-command-palette-overlay .magicss-palette-header {
+    display: none;
+}
+@media (min-width: 600px) {
+    .magicss-command-palette-overlay .magicss-palette-header {
+        display: unset;
+    }
+}
+
+.magicss-command-palette-overlay {
+    --modal-gap-from-top: 10vh;
+}
+
+.magicss-command-palette-overlay .atom-modal {
+    top: var(--modal-gap-from-top);
+}
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen {
+    max-height: 50px;
+    max-height: calc(
+        100vh -
+        var(--modal-gap-from-top) -
+        var(--modal-gap-from-top) -
+        64px
+    ); /* 64px is the height of elements and whitespace apart from the list inside the suggestions box */
+}
+
+/* Reference: https://github.com/asabaylus/react-command-palette/issues/257#issuecomment-549096188 */
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen {
+    overflow: auto;
+}
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar {
+    background: rgba(255, 255, 255, 0.15);
+    width: 10px;
+}
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 0 2px rgb(91, 91, 91);
+}
+
+.magicss-command-palette-overlay .atom-suggestion b {
+    font-weight: 100;
+}
+/* End: Command palette */
+
+
+
+/* Begin: Command palette fixes useful for some sites */
 
 .magicss-command-palette-overlay {
     line-height: 1.2; /* https://css-tricks.com/ */
@@ -1759,75 +1830,15 @@ html body .magicss-command-palette-overlay .atom-inputFocused:focus {
     color: #777 !important;
 }
 
-/* End: Fixes useful for some sites */
 
-
-/* Note: Somehow, the default box-sizing for some of the elements (eg: main input box) for 'react-command-palette' is
-         'content-box' in external editor, while it is 'border-box' for editor inside a normal webpage */
-/* https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
-.magicss-command-palette-overlay *,
-.magicss-command-palette-overlay ::before,
-.magicss-command-palette-overlay ::after {
-    box-sizing: inherit;
-}
-.magicss-command-palette-overlay {
-    box-sizing: border-box;
-}
-
-.magicss-command-palette-overlay .atom-suggestion {
-    padding: 7px 10px;
-}
-
-.magicss-command-palette-overlay .atom-modal {
-    max-width: 605px;
-    width: calc(100% - 25vw);
-}
-
-.magicss-command-palette-overlay .atom-input {
-    max-width: 605px;
-    width: calc(100%);
-}
-
-.magicss-command-palette-overlay .magicss-palette-header {
-    display: none;
-}
-@media (min-width: 600px) {
-    .magicss-command-palette-overlay .magicss-palette-header {
-        display: unset;
-    }
-}
-
-.magicss-command-palette-overlay {
-    --modal-gap-from-top: 10vh;
-}
-
-.magicss-command-palette-overlay .atom-modal {
-    top: var(--modal-gap-from-top);
-}
-.magicss-command-palette-overlay .atom-suggestionsContainerOpen {
-    max-height: 50px;
-    max-height: calc(
-        100vh -
-        var(--modal-gap-from-top) -
-        var(--modal-gap-from-top) -
-        64px
-    ); /* 64px is the height of elements and whitespace apart from the list inside the suggestions box */
-}
-
-/* Reference: https://github.com/asabaylus/react-command-palette/issues/257#issuecomment-549096188 */
-.magicss-command-palette-overlay .atom-suggestionsContainerOpen {
-    overflow: auto;
-}
 .magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar {
-    background: rgba(255, 255, 255, 0.15);
-    width: 10px;
+    width: 10px !important;         /* https://devdocs.io/css/ */
+}
+.magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar-track {
+    display: none !important;       /* https://devdocs.io/css/ */
 }
 .magicss-command-palette-overlay .atom-suggestionsContainerOpen::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.25);
-    box-shadow: inset 0 0 2px rgb(91, 91, 91);
+    border-radius: 0 !important;    /* https://devdocs.io/css/ */
 }
 
-.magicss-command-palette-overlay .atom-suggestion b {
-    font-weight: 100;
-}
-/* End: Command palette */
+/* End: Command palette fixes useful for some sites */
