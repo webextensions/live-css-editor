@@ -1733,7 +1733,12 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 /* Begin: Command palette fixes useful for some sites */
 
 .magicss-command-palette-overlay {
-    line-height: 1.2; /* https://css-tricks.com/ */
+    line-height: 1.2;               /* https://css-tricks.com/ */
+}
+
+.magicss-command-palette-overlay div {
+    flex-direction: unset;          /* https://www.instagram.com/ */
+    display: block;                 /* https://www.instagram.com/ */
 }
 
 .magicss-command-palette-overlay .atom-container * {
