@@ -31,6 +31,17 @@ link-external_edited-yellow.svg
 link-internal_edited-yellow.svg
     Slightly edited version of "link-external_edited-yellow.svg"
 
+logo-chrome-web-store.png
+    https://ssl.gstatic.com/chrome/webstore/images/icon_48px.png
+
+logo-chrome-web-store.svg
+    From page https://chrome.google.com/webstore/category/extensions
+
+logo-chrome-grayscale.svg
+    https://www.iconfinder.com/icons/2559815/download/svg/512
+logo-chrome-grayscale_edited.svg
+    Slightly edited version of "logo-chrome-grayscale.svg"
+
 logo-facebook.svg
     https://upload.wikimedia.org/wikipedia/commons/c/c2/F_icon.svg
 
@@ -118,6 +129,12 @@ settings-server.svg
 
 settings-server_edited.svg
     Slightly edited version of "settings-server_edited.svg"
+
+triple-dots.svg
+    https://www.iconfinder.com/icons/211866/download/svg/512
+
+triple-dots_edited.svg
+    Slightly edited version of "triple-dots.svg" (with help of https://editor.method.ac/ and https://www.iconfinder.com/editor/)
 
 unordered-list.svg
     https://www.iconfinder.com/icons/383201/list_unordered_icon#size=128

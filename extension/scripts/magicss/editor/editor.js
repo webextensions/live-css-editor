@@ -965,8 +965,20 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 $(divHeaderLeft).append($('<div>' + title + '</div>'));
             }
 
-            options.headerOtherIcons = (options.headerOtherIcons || []).filter(function (item) { return !!item; });
-            if (options.headerOtherIcons.length) {
+            options.headerOtherIcons = (
+                (options.headerOtherIcons || [])
+                    .filter(x => x)
+                    .filter(function (item) {
+                        if (item.skip) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    })
+            );
+
+            const useOtherIcons = false;
+            if (useOtherIcons && options.headerOtherIcons.length) {
                 options.headerIcons = options.headerIcons || [];
                 options.headerIcons.unshift({
                     name: 'more',

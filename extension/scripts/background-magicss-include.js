@@ -467,6 +467,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
 
                 pathMagicss + 'magicss.css',
                 pathMagicss + 'generate-selector.js',
+
                 pathMagicss + 'magicss.js'
             ],
             allFrames,

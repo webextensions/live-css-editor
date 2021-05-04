@@ -1,0 +1,5 @@
+{
+    // When "search.useIgnoreFiles" is set to false, the search-in-files functionality does not take
+    // .gitignore into consideration for exclusion
+    "search.useIgnoreFiles": true
+}

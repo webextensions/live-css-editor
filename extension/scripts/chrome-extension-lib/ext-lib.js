@@ -30,7 +30,7 @@ function check(array, iterator, done) {
         throw Error('done should be a function (when available)!');
 }
 
-// TODO: DUPLICATE: Code duplication for browser detection in ext-lib.js, magicss.js and options.js
+// TODO: DUPLICATE: Code duplication for browser detection in commands.js, ext-lib.js, magicss.js and options.js
 var isChrome = false,
     isEdge = false,
     isFirefox = false,

@@ -1,4 +1,3 @@
-/* globals module */
 // Just a block
 {
     const magicCssVersion = '8.11.0';

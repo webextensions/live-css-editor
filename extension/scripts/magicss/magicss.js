@@ -56,6 +56,7 @@ window.magicssHostSessionUuid = (
 
 var loadIfNotAvailable = async function (dependencyToLoad) {
     const
+        pathDist = 'dist/',
         pathScripts = 'scripts/',
         path3rdparty = pathScripts + '3rdparty/';
 
@@ -75,6 +76,22 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
             }
         }
         return window.less;
+    } else if (dependencyToLoad === 'main-bundle') {
+        if (typeof window.reactMain === 'undefined') {
+            if (window.treatAsNormalWebpage) {
+                const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
+                    treatAsNormalWebpage: true,
+                    source: pathDist + 'main.bundle.js'
+                });
+            } else {
+                await chromeRuntimeMessageToBackgroundScript({
+                    type: 'magicss-dependency',
+                    subType: 'load-dependency',
+                    payload: pathDist + 'main.bundle.js'
+                });
+            }
+        }
+        return window.reactMain;
     }
 };
 
@@ -999,7 +1016,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         updateExistingCSSSelectorsAndAutocomplete();
     }
 
-    // TODO: DUPLICATE: Code duplication for browser detection in ext-lib.js, magicss.js and options.js
+    // TODO: DUPLICATE: Code duplication for browser detection in commands.js, ext-lib.js, magicss.js and options.js
     var isChrome = false,
         isEdge = false,
         isFirefox = false,
@@ -1021,6 +1038,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
     }
 
     const flagAllowSassUi = isFirefox ? false : true;
+    window.flagAllowSassUi = flagAllowSassUi;
 
     var extensionUrl = {
         chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
@@ -1028,6 +1046,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/',
         opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
     };
+    window.extensionUrl = extensionUrl;
     extensionUrl.forThisBrowser = (function () {
         if (isEdge)         { return extensionUrl.edge;    }
         else if (isFirefox) { return extensionUrl.firefox; }
@@ -1677,6 +1696,213 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         options.useSpaceCount = parseInt(await window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10) || 4;
                     }
                     return utils.beautifyCSS(cssCode, options);
+                };
+
+                window.execBeautifyCssAction = async function (editor) {
+                    var textValue = editor.getTextValue();
+                    if (!textValue.trim()) {
+                        utils.alertNote('Please type some code to be beautified', 5000);
+                    } else {
+                        var beautifiedCSS = await beautifyCSS(textValue);
+                        if (textValue.trim() !== beautifiedCSS.trim()) {
+                            await editor.setTextValue(beautifiedCSS);
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'update-code-and-apply-css',
+                                payload: {
+                                    cssCodeToUse: beautifiedCSS
+                                }
+                            });
+
+                            utils.alertNote('Your code has been beautified :-)', 5000);
+                        } else {
+                            utils.alertNote('Your code already looks beautiful :-)', 5000);
+                        }
+                    }
+                    editor.focus();
+                };
+
+                window.execMinifyCssAction = async function (editor) {
+                    var textValue = editor.getTextValue();
+                    if (!textValue.trim()) {
+                        await editor.setTextValue('');
+                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                        chromeRuntimeMessageIfRequired({
+                            type: 'magicss',
+                            subType: 'update-code-and-apply-css',
+                            payload: {
+                                cssCodeToUse: ''
+                            }
+                        });
+
+                        utils.alertNote('Please type some code to be minified', 5000);
+                    } else {
+                        var minifiedCSS = utils.minifyCSS(textValue);
+                        if (textValue !== minifiedCSS) {
+                            await editor.setTextValue(minifiedCSS);
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                            chromeRuntimeMessageIfRequired({
+                                type: 'magicss',
+                                subType: 'update-code-and-apply-css',
+                                payload: {
+                                    cssCodeToUse: minifiedCSS
+                                }
+                            });
+
+                            utils.alertNote('Your code has been minified' + noteForUndo, 5000);
+                        } else {
+                            utils.alertNote('Your code is already minified', 5000);
+                        }
+                    }
+                    editor.focus();
+                };
+
+                window.execShowLineNumbersAction = async function (editor) {
+                    editor.cm.setOption('lineNumbers', true);
+                    await editor.userPreference('show-line-numbers', 'yes');
+
+                    chromeRuntimeMessageIfRequired({
+                        type: 'magicss',
+                        subType: 'showLineNumbers'
+                    });
+
+                    editor.focus();
+                };
+
+                window.execHideLineNumbersAction = async function (editor) {
+                    editor.cm.setOption('lineNumbers', false);
+                    await editor.userPreference('show-line-numbers', 'no');
+
+                    chromeRuntimeMessageIfRequired({
+                        type: 'magicss',
+                        subType: 'hideLineNumbers'
+                    });
+
+                    editor.focus();
+                };
+
+                window.execEnableCssLintingAction = async function (editor) {
+                    if (getLanguageMode() === 'css') {
+                        await setCodeMirrorCSSLinting(editor, 'enable');
+                        chromeRuntimeMessageIfRequired({
+                            type: 'magicss',
+                            subType: 'enable-css-linting'
+                        });
+                    } else {
+                        utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                    }
+                    editor.focus();
+                };
+
+                window.execDisableCssLintingAction = async function (editor) {
+                    if (getLanguageMode() === 'css') {
+                        await setCodeMirrorCSSLinting(editor, 'disable');
+                        chromeRuntimeMessageIfRequired({
+                            type: 'magicss',
+                            subType: 'disable-css-linting'
+                        });
+                    } else {
+                        utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                    }
+                    editor.focus();
+                };
+
+                window.execMoreOptionsAction = function (editor) {
+                    try {
+                        chrome.runtime.sendMessage({openOptionsPage: true});
+                    } catch (e) {
+                        console.log('Error message reported by Magic CSS:', e);
+                        utils.alertNote(
+                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                            10000
+                        );
+                        try {
+                            var href = chrome.runtime.getURL('options.html');
+                            if (href) {
+                                utils.alertNote(
+                                    'Configure more options for Magic CSS by going to the following address in a new tab:<br />' + href,
+                                    15000
+                                );
+                            }
+                        } catch (e) {
+                            // do nothing
+                        }
+                    }
+                    editor.focus();
+                };
+
+                window.execConvertToCssAction = async function (editor) {
+                    if (getLanguageMode() === 'less') {
+                        var lessCode = editor.getTextValue();
+                        if (!lessCode.trim()) {
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            utils.alertNote('Please type some LESS code to use this feature', 5000);
+                            editor.focus();
+                        } else {
+                            utils.lessToCSS(lessCode, async function asyncCallback(err, cssCode) {
+                                if (err) {
+                                    utils.alertNote(
+                                        'Invalid LESS syntax.' +
+                                        '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                        '<br />Error message: ' + err.message,
+                                        10000
+                                    );
+                                    highlightErroneousLineTemporarily(editor, err.line - 1);
+                                    editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
+                                } else {
+                                    var beautifiedLessCode = await beautifyCSS(utils.minifyCSS(lessCode));
+                                    cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
+
+                                    if (cssCode === beautifiedLessCode) {
+                                        utils.alertNote('Your code is already CSS compatible', 5000);
+                                    } else {
+                                        await editor.setTextValue(cssCode);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
+                                    }
+                                }
+                                editor.focus();
+                            });
+                        }
+                    } else if (getLanguageMode() === 'sass') {
+                        var sassCode = editor.getTextValue();
+                        if (!sassCode.trim()) {
+                            await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                            utils.alertNote('Please type some SASS code to use this feature', 5000);
+                            editor.focus();
+                        } else {
+                            utils.sassToCSS(sassCode, async function asyncCallback(err, cssCode) {
+                                if (err) {
+                                    utils.alertNote(
+                                        'Invalid SASS syntax.' +
+                                        '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                        '<br />Error message: ' + err.message,
+                                        10000
+                                    );
+                                    highlightErroneousLineTemporarily(editor, err.line - 1);
+                                    editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
+                                } else {
+                                    var beautifiedSassCode = await beautifyCSS(utils.minifyCSS(sassCode));
+                                    cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
+
+                                    if (cssCode === beautifiedSassCode) {
+                                        utils.alertNote('Your code is already CSS compatible', 5000);
+                                    } else {
+                                        await editor.setTextValue(cssCode);
+                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                        utils.alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
+                                    }
+                                }
+                                editor.focus();
+                            });
+                        }
+                    } else {
+                        utils.alertNote('Please switch to editing code in Less/Sass mode to enable this feature', 5000);
+                        editor.focus();
+                    }
                 };
 
                 var getMatchingAndSuggestedSelectors = function (targetElement) {
@@ -2512,6 +2738,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 if (!isChrome) {
                     getMagicCSSForChrome = {
+                        skip: true,
                         name: 'get-magic-css-for-chrome',
                         title: 'Magic CSS for Chrome',
                         uniqCls: 'get-magic-css-for-chrome',
@@ -2521,6 +2748,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 if (!isEdge) {
                     getMagicCSSForEdge = {
+                        skip: true,
                         name: 'get-magic-css-for-edge',
                         title: 'Magic CSS for Edge',
                         uniqCls: 'get-magic-css-for-edge',
@@ -2530,6 +2758,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 // if (!isFirefox) {
                 getMagicCSSForFirefox = {
+                    skip: true,
                     name: 'get-magic-css-for-firefox',
                     // title: 'Magic CSS for Firefox (Android)',
                     title: 'Magic CSS for Android / Firefox',
@@ -2544,6 +2773,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     if (isChrome || isEdge || isFirefox || isOpera) {
                         if (isChrome) {
                             icon = {
+                                skip: true,
                                 name: 'rate-on-webstore',
                                 title: 'Rate us on Chrome Web Store',
                                 cls: 'magicss-rate-on-webstore',
@@ -2552,6 +2782,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             };
                         } else if (isEdge) {
                             icon = {
+                                skip: true,
                                 name: 'rate-on-webstore',
                                 title: 'Rate us on Microsoft Store',
                                 cls: 'magicss-rate-on-webstore',
@@ -2560,6 +2791,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             };
                         } else if (isFirefox) {
                             icon = {
+                                skip: true,
                                 name: 'rate-on-webstore',
                                 title: 'Rate us on Firefox Add-ons Store',
                                 cls: 'magicss-rate-on-webstore',
@@ -2568,6 +2800,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             };
                         } else if (isOpera) {
                             icon = {
+                                skip: true,
                                 name: 'rate-on-webstore',
                                 title: 'Rate us on Opera Add-ons Store',
                                 cls: 'magicss-rate-on-webstore',
@@ -2579,6 +2812,34 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (options.addOpaqueOnHoverClass) {
                                 icon.cls += ' editor-opaque-on-hover';
                             }
+                        }
+                    }
+                    return icon;
+                };
+
+                window.execIconToShowForRateUs = function () {
+                    var icon = null;
+                    if (isChrome || isEdge || isFirefox || isOpera) {
+                        if (isChrome) {
+                            icon = {
+                                browser: 'chrome',
+                                href: extensionUrl.chrome + '/reviews'
+                            };
+                        } else if (isEdge) {
+                            icon = {
+                                browser: 'edge',
+                                href: extensionUrl.edge
+                            };
+                        } else if (isFirefox) {
+                            icon = {
+                                browser: 'firefox',
+                                href: extensionUrl.firefox + 'reviews/'
+                            };
+                        } else if (isOpera) {
+                            icon = {
+                                browser: 'opera',
+                                href: extensionUrl.opera + '#feedback-container'
+                            };
                         }
                     }
                     return icon;
@@ -2923,6 +3184,72 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 return iconForRateUs({addOpaqueOnHoverClass: true});
                             }
                         }()),
+
+                        // Used for mounting the component
+                        {
+                            name: 'command-palette-invisible-root',
+                            cls: 'magicss-command-palette-root',
+                        },
+                        {
+                            name: 'command-palette',
+                            title: (function () {
+                                // const titleText = 'Show all available commands';
+                                const titleText = 'Show more commands';
+                                if (runningInAndroidFirefox) {
+                                    return titleText;
+                                } else {
+                                    const flagMacOs = (navigator.platform || '').toLowerCase().indexOf('mac') >= 0 ? true : false;
+
+                                    if (flagMacOs) {
+                                        return `${titleText}\n\n(Cmd + Shift + P)`;
+                                    } else {
+                                        return `${titleText}\n\n(Ctrl + Shift + P)`;
+                                    }
+                                }
+                            }()),
+                            cls: 'magicss-command-palette editor-gray-out',
+                            onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
+                                const reactMain = await loadIfNotAvailable('main-bundle');
+                                reactMain({
+                                    open: true
+                                });
+                            },
+                            afterrender: function () {
+                                document.addEventListener(
+                                    'keydown',
+                                    function(event) {
+                                        if (window.MagiCSSEditor.isVisible()) {
+                                            if (
+                                                (
+                                                    event.ctrlKey ||
+                                                    event.metaKey
+                                                ) &&
+                                                event.shiftKey &&
+                                                (
+                                                    event.key === 'p' ||
+                                                    event.key === 'P' ||
+                                                    event.code === 'KeyP' ||
+                                                    event.keyCode === 80 ||
+                                                    event.which === 80
+                                                )
+                                            ) {
+                                                event.preventDefault();
+
+                                                setTimeout(async () => {
+                                                    const reactMain = await loadIfNotAvailable('main-bundle');
+                                                    reactMain({
+                                                        open: true
+                                                    });
+                                                });
+                                            }
+                                        }
+                                    },
+                                    {
+                                        capture: true
+                                    }
+                                );
+                            }
+                        },
                         (function () {
                             // Currently, this feature has been tested only in Chrome, Opera and Edge browsers
                             if (isChrome || isOpera || isEdge || isFirefox) {
@@ -3415,9 +3742,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             title: (
                                 runningInAndroidFirefox ?
                                     'Select an element in the page to generate its CSS Selector' :
-                                    'Select an element in the page to generate its CSS Selector \n(Shortcut: Alt + Shift + S)'
+                                    'Select an element in the page to generate its CSS Selector\n\n(Alt + Shift + S)'
                             ),
-                            cls: 'magicss-point-and-click',
+                            cls: 'magicss-point-and-click editor-gray-out',
                             onclick: function (evt, editor) {
                                 togglePointAndClick(editor);
                                 editor.focus();
@@ -3436,78 +3763,12 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         getMagicCSSForEdge,
                         getMagicCSSForFirefox,
                         {
+                            skip: true,
                             name: 'less-or-sass-to-css',
                             title: flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
                             uniqCls: 'magicss-less-or-sass-to-css',
                             onclick: async function (evt, editor) {
-                                if (getLanguageMode() === 'less') {
-                                    var lessCode = editor.getTextValue();
-                                    if (!lessCode.trim()) {
-                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Please type some LESS code to use this feature', 5000);
-                                        editor.focus();
-                                    } else {
-                                        utils.lessToCSS(lessCode, async function asyncCallback(err, cssCode) {
-                                            if (err) {
-                                                utils.alertNote(
-                                                    'Invalid LESS syntax.' +
-                                                    '<br />Error in line: ' + err.line + ' column: ' + err.column +
-                                                    '<br />Error message: ' + err.message,
-                                                    10000
-                                                );
-                                                highlightErroneousLineTemporarily(editor, err.line - 1);
-                                                editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
-                                            } else {
-                                                var beautifiedLessCode = await beautifyCSS(utils.minifyCSS(lessCode));
-                                                cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
-
-                                                if (cssCode === beautifiedLessCode) {
-                                                    utils.alertNote('Your code is already CSS compatible', 5000);
-                                                } else {
-                                                    await editor.setTextValue(cssCode);
-                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                    utils.alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
-                                                }
-                                            }
-                                            editor.focus();
-                                        });
-                                    }
-                                } else if (getLanguageMode() === 'sass') {
-                                    var sassCode = editor.getTextValue();
-                                    if (!sassCode.trim()) {
-                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Please type some SASS code to use this feature', 5000);
-                                        editor.focus();
-                                    } else {
-                                        utils.sassToCSS(sassCode, async function asyncCallback(err, cssCode) {
-                                            if (err) {
-                                                utils.alertNote(
-                                                    'Invalid SASS syntax.' +
-                                                    '<br />Error in line: ' + err.line + ' column: ' + err.column +
-                                                    '<br />Error message: ' + err.message,
-                                                    10000
-                                                );
-                                                highlightErroneousLineTemporarily(editor, err.line - 1);
-                                                editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
-                                            } else {
-                                                var beautifiedSassCode = await beautifyCSS(utils.minifyCSS(sassCode));
-                                                cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
-
-                                                if (cssCode === beautifiedSassCode) {
-                                                    utils.alertNote('Your code is already CSS compatible', 5000);
-                                                } else {
-                                                    await editor.setTextValue(cssCode);
-                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                    utils.alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
-                                                }
-                                            }
-                                            editor.focus();
-                                        });
-                                    }
-                                } else {
-                                    utils.alertNote('Please switch to editing code in Less/Sass mode to enable this feature', 5000);
-                                    editor.focus();
-                                }
+                                await window.execConvertToCssAction(editor);
                             },
                             beforeShow: async function (origin, tooltip, editor) {
                                 // TODO: Move the .addClass() calls to their corresponding .beforeShow()
@@ -3557,139 +3818,57 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         },
                         /* */
                         {
+                            skip: true,
                             name: 'beautify',
                             title: 'Beautify code',
                             uniqCls: 'magicss-beautify',
                             onclick: async function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    utils.alertNote('Please type some code to be beautified', 5000);
-                                } else {
-                                    var beautifiedCSS = await beautifyCSS(textValue);
-                                    if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        await editor.setTextValue(beautifiedCSS);
-                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        chromeRuntimeMessageIfRequired({
-                                            type: 'magicss',
-                                            subType: 'update-code-and-apply-css',
-                                            payload: {
-                                                cssCodeToUse: beautifiedCSS
-                                            }
-                                        });
-
-                                        utils.alertNote('Your code has been beautified :-)', 5000);
-                                    } else {
-                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
-                                    }
-                                }
-                                editor.focus();
+                                await window.execBeautifyCssAction(editor);
                             }
                         },
                         {
+                            skip: true,
                             name: 'minify',
                             title: 'Minify code',
                             uniqCls: 'magicss-minify',
                             onclick: async function (evt, editor) {
-                                var textValue = editor.getTextValue();
-                                if (!textValue.trim()) {
-                                    await editor.setTextValue('');
-                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-
-                                    chromeRuntimeMessageIfRequired({
-                                        type: 'magicss',
-                                        subType: 'update-code-and-apply-css',
-                                        payload: {
-                                            cssCodeToUse: ''
-                                        }
-                                    });
-
-                                    utils.alertNote('Please type some code to be minified', 5000);
-                                } else {
-                                    var minifiedCSS = utils.minifyCSS(textValue);
-                                    if (textValue !== minifiedCSS) {
-                                        await editor.setTextValue(minifiedCSS);
-                                        await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-
-                                        chromeRuntimeMessageIfRequired({
-                                            type: 'magicss',
-                                            subType: 'update-code-and-apply-css',
-                                            payload: {
-                                                cssCodeToUse: minifiedCSS
-                                            }
-                                        });
-
-                                        utils.alertNote('Your code has been minified' + noteForUndo, 5000);
-                                    } else {
-                                        utils.alertNote('Your code is already minified', 5000);
-                                    }
-                                }
-                                editor.focus();
+                                await window.execMinifyCssAction(editor);
                             }
                         },
                         {
+                            skip: true,
                             name: 'showLineNumbers',
                             title: 'Show line numbers',
                             uniqCls: 'magicss-show-line-numbers',
                             onclick: async function (evt, editor) {
-                                editor.cm.setOption('lineNumbers', true);
-                                await editor.userPreference('show-line-numbers', 'yes');
-
-                                chromeRuntimeMessageIfRequired({
-                                    type: 'magicss',
-                                    subType: 'showLineNumbers'
-                                });
-
-                                editor.focus();
+                                await window.execShowLineNumbersAction(editor);
                             }
                         },
                         {
+                            skip: true,
                             name: 'hideLineNumbers',
                             title: 'Hide line numbers',
                             uniqCls: 'magicss-hide-line-numbers',
                             onclick: async function (evt, editor) {
-                                editor.cm.setOption('lineNumbers', false);
-                                await editor.userPreference('show-line-numbers', 'no');
-
-                                chromeRuntimeMessageIfRequired({
-                                    type: 'magicss',
-                                    subType: 'hideLineNumbers'
-                                });
-
-                                editor.focus();
+                                await window.execHideLineNumbersAction(editor);
                             }
                         },
                         {
+                            skip: true,
                             name: 'enableCSSLinting',
                             title: 'Enable CSS linting',
                             uniqCls: 'magicss-enable-css-linting',
                             onclick: async function (evt, editor) {
-                                if (getLanguageMode() === 'css') {
-                                    await setCodeMirrorCSSLinting(editor, 'enable');
-                                    chromeRuntimeMessageIfRequired({
-                                        type: 'magicss',
-                                        subType: 'enable-css-linting'
-                                    });
-                                } else {
-                                    utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
-                                }
-                                editor.focus();
+                                await window.execEnableCssLintingAction(editor);
                             }
                         },
                         {
+                            skip: true,
                             name: 'disableCSSLinting',
                             title: 'Disable CSS linting',
                             uniqCls: 'magicss-disable-css-linting',
                             onclick: async function (evt, editor) {
-                                if (getLanguageMode() === 'css') {
-                                    await setCodeMirrorCSSLinting(editor, 'disable');
-                                    chromeRuntimeMessageIfRequired({
-                                        type: 'magicss',
-                                        subType: 'disable-css-linting'
-                                    });
-                                } else {
-                                    utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
-                                }
-                                editor.focus();
+                                await window.execDisableCssLintingAction(editor);
                             }
                         },
                         /*
@@ -3705,49 +3884,33 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         },
                         /* */
                         {
+                            skip: true,
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
                             href: 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
                         {
+                            skip: true,
                             name: 'share-on-facebook',
                             title: 'Share',
                             uniqCls: 'magicss-share-on-facebook',
                             href: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser)
                         },
                         {
+                            skip: true,
                             name: 'github-repo',
                             title: 'Contribute / Report issue',
                             uniqCls: 'magicss-github-repo',
                             href: 'https://github.com/webextensions/live-css-editor'
                         },
                         {
+                            skip: true,
                             name: 'options',
                             title: 'More options',
                             uniqCls: 'magicss-options',
                             onclick: function (evt, editor) {
-                                try {
-                                    chrome.runtime.sendMessage({openOptionsPage: true});
-                                } catch (e) {
-                                    console.log('Error message reported by Magic CSS:', e);
-                                    utils.alertNote(
-                                        'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                        10000
-                                    );
-                                    try {
-                                        var href = chrome.runtime.getURL('options.html');
-                                        if (href) {
-                                            utils.alertNote(
-                                                'Configure more options for Magic CSS by going to the following address in a new tab:<br />' + href,
-                                                15000
-                                            );
-                                        }
-                                    } catch (e) {
-                                        // do nothing
-                                    }
-                                }
-                                editor.focus();
+                                window.execMoreOptionsAction(editor);
                             }
                         }
                     ],
@@ -4384,7 +4547,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             keyCombination === 'Ctrl-P' ||
                             keyCombination === 'Cmd-P' ||
                             keyCombination === 'Ctrl-O' ||
-                            keyCombination === 'Cmd-P'
+                            keyCombination === 'Cmd-O'
                         ) {
                             await setLanguageMode('file', this);
                         }

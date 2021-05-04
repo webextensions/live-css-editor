@@ -13,25 +13,46 @@
     "zip-firefox-extension": "node ./zip-extension.js firefox",
     "zip-opera-extension": "node ./zip-extension.js opera",
     "zip-extension": "npm run zip-chrome-extension && npm run zip-edge-extension && npm run zip-firefox-extension && npm run zip-opera-extension",
+    "build-and-zip-extension": "npm run start:build-extension && npm run zip-extension",
     "all-is-well": "./scripts/all-is-well.sh",
-    "test": "npm run all-is-well"
+    "test": "npm run all-is-well",
+    "start:build": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
+    "start:build-inspect-brk": "cd extension/ ; node --inspect-brk ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
+    "start:build-extension": "cd extension/ ; node ../node_modules/.bin/webpack --config ./webpack.config.js --env build.buildFor='publish'",
+    "start": "npm run start:build"
   },
   "dependencies": {
+    "@babel/cli": "^7.13.16",
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-react": "^7.13.13",
+    "babel-loader": "^8.2.2",
     "codemirror": "=5.34.0",
+    "css-loader": "^5.2.4",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
+    "eslint-loader": "^4.0.2",
     "jquery": "^3.6.0",
+    "mini-css-extract-plugin": "^1.5.0",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-command-palette": "=0.16.1",
+    "react-dom": "^17.0.2",
     "socket.io": "^2.3.0",
-    "toastr": "^2.1.4"
+    "toastr": "^2.1.4",
+    "webpack-cli": "^4.6.0"
   },
   "devDependencies": {
+    "@rbarilani/remove-source-map-url-webpack-plugin": "=1.1.0",
     "archiver": "^5.3.0",
     "chalk": "^4.1.0",
     "copy-files-from-to": "^3.2.0",
     "cp-file": "^9.0.0",
     "del": "^6.0.0",
     "eslint": "^7.24.0",
+    "eslint-plugin-react": "^7.23.2",
     "git-hooks": "^1.1.10",
     "jsonfile": "^6.1.0",
-    "note-down": "^0.2.3"
+    "note-down": "^0.2.3",
+    "webpack": "^5.35.1"
   }
 }

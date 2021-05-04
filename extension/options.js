@@ -13,7 +13,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
 jQuery(function ($) {
-    // TODO: DUPLICATE: Code duplication for browser detection in ext-lib.js, magicss.js and options.js
+    // TODO: DUPLICATE: Code duplication for browser detection in commands.js, ext-lib.js, magicss.js and options.js
     var isChrome = false,
         isEdge = false,
         isFirefox = false,
