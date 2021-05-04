@@ -16,7 +16,8 @@
     "build-and-zip-extension": "npm run start:build-extension && npm run zip-extension",
     "all-is-well": "./scripts/all-is-well.sh",
     "test": "npm run all-is-well",
-    "start:build": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
+    "start:build": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='publish'",
+    "start:build-with-sourcemap": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
     "start:build-inspect-brk": "cd extension/ ; node --inspect-brk ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
     "start:build-extension": "cd extension/ ; node ../node_modules/.bin/webpack --config ./webpack.config.js --env build.buildFor='publish'",
     "start": "npm run start:build"
