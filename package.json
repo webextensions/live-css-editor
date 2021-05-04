@@ -13,9 +13,12 @@
     "zip-firefox-extension": "node ./zip-extension.js firefox",
     "zip-opera-extension": "node ./zip-extension.js opera",
     "zip-extension": "npm run zip-chrome-extension && npm run zip-edge-extension && npm run zip-firefox-extension && npm run zip-opera-extension",
+    "build-and-zip-extension": "npm run start:build-extension && npm run zip-extension",
     "all-is-well": "./scripts/all-is-well.sh",
     "test": "npm run all-is-well",
-    "start:build": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack.config.js",
+    "start:build": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
+    "start:build-inspect-brk": "cd extension/ ; node --inspect-brk ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
+    "start:build-extension": "cd extension/ ; node ../node_modules/.bin/webpack --config ./webpack.config.js --env build.buildFor='publish'",
     "start": "npm run start:build"
   },
   "dependencies": {
