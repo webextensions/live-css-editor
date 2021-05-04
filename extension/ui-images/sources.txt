@@ -17,6 +17,9 @@ compress.svg
     https://www.iconfinder.com/icons/1608651/compress_icon#size=128
     https://www.iconfinder.com/icons/1608651/download/svg/128
 
+copy.svg
+    Exported from "largeIcons.svg" in Google Chrome's directory, resources/inspector/Images/largeIcons.svg
+
 hash.svg
     https://www.iconfinder.com/icons/118664/hash_icon
     https://www.iconfinder.com/icons/118664/download/svg/512

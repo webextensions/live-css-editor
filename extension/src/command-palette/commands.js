@@ -1,4 +1,6 @@
-/* global extLib */
+/* global extLib, utils */
+
+import copy from 'copy-text-to-clipboard';
 
 const commands = (
     [
@@ -81,6 +83,28 @@ const commands = (
                     var editor = window.MagiCSSEditor;
 
                     await window.execMinifyCssAction(editor);
+                });
+            }
+        },
+
+        {
+            name: 'Copy code',
+            iconCls: 'magicss-use-icon-copy-gray',
+            command() {
+                setTimeout(async function () {
+                    const editor = window.MagiCSSEditor;
+                    const textValue = editor.getTextValue();
+
+                    if (textValue) {
+                        const flag = copy(textValue);
+                        if (flag) {
+                            utils.alertNote('Copied code to clipboard', 2500);
+                        } else {
+                            utils.alertNote('Failed to copy to clipboard', 2500);
+                        }
+                    } else {
+                        utils.alertNote('There is no code to copy', 2500);
+                    }
                 });
             }
         },

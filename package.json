@@ -28,6 +28,7 @@
     "@babel/preset-react": "^7.13.13",
     "babel-loader": "^8.2.2",
     "codemirror": "=5.34.0",
+    "copy-text-to-clipboard": "^3.0.1",
     "css-loader": "^5.2.4",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
     "eslint-loader": "^4.0.2",
