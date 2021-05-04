@@ -51,70 +51,6 @@ const commands = (
                 return null;
             }
         })(),
-        ...(function () {
-            // TODO: DUPLICATE: Code duplication for browser detection in commands.js, ext-lib.js, magicss.js and options.js
-            var isChrome = false,
-                isEdge = false,
-                isFirefox = false,
-                isOpera = false,
-                isChromiumBased = false;
-
-            // Note that we are checking for "Edg/" which is the test required for identifying Chromium based Edge browser
-            if (/Edg\//.test(navigator.appVersion)) {           // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
-                isEdge = true;
-            } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
-                isOpera = true;
-            } else if (/Chrome/.test(navigator.appVersion)) {
-                isChrome = true;
-            } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
-                isFirefox = true;
-            }
-            if (isEdge || isOpera || isChrome) {
-                isChromiumBased = true; // eslint-disable-line no-unused-vars
-            }
-
-            var extensionUrl = {
-                chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
-                edge: 'https://microsoftedge.microsoft.com/addons/detail/live-editor-for-css-less/ahibbdhoijcafelmfepfpcmmdifchpdg',
-                firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/',
-                opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
-            };
-
-            return [
-                {
-                    skip: isChrome ? true : false,
-                    name: 'Magic CSS for Chrome',
-                    iconCls: 'magicss-use-icon-chrome',
-                    command() {
-                        window.open(extensionUrl.chrome);
-                    }
-                },
-                {
-                    skip: isEdge ? true : false,
-                    name: 'Magic CSS for Edge',
-                    iconCls: 'magicss-use-icon-edge-gray',
-                    command() {
-                        window.open(extensionUrl.edge);
-                    }
-                },
-                {
-                    skip: isFirefox ? true : false,
-                    name: 'Magic CSS for Firefox',
-                    iconCls: 'magicss-use-icon-firefox-gray',
-                    command() {
-                        window.open(extensionUrl.firefox);
-                    }
-                },
-                {
-                    skip: isOpera ? true : false,
-                    name: 'Magic CSS for Opera',
-                    iconCls: 'magicss-use-logo-opera-gray',
-                    command() {
-                        window.open(extensionUrl.opera);
-                    }
-                }
-            ];
-        }()),
         {
             name: window.flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
             iconCls: 'magicss-less-or-sass-to-css',
@@ -220,6 +156,70 @@ const commands = (
                 window.open('https://github.com/webextensions/live-css-editor');
             }
         },
+        ...(function () {
+            // TODO: DUPLICATE: Code duplication for browser detection in commands.js, ext-lib.js, magicss.js and options.js
+            var isChrome = false,
+                isEdge = false,
+                isFirefox = false,
+                isOpera = false,
+                isChromiumBased = false;
+
+            // Note that we are checking for "Edg/" which is the test required for identifying Chromium based Edge browser
+            if (/Edg\//.test(navigator.appVersion)) {           // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
+                isEdge = true;
+            } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
+                isOpera = true;
+            } else if (/Chrome/.test(navigator.appVersion)) {
+                isChrome = true;
+            } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
+                isFirefox = true;
+            }
+            if (isEdge || isOpera || isChrome) {
+                isChromiumBased = true; // eslint-disable-line no-unused-vars
+            }
+
+            var extensionUrl = {
+                chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
+                edge: 'https://microsoftedge.microsoft.com/addons/detail/live-editor-for-css-less/ahibbdhoijcafelmfepfpcmmdifchpdg',
+                firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/',
+                opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
+            };
+
+            return [
+                {
+                    skip: isChrome ? true : false,
+                    name: 'Magic CSS for Chrome',
+                    iconCls: 'magicss-use-icon-chrome',
+                    command() {
+                        window.open(extensionUrl.chrome);
+                    }
+                },
+                {
+                    skip: isEdge ? true : false,
+                    name: 'Magic CSS for Edge',
+                    iconCls: 'magicss-use-icon-edge-gray',
+                    command() {
+                        window.open(extensionUrl.edge);
+                    }
+                },
+                {
+                    skip: isFirefox ? true : false,
+                    name: 'Magic CSS for Firefox',
+                    iconCls: 'magicss-use-icon-firefox-gray',
+                    command() {
+                        window.open(extensionUrl.firefox);
+                    }
+                },
+                {
+                    skip: isOpera ? true : false,
+                    name: 'Magic CSS for Opera',
+                    iconCls: 'magicss-use-logo-opera-gray',
+                    command() {
+                        window.open(extensionUrl.opera);
+                    }
+                }
+            ];
+        }()),
         {
             name: 'More options',
             iconCls: 'magicss-options',
