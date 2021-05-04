@@ -31,6 +31,9 @@ window.reactMain = function (options) {
                 window.reactMain({
                     open: false
                 });
+
+                const editor = window.MagiCSSEditor;
+                editor.focus();
             }}
         />,
         document.getElementsByClassName('magicss-command-palette-root')[0]
