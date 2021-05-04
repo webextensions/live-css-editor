@@ -1853,8 +1853,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     highlightErroneousLineTemporarily(editor, err.line - 1);
                                     editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                 } else {
-                                    var beautifiedLessCode = await beautifyCSS(utils.minifyCSS(lessCode));
-                                    cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
+                                    let minifiedLessCode = lessCode ? utils.minifyCSS(lessCode) : '';
+                                    let beautifiedLessCode = minifiedLessCode ? await beautifyCSS(minifiedLessCode) : '';
+                                    let minifiedCssCode = cssCode ? utils.minifyCSS(cssCode) : '';
+                                    cssCode = minifiedCssCode ? await beautifyCSS(minifiedCssCode) : '';
 
                                     if (cssCode === beautifiedLessCode) {
                                         utils.alertNote('Your code is already CSS compatible', 5000);
@@ -1885,8 +1887,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     highlightErroneousLineTemporarily(editor, err.line - 1);
                                     editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                 } else {
-                                    var beautifiedSassCode = await beautifyCSS(utils.minifyCSS(sassCode));
-                                    cssCode = await beautifyCSS(utils.minifyCSS(cssCode));
+                                    let minifiedSassCode = sassCode ? utils.minifyCSS(sassCode) : '';
+                                    let beautifiedSassCode = minifiedSassCode ? await beautifyCSS(minifiedSassCode) : '';
+                                    let minifiedCssCode = cssCode ? utils.minifyCSS(cssCode) : '';
+                                    cssCode = minifiedCssCode ? await beautifyCSS(minifiedCssCode) : '';
 
                                     if (cssCode === beautifiedSassCode) {
                                         utils.alertNote('Your code is already CSS compatible', 5000);
