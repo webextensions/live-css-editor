@@ -26,22 +26,22 @@ const commands = (
                     href
                 } = iconOb;
 
-                let name,
+                let title,
                     iconCls;
                 if (browser === 'chrome') {
-                    name = 'Rate us on Chrome Web Store';
+                    title = 'Rate us on Chrome Web Store';
                     iconCls = 'magicss-use-icon-chrome';
                 } else if (browser === 'edge') {
-                    name = 'Rate us on Microsoft Store';
+                    title = 'Rate us on Microsoft Store';
                     iconCls = 'magicss-use-logo-microsoft-store-gray';
                 } else if (browser === 'firefox') {
-                    name = 'Rate us on Firefox Add-ons Store';
+                    title = 'Rate us on Firefox Add-ons Store';
                     iconCls = 'magicss-use-logo-firefox-add-ons-store-gray';
                 } else if (browser === 'opera') {
-                    name = 'Rate us on Opera Add-ons Store';
+                    title = 'Rate us on Opera Add-ons Store';
                     iconCls = 'magicss-use-logo-opera-add-ons-store-gray';
                 }
-                commandOb.name = name;
+                commandOb.title = title;
                 commandOb.iconCls = iconCls;
 
                 commandOb.command = function () {
@@ -54,7 +54,7 @@ const commands = (
             }
         })(),
         {
-            name: window.flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
+            title: window.flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
             iconCls: 'magicss-less-or-sass-to-css',
             command() {
                 setTimeout(async function () {
@@ -65,7 +65,7 @@ const commands = (
             }
         },
         {
-            name: 'Beautify code',
+            title: 'Beautify code',
             iconCls: 'magicss-use-icon-beautify-gray',
             command() {
                 setTimeout(async function () {
@@ -76,7 +76,7 @@ const commands = (
             }
         },
         {
-            name: 'Minify code',
+            title: 'Minify code',
             iconCls: 'magicss-use-icon-minify-gray',
             command() {
                 setTimeout(async function () {
@@ -88,7 +88,7 @@ const commands = (
         },
 
         {
-            name: 'Copy code',
+            title: 'Copy code',
             iconCls: 'magicss-use-icon-copy-gray',
             command() {
                 setTimeout(async function () {
@@ -111,7 +111,7 @@ const commands = (
 
         {
             id: 'show-line-numbers',
-            name: 'Show line numbers',
+            title: 'Show line numbers',
             iconCls: 'magicss-use-icon-show-line-numbers-gray',
             command() {
                 setTimeout(async function () {
@@ -122,7 +122,7 @@ const commands = (
         },
         {
             id: 'hide-line-numbers',
-            name: 'Hide line numbers',
+            title: 'Hide line numbers',
             iconCls: 'magicss-use-icon-hide-line-numbers-gray',
             command() {
                 setTimeout(async function () {
@@ -134,7 +134,7 @@ const commands = (
 
         {
             id: 'enable-css-linting',
-            name: 'Enable CSS linting',
+            title: 'Enable CSS linting',
             iconCls: 'magicss-use-icon-enable-css-linting-gray',
             command() {
                 setTimeout(async function () {
@@ -145,7 +145,7 @@ const commands = (
         },
         {
             id: 'disable-css-linting',
-            name: 'Disable CSS linting',
+            title: 'Disable CSS linting',
             iconCls: 'magicss-use-icon-disable-css-linting-gray',
             command() {
                 setTimeout(async function () {
@@ -156,7 +156,7 @@ const commands = (
         },
 
         {
-            name: 'Tweet',
+            title: 'Tweet',
             iconCls: 'magicss-use-logo-twitter-gray',
             command() {
                 const extensionUrl = window.extensionUrl;
@@ -165,7 +165,7 @@ const commands = (
             }
         },
         {
-            name: 'Share',
+            title: 'Share',
             iconCls: 'magicss-use-logo-facebook-gray',
             command() {
                 const extensionUrl = window.extensionUrl;
@@ -174,7 +174,7 @@ const commands = (
             }
         },
         {
-            name: 'Contribute / Report issue',
+            title: 'Contribute / Report issue',
             iconCls: 'magicss-use-logo-github-gray',
             command() {
                 window.open('https://github.com/webextensions/live-css-editor');
@@ -212,7 +212,7 @@ const commands = (
             return [
                 {
                     skip: isChrome ? true : false,
-                    name: 'Magic CSS for Chrome',
+                    title: 'Magic CSS for Chrome',
                     iconCls: 'magicss-use-icon-chrome',
                     command() {
                         window.open(extensionUrl.chrome);
@@ -220,7 +220,7 @@ const commands = (
                 },
                 {
                     skip: isEdge ? true : false,
-                    name: 'Magic CSS for Edge',
+                    title: 'Magic CSS for Edge',
                     iconCls: 'magicss-use-icon-edge-gray',
                     command() {
                         window.open(extensionUrl.edge);
@@ -228,7 +228,7 @@ const commands = (
                 },
                 {
                     skip: isFirefox ? true : false,
-                    name: 'Magic CSS for Firefox',
+                    title: 'Magic CSS for Firefox',
                     iconCls: 'magicss-use-icon-firefox-gray',
                     command() {
                         window.open(extensionUrl.firefox);
@@ -236,7 +236,7 @@ const commands = (
                 },
                 {
                     skip: isOpera ? true : false,
-                    name: 'Magic CSS for Opera',
+                    title: 'Magic CSS for Opera',
                     iconCls: 'magicss-use-logo-opera-gray',
                     command() {
                         window.open(extensionUrl.opera);
@@ -245,7 +245,7 @@ const commands = (
             ];
         }()),
         {
-            name: 'More options',
+            title: 'More options',
             iconCls: 'magicss-options',
             command() {
                 var editor = window.MagiCSSEditor;
