@@ -7,7 +7,7 @@ import { commands } from './commands.js';
 
 const renderCommand = function (suggestion) {
     const {
-        title,
+        name,
         iconCls,
         style
     } = suggestion;
@@ -24,7 +24,7 @@ const renderCommand = function (suggestion) {
                     ...style
                 }}
             />
-            <div>{title}</div>
+            <div>{name}</div>
         </div>
     );
 };

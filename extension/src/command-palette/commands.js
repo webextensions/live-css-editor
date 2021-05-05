@@ -26,27 +26,27 @@ const commands = (
                     href
                 } = iconOb;
 
-                let title,
+                let name,
                     operationId,
                     iconCls;
                 if (browser === 'chrome') {
-                    title = 'Rate us on Chrome Web Store';
+                    name = 'Rate us on Chrome Web Store';
                     operationId = 'rate-on-chrome-web-store';
                     iconCls = 'magicss-use-icon-chrome';
                 } else if (browser === 'edge') {
-                    title = 'Rate us on Microsoft Store';
+                    name = 'Rate us on Microsoft Store';
                     operationId = 'rate-on-microsoft-store';
                     iconCls = 'magicss-use-logo-microsoft-store-gray';
                 } else if (browser === 'firefox') {
-                    title = 'Rate us on Firefox Add-ons Store';
+                    name = 'Rate us on Firefox Add-ons Store';
                     operationId = 'rate-on-firefox-web-store';
                     iconCls = 'magicss-use-logo-firefox-add-ons-store-gray';
                 } else if (browser === 'opera') {
-                    title = 'Rate us on Opera Add-ons Store';
+                    name = 'Rate us on Opera Add-ons Store';
                     operationId = 'rate-on-opera-add-ons-store',
                     iconCls = 'magicss-use-logo-opera-add-ons-store-gray';
                 }
-                commandOb.title = title;
+                commandOb.name = name;
                 commandOb.operationId = operationId;
                 commandOb.iconCls = iconCls;
 
@@ -60,8 +60,8 @@ const commands = (
             }
         })(),
         {
-            title: window.flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
             operationId: 'less-or-sass-to-css',
+            name: window.flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
             iconCls: 'magicss-less-or-sass-to-css',
             command() {
                 setTimeout(async function () {
@@ -72,8 +72,8 @@ const commands = (
             }
         },
         {
-            title: 'Beautify code',
             operationId: 'beautify-code',
+            name: 'Beautify code',
             iconCls: 'magicss-use-icon-beautify-gray',
             command() {
                 setTimeout(async function () {
@@ -84,8 +84,7 @@ const commands = (
             }
         },
         {
-            title: 'Minify code',
-            operationId: 'minify-code',
+            name: 'Minify code',
             iconCls: 'magicss-use-icon-minify-gray',
             command() {
                 setTimeout(async function () {
@@ -97,8 +96,8 @@ const commands = (
         },
 
         {
-            title: 'Copy code',
             operationId: 'copy-code',
+            name: 'Copy code',
             iconCls: 'magicss-use-icon-copy-gray',
             command() {
                 setTimeout(async function () {
@@ -122,7 +121,7 @@ const commands = (
         {
             id: 'show-line-numbers',
             operationId: 'toggle-line-numbers',
-            title: 'Show line numbers',
+            name: 'Show line numbers',
             iconCls: 'magicss-use-icon-show-line-numbers-gray',
             command() {
                 setTimeout(async function () {
@@ -134,7 +133,7 @@ const commands = (
         {
             id: 'hide-line-numbers',
             operationId: 'toggle-line-numbers',
-            title: 'Hide line numbers',
+            name: 'Hide line numbers',
             iconCls: 'magicss-use-icon-hide-line-numbers-gray',
             command() {
                 setTimeout(async function () {
@@ -147,7 +146,7 @@ const commands = (
         {
             id: 'enable-css-linting',
             operationId: 'toggle-css-linting',
-            title: 'Enable CSS linting',
+            name: 'Enable CSS linting',
             iconCls: 'magicss-use-icon-enable-css-linting-gray',
             command() {
                 setTimeout(async function () {
@@ -159,7 +158,7 @@ const commands = (
         {
             id: 'disable-css-linting',
             operationId: 'toggle-css-linting',
-            title: 'Disable CSS linting',
+            name: 'Disable CSS linting',
             iconCls: 'magicss-use-icon-disable-css-linting-gray',
             command() {
                 setTimeout(async function () {
@@ -170,8 +169,8 @@ const commands = (
         },
 
         {
-            title: 'Tweet',
             operationId: 'tweet',
+            name: 'Tweet',
             iconCls: 'magicss-use-logo-twitter-gray',
             command() {
                 const extensionUrl = window.extensionUrl;
@@ -180,8 +179,8 @@ const commands = (
             }
         },
         {
-            title: 'Share',
             operationId: 'share-on-facebook',
+            name: 'Share',
             iconCls: 'magicss-use-logo-facebook-gray',
             command() {
                 const extensionUrl = window.extensionUrl;
@@ -190,8 +189,8 @@ const commands = (
             }
         },
         {
-            title: 'Contribute / Report issue',
             operationId: 'link-github',
+            name: 'Contribute / Report issue',
             iconCls: 'magicss-use-logo-github-gray',
             command() {
                 window.open('https://github.com/webextensions/live-css-editor');
@@ -229,8 +228,8 @@ const commands = (
             return [
                 {
                     skip: isChrome ? true : false,
-                    title: 'Magic CSS for Chrome',
                     operationId: 'link-chrome',
+                    name: 'Magic CSS for Chrome',
                     iconCls: 'magicss-use-icon-chrome',
                     command() {
                         window.open(extensionUrl.chrome);
@@ -238,8 +237,8 @@ const commands = (
                 },
                 {
                     skip: isEdge ? true : false,
-                    title: 'Magic CSS for Edge',
                     operationId: 'link-edge',
+                    name: 'Magic CSS for Edge',
                     iconCls: 'magicss-use-icon-edge-gray',
                     command() {
                         window.open(extensionUrl.edge);
@@ -247,8 +246,8 @@ const commands = (
                 },
                 {
                     skip: isFirefox ? true : false,
-                    title: 'Magic CSS for Firefox',
                     operationId: 'link-firefox',
+                    name: 'Magic CSS for Firefox',
                     iconCls: 'magicss-use-icon-firefox-gray',
                     command() {
                         window.open(extensionUrl.firefox);
@@ -256,8 +255,8 @@ const commands = (
                 },
                 {
                     skip: isOpera ? true : false,
-                    title: 'Magic CSS for Opera',
                     operationId: 'link-opera',
+                    name: 'Magic CSS for Opera',
                     iconCls: 'magicss-use-logo-opera-gray',
                     command() {
                         window.open(extensionUrl.opera);
@@ -266,8 +265,8 @@ const commands = (
             ];
         }()),
         {
-            title: 'More options',
             operationId: 'more-options',
+            name: 'More options',
             iconCls: 'magicss-options',
             command() {
                 var editor = window.MagiCSSEditor;
