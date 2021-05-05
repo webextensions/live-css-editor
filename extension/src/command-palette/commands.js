@@ -27,21 +27,27 @@ const commands = (
                 } = iconOb;
 
                 let title,
+                    operationId,
                     iconCls;
                 if (browser === 'chrome') {
                     title = 'Rate us on Chrome Web Store';
+                    operationId = 'rate-on-chrome-web-store';
                     iconCls = 'magicss-use-icon-chrome';
                 } else if (browser === 'edge') {
                     title = 'Rate us on Microsoft Store';
+                    operationId = 'rate-on-microsoft-store';
                     iconCls = 'magicss-use-logo-microsoft-store-gray';
                 } else if (browser === 'firefox') {
                     title = 'Rate us on Firefox Add-ons Store';
+                    operationId = 'rate-on-firefox-web-store';
                     iconCls = 'magicss-use-logo-firefox-add-ons-store-gray';
                 } else if (browser === 'opera') {
                     title = 'Rate us on Opera Add-ons Store';
+                    operationId = 'rate-on-opera-add-ons-store',
                     iconCls = 'magicss-use-logo-opera-add-ons-store-gray';
                 }
                 commandOb.title = title;
+                commandOb.operationId = operationId;
                 commandOb.iconCls = iconCls;
 
                 commandOb.command = function () {
@@ -55,6 +61,7 @@ const commands = (
         })(),
         {
             title: window.flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
+            operationId: 'less-or-sass-to-css',
             iconCls: 'magicss-less-or-sass-to-css',
             command() {
                 setTimeout(async function () {
@@ -66,6 +73,7 @@ const commands = (
         },
         {
             title: 'Beautify code',
+            operationId: 'beautify-code',
             iconCls: 'magicss-use-icon-beautify-gray',
             command() {
                 setTimeout(async function () {
@@ -77,6 +85,7 @@ const commands = (
         },
         {
             title: 'Minify code',
+            operationId: 'minify-code',
             iconCls: 'magicss-use-icon-minify-gray',
             command() {
                 setTimeout(async function () {
@@ -89,6 +98,7 @@ const commands = (
 
         {
             title: 'Copy code',
+            operationId: 'copy-code',
             iconCls: 'magicss-use-icon-copy-gray',
             command() {
                 setTimeout(async function () {
@@ -111,6 +121,7 @@ const commands = (
 
         {
             id: 'show-line-numbers',
+            operationId: 'toggle-line-numbers',
             title: 'Show line numbers',
             iconCls: 'magicss-use-icon-show-line-numbers-gray',
             command() {
@@ -122,6 +133,7 @@ const commands = (
         },
         {
             id: 'hide-line-numbers',
+            operationId: 'toggle-line-numbers',
             title: 'Hide line numbers',
             iconCls: 'magicss-use-icon-hide-line-numbers-gray',
             command() {
@@ -134,6 +146,7 @@ const commands = (
 
         {
             id: 'enable-css-linting',
+            operationId: 'toggle-css-linting',
             title: 'Enable CSS linting',
             iconCls: 'magicss-use-icon-enable-css-linting-gray',
             command() {
@@ -145,6 +158,7 @@ const commands = (
         },
         {
             id: 'disable-css-linting',
+            operationId: 'toggle-css-linting',
             title: 'Disable CSS linting',
             iconCls: 'magicss-use-icon-disable-css-linting-gray',
             command() {
@@ -157,6 +171,7 @@ const commands = (
 
         {
             title: 'Tweet',
+            operationId: 'tweet',
             iconCls: 'magicss-use-logo-twitter-gray',
             command() {
                 const extensionUrl = window.extensionUrl;
@@ -166,6 +181,7 @@ const commands = (
         },
         {
             title: 'Share',
+            operationId: 'share-on-facebook',
             iconCls: 'magicss-use-logo-facebook-gray',
             command() {
                 const extensionUrl = window.extensionUrl;
@@ -175,6 +191,7 @@ const commands = (
         },
         {
             title: 'Contribute / Report issue',
+            operationId: 'link-github',
             iconCls: 'magicss-use-logo-github-gray',
             command() {
                 window.open('https://github.com/webextensions/live-css-editor');
@@ -213,6 +230,7 @@ const commands = (
                 {
                     skip: isChrome ? true : false,
                     title: 'Magic CSS for Chrome',
+                    operationId: 'link-chrome',
                     iconCls: 'magicss-use-icon-chrome',
                     command() {
                         window.open(extensionUrl.chrome);
@@ -221,6 +239,7 @@ const commands = (
                 {
                     skip: isEdge ? true : false,
                     title: 'Magic CSS for Edge',
+                    operationId: 'link-edge',
                     iconCls: 'magicss-use-icon-edge-gray',
                     command() {
                         window.open(extensionUrl.edge);
@@ -229,6 +248,7 @@ const commands = (
                 {
                     skip: isFirefox ? true : false,
                     title: 'Magic CSS for Firefox',
+                    operationId: 'link-firefox',
                     iconCls: 'magicss-use-icon-firefox-gray',
                     command() {
                         window.open(extensionUrl.firefox);
@@ -237,6 +257,7 @@ const commands = (
                 {
                     skip: isOpera ? true : false,
                     title: 'Magic CSS for Opera',
+                    operationId: 'link-opera',
                     iconCls: 'magicss-use-logo-opera-gray',
                     command() {
                         window.open(extensionUrl.opera);
@@ -246,6 +267,7 @@ const commands = (
         }()),
         {
             title: 'More options',
+            operationId: 'more-options',
             iconCls: 'magicss-options',
             command() {
                 var editor = window.MagiCSSEditor;
