@@ -132,6 +132,7 @@ var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, pa
         );
     });
 };
+window.chromeRuntimeMessageToBackgroundScript = chromeRuntimeMessageToBackgroundScript;
 
 if (window.flagEditorInExternalWindow) {
     chromeRuntimeMessageIfRequired({
@@ -3213,9 +3214,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }()),
                             cls: 'magicss-command-palette editor-gray-out',
                             onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
-                                const reactMain = await loadIfNotAvailable('main-bundle');
-                                reactMain({
-                                    open: true
+                                await loadIfNotAvailable('main-bundle');
+
+                                window.redux_store.dispatch({
+                                    type: 'APP_$_OPEN_COMMAND_PALETTE'
                                 });
                             },
                             afterrender: function () {
@@ -3240,9 +3242,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 event.preventDefault();
 
                                                 setTimeout(async () => {
-                                                    const reactMain = await loadIfNotAvailable('main-bundle');
-                                                    reactMain({
-                                                        open: true
+                                                    await loadIfNotAvailable('main-bundle');
+
+                                                    window.redux_store.dispatch({
+                                                        type: 'APP_$_OPEN_COMMAND_PALETTE'
                                                     });
                                                 });
                                             }

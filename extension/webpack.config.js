@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveSourceMapUrlWebpackPlugin = require('@rbarilani/remove-source-map-url-webpack-plugin');
 
 const BABEL_OPTIONS = {
@@ -73,14 +74,42 @@ module.exports = function (env) {
                         }
                         // 'eslint-loader'
                     ]
-                }
+                },
+                {
+                    test: /\.css$/,
+                    use: [
+                        // {
+                        //     loader: MiniCssExtractPlugin.loader
+                        // },
+                        MiniCssExtractPlugin.loader,
+                        'css-loader'
+                    ]
+                },
             ]
+        },
+
+        optimization: {
+            minimize: false,
+            usedExports: true,
+            innerGraph: true
+        },
+
+        resolve: {
+            fallback: {
+                // Required to remove a warning where webpack says that it doesn't automatically polyfill native node
+                // modules ('crypto' in this case)
+                crypto: false
+            }
         },
 
         plugins: [
             // https://stackoverflow.com/questions/42196819/disable-hide-download-the-react-devtools/48324794#48324794
             new webpack.DefinePlugin({
                 '__REACT_DEVTOOLS_GLOBAL_HOOK__': '({ isDisabled: true })'
+            }),
+
+            new MiniCssExtractPlugin({
+                filename: 'main.bundle.css'
             }),
 
             // This plugin is useful for removing (unwanted) sourcemap references. Which otherwise can lead to warnings in

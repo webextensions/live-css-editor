@@ -1,41 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+
+import { Provider } from 'react-redux';
 
 import { Actions } from './actions.js';
 
-const Main = function (props) {
+import { SearchIcons } from './dialogs/searchIcons/searchIcons.js';
+
+import { store } from './store.js';
+
+const Main = function () {
     return (
         <div>
-            <Actions
-                open={props.open}
-                onClose={function () {
-                    if (props.onClose) {
-                        props.onClose();
-                    }
-                }}
-            />
+            <Provider store={store}>
+                <Actions />
+                <SearchIcons />
+            </Provider>
         </div>
     );
 };
-Main.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func
-};
 
-window.reactMain = function (options) {
+window.reactMain = function () {
     ReactDOM.render(
-        <Main
-            open={options.open}
-            onClose={function () {
-                window.reactMain({
-                    open: false
-                });
-
-                const editor = window.MagiCSSEditor;
-                editor.focus();
-            }}
-        />,
+        <Main />,
         document.getElementsByClassName('magicss-command-palette-root')[0]
     );
 };
+
+window.reactMain();

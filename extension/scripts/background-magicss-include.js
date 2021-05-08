@@ -82,7 +82,20 @@ if (window.flagEditorInExternalWindow) {
     if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
-                if (request.type === 'magicss-dependency') {
+                if (request.type === 'magicss-bg') {
+                    if (request.subType === 'ajax') {
+                        const ajaxOb = JSON.parse(JSON.stringify(request.payload));
+                        ajaxOb.error = function (jqXhr, textStatus, error) {
+                            sendResponse([{ jqXhr, textStatus, error }]);
+                        };
+                        ajaxOb.success = function (data, textStatus) { // eslint-disable-line no-unused-vars
+                            sendResponse([null, data]);
+                        };
+                        jQuery.ajax(ajaxOb);
+
+                        return true;
+                    }
+                } else if (request.type === 'magicss-dependency') {
                     if (request.subType === 'load-dependency') {
                         setTimeout(async () => {
                             const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
@@ -342,7 +355,8 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
     }
 
     getAllFrames(function (allFrames) {
-        var pathScripts = 'scripts/',
+        var pathDist = 'dist/',
+            pathScripts = 'scripts/',
             path3rdparty = pathScripts + '3rdparty/',
             path3rdpartyCustomFixes = pathScripts + '3rdparty-custom-fixes/',
             pathMagicss = pathScripts + 'magicss/',
@@ -466,6 +480,8 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
                 pathEditor + 'editor.js',
 
                 pathMagicss + 'magicss.css',
+                pathDist + 'main.bundle.css', // TODO: FIXME: Ideally, this should be loaded only on demand, like main.bundle.js
+
                 pathMagicss + 'generate-selector.js',
 
                 pathMagicss + 'magicss.js'

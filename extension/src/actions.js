@@ -1,7 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import { CommandPalette } from './command-palette/command-palette.js';
+
+import {
+    APP_$_CLOSE_COMMAND_PALETTE
+} from 'reducers/actionTypes.js';
+
+function mapStateToProps(state) {
+    return {
+        open: state.app.commandPalette.open
+    };
+}
 
 const Actions = function (props) {
     return (
@@ -9,9 +20,9 @@ const Actions = function (props) {
             <CommandPalette
                 open={props.open}
                 onClose={function () {
-                    if (props.onClose) {
-                        props.onClose();
-                    }
+                    props.dispatch({
+                        type: APP_$_CLOSE_COMMAND_PALETTE
+                    });
                 }}
             />
         </div>
@@ -19,7 +30,9 @@ const Actions = function (props) {
 };
 Actions.propTypes = {
     open: PropTypes.bool,
-    onClose: PropTypes.func
+    dispatch: PropTypes.func
 };
 
-export { Actions };
+const _Actions = connect(mapStateToProps)(Actions);
+
+export { _Actions as Actions };

@@ -9,6 +9,7 @@ const renderCommand = function (suggestion) {
     const {
         name,
         iconCls,
+        isNew,
         style
     } = suggestion;
     return (
@@ -25,6 +26,10 @@ const renderCommand = function (suggestion) {
                 }}
             />
             <div>{name}</div>
+            {
+                isNew &&
+                <div className="magicss-palette-new">NEW</div>
+            }
         </div>
     );
 };

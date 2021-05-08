@@ -2,6 +2,26 @@
 
 import copy from 'copy-text-to-clipboard';
 
+import {
+    APP_$_OPEN_SEARCH_ICONS
+} from 'reducers/actionTypes.js';
+
+const timeout = function (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+const forceBlur = async function () {
+    const input = document.createElement('input');
+    input.style.position = 'absolute';
+    input.style.visibility = 'hidden';
+    input.style.opacity = '0';
+
+    document.body.appendChild(input);
+    input.focus();
+    await timeout(0);
+    document.body.removeChild(input);
+};
+
 const commands = (
     [
         (function () {
@@ -59,6 +79,22 @@ const commands = (
                 return null;
             }
         })(),
+
+        {
+            name: 'Get icon from Noun Project',
+            isNew: true,
+            iconCls: 'magicss-use-logo-thenounproject-gray',
+            command() {
+                setTimeout(async function () {
+                    await forceBlur();
+
+                    window.redux_store.dispatch({
+                        type: APP_$_OPEN_SEARCH_ICONS
+                    });
+                });
+            }
+        },
+
         {
             operationId: 'less-or-sass-to-css',
             name: window.flagAllowSassUi ? 'Convert this code from Less/Sass to CSS' : 'Convert this code from Less to CSS',
