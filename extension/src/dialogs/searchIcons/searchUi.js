@@ -45,8 +45,8 @@ const ListOfIcons = function (props) {
                             <img
                                 src={preview_url}
                                 style={{
-                                    maxWidth: 24,
-                                    maxHeight: 24
+                                    maxWidth: 40,
+                                    maxHeight: 40
                                 }}
                             />
                         </div>
@@ -110,6 +110,50 @@ const SearchUi = function (/* props */) {
         [READYSTATE]: UNINITIALIZED
     });
 
+    const doSearch = async function () {
+        // http://lti.tools/oauth/
+        const oauth = OAuth({
+            consumer: { key, secret },
+            signature_method: 'HMAC-SHA1',
+            hash_function(base_string, key) {
+                const hash = hmacSha1(base_string, key);
+                const output = Base64.stringify(hash);
+                return output;
+            },
+        });
+
+        const request_data = {
+            url: `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}?limit_to_public_domain=1`,
+            method: 'GET'
+        };
+
+        const headers = oauth.toHeader(oauth.authorize(request_data));
+
+        setOutput({
+            [READYSTATE]: LOADING
+        });
+        const [err, data] = await window.chromeRuntimeMessageToBackgroundScript({
+            type: 'magicss-bg',
+            subType: 'ajax',
+            payload: {
+                url: request_data.url,
+                type: request_data.method,
+                headers
+            }
+        });
+
+        if (err) {
+            setOutput({
+                [READYSTATE]: ERROR
+            });
+        } else {
+            setOutput({
+                [READYSTATE]: LOADED,
+                data
+            });
+        }
+    };
+
     return (
         <div
             style={{
@@ -154,8 +198,18 @@ const SearchUi = function (/* props */) {
                             label="Search for icons..."
                             placeholder="e.g., phone"
                             value={searchText}
+                            autoFocus
                             onChange={(evt) => {
                                 setSearchText(evt.target.value);
+                            }}
+                            onKeyPress={(evt) => {
+                                if (evt.key === 'Enter') {
+                                    evt.preventDefault();
+
+                                    setTimeout(async function () {
+                                        doSearch();
+                                    });
+                                }
                             }}
                             style={{ width: '100%' }}
                         />
@@ -173,47 +227,7 @@ const SearchUi = function (/* props */) {
                             }}
                             onClick={function () {
                                 setTimeout(async function () {
-                                    // http://lti.tools/oauth/
-                                    const oauth = OAuth({
-                                        consumer: { key, secret },
-                                        signature_method: 'HMAC-SHA1',
-                                        hash_function(base_string, key) {
-                                            const hash = hmacSha1(base_string, key);
-                                            const output = Base64.stringify(hash);
-                                            return output;
-                                        },
-                                    });
-
-                                    const request_data = {
-                                        url: `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}`,
-                                        method: 'GET'
-                                    };
-
-                                    const headers = oauth.toHeader(oauth.authorize(request_data));
-
-                                    setOutput({
-                                        [READYSTATE]: LOADING
-                                    });
-                                    const [err, data] = await window.chromeRuntimeMessageToBackgroundScript({
-                                        type: 'magicss-bg',
-                                        subType: 'ajax',
-                                        payload: {
-                                            url: request_data.url,
-                                            type: request_data.method,
-                                            headers
-                                        }
-                                    });
-
-                                    if (err) {
-                                        setOutput({
-                                            [READYSTATE]: ERROR
-                                        });
-                                    } else {
-                                        setOutput({
-                                            [READYSTATE]: LOADED,
-                                            data
-                                        });
-                                    }
+                                    doSearch();
                                 });
                             }}
                         >
