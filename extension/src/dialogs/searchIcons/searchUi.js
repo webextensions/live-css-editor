@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 import OAuth from 'oauth-1.0a';
 import hmacSha1 from 'crypto-js/hmac-sha1.js';
@@ -8,17 +9,115 @@ import TextField from '@material-ui/core/TextField/index.js';
 import Button from '@material-ui/core/Button/index.js';
 import SearchIcon from '@material-ui/icons/Search.js';
 
+import { Loading } from 'Loading/Loading.js';
+
 import './searchUi.css';
+
+import { READYSTATE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
+
+const ListOfIcons = function (props) {
+    const { icons } = props;
+
+    return (
+        <div
+            style={{
+                display: 'grid',
+                gridAutoColumns: 'auto',
+                gridGap: 10,
+                gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 100px) )'
+            }}
+        >
+            {
+                icons.map(function (icon, index) {
+                    const {
+                        preview_url
+                    } = icon;
+                    return (
+                        <div
+                            key={index}
+                            style={{
+                                marginLeft: 'auto',
+                                marginRight: 'auto',
+                                marginTop: 10,
+                                marginBottom: 10
+                            }}
+                        >
+                            <img
+                                src={preview_url}
+                                style={{
+                                    maxWidth: 24,
+                                    maxHeight: 24
+                                }}
+                            />
+                        </div>
+                    );
+                })
+            }
+        </div>
+    );
+};
+ListOfIcons.propTypes = {
+    icons: PropTypes.array.isRequired
+};
+
+const SearchOutput = function (props) {
+    const { output } = props;
+    const { data } = output;
+    const readyState = output[READYSTATE];
+
+    const styleObForCenterAligning = {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    };
+
+    if (readyState === ERROR) {
+        return (
+            <div style={styleObForCenterAligning}>
+                An error occurred
+            </div>
+        );
+    } else if (readyState === UNINITIALIZED) {
+        return (
+            <div style={styleObForCenterAligning}>
+                Try searching for something above
+            </div>
+        );
+    } else if (readyState === LOADED) {
+        const icons = data.icons || [];
+        return (
+            <div>
+                <ListOfIcons icons={icons} />
+            </div>
+        );
+    } else {
+        return (
+            <div style={styleObForCenterAligning}>
+                <Loading type="line-scale" />
+            </div>
+        );
+    }
+};
 
 const SearchUi = function (/* props */) {
     const [key, setKey] = useState('');
     const [secret, setSecret] = useState('');
     const [searchText, setSearchText] = useState('');
 
-    const [output, setOutput] = useState('');
+    const [output, setOutput] = useState({
+        [READYSTATE]: UNINITIALIZED
+    });
 
     return (
-        <div>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%'
+            }}
+        >
             <div style={{ display: 'flex', marginBottom: 20 }}>
                 <div>
                     <input
@@ -40,14 +139,20 @@ const SearchUi = function (/* props */) {
                 </div>
             </div>
 
-            <div>
+            <div
+                style={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}
+            >
                 <div style={{ display: 'flex' }}>
                     <div style={{ flexGrow: 1 }}>
                         <TextField
                             variant="outlined"
                             size="small"
-                            label="Which icon are you looking for?"
-                            placeholder="eg: phone"
+                            label="Search for icons..."
+                            placeholder="e.g., phone"
                             value={searchText}
                             onChange={(evt) => {
                                 setSearchText(evt.target.value);
@@ -86,7 +191,9 @@ const SearchUi = function (/* props */) {
 
                                     const headers = oauth.toHeader(oauth.authorize(request_data));
 
-                                    setOutput('Loading...');
+                                    setOutput({
+                                        [READYSTATE]: LOADING
+                                    });
                                     const [err, data] = await window.chromeRuntimeMessageToBackgroundScript({
                                         type: 'magicss-bg',
                                         subType: 'ajax',
@@ -98,9 +205,14 @@ const SearchUi = function (/* props */) {
                                     });
 
                                     if (err) {
-                                        setOutput('An error occurred');
+                                        setOutput({
+                                            [READYSTATE]: ERROR
+                                        });
                                     } else {
-                                        setOutput(JSON.stringify(data, null, '    '));
+                                        setOutput({
+                                            [READYSTATE]: LOADED,
+                                            data
+                                        });
                                     }
                                 });
                             }}
@@ -110,15 +222,16 @@ const SearchUi = function (/* props */) {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 20 }}>
-                    <textarea
-                        value={output}
-                        readOnly
+                <div style={{ marginTop: 20, flexGrow: 1 }}>
+                    <div
                         style={{
-                            width: 500,
-                            height: 300
+                            border: '1px solid rgba(0, 0, 0, 0.23)',
+                            borderRadius: 4,
+                            height: '100%'
                         }}
-                    />
+                    >
+                        <SearchOutput output={output} />
+                    </div>
                 </div>
             </div>
         </div>

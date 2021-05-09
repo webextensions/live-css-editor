@@ -1,6 +1,11 @@
+const path = require('path');
+
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveSourceMapUrlWebpackPlugin = require('@rbarilani/remove-source-map-url-webpack-plugin');
+
+const projectRoot = path.join(__dirname, '..');
+const nodeModulesAtProjectRoot = path.resolve(projectRoot, 'node_modules');
 
 const BABEL_OPTIONS = {
     // plugins: ['transform-es2015-modules-commonjs'],
@@ -66,7 +71,14 @@ module.exports = function (env) {
             rules: [
                 {
                     test: /\.(js|jsx)$/,
-                    exclude: /node_modules/,
+                    // exclude: /node_modules/,
+                    exclude: function (modulePath) {
+                        if (modulePath.indexOf(nodeModulesAtProjectRoot) === 0) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    },
                     use: [
                         {
                             loader: 'babel-loader',

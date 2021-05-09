@@ -38,6 +38,13 @@ const SearchIcons = function (props) {
                     open={open}
                     onClose={handleClose}
                     className="magicss-dialog-search-icons"
+                    PaperProps={{
+                        style: {
+                            height: '90vh',
+                            width: '90vw'
+                        }
+                    }}
+                    maxWidth={false} // Without this, a max-width limit would be applicable which would limit `width: 90vw`
                 >
                     <DialogTitle id="alert-dialog-title">{"Icons via Noun Project API"}</DialogTitle>
                     <DialogContent>
