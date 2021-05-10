@@ -16,43 +16,90 @@ import './searchUi.css';
 import { READYSTATE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
 
 const ListOfIcons = function (props) {
-    const { icons } = props;
+    const {
+        icons
+    } = props;
+
+    const [selectedIndex, setSelectedIndex] = useState(null);
 
     return (
         <div
             style={{
-                display: 'grid',
-                gridAutoColumns: 'auto',
-                gridGap: 10,
-                gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 100px) )'
+                display: 'flex',
+                flexGrow: 1
             }}
         >
-            {
-                icons.map(function (icon, index) {
-                    const {
-                        preview_url
-                    } = icon;
-                    return (
+            <div
+                style={{
+                    flexGrow: 1,
+                    display: 'grid',
+                    gridAutoColumns: 'auto',
+                    gridGap: 10,
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 100px) )',
+                    overflow: 'auto'
+                }}
+            >
+                {
+                    icons.map(function (icon, index) {
+                        const {
+                            preview_url
+                        } = icon;
+
+                        return (
+                            <div
+                                key={index}
+                                style={{
+                                    marginLeft: 'auto',
+                                    marginRight: 'auto',
+                                    marginTop: 10,
+                                    marginBottom: 10,
+                                    width: 40,
+                                    height: 40,
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => {
+                                    setSelectedIndex(index);
+                                }}
+                            >
+                                <img
+                                    src={preview_url}
+                                    style={{
+                                        maxWidth: 40,
+                                        maxHeight: 40,
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover'
+                                    }}
+                                />
+                            </div>
+                        );
+                    })
+                }
+            </div>
+            <div
+                style={{
+                    width: 300,
+                    overflow: 'auto'
+                }}
+            >
+                <div style={{ textAlign: 'center' }}>
+                    Preview
+                </div>
+                <div>
+                    {
+                        typeof selectedIndex === 'number' &&
                         <div
-                            key={index}
                             style={{
-                                marginLeft: 'auto',
-                                marginRight: 'auto',
-                                marginTop: 10,
-                                marginBottom: 10
+                                wordBreak: 'break-word'
                             }}
                         >
-                            <img
-                                src={preview_url}
-                                style={{
-                                    maxWidth: 40,
-                                    maxHeight: 40
-                                }}
-                            />
+                            {
+                                JSON.stringify(icons[selectedIndex], null, '    ')
+                            }
                         </div>
-                    );
-                })
-            }
+                    }
+                </div>
+            </div>
         </div>
     );
 };
@@ -73,22 +120,39 @@ const SearchOutput = function (props) {
         alignItems: 'center'
     };
 
+    const styleForOneLineMessage = {
+        fontFamily: 'sans-serif',
+        color: '#777',
+        padding: 20,
+        textAlign: 'center',
+        wordBreak: 'break-word'
+    };
+
     if (readyState === ERROR) {
         return (
             <div style={styleObForCenterAligning}>
-                An error occurred
+                <div style={styleForOneLineMessage}>
+                    <div>
+                        An unexpected error occurred.
+                    </div>
+                    <div style={{ marginTop: 5 }}>
+                        Please try again.
+                    </div>
+                </div>
             </div>
         );
     } else if (readyState === UNINITIALIZED) {
         return (
             <div style={styleObForCenterAligning}>
-                Try searching for something above
+                <div style={styleForOneLineMessage}>
+                    Search for an icon above
+                </div>
             </div>
         );
     } else if (readyState === LOADED) {
         const icons = data.icons || [];
         return (
-            <div>
+            <div style={{ display: 'flex', height: '100%' }}>
                 <ListOfIcons icons={icons} />
             </div>
         );
@@ -187,10 +251,11 @@ const SearchUi = function (/* props */) {
                 style={{
                     flexGrow: 1,
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    overflow: 'auto'
                 }}
             >
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', paddingTop: 5 }}>
                     <div style={{ flexGrow: 1 }}>
                         <TextField
                             variant="outlined"
@@ -225,6 +290,7 @@ const SearchUi = function (/* props */) {
                                 paddingTop: 8,
                                 paddingBottom: 7
                             }}
+                            disabled={!searchText}
                             onClick={function () {
                                 setTimeout(async function () {
                                     doSearch();
@@ -236,12 +302,13 @@ const SearchUi = function (/* props */) {
                     </div>
                 </div>
 
-                <div style={{ marginTop: 20, flexGrow: 1 }}>
+                <div style={{ marginTop: 20, flexGrow: 1, display: 'flex', overflow: 'auto' }}>
                     <div
                         style={{
+                            boxSizing: 'border-box',
                             border: '1px solid rgba(0, 0, 0, 0.23)',
                             borderRadius: 4,
-                            height: '100%'
+                            flexGrow: 1
                         }}
                     >
                         <SearchOutput output={output} />
