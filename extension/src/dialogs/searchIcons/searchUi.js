@@ -360,9 +360,11 @@ const SearchUi = function (/* props */) {
                                 if (evt.key === 'Enter') {
                                     evt.preventDefault();
 
-                                    setTimeout(async function () {
-                                        doSearch();
-                                    });
+                                    if (searchText) {
+                                        setTimeout(async function () {
+                                            doSearch();
+                                        });
+                                    }
                                 }
                             }}
                             style={{ width: '100%' }}
