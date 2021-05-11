@@ -30,6 +30,7 @@
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "babel-loader": "^8.2.2",
+    "classnames": "^2.3.1",
     "codemirror": "=5.34.0",
     "copy-text-to-clipboard": "^3.0.1",
     "crypto-js": "^4.0.0",

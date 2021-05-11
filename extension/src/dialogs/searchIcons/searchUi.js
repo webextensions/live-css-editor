@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
+import classNames from 'classnames';
+
 import OAuth from 'oauth-1.0a';
 import hmacSha1 from 'crypto-js/hmac-sha1.js';
 import Base64 from 'crypto-js/enc-base64.js';
@@ -45,6 +47,10 @@ const ListOfIcons = function (props) {
                             preview_url
                         } = icon;
 
+                        const className = classNames({
+                            iconIsSelected: selectedIndex === index ? true : false
+                        });
+
                         return (
                             <div
                                 key={index}
@@ -60,6 +66,7 @@ const ListOfIcons = function (props) {
                                 onClick={() => {
                                     setSelectedIndex(index);
                                 }}
+                                className={className}
                             >
                                 <img
                                     src={preview_url}
