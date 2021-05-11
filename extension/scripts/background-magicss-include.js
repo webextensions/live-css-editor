@@ -86,10 +86,28 @@ if (window.flagEditorInExternalWindow) {
                     if (request.subType === 'ajax') {
                         const ajaxOb = JSON.parse(JSON.stringify(request.payload));
                         ajaxOb.error = function (jqXhr, textStatus, error) {
-                            sendResponse([{ jqXhr, textStatus, error }]);
+                            sendResponse([
+                                {
+                                    jqXhr,
+                                    textStatus,
+                                    error
+                                },
+                                null,
+                                {
+                                    status: jqXhr.status,
+                                    responseText: jqXhr.responseText
+                                }
+                            ]);
                         };
-                        ajaxOb.success = function (data, textStatus) { // eslint-disable-line no-unused-vars
-                            sendResponse([null, data]);
+                        ajaxOb.success = function (data, textStatus, jqXhr) { // eslint-disable-line no-unused-vars
+                            sendResponse([
+                                null,
+                                data,
+                                {
+                                    status: jqXhr.status,
+                                    responseText: jqXhr.responseText
+                                }
+                            ]);
                         };
                         jQuery.ajax(ajaxOb);
 

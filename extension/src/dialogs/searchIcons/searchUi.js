@@ -13,7 +13,7 @@ import { Loading } from 'Loading/Loading.js';
 
 import './searchUi.css';
 
-import { READYSTATE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
+import { READYSTATE, STATUSCODE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
 
 const ListOfIcons = function (props) {
     const {
@@ -93,9 +93,11 @@ const ListOfIcons = function (props) {
                                 wordBreak: 'break-word'
                             }}
                         >
-                            {
-                                JSON.stringify(icons[selectedIndex], null, '    ')
-                            }
+                            <pre>
+                                {
+                                    JSON.stringify(icons[selectedIndex], null, '    ')
+                                }
+                            </pre>
                         </div>
                     }
                 </div>
@@ -132,12 +134,57 @@ const SearchOutput = function (props) {
         return (
             <div style={styleObForCenterAligning}>
                 <div style={styleForOneLineMessage}>
-                    <div>
-                        An unexpected error occurred.
-                    </div>
-                    <div style={{ marginTop: 5 }}>
-                        Please try again.
-                    </div>
+                    {(function () {
+                        const statusCode = output[STATUSCODE];
+                        const {
+                            searchInput
+                        } = output;
+                        const directSearchUrl = `https://thenounproject.com/search/?q=${encodeURIComponent(searchInput).replace(/%20/g, '+')}`;
+                        if (statusCode === 403) {
+                            return (
+                                <React.Fragment>
+                                    <div>
+                                        Error: Unable to access API
+                                    </div>
+                                    <div style={{ marginTop: 10 }}>
+                                        Please ensure that you have configured the Noun Project API access details correctly.
+                                    </div>
+                                </React.Fragment>
+                            );
+                        } else if (statusCode === 404) {
+                            return (
+                                <React.Fragment>
+                                    <div>
+                                        No results found (via API)
+                                    </div>
+                                    <div style={{ marginTop: 10 }}>
+                                        Try for more results at&nbsp;
+                                        <a
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            href={directSearchUrl}
+                                            style={{
+                                                color: '#777'
+                                            }}
+                                        >
+                                            {directSearchUrl}
+                                        </a>
+                                    </div>
+                                </React.Fragment>
+                            );
+                        } else {
+                            return (
+                                <React.Fragment>
+                                    <div>
+                                        An unexpected error occurred.
+                                    </div>
+                                    <div style={{ marginTop: 10 }}>
+                                        Please try again.
+                                    </div>
+                                </React.Fragment>
+                            );
+                        }
+                    }())}
                 </div>
             </div>
         );
@@ -196,7 +243,7 @@ const SearchUi = function (/* props */) {
         setOutput({
             [READYSTATE]: LOADING
         });
-        const [err, data] = await window.chromeRuntimeMessageToBackgroundScript({
+        const [err, data, coreResponse] = await window.chromeRuntimeMessageToBackgroundScript({
             type: 'magicss-bg',
             subType: 'ajax',
             payload: {
@@ -208,11 +255,15 @@ const SearchUi = function (/* props */) {
 
         if (err) {
             setOutput({
-                [READYSTATE]: ERROR
+                [READYSTATE]: ERROR,
+                [STATUSCODE]: coreResponse.status,
+                searchInput: searchText
             });
         } else {
             setOutput({
                 [READYSTATE]: LOADED,
+                [STATUSCODE]: coreResponse.status,
+                searchInput: searchText,
                 data
             });
         }
