@@ -100,11 +100,42 @@ const ListOfIcons = function (props) {
                                 wordBreak: 'break-word'
                             }}
                         >
-                            <pre>
-                                {
-                                    JSON.stringify(icons[selectedIndex], null, '    ')
-                                }
-                            </pre>
+                            <div>
+                                {(function () {
+                                    const icon = icons[selectedIndex];
+
+                                    return (
+                                        <div>
+                                            <div>
+                                                <img src={icon.preview_url} style={{ width: 100 }} />
+                                            </div>
+
+                                            <div>
+                                                <a target="_blank" rel="noreferrer" href={icon.icon_url}>
+                                                    {icon.term}
+                                                </a>
+                                                &nbsp;by&nbsp;
+                                                <a target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.uploader.permalink}/`}>
+                                                    {icon.uploader.name}
+                                                </a>
+                                                &nbsp;from&nbsp;
+                                                <a target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.permalink}/`}>
+                                                    Noun Project
+                                                </a>
+                                            </div>
+
+                                            <div>
+                                                <a target="_blank" rel="noreferrer" href={icon.icon_url}>
+                                                    Download
+                                                </a>
+                                            </div>
+                                            <div>
+                                                License: {icon.license_description}
+                                            </div>
+                                        </div>
+                                    );
+                                }())}
+                            </div>
                         </div>
                     }
                 </div>
