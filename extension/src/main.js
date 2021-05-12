@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { Actions } from './actions.js';
 
 import { SearchIcons } from './dialogs/searchIcons/searchIcons.js';
+import { SearchIconsConfiguration } from './dialogs/searchIcons/searchIconsConfiguration.js';
 
 import { store } from './store.js';
 
@@ -15,6 +16,7 @@ const Main = function () {
             <Provider store={store}>
                 <Actions />
                 <SearchIcons />
+                <SearchIconsConfiguration />
             </Provider>
         </div>
     );

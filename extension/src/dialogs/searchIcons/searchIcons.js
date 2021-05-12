@@ -11,7 +11,8 @@ import DialogTitle from '@material-ui/core/DialogTitle/index.js';
 import { SearchUi } from './searchUi.js';
 
 import {
-    APP_$_CLOSE_SEARCH_ICONS
+    APP_$_CLOSE_SEARCH_ICONS,
+    APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
 } from 'reducers/actionTypes.js';
 
 import './searchIcons.css';
@@ -37,6 +38,7 @@ const SearchIcons = function (props) {
                 <Dialog
                     open={open}
                     onClose={handleClose}
+                    disableBackdropClick
                     className="magicss-dialog-search-icons"
                     PaperProps={{
                         style: {
@@ -46,7 +48,24 @@ const SearchIcons = function (props) {
                     }}
                     maxWidth={false} // Without this, a max-width limit would be applicable which would limit `width: 90vw`
                 >
-                    <DialogTitle id="alert-dialog-title">{"Icons via Noun Project API"}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">
+                        <div style={{ display: 'flex' }}>
+                            <div>
+                                Icons via Noun Project API
+                            </div>
+                            <div
+                                onClick={function () {
+                                    props.dispatch({
+                                        type: APP_$_CLOSE_SEARCH_ICONS
+                                    });
+                                    props.dispatch({
+                                        type: APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
+                                    });
+                                }}
+                                className="magicss-cog-wheel-icon"
+                            />
+                        </div>
+                    </DialogTitle>
                     <DialogContent>
                         <SearchUi />
                     </DialogContent>

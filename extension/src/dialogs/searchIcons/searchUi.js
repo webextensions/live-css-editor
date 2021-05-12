@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import classNames from 'classnames';
 
@@ -178,7 +179,7 @@ const SearchOutput = function (props) {
                             searchInput
                         } = output;
                         const directSearchUrl = `https://thenounproject.com/search/?q=${encodeURIComponent(searchInput).replace(/%20/g, '+')}`;
-                        if (statusCode === 403) {
+                        if (statusCode === 401 || statusCode === 403) {
                             return (
                                 <React.Fragment>
                                     <div>
@@ -250,9 +251,19 @@ const SearchOutput = function (props) {
     }
 };
 
-const SearchUi = function (/* props */) {
-    const [key, setKey] = useState('');
-    const [secret, setSecret] = useState('');
+function mapStateToProps(state) {
+    return {
+        accessKey: state.app.searchIcons.accessKey, // Using "accessKey" since it can't be named as "key" becaused that is a reserved prop name
+        secret: state.app.searchIcons.secret
+    };
+}
+
+const SearchUi = function (props) {
+    const {
+        accessKey,
+        secret
+    } = props;
+
     const [searchText, setSearchText] = useState('');
 
     const [output, setOutput] = useState({
@@ -262,7 +273,10 @@ const SearchUi = function (/* props */) {
     const doSearch = async function () {
         // http://lti.tools/oauth/
         const oauth = OAuth({
-            consumer: { key, secret },
+            consumer: {
+                key: accessKey,
+                secret
+            },
             signature_method: 'HMAC-SHA1',
             hash_function(base_string, key) {
                 const hash = hmacSha1(base_string, key);
@@ -272,6 +286,7 @@ const SearchUi = function (/* props */) {
         });
 
         const request_data = {
+            // url: `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}`,
             url: `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}?limit_to_public_domain=1`,
             method: 'GET'
         };
@@ -315,27 +330,6 @@ const SearchUi = function (/* props */) {
                 height: '100%'
             }}
         >
-            <div style={{ display: 'flex', marginBottom: 20 }}>
-                <div>
-                    <input
-                        value={key}
-                        placeholder="Key"
-                        onChange={(evt) => {
-                            setKey(evt.target.value);
-                        }}
-                    />
-                </div>
-                <div>
-                    <input
-                        value={secret}
-                        placeholder="Secret"
-                        onChange={(evt) => {
-                            setSecret(evt.target.value);
-                        }}
-                    />
-                </div>
-            </div>
-
             <div
                 style={{
                     flexGrow: 1,
@@ -409,5 +403,11 @@ const SearchUi = function (/* props */) {
         </div>
     );
 };
+SearchUi.propTypes = {
+    accessKey: PropTypes.string.isRequired,
+    secret: PropTypes.string.isRequired
+};
 
-export { SearchUi };
+const _SearchUi = connect(mapStateToProps)(SearchUi);
+
+export { _SearchUi as SearchUi };
