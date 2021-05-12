@@ -16,6 +16,11 @@ import { Loading } from 'Loading/Loading.js';
 
 import './searchUi.css';
 
+import {
+    APP_$_CLOSE_SEARCH_ICONS,
+    APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
+} from 'reducers/actionTypes.js';
+
 import { READYSTATE, STATUSCODE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
 
 const ListOfIcons = function (props) {
@@ -149,7 +154,10 @@ ListOfIcons.propTypes = {
 };
 
 const SearchOutput = function (props) {
-    const { output } = props;
+    const {
+        flagConfigurationDone,
+        output
+    } = props;
     const { data } = output;
     const readyState = output[READYSTATE];
 
@@ -169,7 +177,37 @@ const SearchOutput = function (props) {
         wordBreak: 'break-word'
     };
 
-    if (readyState === ERROR) {
+    const buttonConfigure = (
+        <Button
+            variant="contained"
+            color="primary"
+            size="medium"
+            style={{
+                paddingTop: 8,
+                paddingBottom: 7
+            }}
+            onClick={function () {
+                window.redux_store.dispatch({
+                    type: APP_$_CLOSE_SEARCH_ICONS
+                });
+                window.redux_store.dispatch({
+                    type: APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
+                });
+            }}
+        >
+            Configure
+        </Button>
+    );
+
+    if (!flagConfigurationDone) {
+        return (
+            <div style={styleObForCenterAligning}>
+                <div style={styleForOneLineMessage}>
+                    {buttonConfigure}
+                </div>
+            </div>
+        );
+    } else if (readyState === ERROR) {
         return (
             <div style={styleObForCenterAligning}>
                 <div style={styleForOneLineMessage}>
@@ -185,8 +223,12 @@ const SearchOutput = function (props) {
                                     <div>
                                         Error: Unable to access API
                                     </div>
+                                    <div style={{ marginTop: 10, maxWidth: 450 }}>
+                                        Please ensure that you have configured the Noun&nbsp;Project&nbsp;API access details correctly.
+                                    </div>
+
                                     <div style={{ marginTop: 10 }}>
-                                        Please ensure that you have configured the Noun Project API access details correctly.
+                                        {buttonConfigure}
                                     </div>
                                 </React.Fragment>
                             );
@@ -263,6 +305,7 @@ const SearchUi = function (props) {
         accessKey,
         secret
     } = props;
+    const flagAccessKeyAndSecretExist = (accessKey && secret) ? true : false;
 
     const [searchText, setSearchText] = useState('');
 
@@ -375,7 +418,7 @@ const SearchUi = function (props) {
                                 paddingTop: 8,
                                 paddingBottom: 7
                             }}
-                            disabled={!searchText}
+                            disabled={!searchText || !flagAccessKeyAndSecretExist}
                             onClick={function () {
                                 setTimeout(async function () {
                                     doSearch();
@@ -396,7 +439,7 @@ const SearchUi = function (props) {
                             flexGrow: 1
                         }}
                     >
-                        <SearchOutput output={output} />
+                        <SearchOutput flagConfigurationDone={flagAccessKeyAndSecretExist} output={output} />
                     </div>
                 </div>
             </div>

@@ -8,6 +8,8 @@ import DialogActions from '@material-ui/core/DialogActions/index.js';
 import DialogContent from '@material-ui/core/DialogContent/index.js';
 import DialogTitle from '@material-ui/core/DialogTitle/index.js';
 
+import Joyride from 'react-joyride';
+
 import { SearchUi } from './searchUi.js';
 
 import {
@@ -19,19 +21,43 @@ import './searchIcons.css';
 
 function mapStateToProps(state) {
     return {
-        open: state.app.searchIcons.open
+        open: state.app.searchIcons.open,
+        accessKey: state.app.searchIcons.accessKey, // Using "accessKey" since it can't be named as "key" becaused that is a reserved prop name
+        secret: state.app.searchIcons.secret
     };
 }
 
+const joyrideSteps = [
+    {
+        target: '.magicss-joyride-configure-icon-search-api',
+        content: 'Please configure the access details to start using the API',
+        disableBeacon: true,
+        styles: {
+            buttonNext: {
+                paddingLeft: 25,
+                paddingRight: 25,
+                backgroundColor: '#3f51b5'
+            }
+        }
+    }
+];
+
 const SearchIcons = function (props) {
     const {
-        open
+        open,
+        accessKey,
+        secret
     } = props;
 
     if (open) {
         const handleClose = () => {
             props.dispatch({ type: APP_$_CLOSE_SEARCH_ICONS });
         };
+
+        let showJoyride = true;
+        if (accessKey && secret) {
+            showJoyride = false;
+        }
 
         return (
             <div>
@@ -62,9 +88,30 @@ const SearchIcons = function (props) {
                                         type: APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
                                     });
                                 }}
-                                className="magicss-cog-wheel-icon"
+                                className="magicss-cog-wheel-icon magicss-joyride-configure-icon-search-api"
                             />
                         </div>
+
+                        {
+                            showJoyride &&
+                            <Joyride
+                                steps={joyrideSteps}
+                                spotlightClicks
+                                locale={{
+                                    close: "OK", // Change the text of the "close" button
+                                    last: null   // Required to hide the tooltip
+                                }}
+                                styles={{
+                                    options: {
+                                        zIndex: 2147483647
+                                    },
+                                    tooltipContent: {
+                                        fontFamily: 'Arial, sans-serif'
+                                    }
+                                }}
+                                run={true}
+                            />
+                        }
                     </DialogTitle>
                     <DialogContent>
                         <SearchUi />

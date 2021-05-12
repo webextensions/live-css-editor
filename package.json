@@ -2,6 +2,7 @@
   "name": "magic-css",
   "version": "8.12.0",
   "scripts": {
+    "install-legacy-peer-deps": "npm install --legacy-peer-deps",
     "lint": "eslint .",
     "manifest-generator": "node ./extension/manifest-generator.js",
     "copy-files-from-to": "copy-files-from-to",
@@ -45,6 +46,7 @@
     "react": "^17.0.2",
     "react-command-palette": "=0.16.1",
     "react-dom": "^17.0.2",
+    "react-joyride": "^2.3.0",
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
     "socket.io": "^2.3.0",
