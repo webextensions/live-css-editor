@@ -53,6 +53,13 @@ const SearchIconsConfiguration = function (props) {
             props.dispatch({ type: APP_$_OPEN_SEARCH_ICONS });
         };
 
+        const styleForStepTitle = {
+            fontWeight: 'bold',
+            whiteSpace: 'nowrap',
+            marginRight: 5,
+            minWidth: 42
+        };
+
         return (
             <div>
                 <Dialog
@@ -62,7 +69,7 @@ const SearchIconsConfiguration = function (props) {
                     className="magicss-dialog-search-icons"
                     PaperProps={{
                         style: {
-                            maxWidth: 450
+                            maxWidth: 475
                         }
                     }}
                 >
@@ -72,8 +79,47 @@ const SearchIconsConfiguration = function (props) {
                         </span>
                     </DialogTitle>
                     <DialogContent>
+                        <div
+                            style={{
+                                fontFamily: 'Arial, sans-serif',
+                                fontSize: 12
+                            }}
+                        >
+                            <div style={{ display: 'flex' }}>
+                                <div style={styleForStepTitle}>
+                                    Step 1:
+                                </div>
+                                <div>
+                                    Go to Developers page on <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/">The Noun Project</a>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', marginTop: 4 }}>
+                                <div style={styleForStepTitle}>
+                                    Step 2:
+                                </div>
+                                <div>
+                                    Choose your plan and register for API access
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', marginTop: 4 }}>
+                                <div style={styleForStepTitle}>
+                                    Step 3:
+                                </div>
+                                <div>
+                                    Create an application under the <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/apps/">Manage Apps section</a>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', marginTop: 4 }}>
+                                <div style={styleForStepTitle}>
+                                    Step 4:
+                                </div>
+                                <div>
+                                    Paste below the &quot;Key&quot; and &quot;Secret&quot; from the Key Management section in the page for the application
+                                </div>
+                            </div>
+                        </div>
                         <div>
-                            <div>
+                            <div style={{ marginTop: 25 }}>
                                 <TextField
                                     variant="outlined"
                                     size="small"

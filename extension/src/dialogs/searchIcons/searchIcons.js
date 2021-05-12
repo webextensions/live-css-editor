@@ -34,8 +34,9 @@ const joyrideSteps = [
         disableBeacon: true,
         styles: {
             buttonNext: {
-                paddingLeft: 25,
-                paddingRight: 25,
+                padding: '8px 25px',
+                fontSize: 14,
+                lineHeight: 1.75,
                 backgroundColor: '#3f51b5'
             }
         }
