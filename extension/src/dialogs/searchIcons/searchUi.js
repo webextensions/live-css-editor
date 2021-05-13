@@ -4,13 +4,13 @@ import { connect } from 'react-redux';
 
 import classNames from 'classnames';
 
-import OAuth from 'oauth-1.0a';
-import hmacSha1 from 'crypto-js/hmac-sha1.js';
-import Base64 from 'crypto-js/enc-base64.js';
-
 import TextField from '@material-ui/core/TextField/index.js';
 import Button from '@material-ui/core/Button/index.js';
 import SearchIcon from '@material-ui/icons/Search.js';
+
+import OAuth from 'oauth-1.0a';
+import hmacSha1 from 'crypto-js/hmac-sha1.js';
+import Base64 from 'crypto-js/enc-base64.js';
 
 import { Loading } from 'Loading/Loading.js';
 
@@ -325,7 +325,7 @@ const SearchUi = function (props) {
                 const hash = hmacSha1(base_string, key);
                 const output = Base64.stringify(hash);
                 return output;
-            },
+            }
         });
 
         const request_data = {
@@ -333,12 +333,12 @@ const SearchUi = function (props) {
             url: `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}?limit_to_public_domain=1`,
             method: 'GET'
         };
-
         const headers = oauth.toHeader(oauth.authorize(request_data));
 
         setOutput({
             [READYSTATE]: LOADING
         });
+
         const [err, data, coreResponse] = await window.chromeRuntimeMessageToBackgroundScript({
             type: 'magicss-bg',
             subType: 'ajax',

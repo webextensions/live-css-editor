@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -9,6 +9,14 @@ import Dialog from '@material-ui/core/Dialog/index.js';
 import DialogActions from '@material-ui/core/DialogActions/index.js';
 import DialogContent from '@material-ui/core/DialogContent/index.js';
 import DialogTitle from '@material-ui/core/DialogTitle/index.js';
+
+import OAuth from 'oauth-1.0a';
+import hmacSha1 from 'crypto-js/hmac-sha1.js';
+import Base64 from 'crypto-js/enc-base64.js';
+
+import { Loading } from 'Loading/Loading.js';
+
+import { READYSTATE, STATUSCODE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
 
 import {
     APP_$_CLOSE_SEARCH_ICONS_CONFIGURATION,
@@ -34,10 +42,18 @@ const SearchIconsConfiguration = function (props) {
         secret
     } = props;
 
+    const [testConnectionStatus, setTestConnectionStatus] = useState({
+        [READYSTATE]: UNINITIALIZED
+    });
+
     const setAccessKey = function (accessKey) {
         props.dispatch({
             type: APP_$_SEARCH_ICONS_CONFIGURATION_SET_ACCESS_KEY,
             payload: accessKey
+        });
+
+        setTestConnectionStatus({
+            [READYSTATE]: UNINITIALIZED
         });
     };
     const setSecret = function (secret) {
@@ -45,12 +61,65 @@ const SearchIconsConfiguration = function (props) {
             type: APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET,
             payload: secret
         });
+
+        setTestConnectionStatus({
+            [READYSTATE]: UNINITIALIZED
+        });
     };
 
     if (open) {
         const handleClose = () => {
             props.dispatch({ type: APP_$_CLOSE_SEARCH_ICONS_CONFIGURATION });
             props.dispatch({ type: APP_$_OPEN_SEARCH_ICONS });
+        };
+
+        const doTestConnection = async function () {
+            // http://lti.tools/oauth/
+            const oauth = OAuth({
+                consumer: {
+                    key: accessKey,
+                    secret
+                },
+                signature_method: 'HMAC-SHA1',
+                hash_function(base_string, key) {
+                    const hash = hmacSha1(base_string, key);
+                    const output = Base64.stringify(hash);
+                    return output;
+                }
+            });
+
+            const request_data = {
+                url: `https://api.thenounproject.com/oauth/usage`,
+                method: 'GET'
+            };
+            const headers = oauth.toHeader(oauth.authorize(request_data));
+
+            setTestConnectionStatus({
+                [READYSTATE]: LOADING
+            });
+
+            const [err, data, coreResponse] = await window.chromeRuntimeMessageToBackgroundScript({
+                type: 'magicss-bg',
+                subType: 'ajax',
+                payload: {
+                    url: request_data.url,
+                    type: request_data.method,
+                    headers
+                }
+            });
+
+            if (err) {
+                setTestConnectionStatus({
+                    [READYSTATE]: ERROR,
+                    [STATUSCODE]: coreResponse.status,
+                });
+            } else {
+                setTestConnectionStatus({
+                    [READYSTATE]: LOADED,
+                    [STATUSCODE]: coreResponse.status,
+                    data
+                });
+            }
         };
 
         const styleForStepTitle = {
@@ -151,6 +220,55 @@ const SearchIconsConfiguration = function (props) {
                                 />
                             </div>
 
+                            <div style={{ marginTop: 25, display: 'flex', fontFamily: 'Arial, sans-serif', fontSize: 14 }}>
+                                <Button
+                                    onClick={doTestConnection}
+                                    variant="outlined"
+                                    color="primary"
+                                    size="small"
+                                    disabled={ !accessKey || !secret }
+                                >
+                                    Test Connection
+                                </Button>
+                                {function () {
+                                    const readyState = testConnectionStatus[READYSTATE];
+                                    if (readyState === UNINITIALIZED) {
+                                        return null;
+                                    } else if (readyState === ERROR) {
+                                        const statusCode = testConnectionStatus[STATUSCODE];
+                                        return (
+                                            <div style={{ marginLeft: 15, display: 'flex', alignItems: 'center' }}>
+                                                <span style={{ color: '#ff0000' }}>
+                                                    {(function () {
+                                                        if (statusCode === 0) {
+                                                            return 'Network error';
+                                                        } else if (statusCode === 401 || statusCode === 403) {
+                                                            return 'Authentication error';
+                                                        } else {
+                                                            return 'Error';
+                                                        }
+                                                    }())}
+                                                </span>
+                                            </div>
+                                        );
+                                    } else if (readyState === LOADED) {
+                                        return (
+                                            <div style={{ marginLeft: 15, display: 'flex', alignItems: 'center' }}>
+                                                <span style={{ color: '#008000' }}>
+                                                    Success
+                                                </span>
+                                            </div>
+                                        );
+                                    } else {
+                                        return (
+                                            <div style={{ marginLeft: 15, display: 'flex', alignItems: 'center' }}>
+                                                <Loading type="line-scale" />
+                                            </div>
+                                        );
+                                    }
+                                }()}
+                            </div>
+
                             <div style={{ marginTop: 25, fontFamily: 'Arial, sans-serif', fontSize: 12 }}>
                                 <span style={{ fontWeight: 'bold' }}>Note:</span> The &quot;Key&quot; and &quot;Secret&quot; are saved in sync storage provided by your browser. They would be synced across your other logged in browser sessions.
                             </div>
@@ -158,7 +276,7 @@ const SearchIconsConfiguration = function (props) {
 
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose} color="primary">
+                        <Button onClick={handleClose} variant="contained" color="primary">
                             Done
                         </Button>
                     </DialogActions>
