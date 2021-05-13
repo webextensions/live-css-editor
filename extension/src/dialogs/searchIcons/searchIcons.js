@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import Button from '@material-ui/core/Button/index.js';
 import Dialog from '@material-ui/core/Dialog/index.js';
-import DialogActions from '@material-ui/core/DialogActions/index.js';
 import DialogContent from '@material-ui/core/DialogContent/index.js';
 import DialogTitle from '@material-ui/core/DialogTitle/index.js';
+
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 import Joyride from 'react-joyride';
 
@@ -83,20 +84,27 @@ const SearchIcons = function (props) {
                 >
                     <DialogTitle id="alert-dialog-title">
                         <div style={{ display: 'flex' }}>
-                            <div>
-                                Icons via Noun Project API
+                            <div style={{ flexGrow: 1, display: 'flex' }}>
+                                <div>
+                                    Icons via Noun Project API
+                                </div>
+                                <div
+                                    onClick={function () {
+                                        props.dispatch({
+                                            type: APP_$_CLOSE_SEARCH_ICONS
+                                        });
+                                        props.dispatch({
+                                            type: APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
+                                        });
+                                    }}
+                                    className="magicss-cog-wheel-icon magicss-joyride-configure-icon-search-api"
+                                />
                             </div>
-                            <div
-                                onClick={function () {
-                                    props.dispatch({
-                                        type: APP_$_CLOSE_SEARCH_ICONS
-                                    });
-                                    props.dispatch({
-                                        type: APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
-                                    });
-                                }}
-                                className="magicss-cog-wheel-icon magicss-joyride-configure-icon-search-api"
-                            />
+                            <div>
+                                <IconButton onClick={handleClose} size="small">
+                                    <CloseIcon />
+                                </IconButton>
+                            </div>
                         </div>
 
                         {
@@ -134,14 +142,9 @@ const SearchIcons = function (props) {
                             />
                         }
                     </DialogTitle>
-                    <DialogContent>
+                    <DialogContent style={{ paddingBottom: 24 }}>
                         <SearchUi />
                     </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose} color="primary">
-                            Close
-                        </Button>
-                    </DialogActions>
                 </Dialog>
             </div>
         );
