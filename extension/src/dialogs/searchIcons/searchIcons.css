@@ -5,8 +5,8 @@
 .magicss-dialog-search-icons .magicss-cog-wheel-icon {
     background-image: var(--cog-wheel-icon) !important;
     background-size: contain;
-    width: 16;
-    height: 16;
+    width: 16px;
+    height: 16px;
     margin-top: 6px;
     margin-left: 15px;
     cursor: pointer;

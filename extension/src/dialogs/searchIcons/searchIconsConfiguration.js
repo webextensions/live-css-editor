@@ -159,7 +159,7 @@ const SearchIconsConfiguration = function (props) {
                                     Step 1:
                                 </div>
                                 <div>
-                                    Go to Developers page on <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/">The Noun Project</a>
+                                    Go to API page on <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/">The Noun Project</a>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
@@ -276,9 +276,11 @@ const SearchIconsConfiguration = function (props) {
 
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose} variant="contained" color="primary">
-                            Done
-                        </Button>
+                        <div style={{ margin: '8px 16px' }}>
+                            <Button onClick={handleClose} variant="contained" color="primary">
+                                Done
+                            </Button>
+                        </div>
                     </DialogActions>
                 </Dialog>
             </div>

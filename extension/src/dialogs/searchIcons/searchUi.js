@@ -253,6 +253,17 @@ const SearchOutput = function (props) {
                                     </div>
                                 </React.Fragment>
                             );
+                        } else if (statusCode === 0) {
+                            return (
+                                <React.Fragment>
+                                    <div>
+                                        A network error occurred.
+                                    </div>
+                                    <div style={{ marginTop: 10 }}>
+                                        Please check your internet connection and try again.
+                                    </div>
+                                </React.Fragment>
+                            );
                         } else {
                             return (
                                 <React.Fragment>

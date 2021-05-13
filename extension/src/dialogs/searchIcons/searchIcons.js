@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -50,6 +50,8 @@ const SearchIcons = function (props) {
         secret
     } = props;
 
+    const [joyrideCompleted, setJoyrideCompleted] = useState(false);
+
     if (open) {
         const handleClose = () => {
             props.dispatch({ type: APP_$_CLOSE_SEARCH_ICONS });
@@ -66,6 +68,10 @@ const SearchIcons = function (props) {
                     open={open}
                     onClose={handleClose}
                     disableBackdropClick
+
+                    disableAutoFocus={showJoyride && !joyrideCompleted}
+                    disableEnforceFocus={showJoyride && !joyrideCompleted}
+
                     className="magicss-dialog-search-icons"
                     PaperProps={{
                         style: {
@@ -94,10 +100,15 @@ const SearchIcons = function (props) {
                         </div>
 
                         {
-                            showJoyride &&
+                            (
+                                showJoyride &&
+                                !joyrideCompleted
+                            ) &&
                             <Joyride
                                 steps={joyrideSteps}
                                 spotlightClicks
+                                disableScrolling={true}
+                                scrollToFirstStep={false}
                                 locale={{
                                     close: "OK", // Change the text of the "close" button
                                     last: null   // Required to hide the tooltip
@@ -110,7 +121,16 @@ const SearchIcons = function (props) {
                                         fontFamily: 'Arial, sans-serif'
                                     }
                                 }}
+                                floaterProps = {{
+                                    disableAnimation: true
+                                }}
                                 run={true}
+                                callback={function (data) {
+                                    const { lifecycle, status } = data;
+                                    if (lifecycle === 'complete' && status === 'finished') {
+                                        setJoyrideCompleted(true);
+                                    }
+                                }}
                             />
                         }
                     </DialogTitle>
