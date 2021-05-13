@@ -146,7 +146,7 @@ const SearchIconsConfiguration = function (props) {
                 >
                     <DialogTitle id="alert-dialog-title">
                         <span>
-                            Configure Access for Noun Project API
+                            Noun Project API Configuration
                         </span>
                     </DialogTitle>
                     <DialogContent style={{ minHeight: 75 }}>
