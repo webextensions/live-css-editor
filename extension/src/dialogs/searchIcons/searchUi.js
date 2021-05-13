@@ -195,7 +195,7 @@ const SearchOutput = function (props) {
                 });
             }}
         >
-            Configure
+            Configure Access
         </Button>
     );
 
@@ -381,7 +381,8 @@ const SearchUi = function (props) {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                height: '100%'
+                height: '100%',
+                minHeight: 125
             }}
         >
             <div

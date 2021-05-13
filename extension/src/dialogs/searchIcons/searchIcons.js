@@ -98,6 +98,7 @@ const SearchIcons = function (props) {
                                         });
                                     }}
                                     className="magicss-cog-wheel-icon magicss-joyride-configure-icon-search-api"
+                                    title="Configure Access"
                                 />
                             </div>
                             <div>

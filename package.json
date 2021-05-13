@@ -48,6 +48,7 @@
     "react-dom": "^17.0.2",
     "react-joyride": "^2.3.0",
     "react-redux": "^7.2.4",
+    "react-responsive": "^8.2.0",
     "redux": "^4.1.0",
     "socket.io": "^2.3.0",
     "toastr": "^2.1.4",

@@ -14,6 +14,8 @@ import OAuth from 'oauth-1.0a';
 import hmacSha1 from 'crypto-js/hmac-sha1.js';
 import Base64 from 'crypto-js/enc-base64.js';
 
+import MediaQuery from 'react-responsive';
+
 import { Loading } from 'Loading/Loading.js';
 
 import { READYSTATE, STATUSCODE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
@@ -147,7 +149,7 @@ const SearchIconsConfiguration = function (props) {
                             Configure Access for Noun Project API
                         </span>
                     </DialogTitle>
-                    <DialogContent>
+                    <DialogContent style={{ minHeight: 75 }}>
                         <div
                             style={{
                                 fontFamily: 'Arial, sans-serif',
@@ -159,7 +161,7 @@ const SearchIconsConfiguration = function (props) {
                                     Step 1:
                                 </div>
                                 <div>
-                                    Go to API page on <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/">The Noun Project</a>
+                                    Go to the API page on <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/">The Noun Project</a>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
@@ -220,55 +222,6 @@ const SearchIconsConfiguration = function (props) {
                                 />
                             </div>
 
-                            <div style={{ marginTop: 25, display: 'flex', fontFamily: 'Arial, sans-serif', fontSize: 14 }}>
-                                <Button
-                                    onClick={doTestConnection}
-                                    variant="outlined"
-                                    color="primary"
-                                    size="small"
-                                    disabled={ !accessKey || !secret }
-                                >
-                                    Test Connection
-                                </Button>
-                                {function () {
-                                    const readyState = testConnectionStatus[READYSTATE];
-                                    if (readyState === UNINITIALIZED) {
-                                        return null;
-                                    } else if (readyState === ERROR) {
-                                        const statusCode = testConnectionStatus[STATUSCODE];
-                                        return (
-                                            <div style={{ marginLeft: 15, display: 'flex', alignItems: 'center' }}>
-                                                <span style={{ color: '#ff0000' }}>
-                                                    {(function () {
-                                                        if (statusCode === 0) {
-                                                            return 'Network error';
-                                                        } else if (statusCode === 401 || statusCode === 403) {
-                                                            return 'Authentication error';
-                                                        } else {
-                                                            return 'Error';
-                                                        }
-                                                    }())}
-                                                </span>
-                                            </div>
-                                        );
-                                    } else if (readyState === LOADED) {
-                                        return (
-                                            <div style={{ marginLeft: 15, display: 'flex', alignItems: 'center' }}>
-                                                <span style={{ color: '#008000' }}>
-                                                    Success
-                                                </span>
-                                            </div>
-                                        );
-                                    } else {
-                                        return (
-                                            <div style={{ marginLeft: 15, display: 'flex', alignItems: 'center' }}>
-                                                <Loading type="line-scale" />
-                                            </div>
-                                        );
-                                    }
-                                }()}
-                            </div>
-
                             <div style={{ marginTop: 25, fontFamily: 'Arial, sans-serif', fontSize: 12 }}>
                                 <span style={{ fontWeight: 'bold' }}>Note:</span> The &quot;Key&quot; and &quot;Secret&quot; are saved in sync storage provided by your browser. They would be synced across your other logged in browser sessions.
                             </div>
@@ -276,10 +229,67 @@ const SearchIconsConfiguration = function (props) {
 
                     </DialogContent>
                     <DialogActions>
-                        <div style={{ margin: '8px 16px' }}>
-                            <Button onClick={handleClose} variant="contained" color="primary">
-                                Done
-                            </Button>
+                        <div style={{ margin: '8px 16px', display: 'flex', width: '100%' }}>
+                            <div style={{ display: 'flex', flexGrow: 1 }}>
+                                <Button
+                                    onClick={doTestConnection}
+                                    variant="outlined"
+                                    color="primary"
+                                    size="small"
+                                    disabled={ !accessKey || !secret }
+                                >
+                                    <MediaQuery maxWidth={499}>
+                                        Test
+                                    </MediaQuery>
+                                    <MediaQuery minWidth={500}>
+                                        Test Connection
+                                    </MediaQuery>
+                                </Button>
+                                <div style={{ fontFamily: 'Arial, sans-serif', fontSize: 14, display: 'flex' }}>
+                                    {function () {
+                                        const readyState = testConnectionStatus[READYSTATE];
+                                        if (readyState === UNINITIALIZED) {
+                                            return null;
+                                        } else if (readyState === ERROR) {
+                                            const statusCode = testConnectionStatus[STATUSCODE];
+                                            return (
+                                                <div style={{ marginLeft: 15, marginRight: 15, display: 'flex', alignItems: 'center' }}>
+                                                    <span style={{ color: '#ff0000' }}>
+                                                        {(function () {
+                                                            if (statusCode === 0) {
+                                                                return 'Network error';
+                                                            } else if (statusCode === 401 || statusCode === 403) {
+                                                                return 'Authentication error';
+                                                            } else {
+                                                                return 'Error';
+                                                            }
+                                                        }())}
+                                                    </span>
+                                                </div>
+                                            );
+                                        } else if (readyState === LOADED) {
+                                            return (
+                                                <div style={{ marginLeft: 15, marginRight: 15, display: 'flex', alignItems: 'center' }}>
+                                                    <span style={{ color: '#008000' }}>
+                                                        Success
+                                                    </span>
+                                                </div>
+                                            );
+                                        } else {
+                                            return (
+                                                <div style={{ marginLeft: 15, marginRight: 15, display: 'flex', alignItems: 'center' }}>
+                                                    <Loading type="line-scale" />
+                                                </div>
+                                            );
+                                        }
+                                    }()}
+                                </div>
+                            </div>
+                            <div>
+                                <Button onClick={handleClose} variant="contained" color="primary">
+                                    Done
+                                </Button>
+                            </div>
                         </div>
                     </DialogActions>
                 </Dialog>
