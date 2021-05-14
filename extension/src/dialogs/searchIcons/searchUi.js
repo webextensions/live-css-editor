@@ -131,38 +131,62 @@ const ListOfIcons = function (props) {
                                     return (
                                         <div>
                                             <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                                <img src={icon.preview_url} style={{ width: 100 }} />
+                                                <a target="_blank" rel="noreferrer" href={icon.icon_url}>
+                                                    <img src={icon.preview_url} style={{ width: 100 }} />
+                                                </a>
                                             </div>
 
                                             <div style={{ marginTop: 15, textAlign: 'center' }}>
                                                 <div>
-                                                    <a style={{ textDecoration: 'none' }} target="_blank" rel="noreferrer" href={icon.icon_url}>
+                                                    <a style={{ textDecoration: 'none', color: '#444' }} target="_blank" rel="noreferrer" href={icon.icon_url}>
                                                         {icon.term}
                                                     </a>
                                                 </div>
-                                                <div style={{ marginTop: 10 }}>
-                                                    By: <a style={{ textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.uploader.permalink}/`}>
-                                                        {icon.uploader.name}
-                                                    </a>
-                                                </div>
-                                                <div>
-                                                    From: <a style={{ textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.permalink}/`}>
-                                                        Noun Project
-                                                    </a>
-                                                </div>
-                                                <div style={{ marginTop: 10 }}>
-                                                    License: {(
-                                                        icon.license_description === 'public-domain' ?
-                                                            'Public domain' :
-                                                            icon.license_description
-                                                    )}
+                                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
+                                                    <table className="magicss-icon-description">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style={{ color: '#aaa', textAlign: 'right' }}>By: </td>
+                                                                <td>
+                                                                    <a style={{ color: '#888', textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.uploader.permalink}/`}>
+                                                                        {icon.uploader.name}
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style={{ color: '#aaa', textAlign: 'right' }}>From: </td>
+                                                                <td>
+                                                                    <a style={{ color: '#888', textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.permalink}/`}>
+                                                                        Noun Project
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style={{ color: '#aaa', textAlign: 'right' }}>License: </td>
+                                                                <td style={{ color: '#888' }}>
+                                                                    {(
+                                                                        icon.license_description === 'public-domain' ?
+                                                                            'Public domain' :
+                                                                            icon.license_description
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
 
                                             <div style={{ marginTop: 10, textAlign: 'center' }}>
-                                                <a target="_blank" rel="noreferrer" href={icon.icon_url}>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    size="small"
+                                                    href={icon.icon_url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                >
                                                     Download
-                                                </a>
+                                                </Button>
                                             </div>
                                         </div>
                                     );
@@ -207,7 +231,7 @@ const SearchOutput = function (props) {
         <Button
             variant="contained"
             color="primary"
-            size="medium"
+            size="small"
             style={{
                 paddingTop: 8,
                 paddingBottom: 7

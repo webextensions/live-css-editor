@@ -1,6 +1,9 @@
 .magicss-dialog-search-icons {
     z-index: 2147483646 !important;
 }
+.magicss-dialog-search-icons * {
+    font-family: Arial, sans-serif;
+}
 
 .magicss-dialog-search-icons .magicss-cog-wheel-icon {
     background-image: var(--cog-wheel-icon) !important;
