@@ -198,6 +198,7 @@ const SearchIconsConfiguration = function (props) {
                                     placeholder="e.g., 0123456789abcdef0123456789abcdef"
                                     value={accessKey}
                                     autoFocus
+                                    spellCheck={false}
                                     onChange={(evt) => {
                                         setAccessKey(evt.target.value);
                                     }}
@@ -213,6 +214,7 @@ const SearchIconsConfiguration = function (props) {
                                     label="Secret"
                                     placeholder="e.g., 0123456789abcdef0123456789abcdef"
                                     value={secret}
+                                    spellCheck={false}
                                     onChange={(evt) => {
                                         setSecret(evt.target.value);
                                     }}
@@ -223,7 +225,7 @@ const SearchIconsConfiguration = function (props) {
                             </div>
 
                             <div style={{ marginTop: 25, fontFamily: 'Arial, sans-serif', fontSize: 12 }}>
-                                <span style={{ fontWeight: 'bold' }}>Note:</span> The &quot;Key&quot; and &quot;Secret&quot; are saved in sync storage provided by your browser. They would be synced across your other logged in browser sessions.
+                                <span style={{ fontWeight: 'bold' }}>Note:</span> The &quot;Key&quot; and &quot;Secret&quot; are saved in Sync/Local storage provided by your browser. Data from Sync storage is synchronized across your other logged in browser sessions.
                             </div>
                         </div>
 

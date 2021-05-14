@@ -54,6 +54,28 @@ window.magicssHostSessionUuid = (
     uuidv4()
 );
 
+if (!window.loadedConfigFromBrowserStorage) {
+    const loadedConfigFromBrowserStorage = {};
+    window.loadedConfigFromBrowserStorage = loadedConfigFromBrowserStorage;
+    setTimeout(async function () {
+        const chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
+
+        const chromeStorageForExtensionDataGet = async function (key) {
+            return new Promise((resolve) => {
+                chromeStorageForExtensionData.get(key, function (values) {
+                    resolve(values && values[key]);
+                });
+            });
+        };
+
+        const USER_PREFERENCE_NOUN_PROJECT_API_ACCESS_KEY = 'noun-project-api-access-key';
+        const USER_PREFERENCE_NOUN_PROJECT_API_SECRET     = 'noun-project-api-secret';
+
+        loadedConfigFromBrowserStorage[USER_PREFERENCE_NOUN_PROJECT_API_ACCESS_KEY] = String((await chromeStorageForExtensionDataGet(USER_PREFERENCE_NOUN_PROJECT_API_ACCESS_KEY)) || '');
+        loadedConfigFromBrowserStorage[USER_PREFERENCE_NOUN_PROJECT_API_SECRET]     = String((await chromeStorageForExtensionDataGet(USER_PREFERENCE_NOUN_PROJECT_API_SECRET))     || '');
+    });
+}
+
 var loadIfNotAvailable = async function (dependencyToLoad) {
     const
         pathDist = 'dist/',
@@ -91,6 +113,7 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
                 });
             }
         }
+
         return window.reactMain;
     }
 };
