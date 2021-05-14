@@ -70,7 +70,11 @@ const ListOfIcons = function (props) {
                                     cursor: 'pointer'
                                 }}
                                 onClick={() => {
-                                    setSelectedIndex(index);
+                                    if (selectedIndex === index) {
+                                        setSelectedIndex(null);
+                                    } else {
+                                        setSelectedIndex(index);
+                                    }
                                 }}
                                 className={className}
                             >
@@ -92,17 +96,31 @@ const ListOfIcons = function (props) {
             <div
                 style={{
                     width: 300,
-                    overflow: 'auto'
+                    overflow: 'auto',
+                    borderLeft: '1px solid rgba(0, 0, 0, 0.23)'
                 }}
             >
-                <div style={{ textAlign: 'center' }}>
-                    Preview
-                </div>
-                <div>
+                <div style={{ height: '100%' }}>
+                    {
+                        selectedIndex === null &&
+                        <div
+                            style={{
+                                height: '100%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                fontFamily: 'Arial, sans-serif',
+                                color: '#777'
+                            }}
+                        >
+                            Please select an icon to get its details
+                        </div>
+                    }
                     {
                         typeof selectedIndex === 'number' &&
                         <div
                             style={{
+                                padding: 10,
                                 wordBreak: 'break-word'
                             }}
                         >
@@ -112,31 +130,39 @@ const ListOfIcons = function (props) {
 
                                     return (
                                         <div>
-                                            <div>
+                                            <div style={{ display: 'flex', justifyContent: 'center' }}>
                                                 <img src={icon.preview_url} style={{ width: 100 }} />
                                             </div>
 
-                                            <div>
-                                                <a target="_blank" rel="noreferrer" href={icon.icon_url}>
-                                                    {icon.term}
-                                                </a>
-                                                &nbsp;by&nbsp;
-                                                <a target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.uploader.permalink}/`}>
-                                                    {icon.uploader.name}
-                                                </a>
-                                                &nbsp;from&nbsp;
-                                                <a target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.permalink}/`}>
-                                                    Noun Project
-                                                </a>
+                                            <div style={{ marginTop: 15, textAlign: 'center' }}>
+                                                <div>
+                                                    <a style={{ textDecoration: 'none' }} target="_blank" rel="noreferrer" href={icon.icon_url}>
+                                                        {icon.term}
+                                                    </a>
+                                                </div>
+                                                <div style={{ marginTop: 10 }}>
+                                                    By: <a style={{ textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.uploader.permalink}/`}>
+                                                        {icon.uploader.name}
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    From: <a style={{ textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.permalink}/`}>
+                                                        Noun Project
+                                                    </a>
+                                                </div>
+                                                <div style={{ marginTop: 10 }}>
+                                                    License: {(
+                                                        icon.license_description === 'public-domain' ?
+                                                            'Public domain' :
+                                                            icon.license_description
+                                                    )}
+                                                </div>
                                             </div>
 
-                                            <div>
+                                            <div style={{ marginTop: 10, textAlign: 'center' }}>
                                                 <a target="_blank" rel="noreferrer" href={icon.icon_url}>
                                                     Download
                                                 </a>
-                                            </div>
-                                            <div>
-                                                License: {icon.license_description}
                                             </div>
                                         </div>
                                     );
