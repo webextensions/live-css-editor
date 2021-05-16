@@ -332,7 +332,9 @@ const ListOfIcons = function (props) {
 
                                                                                     let strToInsert = [
                                                                                         'selector-goes-here {',
+                                                                                        `\t/* Source: https://thenounproject.com${icon.permalink}/ */`,
                                                                                         '\tbackground-image: url("' + dataUrl + '");',
+                                                                                        '',
                                                                                         '\tbackground-repeat: no-repeat;',
                                                                                         '\tbackground-size: contain;',
                                                                                         '\twidth: 24px;',
