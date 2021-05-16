@@ -3267,9 +3267,23 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 setTimeout(async () => {
                                                     await loadIfNotAvailable('main-bundle');
 
-                                                    window.redux_store.dispatch({
-                                                        type: 'APP_$_OPEN_COMMAND_PALETTE'
-                                                    });
+                                                    const storeState = window.redux_store.getState();
+
+                                                    // If any dialog is open, don't launch the command palette
+                                                    if (
+                                                        storeState.app &&
+                                                        storeState.app.searchIcons &&
+                                                        (
+                                                            storeState.app.searchIcons.open ||
+                                                            storeState.app.searchIcons.openConfiguration
+                                                        )
+                                                    ) {
+                                                        // do nothing
+                                                    } else {
+                                                        window.redux_store.dispatch({
+                                                            type: 'APP_$_OPEN_COMMAND_PALETTE'
+                                                        });
+                                                    }
                                                 });
                                             }
                                         }
