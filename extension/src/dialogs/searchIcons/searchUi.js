@@ -323,10 +323,45 @@ const ListOfIcons = function (props) {
 
                                                                         setSvgContents(function (prevState) {
                                                                             if (prevState[READYSTATE] === LOADED) {
-                                                                                copy('TODO: Pending');
+                                                                                setTimeout(async function () {
+                                                                                    const editor = window.MagiCSSEditor;
+
+                                                                                    const code = editor.getTextValue();
+
+                                                                                    const dataUrl = `data:${prevState['contentType']};base64,` + btoa(prevState['svgXml']);
+
+                                                                                    let strToInsert = [
+                                                                                        'selector-goes-here {',
+                                                                                        '\tbackground-image: url("' + dataUrl + '");',
+                                                                                        '\tbackground-repeat: no-repeat;',
+                                                                                        '\tbackground-size: contain;',
+                                                                                        '\twidth: 24px;',
+                                                                                        '\theight: 24px;',
+                                                                                        '}',
+                                                                                        '',
+                                                                                        ''
+                                                                                    ].join('\n');
+                                                                                    if (window.indentWithTabs) {
+                                                                                        // do nothing
+                                                                                    } else {
+                                                                                        strToInsert = strToInsert.replace(/\t/g, ' '.repeat(window.indentUnit));
+                                                                                    }
+                                                                                    await editor.setTextValue(strToInsert + code);
+                                                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+
+                                                                                    editor.setCursor({ line: 0, ch: 0 }, {pleaseIgnoreCursorActivity: true});
+                                                                                    editor.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 18 });
+                                                                                    editor.focus();
+
+                                                                                    window.redux_store.dispatch({
+                                                                                        type: APP_$_CLOSE_SEARCH_ICONS
+                                                                                    });
+                                                                                });
+
+
                                                                                 return {
                                                                                     ...prevState,
-                                                                                    status: '✘ TODO: Pending'
+                                                                                    status: '✔ Inserted CSS'
                                                                                 };
                                                                             } else {
                                                                                 return prevState;
