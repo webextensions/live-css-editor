@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -53,20 +53,38 @@ const SearchIcons = function (props) {
 
     const [joyrideCompleted, setJoyrideCompleted] = useState(false);
 
-    if (open) {
-        const handleClose = () => {
-            props.dispatch({ type: APP_$_CLOSE_SEARCH_ICONS });
-        };
+    const handleClose = () => {
+        props.dispatch({ type: APP_$_CLOSE_SEARCH_ICONS });
+    };
 
-        let showJoyride = true;
-        if (accessKey && secret) {
-            showJoyride = false;
+    let showJoyride = true;
+    if (accessKey && secret) {
+        showJoyride = false;
+    }
+
+    const [openedAtLeastOnce, setOpenedAtLeastOnce] = useState(false);
+    useEffect(() => {
+        if (open) {
+            setOpenedAtLeastOnce(true);
         }
+    });
 
+    let styleHideIfNotOpen;
+    if (open) {
+        styleHideIfNotOpen = {};
+    } else {
+        styleHideIfNotOpen = {
+            visibility: 'hidden'
+        };
+    }
+
+    if (openedAtLeastOnce) {
         return (
-            <div>
+            <div style={styleHideIfNotOpen}>
                 <Dialog
-                    open={open}
+                    open={openedAtLeastOnce}
+                    style={styleHideIfNotOpen}
+
                     onClose={handleClose}
                     disableBackdropClick
 
