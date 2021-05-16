@@ -8,6 +8,8 @@ import TextField from '@material-ui/core/TextField/index.js';
 import Button from '@material-ui/core/Button/index.js';
 import SearchIcon from '@material-ui/icons/Search.js';
 
+import copy from 'copy-text-to-clipboard';
+
 import OAuth from 'oauth-1.0a';
 import hmacSha1 from 'crypto-js/hmac-sha1.js';
 import Base64 from 'crypto-js/enc-base64.js';
@@ -96,6 +98,48 @@ const ListOfIcons = function (props) {
         setColumnCount(gridColumnCount);
     });
 
+    const [svgContents, setSvgContents] = useState({
+        [READYSTATE]: UNINITIALIZED
+    });
+    const ensureLoad = async function (iconUrl) {
+        if (svgContents[READYSTATE] === LOADED) {
+            // do nothing
+        } else {
+            setSvgContents({
+                [READYSTATE]: LOADING
+            });
+
+            const [err, data, coreResponse] = await window.chromeRuntimeMessageToBackgroundScript({
+                type: 'magicss-bg',
+                subType: 'ajax',
+                payload: {
+                    url: iconUrl
+                }
+            });
+
+            if (err) {
+                setSvgContents({
+                    [READYSTATE]: ERROR,
+                    status: '✘ Failed to get icon data'
+                });
+            } else if (coreResponse && coreResponse.status === 200 && coreResponse.responseText) {
+                const svgInResponse = coreResponse.responseText;
+
+                setSvgContents({
+                    [READYSTATE]: LOADED,
+                    svgXml: svgInResponse,
+                    contentType: coreResponse.contentType
+                });
+            } else {
+                // Unexpected error
+                setSvgContents({
+                    [READYSTATE]: ERROR,
+                    status: '✘ Failed to get icon data'
+                });
+            }
+        }
+    };
+
     return (
         <div
             style={{
@@ -134,6 +178,9 @@ const ListOfIcons = function (props) {
                                     rowIndex={parseInt(index / columnCount)}
                                     onFocus={() => {
                                         setSelectedIndex(index);
+                                        setSvgContents({
+                                            [READYSTATE]: UNINITIALIZED
+                                        });
                                     }}
                                     className={className}
                                 >
@@ -198,7 +245,7 @@ const ListOfIcons = function (props) {
                         typeof selectedIndex === 'number' &&
                         <div
                             style={{
-                                padding: 10,
+                                padding: '30px 10px',
                                 wordBreak: 'break-word'
                             }}
                         >
@@ -214,57 +261,164 @@ const ListOfIcons = function (props) {
                                                 </a>
                                             </div>
 
-                                            <div style={{ marginTop: 15, textAlign: 'center' }}>
-                                                <div>
-                                                    <a style={{ textDecoration: 'none', color: '#444' }} target="_blank" rel="noreferrer" href={icon.icon_url}>
-                                                        {icon.term}
-                                                    </a>
-                                                </div>
-                                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
-                                                    <table className="magicss-icon-description">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td style={{ color: '#aaa', textAlign: 'right' }}>By: </td>
-                                                                <td>
-                                                                    <a style={{ color: '#888', textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.uploader.permalink}/`}>
-                                                                        {icon.uploader.name}
-                                                                    </a>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td style={{ color: '#aaa', textAlign: 'right' }}>From: </td>
-                                                                <td>
-                                                                    <a style={{ color: '#888', textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.permalink}/`}>
-                                                                        Noun Project
-                                                                    </a>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td style={{ color: '#aaa', textAlign: 'right' }}>License: </td>
-                                                                <td style={{ color: '#888' }}>
-                                                                    {(
-                                                                        icon.license_description === 'public-domain' ?
-                                                                            'Public domain' :
-                                                                            icon.license_description
-                                                                    )}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                            <div style={{ marginTop: 20, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
+                                                <table className="magicss-icon-description">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style={{ color: '#aaa', textAlign: 'right' }}>Download: </td>
+                                                            <td style={{ color: '#888' }}>
+                                                                <a style={{ textDecoration: 'none', color: '#3f51b5' }} target="_blank" rel="noreferrer" href={icon.icon_url}>
+                                                                    {icon.term}
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style={{ color: '#aaa', textAlign: 'right' }}>By: </td>
+                                                            <td>
+                                                                <a style={{ color: '#888', textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.uploader.permalink}/`}>
+                                                                    {icon.uploader.name}
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style={{ color: '#aaa', textAlign: 'right' }}>From: </td>
+                                                            <td>
+                                                                <a style={{ color: '#888', textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.permalink}/`}>
+                                                                    Noun Project
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style={{ color: '#aaa', textAlign: 'right' }}>License: </td>
+                                                            <td style={{ color: '#888' }}>
+                                                                {(
+                                                                    icon.license_description === 'public-domain' ?
+                                                                        'Public domain' :
+                                                                        icon.license_description
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
 
-                                            <div style={{ marginTop: 10, textAlign: 'center' }}>
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    size="small"
-                                                    href={icon.icon_url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                >
-                                                    Download
-                                                </Button>
+                                            <div style={{ marginTop: 20, textAlign: 'center' }}>
+                                                {(function () {
+                                                    let btnComponents = null;
+
+                                                    let disabled = false;
+                                                    if (svgContents[READYSTATE] === LOADING) {
+                                                        disabled = true;
+                                                    }
+                                                    btnComponents = (
+                                                        <React.Fragment>
+                                                            <div>
+                                                                <Button
+                                                                    variant="contained"
+                                                                    color="primary"
+                                                                    size="small"
+                                                                    disabled={disabled}
+                                                                    onClick={async () => {
+                                                                        await ensureLoad(icon.icon_url);
+
+                                                                        setSvgContents(function (prevState) {
+                                                                            if (prevState[READYSTATE] === LOADED) {
+                                                                                copy('TODO: Pending');
+                                                                                return {
+                                                                                    ...prevState,
+                                                                                    status: '✘ TODO: Pending'
+                                                                                };
+                                                                            } else {
+                                                                                return prevState;
+                                                                            }
+                                                                        });
+                                                                    }}
+                                                                >
+                                                                    Insert in editor
+                                                                </Button>
+                                                            </div>
+
+                                                            <div style={{ marginTop: 15 }}>
+                                                                <Button
+                                                                    variant="text"
+                                                                    color="primary"
+                                                                    size="small"
+                                                                    disabled={disabled}
+                                                                    onClick={async () => {
+                                                                        await ensureLoad(icon.icon_url);
+
+                                                                        setSvgContents(function (prevState) {
+                                                                            if (prevState[READYSTATE] === LOADED) {
+                                                                                copy(prevState['svgXml']);
+                                                                                return {
+                                                                                    ...prevState,
+                                                                                    status: '✔ Copied SVG'
+                                                                                };
+                                                                            } else {
+                                                                                return prevState;
+                                                                            }
+                                                                        });
+                                                                    }}
+                                                                >
+                                                                    Copy SVG
+                                                                </Button>
+                                                                <Button
+                                                                    variant="text"
+                                                                    color="primary"
+                                                                    size="small"
+                                                                    disabled={disabled}
+                                                                    onClick={async () => {
+                                                                        await ensureLoad(icon.icon_url);
+
+                                                                        setSvgContents(function (prevState) {
+                                                                            if (prevState[READYSTATE] === LOADED) {
+                                                                                const dataUrl = `data:${prevState['contentType']};base64,` + btoa(prevState['svgXml']);
+                                                                                copy(dataUrl);
+                                                                                return {
+                                                                                    ...prevState,
+                                                                                    status: '✔ Copied Data URL'
+                                                                                };
+                                                                            } else {
+                                                                                return prevState;
+                                                                            }
+                                                                        });
+                                                                    }}
+                                                                    style={{ marginLeft: 10 }}
+                                                                >
+                                                                    Copy Data URL
+                                                                </Button>
+                                                            </div>
+                                                        </React.Fragment>
+                                                    );
+
+                                                    let cmpStatus = null;
+                                                    if (svgContents[READYSTATE] === LOADING) {
+                                                        cmpStatus = (
+                                                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 5, color: '#f00', fontSize: 12 }}>
+                                                                <Loading type="line-scale" />
+                                                            </div>
+                                                        );
+                                                    } else if (svgContents[READYSTATE] === ERROR) {
+                                                        cmpStatus = (
+                                                            <div style={{ marginTop: 5, color: '#f00', fontSize: 12 }}>
+                                                                {svgContents['status']}
+                                                            </div>
+                                                        );
+                                                    } else if (svgContents[READYSTATE] === LOADED) {
+                                                        cmpStatus = (
+                                                            <div style={{ marginTop: 5, color: '#008000', fontSize: 12 }}>
+                                                                {svgContents['status']}
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    return (
+                                                        <React.Fragment>
+                                                            {btnComponents}
+                                                            {cmpStatus}
+                                                        </React.Fragment>
+                                                    );
+                                                }())}
                                             </div>
                                         </div>
                                     );

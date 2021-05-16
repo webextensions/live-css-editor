@@ -105,6 +105,7 @@ if (window.flagEditorInExternalWindow) {
                                 data,
                                 {
                                     status: jqXhr.status,
+                                    contentType: jqXhr.getResponseHeader('content-type'),
                                     responseText: jqXhr.responseText
                                 }
                             ]);
