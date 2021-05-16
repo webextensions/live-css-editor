@@ -109,10 +109,10 @@ const ListOfIcons = function (props) {
                     flexGrow: 1,
                     display: 'grid',
                     gridAutoColumns: 'auto',
-                    gridGap: 10,
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 100px) )',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 80px) )',
+                    gridAutoRows: 80,
                     overflow: 'auto',
-                    padding: 2
+                    padding: 10
                 }}
                 role="grid"
             >
@@ -138,26 +138,32 @@ const ListOfIcons = function (props) {
                                     className={className}
                                 >
                                     <div
-                                        key={index}
                                         style={{
-                                            marginLeft: 'auto',
-                                            marginRight: 'auto',
-                                            marginTop: 10,
-                                            marginBottom: 10,
-                                            width: 40,
-                                            height: 40
+                                            width: '100%',
+                                            height: '100%'
                                         }}
                                     >
-                                        <img
-                                            src={preview_url}
+                                        <div
+                                            className="magicssSearchResultEntryIconBorderLayer"
                                             style={{
-                                                maxWidth: 40,
-                                                maxHeight: 40,
                                                 width: '100%',
                                                 height: '100%',
-                                                objectFit: 'cover'
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
                                             }}
-                                        />
+                                        >
+                                            <img
+                                                src={preview_url}
+                                                style={{
+                                                    maxWidth: 40,
+                                                    maxHeight: 40,
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover'
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 </IconEntry>
                             );

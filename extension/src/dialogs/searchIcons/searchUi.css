@@ -1,19 +1,33 @@
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon * {
+    box-sizing: border-box;
+}
+
 .magicss-dialog-search-icons .magicssSearchResultEntryIcon {
+    width: 80px;
+    height: 80px;
+    outline: none;
+}
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon > div {
     border: 2px solid transparent;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon:focus > div,
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon.iconIsSelected > div {
+    border: 2px solid blue;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon .magicssSearchResultEntryIconBorderLayer {
+    border: 2px solid transparent;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon:focus .magicssSearchResultEntryIconBorderLayer {
+    border: 2px solid rgb(139,139,192);
 }
 
 .magicss-dialog-search-icons .magicssSearchResultEntryIcon:hover {
     background-color: #ddd;
 }
 
-.magicss-dialog-search-icons .magicssSearchResultEntryIcon.iconIsSelected:focus {
-    border: 2px solid rgb(139,139,192);
-}
-
-.magicss-dialog-search-icons .magicssSearchResultEntryIcon.iconIsSelected {
-    outline: 2px solid blue;
-}
-
-table.magicss-icon-description * {
+.magicss-dialog-search-icons table.magicss-icon-description * {
     font-size: 12px;;
 }
