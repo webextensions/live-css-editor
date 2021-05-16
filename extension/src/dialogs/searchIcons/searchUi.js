@@ -109,13 +109,15 @@ const ListOfIcons = function (props) {
                 [READYSTATE]: LOADING
             });
 
-            const [err, data, coreResponse] = await window.chromeRuntimeMessageToBackgroundScript({
-                type: 'magicss-bg',
-                subType: 'ajax',
-                payload: {
-                    url: iconUrl
-                }
-            });
+            const [err, data, coreResponse] = ( // eslint-disable-line no-unused-vars
+                await window.chromeRuntimeMessageToBackgroundScript({
+                    type: 'magicss-bg',
+                    subType: 'ajax',
+                    payload: {
+                        url: iconUrl
+                    }
+                })
+            );
 
             if (err) {
                 setSvgContents({
@@ -630,12 +632,39 @@ function mapStateToProps(state) {
     };
 }
 
+// https://stackoverflow.com/questions/53446020/how-to-compare-oldvalues-and-newvalues-on-react-hooks-useeffect/53446665#53446665
+// https://reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
+function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+        ref.current = value;
+    });
+    return ref.current;
+}
+
 const SearchUi = function (props) {
     const {
         accessKey,
-        secret
+        secret,
+        lastOpenedAt
     } = props;
     const flagAccessKeyAndSecretExist = (accessKey && secret) ? true : false;
+
+    const refFirstInput = useRef(null);
+
+    const prevData = usePrevious({ lastOpenedAt });
+    useEffect(() => {
+        if(prevData && prevData.lastOpenedAt !== lastOpenedAt) {
+            const current = refFirstInput.current;
+            if (current) {
+                const inputEl = current.querySelector('input');
+                if (inputEl) {
+                    inputEl.select();
+                    inputEl.focus();
+                }
+            }
+        }
+    }, [lastOpenedAt]);
 
     const [searchText, setSearchText] = useState('');
 
@@ -715,6 +744,7 @@ const SearchUi = function (props) {
                 <div style={{ display: 'flex', paddingTop: 5 }}>
                     <div style={{ flexGrow: 1 }}>
                         <TextField
+                            ref={refFirstInput}
                             variant="outlined"
                             size="small"
                             label="Search for icons..."
@@ -779,7 +809,8 @@ const SearchUi = function (props) {
 };
 SearchUi.propTypes = {
     accessKey: PropTypes.string.isRequired,
-    secret: PropTypes.string.isRequired
+    secret: PropTypes.string.isRequired,
+    lastOpenedAt: PropTypes.number.isRequired
 };
 
 const _SearchUi = connect(mapStateToProps)(SearchUi);

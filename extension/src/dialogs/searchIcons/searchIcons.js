@@ -69,12 +69,21 @@ const SearchIcons = function (props) {
         }
     });
 
+    const [lastOpenedAt, setLastOpenedAt] = useState(0);
+
+    useEffect(() => {
+        if (open) {
+            setLastOpenedAt(+new Date());
+        }
+    }, [open]);
+
     let styleHideIfNotOpen;
     if (open) {
         styleHideIfNotOpen = {};
     } else {
         styleHideIfNotOpen = {
-            visibility: 'hidden'
+            visibility: 'hidden',
+            display: 'none'
         };
     }
 
@@ -88,8 +97,11 @@ const SearchIcons = function (props) {
                     onClose={handleClose}
                     disableBackdropClick
 
-                    disableAutoFocus={showJoyride && !joyrideCompleted}
-                    disableEnforceFocus={showJoyride && !joyrideCompleted}
+                    disableAutoFocus={!open || (showJoyride && !joyrideCompleted)}
+                    disableEnforceFocus={!open || (showJoyride && !joyrideCompleted)}
+                    // Helpful while debugging
+                    // disableAutoFocus={true}
+                    // disableEnforceFocus={true}
 
                     className="magicss-dialog-search-icons"
                     PaperProps={{
@@ -162,7 +174,7 @@ const SearchIcons = function (props) {
                         }
                     </DialogTitle>
                     <DialogContent style={{ paddingBottom: 24 }}>
-                        <SearchUi />
+                        <SearchUi lastOpenedAt={lastOpenedAt} />
                     </DialogContent>
                 </Dialog>
             </div>
