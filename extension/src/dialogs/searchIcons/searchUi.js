@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -12,6 +12,14 @@ import OAuth from 'oauth-1.0a';
 import hmacSha1 from 'crypto-js/hmac-sha1.js';
 import Base64 from 'crypto-js/enc-base64.js';
 
+import {
+    RovingTabIndexProvider,
+    useRovingTabIndex,
+    useFocusEffect
+} from 'react-roving-tabindex';
+
+import { useWindowSize } from '@react-hook/window-size';
+
 import { Loading } from 'Loading/Loading.js';
 
 import './searchUi.css';
@@ -23,12 +31,70 @@ import {
 
 import { READYSTATE, STATUSCODE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
 
+const IconEntry = ({ children, rowIndex, onFocus, className }) => {
+    // The ref of the input to be controlled.
+    const ref = useRef(null);
+
+    // handleKeyDown and handleClick are stable for the lifetime of the component:
+    const [tabIndex, focused, handleKeyDown, handleClick] = useRovingTabIndex(
+        ref,     // Don't change the value of this ref
+        false,   // This sets "disabled" as false
+        rowIndex
+    );
+
+    // Use some mechanism to set focus on the button if it gets focus.
+    // In this case, the included useFocusEffect hook is used.
+    useFocusEffect(focused, ref);
+
+    return (
+        <a
+            ref={ref}
+            tabIndex={tabIndex} // tabIndex must be applied here
+            onKeyDown={handleKeyDown}
+            onFocus={(evt) => {
+                if (onFocus) {
+                    onFocus(evt);
+                }
+            }}
+            onClick={handleClick}
+            role="gridcell"
+            style={{ display: 'block', cursor: 'pointer' }}
+            className={className}
+        >
+            {children}
+        </a>
+    );
+};
+IconEntry.propTypes = {
+    children: PropTypes.node.isRequired,
+    rowIndex: PropTypes.number.isRequired,
+    onFocus: PropTypes.func.isRequired,
+    className: PropTypes.string
+};
+
 const ListOfIcons = function (props) {
     const {
         icons
     } = props;
 
+    // Required to re-render upon window resize so that the grid column count gets updated. Otherwise, before first
+    // re-render, the focus traversal with keyboard would move with respect to old positioning.
+    useWindowSize();
+
     const [selectedIndex, setSelectedIndex] = useState(null);
+
+    // https://stackoverflow.com/questions/55204205/a-way-to-count-columns-in-a-responsive-grid/58393617#58393617
+    // https://codepen.io/Robbendebiene/pen/pooyOyd
+    const [columnCount, setColumnCount] = useState(1);
+
+    const refGrid = useRef(null);
+
+    useEffect(() => {
+        const gridComputedStyle = window.getComputedStyle(refGrid.current);
+        const gridColumnCount = gridComputedStyle.getPropertyValue("grid-template-columns").split(" ").length;
+
+        setColumnCount(gridColumnCount);
+    });
 
     return (
         <div
@@ -38,60 +104,66 @@ const ListOfIcons = function (props) {
             }}
         >
             <div
+                ref={refGrid}
                 style={{
                     flexGrow: 1,
                     display: 'grid',
                     gridAutoColumns: 'auto',
                     gridGap: 10,
                     gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 100px) )',
-                    overflow: 'auto'
+                    overflow: 'auto',
+                    padding: 2
                 }}
+                role="grid"
             >
-                {
-                    icons.map(function (icon, index) {
-                        const {
-                            preview_url
-                        } = icon;
+                <RovingTabIndexProvider>
+                    {
+                        icons.map(function (icon, index) {
+                            const {
+                                preview_url
+                            } = icon;
 
-                        const className = classNames({
-                            iconIsSelected: selectedIndex === index ? true : false
-                        });
+                            const className = classNames({
+                                magicssSearchResultEntryIcon: true,
+                                iconIsSelected: selectedIndex === index ? true : false
+                            });
 
-                        return (
-                            <div
-                                key={index}
-                                style={{
-                                    marginLeft: 'auto',
-                                    marginRight: 'auto',
-                                    marginTop: 10,
-                                    marginBottom: 10,
-                                    width: 40,
-                                    height: 40,
-                                    cursor: 'pointer'
-                                }}
-                                onClick={() => {
-                                    if (selectedIndex === index) {
-                                        setSelectedIndex(null);
-                                    } else {
+                            return (
+                                <IconEntry
+                                    key={index}
+                                    rowIndex={parseInt(index / columnCount)}
+                                    onFocus={() => {
                                         setSelectedIndex(index);
-                                    }
-                                }}
-                                className={className}
-                            >
-                                <img
-                                    src={preview_url}
-                                    style={{
-                                        maxWidth: 40,
-                                        maxHeight: 40,
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'cover'
                                     }}
-                                />
-                            </div>
-                        );
-                    })
-                }
+                                    className={className}
+                                >
+                                    <div
+                                        key={index}
+                                        style={{
+                                            marginLeft: 'auto',
+                                            marginRight: 'auto',
+                                            marginTop: 10,
+                                            marginBottom: 10,
+                                            width: 40,
+                                            height: 40
+                                        }}
+                                    >
+                                        <img
+                                            src={preview_url}
+                                            style={{
+                                                maxWidth: 40,
+                                                maxHeight: 40,
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover'
+                                            }}
+                                        />
+                                    </div>
+                                </IconEntry>
+                            );
+                        })
+                    }
+                </RovingTabIndexProvider>
             </div>
             <div
                 style={{

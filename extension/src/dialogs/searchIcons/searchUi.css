@@ -1,4 +1,16 @@
-.magicss-dialog-search-icons .iconIsSelected {
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon {
+    border: 2px solid transparent;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon:hover {
+    background-color: #ddd;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon.iconIsSelected:focus {
+    border: 2px solid rgb(139,139,192);
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon.iconIsSelected {
     outline: 2px solid blue;
 }
 
