@@ -10,6 +10,7 @@
 * Add a keyboard shortcut to reload all CSS resources.
 
 #### Improvements
+* Set a different icon when the styles are applied.
 * Support for a different extension icon color for use with dark web browser themes (black icon is almost invisible when using a dark browser theme). (Reported in https://github.com/webextensions/live-css-editor/issues/45)
 * Change the background color to neutral dark-gray with appropriate shadow
 * Use black-and-white/grayscale + transparent/translucent for all icons under "+"
