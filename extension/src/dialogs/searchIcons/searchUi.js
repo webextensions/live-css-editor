@@ -31,6 +31,9 @@ import {
 
 import { READYSTATE, STATUSCODE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
 
+const READYSTATE_FURTHER = 'READYSTATE_FURTHER';
+const STATUSCODE_FURTHER = 'STATUSCODE_FURTHER';
+
 // TODO: DUPLICATE: This piece of code is duplicated in commands.js
 const copy = async function (simpleText) {
     try {
@@ -84,7 +87,9 @@ IconEntry.propTypes = {
 
 const ListOfIcons = function (props) {
     const {
-        icons
+        icons,
+        doSearch,
+        output
     } = props;
 
     // Required to re-render upon window resize so that the grid column count gets updated. Otherwise, before first
@@ -227,6 +232,66 @@ const ListOfIcons = function (props) {
                         })
                     }
                 </RovingTabIndexProvider>
+                {
+                    (
+                        icons.length % 50 === 0 &&
+                        icons.length >= 50         // Added just for robustness
+                    ) &&
+                    <Button
+                        variant="contained"
+                        color="default"
+                        size="medium"
+                        style={{
+                            paddingTop: 8,
+                            paddingBottom: 7
+                        }}
+                        disabled={function () {
+                            if (output[READYSTATE_FURTHER] === LOADING) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }()}
+                        onClick={function () {
+                            setTimeout(async function () {
+                                const pageNumber = 1 + parseInt(icons.length / 50);
+                                doSearch({ page: pageNumber });
+                            });
+                        }}
+                    >
+                        {function () {
+                            if (output[READYSTATE_FURTHER] === LOADING) {
+                                return <Loading type="line-scale" />;
+                            } else {
+                                if (output[READYSTATE_FURTHER] === ERROR) {
+                                    return (
+                                        <div>
+                                            <div
+                                                style={{
+                                                    textTransform: 'none'
+                                                }}
+                                            >
+                                                More
+                                            </div>
+                                            <div
+                                                style={{
+                                                    fontSize: 11,
+                                                    textTransform: 'none',
+                                                    color: '#444',
+                                                    textDecoration: 'underline'
+                                                }}
+                                            >
+                                                Retry
+                                            </div>
+                                        </div>
+                                    );
+                                } else {
+                                    return 'More';
+                                }
+                            }
+                        }()}
+                    </Button>
+                }
             </div>
             <div
                 style={{
@@ -508,15 +573,18 @@ const ListOfIcons = function (props) {
     );
 };
 ListOfIcons.propTypes = {
-    icons: PropTypes.array.isRequired
+    icons: PropTypes.array.isRequired,
+    doSearch: PropTypes.func.isRequired,
+    output: PropTypes.object.isRequired
 };
 
 const SearchOutput = function (props) {
     const {
         flagConfigurationDone,
-        output
+        output,
+        doSearch
     } = props;
-    const { data } = output;
+    const { icons } = output;
     const readyState = output[READYSTATE];
 
     const styleObForCenterAligning = {
@@ -647,10 +715,9 @@ const SearchOutput = function (props) {
             </div>
         );
     } else if (readyState === LOADED) {
-        const icons = data.icons || [];
         return (
             <div style={{ display: 'flex', height: '100%' }}>
-                <ListOfIcons icons={icons} />
+                <ListOfIcons icons={icons} doSearch={doSearch} output={output} />
             </div>
         );
     } else {
@@ -709,7 +776,7 @@ const SearchUi = function (props) {
         [READYSTATE]: UNINITIALIZED
     });
 
-    const doSearch = async function () {
+    const doSearch = async function ({ page }) {
         // http://lti.tools/oauth/
         const oauth = OAuth({
             consumer: {
@@ -725,15 +792,25 @@ const SearchUi = function (props) {
         });
 
         const request_data = {
-            // url: `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}`,
-            url: `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}?limit_to_public_domain=1`,
+            url: (
+                // `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}`
+                `https://api.thenounproject.com/icons/${encodeURIComponent(searchText)}?limit_to_public_domain=1` +
+                (page >= 2 ? `&page=${page}` : '')
+            ),
             method: 'GET'
         };
         const headers = oauth.toHeader(oauth.authorize(request_data));
 
-        setOutput({
-            [READYSTATE]: LOADING
-        });
+        if (page === 1) {
+            setOutput({
+                [READYSTATE]: LOADING
+            });
+        } else {
+            setOutput({
+                ...output,
+                [READYSTATE_FURTHER]: LOADING
+            });
+        }
 
         const [err, data, coreResponse] = await window.chromeRuntimeMessageToBackgroundScript({
             type: 'magicss-bg',
@@ -746,18 +823,35 @@ const SearchUi = function (props) {
         });
 
         if (err) {
-            setOutput({
-                [READYSTATE]: ERROR,
-                [STATUSCODE]: coreResponse.status,
-                searchInput: searchText
-            });
+            if (page === 1) {
+                setOutput({
+                    [READYSTATE]: ERROR,
+                    [STATUSCODE]: coreResponse.status,
+                    searchInput: searchText
+                });
+            } else {
+                setOutput({
+                    ...output,
+                    [READYSTATE_FURTHER]: ERROR,
+                    [STATUSCODE_FURTHER]: coreResponse.status,
+                });
+            }
         } else {
-            setOutput({
-                [READYSTATE]: LOADED,
-                [STATUSCODE]: coreResponse.status,
-                searchInput: searchText,
-                data
-            });
+            if (page === 1) {
+                setOutput({
+                    [READYSTATE]: LOADED,
+                    [STATUSCODE]: coreResponse.status,
+                    searchInput: searchText,
+                    icons: data.icons
+                });
+            } else {
+                setOutput({
+                    ...output,
+                    [READYSTATE_FURTHER]: LOADED,
+                    [STATUSCODE_FURTHER]: coreResponse.status,
+                    icons: output.icons.concat(data.icons)
+                });
+            }
         }
     };
 
@@ -797,7 +891,7 @@ const SearchUi = function (props) {
 
                                     if (searchText) {
                                         setTimeout(async function () {
-                                            doSearch();
+                                            await doSearch({ page: 1 });
                                         });
                                     }
                                 }
@@ -819,7 +913,7 @@ const SearchUi = function (props) {
                             disabled={!searchText || !flagAccessKeyAndSecretExist}
                             onClick={function () {
                                 setTimeout(async function () {
-                                    doSearch();
+                                    await doSearch({ page: 1 });
                                 });
                             }}
                         >
@@ -837,7 +931,11 @@ const SearchUi = function (props) {
                             flexGrow: 1
                         }}
                     >
-                        <SearchOutput flagConfigurationDone={flagAccessKeyAndSecretExist} output={output} />
+                        <SearchOutput
+                            flagConfigurationDone={flagAccessKeyAndSecretExist}
+                            output={output}
+                            doSearch={doSearch}
+                        />
                     </div>
                 </div>
             </div>
