@@ -161,7 +161,7 @@ const SearchIconsConfiguration = function (props) {
                                     Step 1:
                                 </div>
                                 <div>
-                                    Go to the API page on <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/">The Noun Project</a>
+                                    Go to the API page on <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/" style={{ color: '#3f51b5' }}>The Noun Project</a>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
@@ -177,7 +177,7 @@ const SearchIconsConfiguration = function (props) {
                                     Step 3:
                                 </div>
                                 <div>
-                                    Create an application under the <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/apps/">Manage Apps section</a>
+                                    Create an application under the <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/apps/" style={{ color: '#3f51b5' }}>Manage Apps section</a>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
