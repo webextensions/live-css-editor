@@ -8,8 +8,6 @@ import TextField from '@material-ui/core/TextField/index.js';
 import Button from '@material-ui/core/Button/index.js';
 import SearchIcon from '@material-ui/icons/Search.js';
 
-import copy from 'copy-text-to-clipboard';
-
 import OAuth from 'oauth-1.0a';
 import hmacSha1 from 'crypto-js/hmac-sha1.js';
 import Base64 from 'crypto-js/enc-base64.js';
@@ -32,6 +30,16 @@ import {
 } from 'reducers/actionTypes.js';
 
 import { READYSTATE, STATUSCODE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'constants/readyStates.js';
+
+// TODO: DUPLICATE: This piece of code is duplicated in commands.js
+const copy = async function (simpleText) {
+    try {
+        await navigator.clipboard.writeText(simpleText);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
 
 const IconEntry = ({ children, rowIndex, onFocus, className }) => {
     // The ref of the input to be controlled.
@@ -388,7 +396,17 @@ const ListOfIcons = function (props) {
 
                                                                         setSvgContents(function (prevState) {
                                                                             if (prevState[READYSTATE] === LOADED) {
-                                                                                copy(prevState['svgXml']);
+                                                                                setTimeout(async function () {
+                                                                                    const flag = await copy(prevState['svgXml']);
+                                                                                    if (!flag) {
+                                                                                        setSvgContents(function (prevState) {
+                                                                                            return {
+                                                                                                ...prevState,
+                                                                                                status: '✘ Failed to copy'
+                                                                                            };
+                                                                                        });
+                                                                                    }
+                                                                                });
                                                                                 return {
                                                                                     ...prevState,
                                                                                     status: '✔ Copied SVG'
@@ -411,8 +429,18 @@ const ListOfIcons = function (props) {
 
                                                                         setSvgContents(function (prevState) {
                                                                             if (prevState[READYSTATE] === LOADED) {
-                                                                                const dataUrl = `data:${prevState['contentType']};base64,` + btoa(prevState['svgXml']);
-                                                                                copy(dataUrl);
+                                                                                setTimeout(async function () {
+                                                                                    const dataUrl = `data:${prevState['contentType']};base64,` + btoa(prevState['svgXml']);
+                                                                                    const flag = await copy(dataUrl);
+                                                                                    if (!flag) {
+                                                                                        setSvgContents(function (prevState) {
+                                                                                            return {
+                                                                                                ...prevState,
+                                                                                                status: '✘ Failed to copy'
+                                                                                            };
+                                                                                        });
+                                                                                    }
+                                                                                });
                                                                                 return {
                                                                                     ...prevState,
                                                                                     status: '✔ Copied Data URL'
@@ -438,17 +466,26 @@ const ListOfIcons = function (props) {
                                                             </div>
                                                         );
                                                     } else if (svgContents[READYSTATE] === ERROR) {
-                                                        cmpStatus = (
-                                                            <div style={{ marginTop: 5, color: '#f00', fontSize: 12 }}>
-                                                                {svgContents['status']}
-                                                            </div>
-                                                        );
+                                                        if (svgContents['status']) {
+                                                            cmpStatus = (
+                                                                <div style={{ marginTop: 5, color: '#f00', fontSize: 12 }}>
+                                                                    {svgContents['status']}
+                                                                </div>
+                                                            );
+                                                        }
                                                     } else if (svgContents[READYSTATE] === LOADED) {
-                                                        cmpStatus = (
-                                                            <div style={{ marginTop: 5, color: '#008000', fontSize: 12 }}>
-                                                                {svgContents['status']}
-                                                            </div>
-                                                        );
+                                                        if (svgContents['status']) {
+                                                            let color = '#008000';
+                                                            // TODO: Improve this if condition as this one is fragile
+                                                            if (svgContents['status'].indexOf('✘') === 0) {
+                                                                color = '#f00';
+                                                            }
+                                                            cmpStatus = (
+                                                                <div style={{ marginTop: 5, color, fontSize: 12 }}>
+                                                                    {svgContents['status']}
+                                                                </div>
+                                                            );
+                                                        }
                                                     }
 
                                                     return (

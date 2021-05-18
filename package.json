@@ -34,7 +34,6 @@
     "babel-loader": "^8.2.2",
     "classnames": "^2.3.1",
     "codemirror": "=5.34.0",
-    "copy-text-to-clipboard": "^3.0.1",
     "crypto-js": "^4.0.0",
     "css-loader": "^5.2.4",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",

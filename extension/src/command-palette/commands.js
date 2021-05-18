@@ -1,10 +1,18 @@
 /* global extLib, utils */
 
-import copy from 'copy-text-to-clipboard';
-
 import {
     APP_$_OPEN_SEARCH_ICONS
 } from 'reducers/actionTypes.js';
+
+// TODO: DUPLICATE: This piece of code is duplicated in searchUi.js
+const copy = async function (simpleText) {
+    try {
+        await navigator.clipboard.writeText(simpleText);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
 
 const timeout = function (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -141,7 +149,7 @@ const commands = (
                     const textValue = editor.getTextValue();
 
                     if (textValue) {
-                        const flag = copy(textValue);
+                        const flag = await copy(textValue);
                         if (flag) {
                             utils.alertNote('Copied code to clipboard', 2500);
                         } else {
