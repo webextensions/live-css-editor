@@ -1517,6 +1517,12 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     height: 100%;
 }
 
+/* https://code.visualstudio.com/ */
+/* https://jquery.com/ */
+#MagiCSS-bookmarklet .CodeMirror pre {
+    font-family: inherit !important;
+}
+
 /* https://developer.chrome.com/home */
 #MagiCSS-bookmarklet .CodeMirror pre {
     box-shadow: none;
