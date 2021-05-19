@@ -1,0 +1,55 @@
+{
+    "version": "8.12.0",
+    "manifest_version": 2,
+    "author": "Priyank Parashar",
+    "default_locale": "en",
+    "name": "__MSG_Extension_Name__",
+    "description": "__MSG_Extension_Description__",
+    "homepage_url": "https://github.com/webextensions/live-css-editor",
+    "icons": {
+        "16": "icons/icon-16.png",
+        "24": "icons/icon-24.png",
+        "32": "icons/icon-32.png",
+        "40": "icons/icon-40.png",
+        "48": "icons/icon-48.png",
+        "128": "icons/icon-128.png",
+        "256": "icons/icon-256.png"
+    },
+    "permissions": [
+        "activeTab",
+        "storage",
+        "unlimitedStorage",
+        "<all_urls>"
+    ],
+    "optional_permissions": [
+        "webNavigation",
+        "<all_urls>"
+    ],
+    "browser_action": {
+        "default_icon": {
+            "16": "icons/icon-16.png",
+            "24": "icons/icon-24.png",
+            "32": "icons/icon-32.png",
+            "40": "icons/icon-40.png",
+            "48": "icons/icon-48.png",
+            "128": "icons/icon-128.png",
+            "256": "icons/icon-256.png"
+        }
+    },
+    "background": {
+        "page": "background-magicss.html",
+        "persistent": false
+    },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Alt+Shift+C"
+            }
+        }
+    },
+    "options_ui": {
+        "page": "options.html",
+        "chrome_style": true
+    },
+    "offline_enabled": true
+}

@@ -35,6 +35,8 @@ var generateManifest = function (whichBrowser) {
             if (whichBrowser === "firefox") {
                 permissions.push("webNavigation");
                 permissions.push("<all_urls>");
+            } else if (whichBrowser === "puppeteer") {
+                permissions.push("<all_urls>");
             }
             return permissions;
         }()),
@@ -101,11 +103,12 @@ var generateManifest = function (whichBrowser) {
 
     var targetFileName;
     switch (whichBrowser) {
-        case "chrome":  targetFileName = "manifest-chrome.json";  break;
-        case "edge":    targetFileName = "manifest-edge.json";    break;
-        case "firefox": targetFileName = "manifest-firefox.json"; break;
-        case "opera":   targetFileName = "manifest-opera.json";   break;
-        default:        targetFileName = "manifest.json";         break;
+        case "chrome":    targetFileName = "manifest-chrome.json";    break;
+        case "edge":      targetFileName = "manifest-edge.json";      break;
+        case "firefox":   targetFileName = "manifest-firefox.json";   break;
+        case "opera":     targetFileName = "manifest-opera.json";     break;
+        case "puppeteer": targetFileName = "manifest-puppeteer.json"; break;
+        default:          targetFileName = "manifest.json";           break;
     }
     process.stdout.write("Generating " + targetFileName + " : ");
     jsonfile.writeFileSync(path.join(__dirname, targetFileName), manifest, {spaces: 4});
@@ -117,3 +120,4 @@ generateManifest("chrome");
 generateManifest("edge");
 generateManifest("firefox");
 generateManifest("opera");
+generateManifest("puppeteer");
