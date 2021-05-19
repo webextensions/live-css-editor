@@ -88,6 +88,12 @@ var generateManifest = function (whichBrowser) {
         /* */
     };
 
+    if (whichBrowser === "puppeteer") {
+        manifest["__custom__"] = {
+            "hideRateUsHeaderIcon": true
+        };
+    }
+
     if (whichBrowser !== "firefox") {
         manifest["offline_enabled"] = true;
     }

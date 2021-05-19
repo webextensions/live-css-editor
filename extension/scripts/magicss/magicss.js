@@ -3206,6 +3206,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     bgColor: '99,113,186,1',
                     headerIcons: [
                         (function () {
+                            const
+                                manifest = chrome.runtime.getManifest(),
+                                __custom__ = manifest.__custom__ || {},
+                                hideRateUsHeaderIcon = __custom__ || false;
+                            // Hide rate us icon ; Useful for puppeteer based testing by maintaining screenshot consistency across different loads of the extension
+                            if (hideRateUsHeaderIcon) {
+                                return null;
+                            }
+
                             if (executionCounter < const_rateUsUsageCounterFrom || const_rateUsUsageCounterTo <= executionCounter) {
                                 return null;
                             } else {

@@ -51,5 +51,8 @@
         "page": "options.html",
         "chrome_style": true
     },
+    "__custom__": {
+        "hideRateUsHeaderIcon": true
+    },
     "offline_enabled": true
 }
