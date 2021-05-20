@@ -1881,12 +1881,16 @@ html body .magicss-command-palette-overlay .atom-inputFocused:focus {
     /* https://visualstudio.microsoft.com/ */
     color: #777 !important;
 
+    opacity: 1 !important;        /* https://sass-lang.com/ */
+
     font-style: unset !important; /* https://www.vistaprint.com/ */
 }
 .magicss-command-palette-overlay ::-moz-placeholder {
     /* https://jquery.com/ */
     /* https://visualstudio.microsoft.com/ */
     color: #777 !important;
+
+    opacity: 1 !important;        /* https://sass-lang.com/ */
 
     font-style: unset !important; /* https://www.vistaprint.com/ */
 }
