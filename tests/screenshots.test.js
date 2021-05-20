@@ -111,6 +111,53 @@ const main = async function () {
             failureThresholdType: 'percent',
             failureThreshold: 0.02 // Below 0.02% threshold, there were some intermittent test failures
         });
+
+        await page.keyboard.down('Control');
+        await page.keyboard.down('Shift');
+        await page.keyboard.press('KeyP');
+        await page.keyboard.up('Shift');
+        await page.keyboard.up('Control');
+
+        await page.waitForSelector('.magicss-command-palette-overlay');
+
+        const elementHandle = await page.$('.magicss-command-palette-overlay .ReactModal__Content > div');
+
+        await page.evaluate(async function () {
+            const timeout = function (ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            };
+
+            const forceBlur = async function () {
+                const input = document.createElement('input');
+                input.style.position = 'absolute';
+                input.style.opacity = '0';
+
+                document.body.appendChild(input);
+                input.focus();
+                await timeout(0);
+                document.body.removeChild(input);
+            };
+
+            await forceBlur();
+        });
+
+        await page.waitForTimeout(200); // Delay to let focus/blur happen properly
+
+        const commandPaletteImage = await elementHandle.screenshot({
+            // https://github.com/puppeteer/puppeteer/issues/7043
+            // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
+            captureBeyondViewport: false,
+
+            path: path.resolve(__dirname, 'screenshots', 'all', 'command-palette-' + url.replace(/[:/?=%]/g, '-') + '.png')
+        });
+        expect(commandPaletteImage).toMatchImageSnapshot({
+            customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+
+            customSnapshotIdentifier: 'command-palette',
+
+            failureThresholdType: 'percent',
+            failureThreshold: 0.03 // Below 0.03% threshold, there were some intermittent test failures
+        });
     }
 };
 
