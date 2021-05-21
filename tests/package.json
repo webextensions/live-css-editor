@@ -2,11 +2,12 @@
   "name": "live-css-editor-tests",
   "version": "0.0.1",
   "scripts": {
-    "test": "cp ../extension/manifest-puppeteer.json ../extension/manifest.json ; jest ; cp ../extension/manifest-chrome.json ../extension/manifest.json"
+    "test": "cp ../extension/manifest-puppeteer.json ../extension/manifest.json ; mocha screenshots.test.js ; cp ../extension/manifest-chrome.json ../extension/manifest.json"
   },
   "devDependencies": {
-    "jest": "^26.6.3",
-    "jest-image-snapshot": "^4.5.0",
+    "expect": "^26.6.2",
+    "expect-mocha-image-snapshot": "^2.0.3",
+    "mocha": "^8.4.0",
     "puppeteer": "^9.1.1"
   }
 }
