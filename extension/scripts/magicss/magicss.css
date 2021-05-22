@@ -1844,6 +1844,10 @@ html body .magicss-command-palette-overlay .atom-inputFocused:focus {
 }
 
 .magicss-command-palette-overlay .atom-input {
+    color: #d7dae0 !important;            /* https://www.linkedin.com/ */
+}
+
+.magicss-command-palette-overlay .atom-input {
     border: 2px solid #181a1f !important; /* https://css-tricks.com/ */
 }
 .magicss-command-palette-overlay .atom-inputFocused:focus {
