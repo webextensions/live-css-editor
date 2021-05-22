@@ -24,7 +24,12 @@ describe('Cross site UI consistency', async function () {
         /* */
         'http://localhost/',
         'https://css-tricks.com/',
-        'https://devdocs.io/css/',
+        {
+            url: 'https://devdocs.io/css/',
+            skip: [
+                'should search for icon in command palette'
+            ]
+        },
         'https://getbootstrap.com/',
         'https://github.com/',
         'https://google.com/',
@@ -76,7 +81,27 @@ describe('Cross site UI consistency', async function () {
         extBackgroundPage = await extBackgroundTarget.page();
     });
 
-    for (let url of urls) {
+    const getItOrSkip = function (testName, arrSkip) {
+        let itOrSkip;
+        if (arrSkip.indexOf(testName) >= 0) {
+            itOrSkip = it.skip;
+        } else {
+            itOrSkip = it;
+        }
+        return itOrSkip;
+    };
+
+    for (let urlToUse of urls) {
+        let url;
+        let arrSkip;
+        if (typeof urlToUse === 'object') {
+            url = urlToUse.url;
+            arrSkip = urlToUse.skip;
+        } else {
+            url = urlToUse;
+            arrSkip = [];
+        }
+
         let page;
 
         describe(`${url}`, async function () {
@@ -156,7 +181,7 @@ describe('Cross site UI consistency', async function () {
                     await forceBlur();
                 });
 
-                await page.waitForTimeout(200); // Delay to let focus/blur happen properly
+                await page.waitForTimeout(200); // Delay to let blur happen properly
 
                 const commandPaletteImage = await elementHandle.screenshot({
                     // https://github.com/puppeteer/puppeteer/issues/7043
@@ -177,6 +202,60 @@ describe('Cross site UI consistency', async function () {
                     }
                 );
             });
+
+            getItOrSkip('should search for icon in command palette', arrSkip)(
+                'should search for icon in command palette',
+                async function () {
+                    await page.focus('.magicss-command-palette-overlay input');
+                    await page.keyboard.press('KeyI');
+                    await page.keyboard.press('KeyC');
+                    await page.keyboard.press('KeyO');
+                    await page.keyboard.press('KeyN');
+
+                    const elementHandle = await page.$('.magicss-command-palette-overlay .ReactModal__Content > div');
+
+                    await page.evaluate(async function () {
+                        const timeout = function (ms) {
+                            return new Promise(resolve => setTimeout(resolve, ms));
+                        };
+
+                        const forceBlur = async function () {
+                            const input = document.createElement('input');
+                            input.style.position = 'absolute';
+                            input.style.opacity = '0';
+
+                            document.body.appendChild(input);
+                            input.focus();
+                            await timeout(0);
+                            document.body.removeChild(input);
+                        };
+
+                        await forceBlur();
+                    });
+
+                    await page.waitForTimeout(200); // Delay to let blur happen properly
+
+                    const commandPaletteSearchIconImage = await elementHandle.screenshot({
+                        // https://github.com/puppeteer/puppeteer/issues/7043
+                        // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
+                        captureBeyondViewport: false,
+
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'command-palette-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
+                    });
+
+                    expect(commandPaletteSearchIconImage).toMatchImageSnapshot(
+                        this,
+                        {
+                            customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+
+                            customSnapshotIdentifier: 'command-palette-search-icon',
+
+                            failureThresholdType: 'percent',
+                            failureThreshold: 0.02 // Below 0.02% threshold, there were some intermittent test failures
+                        }
+                    );
+                }
+            );
         });
     }
 
