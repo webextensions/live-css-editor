@@ -20,3 +20,22 @@
 .magicss-dialog-search-icons .magicss-cog-wheel-icon:hover {
     opacity: 1;
 }
+
+/* FIXME: Make this selector specific to Magic CSS */
+#react-joyride-step-0  {
+    direction: ltr;                                        /* https://www.google.ae/ */
+}
+
+/* FIXME: Make this selector specific to Magic CSS */
+#react-joyride-step-0 .react-joyride__tooltip button[data-action=primary] {
+    font-weight: 400 !important;                           /* https://code.visualstudio.com/ */
+    font-family: Arial, sans-serif !important;             /* https://css-tricks.com/ */
+}
+/* FIXME: Make this selector specific to Magic CSS */
+#react-joyride-step-0 .react-joyride__tooltip button[data-action=primary]:focus {
+    outline: -webkit-focus-ring-color auto 1px !important; /* https://www.smashingmagazine.com/ */
+}
+/* FIXME: Make this selector specific to Magic CSS */
+#react-joyride-step-0 .react-joyride__tooltip button[data-action=close] {
+    font-family: Arial, sans-serif !important;             /* https://getbootstrap.com/ */
+}

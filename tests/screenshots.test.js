@@ -27,14 +27,21 @@ describe('Cross site UI consistency', async function () {
         {
             url: 'https://devdocs.io/css/',
             skip: [
-                'should search for icon in command palette'
+                'should search for icon in command palette',
+                'should load icon search UI'
             ]
         },
         'https://getbootstrap.com/',
         'https://github.com/',
-        'https://google.com/',
+        'https://google.ae/',
+        'https://google.com/ncr',
         'https://www.google.com/chrome/',
-        'https://www.instagram.com/',
+        {
+            url: 'https://www.instagram.com/',
+            skip: [
+                'should load icon search UI'
+            ]
+        },
         'https://jquery.com/',
         'https://lesscss.org/',
         'https://www.linkedin.com/feed/',
@@ -142,11 +149,10 @@ describe('Cross site UI consistency', async function () {
                     this,
                     {
                         customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
-
                         customSnapshotIdentifier: 'magic-css-loaded',
 
                         failureThresholdType: 'percent',
-                        failureThreshold: 0.02 // Below 0.02% threshold, there were some intermittent test failures
+                        failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                     }
                 );
             });
@@ -194,17 +200,16 @@ describe('Cross site UI consistency', async function () {
                     this,
                     {
                         customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
-
                         customSnapshotIdentifier: 'command-palette',
 
                         failureThresholdType: 'percent',
-                        failureThreshold: 0.03 // Below 0.03% threshold, there were some intermittent test failures
+                        failureThreshold: 0.03 // Below 0.03% threshold, there can be some intermittent test failures
                     }
                 );
             });
 
             getItOrSkip('should search for icon in command palette', arrSkip)(
-                'should search for icon in command palette',
+                'should search for "icon" in command palette',
                 async function () {
                     await page.focus('.magicss-command-palette-overlay input');
                     await page.keyboard.press('KeyI');
@@ -247,11 +252,40 @@ describe('Cross site UI consistency', async function () {
                         this,
                         {
                             customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
-
                             customSnapshotIdentifier: 'command-palette-search-icon',
 
                             failureThresholdType: 'percent',
-                            failureThreshold: 0.02 // Below 0.02% threshold, there were some intermittent test failures
+                            failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
+                        }
+                    );
+                }
+            );
+
+            getItOrSkip('should load joyride for icon search UI', arrSkip)(
+                'should load joyride for icon search UI',
+                async function () {
+                    await page.focus('.magicss-command-palette-overlay input');
+                    await page.keyboard.press('Enter');
+
+                    const elementHandle = await page.waitForSelector('#react-joyride-step-0 .__floater.__floater__open');
+                    await page.waitForTimeout(200); // Let it appear (wait for joyride tranistion effects to complete)
+
+                    const joyrideInSearchIconImage = await elementHandle.screenshot({
+                        // https://github.com/puppeteer/puppeteer/issues/7043
+                        // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
+                        captureBeyondViewport: false,
+
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-in-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
+                    });
+
+                    expect(joyrideInSearchIconImage).toMatchImageSnapshot(
+                        this,
+                        {
+                            customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+                            customSnapshotIdentifier: 'joyride-in-search-icon',
+
+                            failureThresholdType: 'percent',
+                            failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
                         }
                     );
                 }

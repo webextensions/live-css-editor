@@ -39,6 +39,9 @@ const joyrideSteps = [
                 fontSize: 14,
                 lineHeight: 1.75,
                 backgroundColor: '#3f51b5'
+            },
+            tooltipContent: {
+                letterSpacing: 'normal' /* CSS fix for https://developer.mozilla.org/en-US/docs/Web */
             }
         }
     }
