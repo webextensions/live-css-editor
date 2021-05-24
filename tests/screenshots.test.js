@@ -63,31 +63,6 @@ describe('Cross site UI consistency', async function () {
         /* */
     ];
 
-    before(async () => {
-        const puppeteerArgs = [
-            `--disable-extensions-except=${pathToExtension}`,
-            `--load-extension=${pathToExtension}`,
-            '--show-component-extension-options'
-        ];
-
-        browser = await puppeteer.launch({
-            headless: false,
-            // slowMo: 250,
-            // devtools: true,
-            defaultViewport: {
-                width: 1200,
-                height: 600
-            },
-            args: puppeteerArgs
-        });
-
-        // Wait for extension background target
-        const extBackgroundTarget = await browser.waitForTarget((t) => {
-            return t.type() === 'background_page';
-        });
-        extBackgroundPage = await extBackgroundTarget.page();
-    });
-
     const getItOrSkip = function (testName, arrSkip) {
         let itOrSkip;
         if (arrSkip.indexOf(testName) >= 0) {
@@ -112,6 +87,31 @@ describe('Cross site UI consistency', async function () {
         let page;
 
         describe(`${url}`, async function () {
+            before(async () => {
+                const puppeteerArgs = [
+                    `--disable-extensions-except=${pathToExtension}`,
+                    `--load-extension=${pathToExtension}`,
+                    '--show-component-extension-options'
+                ];
+
+                browser = await puppeteer.launch({
+                    headless: false,
+                    // slowMo: 250,
+                    // devtools: true,
+                    defaultViewport: {
+                        width: 1200,
+                        height: 600
+                    },
+                    args: puppeteerArgs
+                });
+
+                // Wait for extension background target
+                const extBackgroundTarget = await browser.waitForTarget((t) => {
+                    return t.type() === 'background_page';
+                });
+                extBackgroundPage = await extBackgroundTarget.page();
+            });
+
             it('should initiate Magic CSS', async function () {
                 // https://stackoverflow.com/questions/47744369/puppeteer-opens-an-empty-tab-in-non-headless-mode#comment94423244_47818964
                 const pages = await browser.pages({});
@@ -290,10 +290,10 @@ describe('Cross site UI consistency', async function () {
                     );
                 }
             );
+
+            after(async () => {
+                await browser.close();
+            });
         });
     }
-
-    after(async () => {
-        await browser.close();
-    });
 });
