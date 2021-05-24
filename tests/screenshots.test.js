@@ -28,7 +28,7 @@ describe('Cross site UI consistency', async function () {
             url: 'https://devdocs.io/css/',
             skip: [
                 'should search for icon in command palette',
-                'should load icon search UI'
+                'should load joyride for icon search UI'
             ]
         },
         'https://getbootstrap.com/',
@@ -39,7 +39,7 @@ describe('Cross site UI consistency', async function () {
         {
             url: 'https://www.instagram.com/',
             skip: [
-                'should load icon search UI'
+                'should load joyride for icon search UI'
             ]
         },
         'https://jquery.com/',
