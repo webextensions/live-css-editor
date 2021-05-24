@@ -23,6 +23,11 @@ const _screenshot = async function (handle, options) {
     return image;
 };
 
+const _matchImageOptions = {
+    customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+    failureThresholdType: 'percent',
+};
+
 describe('Cross site UI consistency', async function () {
     this.timeout(2 * 60 * 1000);
 
@@ -154,10 +159,8 @@ describe('Cross site UI consistency', async function () {
                 expect(image).toMatchImageSnapshot(
                     this,
                     {
-                        customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+                        ..._matchImageOptions,
                         customSnapshotIdentifier: 'magic-css-loaded',
-
-                        failureThresholdType: 'percent',
                         failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                     }
                 );
@@ -201,10 +204,8 @@ describe('Cross site UI consistency', async function () {
                 expect(commandPaletteImage).toMatchImageSnapshot(
                     this,
                     {
-                        customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+                        ..._matchImageOptions,
                         customSnapshotIdentifier: 'command-palette',
-
-                        failureThresholdType: 'percent',
                         failureThreshold: 0.03 // Below 0.03% threshold, there can be some intermittent test failures
                     }
                 );
@@ -249,10 +250,8 @@ describe('Cross site UI consistency', async function () {
                     expect(commandPaletteSearchIconImage).toMatchImageSnapshot(
                         this,
                         {
-                            customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+                            ..._matchImageOptions,
                             customSnapshotIdentifier: 'command-palette-search-icon',
-
-                            failureThresholdType: 'percent',
                             failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                         }
                     );
@@ -275,10 +274,8 @@ describe('Cross site UI consistency', async function () {
                     expect(joyrideInSearchIconImage).toMatchImageSnapshot(
                         this,
                         {
-                            customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+                            ..._matchImageOptions,
                             customSnapshotIdentifier: 'joyride-for-search-icon',
-
-                            failureThresholdType: 'percent',
                             failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                         }
                     );
