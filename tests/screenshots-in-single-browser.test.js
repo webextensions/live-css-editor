@@ -13,6 +13,16 @@ expect.extend({ toMatchImageSnapshot });
 
 const pathToExtension = path.resolve(__dirname, '..', 'extension');
 
+const _screenshot = async function (handle, options) {
+    const image = await handle.screenshot({
+        // https://github.com/puppeteer/puppeteer/issues/7043
+        // Without "captureBeyondViewport: false", the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
+        captureBeyondViewport: false,
+        ...options
+    });
+    return image;
+};
+
 describe('Cross site UI consistency', async function () {
     this.timeout(2 * 60 * 1000);
 
@@ -131,11 +141,7 @@ describe('Cross site UI consistency', async function () {
             it('should load Magic CSS', async function () {
                 await page.waitForSelector('#MagiCSS-bookmarklet .CodeMirror');
 
-                const image = await page.screenshot({
-                    // https://github.com/puppeteer/puppeteer/issues/7043
-                    // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
-                    captureBeyondViewport: false,
-
+                const image = await _screenshot(page, {
                     clip: {
                         x: 25,
                         y: 25,
@@ -189,11 +195,7 @@ describe('Cross site UI consistency', async function () {
 
                 await page.waitForTimeout(200); // Delay to let blur happen properly
 
-                const commandPaletteImage = await elementHandle.screenshot({
-                    // https://github.com/puppeteer/puppeteer/issues/7043
-                    // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
-                    captureBeyondViewport: false,
-
+                const commandPaletteImage = await _screenshot(elementHandle, {
                     path: path.resolve(__dirname, 'screenshots', 'all', 'command-palette-' + url.replace(/[:/?=%]/g, '-') + '.png')
                 });
                 expect(commandPaletteImage).toMatchImageSnapshot(
@@ -240,11 +242,7 @@ describe('Cross site UI consistency', async function () {
 
                     await page.waitForTimeout(200); // Delay to let blur happen properly
 
-                    const commandPaletteSearchIconImage = await elementHandle.screenshot({
-                        // https://github.com/puppeteer/puppeteer/issues/7043
-                        // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
-                        captureBeyondViewport: false,
-
+                    const commandPaletteSearchIconImage = await _screenshot(elementHandle, {
                         path: path.resolve(__dirname, 'screenshots', 'all', 'command-palette-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
                     });
 
@@ -270,11 +268,7 @@ describe('Cross site UI consistency', async function () {
                     const elementHandle = await page.waitForSelector('#react-joyride-step-0 .__floater.__floater__open');
                     await page.waitForTimeout(200); // Let it appear (wait for joyride tranistion effects to complete)
 
-                    const joyrideInSearchIconImage = await elementHandle.screenshot({
-                        // https://github.com/puppeteer/puppeteer/issues/7043
-                        // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
-                        captureBeyondViewport: false,
-
+                    const joyrideInSearchIconImage = await _screenshot(elementHandle, {
                         path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
                     });
 
