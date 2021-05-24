@@ -275,17 +275,17 @@ describe('Cross site UI consistency', async function () {
                         // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
                         captureBeyondViewport: false,
 
-                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-in-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
                     });
 
                     expect(joyrideInSearchIconImage).toMatchImageSnapshot(
                         this,
                         {
                             customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
-                            customSnapshotIdentifier: 'joyride-in-search-icon',
+                            customSnapshotIdentifier: 'joyride-for-search-icon',
 
                             failureThresholdType: 'percent',
-                            failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                            failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                         }
                     );
                 }
