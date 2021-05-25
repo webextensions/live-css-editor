@@ -23,8 +23,9 @@ const _screenshot = async function (handle, options) {
     return image;
 };
 
+const screenshotsDir = path.resolve(__dirname, 'screenshots');
 const _matchImageOptions = {
-    customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
+    customSnapshotsDir: screenshotsDir,
     failureThresholdType: 'percent',
 };
 
@@ -124,6 +125,9 @@ describe('Cross site UI consistency', async function () {
             arrSkip = [];
         }
 
+        const fsNameForUrl = url.replace(/[:/?=%]/g, '-');
+        const customDiffDir = path.resolve(screenshotsDir, `__diff_output__${fsNameForUrl}`);
+
         let page;
 
         describe(`${url}`, async function () {
@@ -153,13 +157,14 @@ describe('Cross site UI consistency', async function () {
                         width: 355,
                         height: 273
                     },
-                    path: path.resolve(__dirname, 'screenshots', 'all', url.replace(/[:/?=%]/g, '-') + '.png')
+                    path: path.resolve(__dirname, 'screenshots', 'all', fsNameForUrl + '.png')
                 });
 
                 expect(image).toMatchImageSnapshot(
                     this,
                     {
                         ..._matchImageOptions,
+                        customDiffDir,
                         customSnapshotIdentifier: 'magic-css-loaded',
                         failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                     }
@@ -199,12 +204,13 @@ describe('Cross site UI consistency', async function () {
                 await page.waitForTimeout(200); // Delay to let blur happen properly
 
                 const commandPaletteImage = await _screenshot(elementHandle, {
-                    path: path.resolve(__dirname, 'screenshots', 'all', 'command-palette-' + url.replace(/[:/?=%]/g, '-') + '.png')
+                    path: path.resolve(__dirname, 'screenshots', 'all', 'command-palette-' + fsNameForUrl + '.png')
                 });
                 expect(commandPaletteImage).toMatchImageSnapshot(
                     this,
                     {
                         ..._matchImageOptions,
+                        customDiffDir,
                         customSnapshotIdentifier: 'command-palette',
                         failureThreshold: 0.03 // Below 0.03% threshold, there can be some intermittent test failures
                     }
@@ -244,13 +250,14 @@ describe('Cross site UI consistency', async function () {
                     await page.waitForTimeout(200); // Delay to let blur happen properly
 
                     const commandPaletteSearchIconImage = await _screenshot(elementHandle, {
-                        path: path.resolve(__dirname, 'screenshots', 'all', 'command-palette-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'command-palette-search-icon-' + fsNameForUrl + '.png')
                     });
 
                     expect(commandPaletteSearchIconImage).toMatchImageSnapshot(
                         this,
                         {
                             ..._matchImageOptions,
+                            customDiffDir,
                             customSnapshotIdentifier: 'command-palette-search-icon',
                             failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                         }
@@ -268,13 +275,14 @@ describe('Cross site UI consistency', async function () {
                     await page.waitForTimeout(200); // Let it appear (wait for joyride tranistion effects to complete)
 
                     const joyrideInSearchIconImage = await _screenshot(elementHandle, {
-                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icon-' + fsNameForUrl + '.png')
                     });
 
                     expect(joyrideInSearchIconImage).toMatchImageSnapshot(
                         this,
                         {
                             ..._matchImageOptions,
+                            customDiffDir,
                             customSnapshotIdentifier: 'joyride-for-search-icon',
                             failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                         }
