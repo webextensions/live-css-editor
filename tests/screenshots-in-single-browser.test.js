@@ -272,7 +272,7 @@ describe('Cross site UI consistency', async function () {
                     await page.keyboard.press('Enter');
 
                     const elementHandle = await page.waitForSelector('#react-joyride-step-0 .__floater.__floater__open');
-                    await page.waitForTimeout(200); // Let it appear (wait for joyride tranistion effects to complete)
+                    await page.waitForTimeout(250); // Let it appear (wait for joyride tranistion effects to complete)
 
                     const joyrideInSearchIconImage = await _screenshot(elementHandle, {
                         path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icon-' + fsNameForUrl + '.png')
