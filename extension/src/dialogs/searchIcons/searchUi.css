@@ -41,3 +41,14 @@
 .magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline span {
     font-size: 12px !important; /* https://code.visualstudio.com/ */
 }
+
+.magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline {
+    background-color: #fff !important; /* https://css-tricks.com/ */
+}
+.magicss-search-for-icons-input .MuiOutlinedInput-inputMarginDense {
+    padding-top: 10.5px !important;      /* https://css-tricks.com/ */
+    padding-bottom: 10.5px !important;   /* https://css-tricks.com/ */
+}
+.magicss-search-for-icons-input input[type=text].MuiOutlinedInput-inputMarginDense {
+    border-width: 0 !important;          /* https://css-tricks.com/ */
+}
