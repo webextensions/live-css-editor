@@ -44,7 +44,8 @@ describe('Cross site UI consistency', async function () {
             url: 'https://devdocs.io/css/',
             skip: [
                 'should search for icon in command palette',
-                'should load joyride for search icons UI'
+                'should load joyride for search icons UI',
+                'should load search icons UI'
             ]
         },
         'https://getbootstrap.com/',
@@ -55,7 +56,8 @@ describe('Cross site UI consistency', async function () {
         {
             url: 'https://www.instagram.com/',
             skip: [
-                'should load joyride for search icons UI'
+                'should load joyride for search icons UI',
+                'should load search icons UI'
             ]
         },
         'https://jquery.com/',
@@ -285,6 +287,28 @@ describe('Cross site UI consistency', async function () {
                             customDiffDir,
                             customSnapshotIdentifier: 'joyride-for-search-icons',
                             failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
+                        }
+                    );
+                }
+            );
+
+            getItOrSkip('should load search icons UI', arrSkip)(
+                'should load search icons UI',
+                async function () {
+                    await page.click('.react-joyride__tooltip button[data-action=primary]');
+
+                    const elementHandle = await page.$('.magicss-dialog-search-icons .MuiDialog-paper');
+                    const searchIconsUiImage = await _screenshot(elementHandle, {
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'search-icons-ui-' + fsNameForUrl + '.png')
+                    });
+
+                    expect(searchIconsUiImage).toMatchImageSnapshot(
+                        this,
+                        {
+                            ..._matchImageOptions,
+                            customDiffDir,
+                            customSnapshotIdentifier: 'search-icons-ui',
+                            failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
                         }
                     );
                 }
