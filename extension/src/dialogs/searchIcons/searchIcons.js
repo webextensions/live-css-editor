@@ -118,7 +118,12 @@ const SearchIcons = function (props) {
                     <DialogTitle id="alert-dialog-title">
                         <div style={{ display: 'flex' }}>
                             <div style={{ flexGrow: 1, display: 'flex' }}>
-                                <div>
+                                <div
+                                    style={{
+                                        fontSize: 20,       /* https://code.visualstudio.com/ */
+                                        letterSpacing: 0.15 /* https://code.visualstudio.com/ */
+                                    }}
+                                >
                                     Icons via Noun Project API
                                 </div>
                                 <div
@@ -136,7 +141,11 @@ const SearchIcons = function (props) {
                             </div>
                             <div>
                                 <IconButton onClick={handleClose} size="small">
-                                    <CloseIcon />
+                                    <CloseIcon
+                                        style={{
+                                            fontSize: 24 /* https://code.visualstudio.com/ */
+                                        }}
+                                    />
                                 </IconButton>
                             </div>
                         </div>

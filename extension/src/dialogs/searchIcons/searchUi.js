@@ -610,7 +610,8 @@ const SearchOutput = function (props) {
             size="small"
             style={{
                 paddingTop: 8,
-                paddingBottom: 7
+                paddingBottom: 7,
+                fontSize: 13 /* https://code.visualstudio.com/ */
             }}
             onClick={function () {
                 window.redux_store.dispatch({
@@ -896,6 +897,7 @@ const SearchUi = function (props) {
                                     }
                                 }
                             }}
+                            className="magicss-search-for-icons-input"
                             style={{ width: '100%' }}
                         />
                     </div>
@@ -908,7 +910,8 @@ const SearchUi = function (props) {
                             startIcon={<SearchIcon />}
                             style={{
                                 paddingTop: 8,
-                                paddingBottom: 7
+                                paddingBottom: 7,
+                                fontSize: 14 /* https://code.visualstudio.com/ */
                             }}
                             disabled={!searchText || !flagAccessKeyAndSecretExist}
                             onClick={function () {

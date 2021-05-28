@@ -31,3 +31,13 @@
 .magicss-dialog-search-icons table.magicss-icon-description * {
     font-size: 12px;;
 }
+
+.magicss-dialog-search-icons .magicss-search-for-icons-input .MuiFormLabel-root {
+    font-size: 16px !important; /* https://code.visualstudio.com/ */
+}
+.magicss-dialog-search-icons .magicss-search-for-icons-input .MuiInputBase-input {
+    height: 19px !important;    /* https://code.visualstudio.com/ */
+}
+.magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline span {
+    font-size: 12px !important; /* https://code.visualstudio.com/ */
+}
