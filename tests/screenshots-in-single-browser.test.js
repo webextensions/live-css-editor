@@ -39,6 +39,7 @@ describe('Cross site UI consistency', async function () {
         /*
         /* */
         'http://localhost/',
+        'https://code.visualstudio.com/',
         'https://css-tricks.com/',
         {
             url: 'https://devdocs.io/css/',
@@ -48,10 +49,20 @@ describe('Cross site UI consistency', async function () {
                 'should load search icons UI'
             ]
         },
+        'https://developer.mozilla.org/en-US/docs/Web',
         'https://getbootstrap.com/',
         'https://github.com/',
         'https://google.ae/',
         'https://google.com/ncr',
+        'https://jquery.com/',
+        'https://lesscss.org/',
+        'https://materializecss.com/',
+        'https://moderncss.dev/',
+        'https://reactjs.org/',
+        'https://sass-lang.com/',
+        'https://twitter.com/webextensions',
+        'https://visualstudio.microsoft.com/',
+        'https://webextensions.org/',
         'https://www.google.com/chrome/',
         {
             url: 'https://www.instagram.com/',
@@ -60,23 +71,12 @@ describe('Cross site UI consistency', async function () {
                 'should load search icons UI'
             ]
         },
-        'https://jquery.com/',
-        'https://lesscss.org/',
         'https://www.linkedin.com/feed/',
-        'https://materializecss.com/',
-        'https://visualstudio.microsoft.com/',
-        'https://moderncss.dev/',
-        'https://developer.mozilla.org/en-US/docs/Web',
         'https://www.mozilla.org/',
         'https://www.phpbb.com/',
-        'https://reactjs.org/',
-        'https://sass-lang.com/',
         'https://www.sitepoint.com/',
         'https://www.smashingmagazine.com/',
-        'https://twitter.com/webextensions',
         'https://www.udemy.com/',
-        'https://code.visualstudio.com/',
-        'https://webextensions.org/',
         'https://www.youtube.com/'
         /* */
     ];
