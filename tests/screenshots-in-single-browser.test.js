@@ -30,8 +30,6 @@ const _matchImageOptions = {
 };
 
 describe('Cross site UI consistency', async function () {
-    this.timeout(2 * 60 * 1000);
-
     let browser;
     let extBackgroundPage;
 
@@ -134,6 +132,8 @@ describe('Cross site UI consistency', async function () {
 
         describe(`${url}`, async function () {
             it('should initiate Magic CSS', async function () {
+                this.timeout(30 * 1000);
+
                 // https://stackoverflow.com/questions/47744369/puppeteer-opens-an-empty-tab-in-non-headless-mode#comment94423244_47818964
                 const pages = await browser.pages({});
                 page = pages[0];
