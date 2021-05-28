@@ -41,11 +41,7 @@ describe('Cross site UI consistency', async function () {
         'https://css-tricks.com/',
         {
             url: 'https://devdocs.io/css/',
-            skip: [
-                'should search for icon in command palette',
-                'should load joyride for search icons UI',
-                'should load search icons UI'
-            ]
+            skipFrom: 'should search for "icon" in command palette'
         },
         'https://developer.mozilla.org/en-US/docs/Web',
         'https://getbootstrap.com/',
@@ -64,10 +60,7 @@ describe('Cross site UI consistency', async function () {
         'https://www.google.com/chrome/',
         {
             url: 'https://www.instagram.com/',
-            skip: [
-                'should load joyride for search icons UI',
-                'should load search icons UI'
-            ]
+            skipFrom: 'should load joyride for search icons UI'
         },
         'https://www.linkedin.com/feed/',
         'https://www.mozilla.org/',
@@ -104,25 +97,28 @@ describe('Cross site UI consistency', async function () {
         extBackgroundPage = await extBackgroundTarget.page();
     });
 
-    const getItOrSkip = function (testName, arrSkip) {
-        let itOrSkip;
-        if (arrSkip.indexOf(testName) >= 0) {
-            itOrSkip = it.skip;
-        } else {
-            itOrSkip = it;
-        }
-        return itOrSkip;
-    };
-
     for (let urlToUse of urls) {
+        let markForSkipping = false;
+        const getItOrSkip = function (testName, skipFrom) {
+            let itOrSkip;
+            if (markForSkipping) {
+                itOrSkip = it.skip;
+            } else if (skipFrom === testName) {
+                itOrSkip = it.skip;
+                markForSkipping = true;
+            } else {
+                itOrSkip = it;
+            }
+            return itOrSkip;
+        };
+
         let url;
-        let arrSkip;
+        let skipFrom;
         if (typeof urlToUse === 'object') {
             url = urlToUse.url;
-            arrSkip = urlToUse.skip;
+            skipFrom = urlToUse.skipFrom;
         } else {
             url = urlToUse;
-            arrSkip = [];
         }
 
         const fsNameForUrl = url.replace(/[:/?=%]/g, '-');
@@ -219,7 +215,7 @@ describe('Cross site UI consistency', async function () {
                 );
             });
 
-            getItOrSkip('should search for icon in command palette', arrSkip)(
+            getItOrSkip('should search for "icon" in command palette', skipFrom)(
                 'should search for "icon" in command palette',
                 async function () {
                     await page.focus('.magicss-command-palette-overlay input');
@@ -267,7 +263,7 @@ describe('Cross site UI consistency', async function () {
                 }
             );
 
-            getItOrSkip('should load joyride for search icons UI', arrSkip)(
+            getItOrSkip('should load joyride for search icons UI', skipFrom)(
                 'should load joyride for search icons UI',
                 async function () {
                     await page.focus('.magicss-command-palette-overlay input');
@@ -292,7 +288,7 @@ describe('Cross site UI consistency', async function () {
                 }
             );
 
-            getItOrSkip('should load search icons UI', arrSkip)(
+            getItOrSkip('should load search icons UI', skipFrom)(
                 'should load search icons UI',
                 async function () {
                     await page.click('.react-joyride__tooltip button[data-action=primary]');
