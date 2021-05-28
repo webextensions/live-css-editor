@@ -1,6 +1,11 @@
 .magicss-dialog-search-icons {
     z-index: 2147483646 !important;
 }
+
+.magicss-dialog-search-icons {
+    direction: ltr !important; /* https://www.google.ae/ */
+}
+
 .magicss-dialog-search-icons * {
     font-family: Arial, sans-serif;
 }
@@ -38,4 +43,12 @@
 /* FIXME: Make this selector specific to Magic CSS */
 #react-joyride-step-0 .react-joyride__tooltip button[data-action=close] {
     font-family: Arial, sans-serif !important;             /* https://getbootstrap.com/ */
+}
+
+.magicss-dialog-search-icons h2 {
+    padding-left: 0; /* https://lesscss.org/ */
+}
+
+.magicss-dialog-search-icons input[type=text] {
+    box-sizing: content-box; /* https://visualstudio.microsoft.com/ */
 }
