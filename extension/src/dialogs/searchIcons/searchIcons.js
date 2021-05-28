@@ -120,8 +120,9 @@ const SearchIcons = function (props) {
                             <div style={{ flexGrow: 1, display: 'flex' }}>
                                 <div
                                     style={{
-                                        fontSize: 20,       /* https://code.visualstudio.com/ */
-                                        letterSpacing: 0.15 /* https://code.visualstudio.com/ */
+                                        fontSize: 20,                /* https://code.visualstudio.com/ */
+                                        letterSpacing: 0.15,         /* https://code.visualstudio.com/ */
+                                        color: 'rgba(0, 0, 0, 0.87)' /* https://lesscss.org/ */
                                     }}
                                 >
                                     Icons via Noun Project API

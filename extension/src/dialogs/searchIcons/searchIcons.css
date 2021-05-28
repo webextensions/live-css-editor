@@ -57,3 +57,7 @@
 .magicss-dialog-search-icons input[type=text]:not(.browser-default) {
     margin-bottom: 0; /* https://materializecss.com/ */
 }
+
+.magicss-dialog-search-icons fieldset {
+    width: unset; /* https://www.mozilla.org/en-US/ */
+}
