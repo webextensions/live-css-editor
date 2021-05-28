@@ -52,3 +52,7 @@
 .magicss-search-for-icons-input input[type=text].MuiOutlinedInput-inputMarginDense {
     border-width: 0 !important;          /* https://css-tricks.com/ */
 }
+
+.magicss-dialog-search-icons legend {
+    float: unset !important; /* https://getbootstrap.com/ */
+}
