@@ -46,9 +46,14 @@
 }
 
 .magicss-dialog-search-icons h2 {
-    padding-left: 0; /* https://lesscss.org/ */
+    padding-left: 0;  /* https://lesscss.org/ */
+    max-width: unset; /* https://www.udemy.com/ */
 }
 
 .magicss-dialog-search-icons input[type=text] {
     box-sizing: content-box; /* https://visualstudio.microsoft.com/ */
+}
+
+.magicss-dialog-search-icons input[type=text]:not(.browser-default) {
+    margin-bottom: 0; /* https://materializecss.com/ */
 }
