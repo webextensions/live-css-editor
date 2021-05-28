@@ -44,7 +44,7 @@ describe('Cross site UI consistency', async function () {
             url: 'https://devdocs.io/css/',
             skip: [
                 'should search for icon in command palette',
-                'should load joyride for icon search UI'
+                'should load joyride for search icons UI'
             ]
         },
         'https://getbootstrap.com/',
@@ -55,7 +55,7 @@ describe('Cross site UI consistency', async function () {
         {
             url: 'https://www.instagram.com/',
             skip: [
-                'should load joyride for icon search UI'
+                'should load joyride for search icons UI'
             ]
         },
         'https://jquery.com/',
@@ -265,8 +265,8 @@ describe('Cross site UI consistency', async function () {
                 }
             );
 
-            getItOrSkip('should load joyride for icon search UI', arrSkip)(
-                'should load joyride for icon search UI',
+            getItOrSkip('should load joyride for search icons UI', arrSkip)(
+                'should load joyride for search icons UI',
                 async function () {
                     await page.focus('.magicss-command-palette-overlay input');
                     await page.keyboard.press('Enter');
@@ -275,7 +275,7 @@ describe('Cross site UI consistency', async function () {
                     await page.waitForTimeout(250); // Let it appear (wait for joyride tranistion effects to complete)
 
                     const joyrideInSearchIconImage = await _screenshot(elementHandle, {
-                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icon-' + fsNameForUrl + '.png')
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icons-' + fsNameForUrl + '.png')
                     });
 
                     expect(joyrideInSearchIconImage).toMatchImageSnapshot(
@@ -283,7 +283,7 @@ describe('Cross site UI consistency', async function () {
                         {
                             ..._matchImageOptions,
                             customDiffDir,
-                            customSnapshotIdentifier: 'joyride-for-search-icon',
+                            customSnapshotIdentifier: 'joyride-for-search-icons',
                             failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
                         }
                     );
