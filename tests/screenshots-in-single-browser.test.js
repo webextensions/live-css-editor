@@ -122,7 +122,7 @@ describe('Cross site UI consistency', async function () {
         }
 
         const fsNameForUrl = url.replace(/[:/?=%]/g, '-');
-        const customDiffDir = path.resolve(screenshotsDir, `__diff_output__${fsNameForUrl}`);
+        const customDiffDir = path.resolve(screenshotsDir, 'diffs', `__diff_output__${fsNameForUrl}`);
 
         let page;
 
