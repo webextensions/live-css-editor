@@ -147,7 +147,9 @@ const SearchIconsConfiguration = function (props) {
                     <DialogTitle id="alert-dialog-title">
                         <span
                             style={{
-                                fontSize: 20 /* https://code.visualstudio.com/ */
+                                fontSize: 20,                /* https://code.visualstudio.com/ */
+                                letterSpacing: 0.15,         /* https://code.visualstudio.com/ */
+                                color: 'rgba(0, 0, 0, 0.87)' /* https://lesscss.org/ */
                             }}
                         >
                             Noun Project API Configuration
@@ -241,10 +243,10 @@ const SearchIconsConfiguration = function (props) {
                                     onClick={doTestConnection}
                                     variant="outlined"
                                     color="primary"
-                                    size="small"
+                                    size="medium"
                                     disabled={ !accessKey || !secret }
                                     style={{
-                                        fontSize: 13 /* https://code.visualstudio.com/ */
+                                        fontSize: 14 /* https://code.visualstudio.com/ */
                                     }}
                                 >
                                     <MediaQuery maxWidth={499}>
@@ -299,9 +301,9 @@ const SearchIconsConfiguration = function (props) {
                                     onClick={handleClose}
                                     variant="contained"
                                     color="primary"
-                                    size="small"
+                                    size="medium"
                                     style={{
-                                        fontSize: 13 /* https://code.visualstudio.com/ */
+                                        fontSize: 14 /* https://code.visualstudio.com/ */
                                     }}
                                 >
                                     Done

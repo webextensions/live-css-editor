@@ -38,28 +38,30 @@
     letter-spacing: 0.15px !important; /* https://code.visualstudio.com/ */
 }
 
-.magicss-dialog-search-icons .magicss-search-for-icons-input .MuiFormLabel-root {
+.magicss-dialog-search-icons .MuiInputLabel-outlined {
     font-size: 16px !important; /* https://code.visualstudio.com/ */
 }
-.magicss-dialog-search-icons .magicss-search-for-icons-input .MuiInputBase-input {
+
+.magicss-dialog-search-icons .MuiInputBase-input {
     height: 19px !important;    /* https://code.visualstudio.com/ */
 }
-.magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline span {
+
+.magicss-dialog-search-icons .MuiOutlinedInput-notchedOutline span {
     font-size: 12px !important; /* https://code.visualstudio.com/ */
 }
 
-.magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline {
+.magicss-dialog-search-icons .MuiOutlinedInput-notchedOutline {
     background-color: unset !important; /* https://css-tricks.com/ */
 }
-.magicss-search-for-icons-input .MuiOutlinedInput-inputMarginDense {
+.magicss-dialog-search-icons .MuiOutlinedInput-inputMarginDense {
     padding-top: 10.5px !important;      /* https://css-tricks.com/ */
     padding-bottom: 10.5px !important;   /* https://css-tricks.com/ */
 }
-.magicss-search-for-icons-input input[type=text].MuiOutlinedInput-inputMarginDense {
+.magicss-dialog-search-icons input[type=text].MuiOutlinedInput-inputMarginDense {
     border-width: 0 !important;          /* https://css-tricks.com/ */
 }
 
-.magicss-search-for-icons-input input.MuiOutlinedInput-input[type=text] {
+.magicss-dialog-search-icons input.MuiOutlinedInput-input[type=text] {
     padding-left: 14px !important;             /* https://css-tricks.com/ */
     padding-right: 14px !important;            /* https://css-tricks.com/ */
 
@@ -67,7 +69,7 @@
     background-color: #fff !important;         /* https://css-tricks.com/ */
 }
 
-.magicss-search-for-icons-input input[type=text]:focus {
+.magicss-dialog-search-icons input[type=text]:focus {
     box-shadow: unset !important               /* https://developer.mozilla.org/en-US/docs/Web */
 }
 
@@ -76,11 +78,11 @@
     font-weight: unset !important;             /* https://www.mozilla.org/ */
 }
 
-.magicss-search-for-icons-input label {
+.magicss-dialog-search-icons label {
     margin: 0 !important;                      /* https://www.linkedin.com/feed/ */
 }
 
-.magicss-search-for-icons-input .MuiFormLabel-root {
+.magicss-dialog-search-icons .MuiFormLabel-root {
     font-family: Arial, sans-serif !important; /* https://www.sitepoint.com/ */
 }
 
@@ -91,11 +93,11 @@
         * The default colors are different for different browsers. #777 seems to suit well.
           Ref: https://stackoverflow.com/questions/41900143/what-is-the-default-color-and-font-for-input-placeholders/41900282#41900282
 */
-.magicss-search-for-icons-input ::-webkit-input-placeholder {
+.magicss-dialog-search-icons ::-webkit-input-placeholder {
     color: rgba(0, 0, 0, 0.87) !important;     /* https://www.linkedin.com/feed/ */
     opacity: 0.42 !important;                  /* https://www.linkedin.com/feed/ */
 }
-.magicss-search-for-icons-input ::-moz-placeholder {
+.magicss-dialog-search-icons ::-moz-placeholder {
     color: rgba(0, 0, 0, 0.87) !important;     /* https://www.linkedin.com/feed/ */
     opacity: 0.42 !important;                  /* https://www.linkedin.com/feed/ */
 }
