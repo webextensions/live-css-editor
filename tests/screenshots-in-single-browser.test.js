@@ -270,7 +270,7 @@ describe('Cross site UI consistency', async function () {
                     await page.keyboard.press('Enter');
 
                     const elementHandle = await page.waitForSelector('#react-joyride-step-0 .__floater.__floater__open');
-                    await page.waitForTimeout(250); // Let it appear (wait for joyride tranistion effects to complete)
+                    await page.waitForTimeout(250); // Let it appear (wait for joyride transition effects to complete)
 
                     const joyrideInSearchIconImage = await _screenshot(elementHandle, {
                         path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icons-' + fsNameForUrl + '.png')
@@ -315,7 +315,7 @@ describe('Cross site UI consistency', async function () {
                 async function () {
                     await page.click('.magicss-search-for-icons-input input');
 
-                    await page.waitForTimeout(200); // Wait for completion of material-ui tranistion effects
+                    await page.waitForTimeout(200); // Wait for completion of material-ui transition effects
 
                     const elementHandle = await page.$('.magicss-dialog-search-icons .MuiDialog-paper');
                     const searchIconsUiImage = await _screenshot(elementHandle, {

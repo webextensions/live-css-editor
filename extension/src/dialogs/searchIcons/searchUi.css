@@ -32,6 +32,12 @@
     font-size: 12px;;
 }
 
+.magicss-dialog-search-icons input.MuiInputBase-input {
+    font-size: 16px !important;        /* https://css-tricks.com/ */
+    line-height: 19px !important;      /* https://code.visualstudio.com/ */
+    letter-spacing: 0.15px !important; /* https://code.visualstudio.com/ */
+}
+
 .magicss-dialog-search-icons .magicss-search-for-icons-input .MuiFormLabel-root {
     font-size: 16px !important; /* https://code.visualstudio.com/ */
 }
@@ -40,10 +46,6 @@
 }
 .magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline span {
     font-size: 12px !important; /* https://code.visualstudio.com/ */
-}
-
-.magicss-search-for-icons-input input {
-    line-height: 19px !important; /* https://code.visualstudio.com/ */
 }
 
 .magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline {
@@ -63,8 +65,6 @@
 
     font-family: Arial, sans-serif !important; /* https://css-tricks.com/ */
     background-color: #fff !important;         /* https://css-tricks.com/ */
-
-    font-size: 16px !important;                /* https://css-tricks.com/ */
 }
 
 .magicss-search-for-icons-input input[type=text]:focus {

@@ -106,7 +106,7 @@ const SearchIcons = function (props) {
                     // disableAutoFocus={true}
                     // disableEnforceFocus={true}
 
-                    className="magicss-dialog-search-icons"
+                    className="magicss-dialog-search-icons magicss-dialog-search-icons-main"
                     PaperProps={{
                         style: {
                             height: '90vh',

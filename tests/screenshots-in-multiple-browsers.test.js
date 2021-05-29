@@ -229,7 +229,7 @@ describe('Cross site UI consistency', async function () {
                     await page.keyboard.press('Enter');
 
                     const elementHandle = await page.waitForSelector('#react-joyride-step-0 .__floater.__floater__open');
-                    await page.waitForTimeout(200); // Let it appear (wait for joyride tranistion effects to complete)
+                    await page.waitForTimeout(200); // Let it appear (wait for joyride transition effects to complete)
 
                     const joyrideInSearchIconImage = await elementHandle.screenshot({
                         // https://github.com/puppeteer/puppeteer/issues/7043

@@ -3,7 +3,8 @@
 }
 
 .magicss-dialog-search-icons {
-    direction: ltr !important; /* https://www.google.ae/ */
+    direction: ltr !important;      /* https://www.google.ae/ */
+    line-height: normal !important; /* https://code.visualstudio.com/ - Useful in various children elements */
 }
 
 .magicss-dialog-search-icons * {
