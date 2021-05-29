@@ -42,6 +42,10 @@
     font-size: 12px !important; /* https://code.visualstudio.com/ */
 }
 
+.magicss-search-for-icons-input input {
+    line-height: 19px !important; /* https://code.visualstudio.com/ */
+}
+
 .magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline {
     background-color: unset !important; /* https://css-tricks.com/ */
 }
@@ -53,6 +57,45 @@
     border-width: 0 !important;          /* https://css-tricks.com/ */
 }
 
+.magicss-search-for-icons-input input.MuiOutlinedInput-input[type=text] {
+    padding-left: 14px !important;             /* https://css-tricks.com/ */
+    padding-right: 14px !important;            /* https://css-tricks.com/ */
+
+    font-family: Arial, sans-serif !important; /* https://css-tricks.com/ */
+    background-color: #fff !important;         /* https://css-tricks.com/ */
+
+    font-size: 16px !important;                /* https://css-tricks.com/ */
+}
+
+.magicss-search-for-icons-input input[type=text]:focus {
+    box-shadow: unset !important               /* https://developer.mozilla.org/en-US/docs/Web */
+}
+
 .magicss-dialog-search-icons legend {
-    float: unset !important; /* https://getbootstrap.com/ */
+    float: unset !important;                   /* https://getbootstrap.com/ */
+    font-weight: unset !important;             /* https://www.mozilla.org/ */
+}
+
+.magicss-search-for-icons-input label {
+    margin: 0 !important;                      /* https://www.linkedin.com/feed/ */
+}
+
+.magicss-search-for-icons-input .MuiFormLabel-root {
+    font-family: Arial, sans-serif !important; /* https://www.sitepoint.com/ */
+}
+
+/*
+    Notes:
+        * Somehow, for Chrome browser, the "::-webkit-input-placeholder" and "::-moz-placeholder" styles don't work
+          together inside a single selector group (for Firefox, that works), hence they have been split.
+        * The default colors are different for different browsers. #777 seems to suit well.
+          Ref: https://stackoverflow.com/questions/41900143/what-is-the-default-color-and-font-for-input-placeholders/41900282#41900282
+*/
+.magicss-search-for-icons-input ::-webkit-input-placeholder {
+    color: rgba(0, 0, 0, 0.87) !important;     /* https://www.linkedin.com/feed/ */
+    opacity: 0.42 !important;                  /* https://www.linkedin.com/feed/ */
+}
+.magicss-search-for-icons-input ::-moz-placeholder {
+    color: rgba(0, 0, 0, 0.87) !important;     /* https://www.linkedin.com/feed/ */
+    opacity: 0.42 !important;                  /* https://www.linkedin.com/feed/ */
 }

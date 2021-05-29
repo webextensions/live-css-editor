@@ -61,3 +61,8 @@
 .magicss-dialog-search-icons fieldset {
     width: unset; /* https://www.mozilla.org/en-US/ */
 }
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #3f51b5 !important; /* https://css-tricks.com/ */
+    border-width: 2px !important;     /* https://css-tricks.com/ */
+}

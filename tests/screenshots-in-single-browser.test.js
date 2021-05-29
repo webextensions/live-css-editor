@@ -309,6 +309,30 @@ describe('Cross site UI consistency', async function () {
                     );
                 }
             );
+
+            getItOrSkip('should focus main input in search icons UI', skipFrom)(
+                'should focus main input in search icons UI',
+                async function () {
+                    await page.click('.magicss-search-for-icons-input input');
+
+                    await page.waitForTimeout(200); // Wait for completion of material-ui tranistion effects
+
+                    const elementHandle = await page.$('.magicss-dialog-search-icons .MuiDialog-paper');
+                    const searchIconsUiImage = await _screenshot(elementHandle, {
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'focused-input-search-icons-ui-' + fsNameForUrl + '.png')
+                    });
+
+                    expect(searchIconsUiImage).toMatchImageSnapshot(
+                        this,
+                        {
+                            ..._matchImageOptions,
+                            customDiffDir,
+                            customSnapshotIdentifier: 'focused-input-search-icons-ui',
+                            failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                        }
+                    );
+                }
+            );
         });
     }
 
