@@ -1,3 +1,7 @@
+.magicss-dialog-search-icons {
+    letter-spacing: normal; /* https://developer.mozilla.org/en-US/docs/Web */
+}
+
 .magicss-dialog-search-icons .magicssSearchResultEntryIcon * {
     box-sizing: border-box;
 }
