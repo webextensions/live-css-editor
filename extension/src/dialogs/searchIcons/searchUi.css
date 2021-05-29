@@ -43,7 +43,7 @@
 }
 
 .magicss-search-for-icons-input .MuiOutlinedInput-notchedOutline {
-    background-color: #fff !important; /* https://css-tricks.com/ */
+    background-color: unset !important; /* https://css-tricks.com/ */
 }
 .magicss-search-for-icons-input .MuiOutlinedInput-inputMarginDense {
     padding-top: 10.5px !important;      /* https://css-tricks.com/ */
