@@ -333,6 +333,64 @@ describe('Cross site UI consistency', async function () {
                     );
                 }
             );
+
+            getItOrSkip('should open configure access in search icons UI', skipFrom)(
+                'should open configure access in search icons UI',
+                async function () {
+                    await page.click('.magicss-cog-wheel-icon');
+
+                    const elementHandle = await page.waitForSelector('.magicss-dialog-search-icons-configuration .MuiDialog-paper');
+
+                    await page.waitForTimeout(200); // Wait for completion of material-ui transition effects
+
+                    await page.evaluate(async function () {
+                        const timeout = function (ms) {
+                            return new Promise(resolve => setTimeout(resolve, ms));
+                        };
+
+                        const forceBlur = async function () {
+                            const input = document.createElement('input');
+                            input.style.position = 'absolute';
+                            input.style.opacity = '0';
+
+                            document.body.appendChild(input);
+                            input.focus();
+                            await timeout(0);
+                            document.body.removeChild(input);
+                        };
+
+                        await forceBlur();
+                    });
+
+                    await page.waitForTimeout(200); // Delay to let blur happen properly
+
+                    const searchIconsConfigurationImage = await _screenshot(elementHandle, {
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'opened-search-icons-configuration-' + fsNameForUrl + '.png')
+                    });
+
+                    try {
+                        expect(searchIconsConfigurationImage).toMatchImageSnapshot(
+                            this,
+                            {
+                                ..._matchImageOptions,
+                                customDiffDir,
+                                customSnapshotIdentifier: 'opened-search-icons-configuration',
+                                failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                            }
+                        );
+                    } catch (e) {
+                        expect(searchIconsConfigurationImage).toMatchImageSnapshot(
+                            this,
+                            {
+                                ..._matchImageOptions,
+                                customDiffDir,
+                                customSnapshotIdentifier: 'opened-search-icons-configuration-2',
+                                failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                            }
+                        );
+                    }
+                }
+            );
         });
     }
 
