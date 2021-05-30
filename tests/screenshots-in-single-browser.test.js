@@ -401,6 +401,53 @@ describe('Cross site UI consistency', async function () {
                     }, originalOverflow);
                 }
             );
+
+            getItOrSkip('should focus first input field for configure access in search icons UI', skipFrom)(
+                'should focus first input field for configure access in search icons UI',
+                async function () {
+                    await page.focus('.magicss-dialog-search-icons-configuration input');
+
+                    await page.waitForTimeout(250); // Wait for completion of material-ui transition effects
+
+                    const elementHandle = await page.$('.magicss-dialog-search-icons-configuration .MuiDialog-paper');
+
+                    const originalOverflow = await page.evaluate(async function () {
+                        const originalOverflow = document.documentElement.style.overflow;
+                        document.documentElement.style.overflow = 'hidden';
+                        return originalOverflow;
+                    });
+
+                    const searchIconsConfigurationImage = await _screenshot(elementHandle, {
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'opened-and-focused-search-icons-configuration-' + fsNameForUrl + '.png')
+                    });
+
+                    try {
+                        expect(searchIconsConfigurationImage).toMatchImageSnapshot(
+                            this,
+                            {
+                                ..._matchImageOptions,
+                                customDiffDir,
+                                customSnapshotIdentifier: 'opened-and-focused-search-icons-configuration',
+                                failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                            }
+                        );
+                    } catch (e) {
+                        expect(searchIconsConfigurationImage).toMatchImageSnapshot(
+                            this,
+                            {
+                                ..._matchImageOptions,
+                                customDiffDir,
+                                customSnapshotIdentifier: 'opened-and-focused-search-icons-configuration-2',
+                                failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                            }
+                        );
+                    }
+
+                    await page.evaluate(async function (originalOverflow) {
+                        document.documentElement.style.overflow = originalOverflow;
+                    }, originalOverflow);
+                }
+            );
         });
     }
 
