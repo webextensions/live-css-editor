@@ -49,6 +49,7 @@
 .magicss-dialog-search-icons h2 {
     padding-left: 0;  /* https://lesscss.org/ */
     max-width: unset; /* https://www.udemy.com/ */
+    font-family: Arial, sans-serif !important; /* https://jquery.com/ */
 }
 
 .magicss-dialog-search-icons input[type=text] {
@@ -66,4 +67,8 @@
 .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
     border-color: #3f51b5 !important; /* https://css-tricks.com/ */
     border-width: 2px !important;     /* https://css-tricks.com/ */
+}
+
+.magicss-dialog-search-icons a {
+    text-underline-offset: unset !important; /* https://moderncss.dev/ */
 }

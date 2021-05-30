@@ -71,6 +71,7 @@
 
     font-family: Arial, sans-serif !important; /* https://css-tricks.com/ */
     background-color: #fff !important;         /* https://css-tricks.com/ */
+    box-shadow: none !important;               /* https://www.smashingmagazine.com/ */
 }
 
 .magicss-dialog-search-icons input[type=text]:focus {

@@ -137,7 +137,7 @@ const SearchIconsConfiguration = function (props) {
                     open={open}
                     onClose={handleClose}
                     disableBackdropClick
-                    className="magicss-dialog-search-icons magicss-dialog-search-icons-configuration"
+                    className="magicss-base-element magicss-dialog-search-icons magicss-dialog-search-icons-configuration"
                     PaperProps={{
                         style: {
                             maxWidth: 475
@@ -167,7 +167,16 @@ const SearchIconsConfiguration = function (props) {
                                     Step 1:
                                 </div>
                                 <div>
-                                    Go to the API page on <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/" style={{ color: '#3f51b5', textDecoration: 'underline' }}>The Noun Project</a>
+                                    Go to the API page on <a
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        href="https://thenounproject.com/developers/"
+                                        style={{
+                                            color: '#3f51b5',
+                                            textDecoration: 'underline',
+                                            fontWeight: 'normal' /* https://www.linkedin.com/feed/ */
+                                        }}
+                                    >The Noun Project</a>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
@@ -183,7 +192,16 @@ const SearchIconsConfiguration = function (props) {
                                     Step 3:
                                 </div>
                                 <div>
-                                    Create an application under the <a target="_blank" rel="noreferrer" href="https://thenounproject.com/developers/apps/" style={{ color: '#3f51b5', textDecoration: 'underline' }}>Manage Apps section</a>
+                                    Create an application under the <a
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        href="https://thenounproject.com/developers/apps/"
+                                        style={{
+                                            color: '#3f51b5',
+                                            textDecoration: 'underline',
+                                            fontWeight: 'normal' /* https://www.linkedin.com/feed/ */
+                                        }}
+                                    >Manage Apps section</a>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>

@@ -1767,6 +1767,23 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 }
 /* End: Command palette */
 
+/* Begin: Generic (not targeting specific components via CSS selector) fixes */
+
+.magicss-base-element {
+    text-align: left;    /* https://www.phpbb.com/ */
+}
+
+.magicss-base-element a {
+    /* Without this style, there were minor pixel level differences in text rendering on Chrome for a particular anchor
+       tag in https://www.phpbb.com/ and notably, it didn't affect all possible anchor elements as such */
+    unicode-bidi: unset; /* https://www.phpbb.com/ */
+}
+
+.magicss-base-element .MuiTypography-h6 {
+    font-size: 20px;     /* https://www.sitepoint.com/ */
+}
+
+/* End: Generic (not targeting specific components via CSS selector) fixes */
 
 
 /* Begin: Command palette fixes useful for some sites */

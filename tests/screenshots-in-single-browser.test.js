@@ -364,6 +364,12 @@ describe('Cross site UI consistency', async function () {
 
                     await page.waitForTimeout(200); // Delay to let blur happen properly
 
+                    const originalOverflow = await page.evaluate(async function () {
+                        const originalOverflow = document.documentElement.style.overflow;
+                        document.documentElement.style.overflow = 'hidden';
+                        return originalOverflow;
+                    });
+
                     const searchIconsConfigurationImage = await _screenshot(elementHandle, {
                         path: path.resolve(__dirname, 'screenshots', 'all', 'opened-search-icons-configuration-' + fsNameForUrl + '.png')
                     });
@@ -389,6 +395,10 @@ describe('Cross site UI consistency', async function () {
                             }
                         );
                     }
+
+                    await page.evaluate(async function (originalOverflow) {
+                        document.documentElement.style.overflow = originalOverflow;
+                    }, originalOverflow);
                 }
             );
         });
