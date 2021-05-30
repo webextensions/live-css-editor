@@ -236,14 +236,14 @@ describe('Cross site UI consistency', async function () {
                         // Without this, the screenshots appear to be affected by some unexpected behavior of scroll-for-taking-screenshot
                         captureBeyondViewport: false,
 
-                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icon-' + url.replace(/[:/?=%]/g, '-') + '.png')
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'joyride-for-search-icons-' + url.replace(/[:/?=%]/g, '-') + '.png')
                     });
 
                     expect(joyrideInSearchIconImage).toMatchImageSnapshot(
                         this,
                         {
                             customSnapshotsDir: path.resolve(__dirname, 'screenshots'),
-                            customSnapshotIdentifier: 'joyride-for-search-icon',
+                            customSnapshotIdentifier: 'joyride-for-search-icons',
 
                             failureThresholdType: 'percent',
                             failureThreshold: 0.02 // Below 0.02% threshold, there can be some intermittent test failures
