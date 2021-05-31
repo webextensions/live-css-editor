@@ -511,6 +511,32 @@ describe('Cross site UI consistency', async function () {
                     );
                 }
             );
+
+            getItOrSkip('should attempt icon search with invalid configuration data', skipFrom)(
+                'should attempt icon search with invalid configuration data',
+                async function () {
+                    this.timeout(10 * 1000 * 1000);
+
+                    await page.click('.magicss-dialog-search-icons-main .magicss-search-icons-button');
+
+                    await page.waitForSelector('.magicss-dialog-search-icons-main .magic-css-unable-to-access-noun-project-api');
+
+                    const elementHandle = await page.$('.magicss-dialog-search-icons-main .MuiDialog-paper');
+                    const searchIconsUiImage = await _screenshot(elementHandle, {
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'search-for-arrow-icon-with-erroneous-configuration-' + fsNameForUrl + '.png')
+                    });
+
+                    expect(searchIconsUiImage).toMatchImageSnapshot(
+                        this,
+                        {
+                            ..._matchImageOptions,
+                            customDiffDir,
+                            customSnapshotIdentifier: 'search-for-arrow-icon-with-erroneous-configuration',
+                            failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                        }
+                    );
+                }
+            );
         });
     }
 

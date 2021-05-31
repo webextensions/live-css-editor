@@ -647,7 +647,7 @@ const SearchOutput = function (props) {
                         if (statusCode === 401 || statusCode === 403) {
                             return (
                                 <React.Fragment>
-                                    <div>
+                                    <div className="magic-css-unable-to-access-noun-project-api">
                                         Error: Unable to access API
                                     </div>
                                     <div style={{ marginTop: 10, maxWidth: 450 }}>
@@ -904,6 +904,7 @@ const SearchUi = function (props) {
 
                     <div style={{ marginLeft: 20 }}>
                         <Button
+                            className="magicss-search-icons-button"
                             variant="contained"
                             color="primary"
                             size="medium"
