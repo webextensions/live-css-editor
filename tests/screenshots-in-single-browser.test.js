@@ -507,7 +507,7 @@ describe('Cross site UI consistency', async function () {
                         {
                             ..._matchImageOptions,
                             customDiffDir,
-                            customSnapshotIdentifier: 'about-to-search-for-arrow-icon-',
+                            customSnapshotIdentifier: 'about-to-search-for-arrow-icon',
                             failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
                         }
                     );
