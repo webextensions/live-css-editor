@@ -547,6 +547,67 @@ describe('Cross site UI consistency', async function () {
                     }, originalOverflow);
                 }
             );
+
+            getItOrSkip('should search for "arrow" in search icons UI', skipFrom)(
+                'should search for "arrow" in search icons UI',
+                async function () {
+                    this.timeout(15 * 1000 * 1000);
+
+                    await extensionContext.evaluate(async function (secrets) {
+                        window.redux_store.dispatch({
+                            // FIXME: Remove hard-coding
+                            type: 'APP_$_SEARCH_ICONS_CONFIGURATION_SET_ACCESS_KEY',
+                            payload: {
+                                accessKey: secrets.nounProjectApi.accessKey,
+                                skipPersistence: true
+                            }
+                        });
+                        window.redux_store.dispatch({
+                            // FIXME: Remove hard-coding
+                            type: 'APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET',
+                            payload: {
+                                secret: secrets.nounProjectApi.secret,
+                                skipPersistence: true
+                            }
+                        });
+                    }, secrets);
+
+                    await page.click('.magicss-dialog-search-icons-main .magicss-search-icons-button');
+
+                    await page.waitForFunction(async () => {
+                        const imgs = Array.from(document.querySelectorAll('.magicssSearchResultEntryIcon img'));
+
+                        if (imgs.length === 50) {
+                            let allImagesAreLoaded = imgs.every(function (img) {
+                                if (img.complete) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            });
+
+                            return allImagesAreLoaded;
+                        } else {
+                            return false;
+                        }
+                    });
+
+                    const elementHandle = await page.$('.magicss-dialog-search-icons-main .MuiDialog-paper');
+                    const searchIconsUiImage = await _screenshot(elementHandle, {
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'page-1-search-results-for-arrow-icon-' + fsNameForUrl + '.png')
+                    });
+
+                    expect(searchIconsUiImage).toMatchImageSnapshot(
+                        this,
+                        {
+                            ..._matchImageOptions,
+                            customDiffDir,
+                            customSnapshotIdentifier: 'page-1-search-results-for-arrow-icon',
+                            failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                        }
+                    );
+                }
+            );
         });
     }
 
