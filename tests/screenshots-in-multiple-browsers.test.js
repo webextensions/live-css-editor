@@ -20,8 +20,8 @@ describe('Cross site UI consistency', async function () {
     let extBackgroundPage;
 
     const urls = [
-        'http://localhost/',
-        'http://127.0.0.1/'
+        'http://127.0.0.1/',
+        'http://localhost/'
     ];
 
     const getItOrSkip = function (testName, arrSkip) {

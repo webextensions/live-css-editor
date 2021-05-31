@@ -48,8 +48,6 @@ describe('Cross site UI consistency', async function () {
         'https://developer.mozilla.org/en-US/docs/Web',
         'https://getbootstrap.com/',
         'https://github.com/',
-        'https://google.ae/',
-        'https://google.com/ncr',
         'https://jquery.com/',
         'https://lesscss.org/',
         'https://materializecss.com/',
@@ -58,18 +56,20 @@ describe('Cross site UI consistency', async function () {
         'https://sass-lang.com/',
         'https://twitter.com/webextensions',
         'https://visualstudio.microsoft.com/',
-        'https://webextensions.org/',
+        'https://www.google.ae/',
+        'https://www.google.com/ncr',
         'https://www.google.com/chrome/',
         {
             url: 'https://www.instagram.com/',
             skipFrom: 'should load joyride for search icons UI'
         },
         'https://www.linkedin.com/feed/',
-        'https://www.mozilla.org/',
+        'https://www.mozilla.org/en-US/',
         'https://www.phpbb.com/',
         'https://www.sitepoint.com/',
         'https://www.smashingmagazine.com/',
         'https://www.udemy.com/',
+        'https://www.webextensions.org/',
         'https://www.youtube.com/'
         /* */
     ];
