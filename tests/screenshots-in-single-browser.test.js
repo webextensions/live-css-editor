@@ -521,6 +521,12 @@ describe('Cross site UI consistency', async function () {
 
                     await page.waitForSelector('.magicss-dialog-search-icons-main .magic-css-unable-to-access-noun-project-api');
 
+                    const originalOverflow = await page.evaluate(async function () {
+                        const originalOverflow = document.documentElement.style.overflow;
+                        document.documentElement.style.overflow = 'hidden';
+                        return originalOverflow;
+                    });
+
                     const elementHandle = await page.$('.magicss-dialog-search-icons-main .MuiDialog-paper');
                     const searchIconsUiImage = await _screenshot(elementHandle, {
                         path: path.resolve(__dirname, 'screenshots', 'all', 'search-for-arrow-icon-with-erroneous-configuration-' + fsNameForUrl + '.png')
@@ -535,6 +541,10 @@ describe('Cross site UI consistency', async function () {
                             failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
                         }
                     );
+
+                    await page.evaluate(async function (originalOverflow) {
+                        document.documentElement.style.overflow = originalOverflow;
+                    }, originalOverflow);
                 }
             );
         });
