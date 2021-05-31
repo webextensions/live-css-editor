@@ -71,7 +71,11 @@ const IconEntry = ({ children, rowIndex, onFocus, className }) => {
             }}
             onClick={handleClick}
             role="gridcell"
-            style={{ display: 'block', cursor: 'pointer' }}
+            style={{
+                display: 'block',
+                cursor: 'pointer',
+                borderWidth: 0 /* https://sass-lang.com/ */
+            }}
             className={className}
         >
             {children}
@@ -222,7 +226,8 @@ const ListOfIcons = function (props) {
                                                     maxHeight: 40,
                                                     width: '100%',
                                                     height: '100%',
-                                                    objectFit: 'cover'
+                                                    objectFit: 'cover',
+                                                    borderWidth: 0 /* https://moderncss.dev/ */
                                                 }}
                                             />
                                         </div>
