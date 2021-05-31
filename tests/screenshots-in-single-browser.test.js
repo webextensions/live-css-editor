@@ -463,8 +463,8 @@ describe('Cross site UI consistency', async function () {
                 }
             );
 
-            getItOrSkip('should set configuration data and type the text "arrow" in search icons UI', skipFrom)(
-                'should set configuration data and type the text "arrow" in search icons UI',
+            getItOrSkip('should set (invalid) configuration data and type the text "arrow" in search icons UI', skipFrom)(
+                'should set (invalid) configuration data and type the text "arrow" in search icons UI',
                 async function () {
                     await page.click('.magicss-dialog-search-icons-configuration .MuiButton-containedPrimary');
 
@@ -479,7 +479,7 @@ describe('Cross site UI consistency', async function () {
                             // FIXME: Remove hard-coding
                             type: 'APP_$_SEARCH_ICONS_CONFIGURATION_SET_ACCESS_KEY',
                             payload: {
-                                accessKey: secrets.nounProjectApi.accessKey,
+                                accessKey: secrets.nounProjectApiIncorrectAccessKeyAndSecret.accessKey,
                                 skipPersistence: true
                             }
                         });
@@ -487,7 +487,7 @@ describe('Cross site UI consistency', async function () {
                             // FIXME: Remove hard-coding
                             type: 'APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET',
                             payload: {
-                                secret: secrets.nounProjectApi.secret,
+                                secret: secrets.nounProjectApiIncorrectAccessKeyAndSecret.secret,
                                 skipPersistence: true
                             }
                         });
