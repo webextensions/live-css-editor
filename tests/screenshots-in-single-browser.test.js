@@ -125,6 +125,7 @@ describe('Cross site UI consistency', async function () {
         const customDiffDir = path.resolve(screenshotsDir, 'diffs', `__diff_output__${fsNameForUrl}`);
 
         let page;
+        let extensionContext;
 
         describe(`${url}`, async function () {
             it('should initiate Magic CSS', async function () {
@@ -145,9 +146,20 @@ describe('Cross site UI consistency', async function () {
                 });
             });
 
-            it('should load Magic CSS', async function () {
+            it('should be able to set the extensionContext', async function () {
                 await page.waitForSelector('#MagiCSS-bookmarklet .CodeMirror');
 
+                let _frameManager = page._frameManager;
+                _frameManager._contextIdToContext.forEach(function (executionContext) {
+                    if (executionContext._contextName === 'Live editor for CSS, Less & Sass - Magic CSS') {
+                        extensionContext = executionContext;
+                    }
+                });
+
+                expect(extensionContext).not.toBeUndefined();
+            });
+
+            it('should load Magic CSS', async function () {
                 const image = await _screenshot(page, {
                     clip: {
                         x: 25,
