@@ -466,8 +466,6 @@ describe('Cross site UI consistency', async function () {
             getItOrSkip('should set configuration data and type the text "arrow" in search icons UI', skipFrom)(
                 'should set configuration data and type the text "arrow" in search icons UI',
                 async function () {
-                    this.timeout(30 * 1000 * 1000);
-
                     await page.click('.magicss-dialog-search-icons-configuration .MuiButton-containedPrimary');
 
                     await page.waitForTimeout(250); // Wait for completion of material-ui transition effects
