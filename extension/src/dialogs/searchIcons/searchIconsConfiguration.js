@@ -141,7 +141,7 @@ const SearchIconsConfiguration = function (props) {
                     open={open}
                     onClose={handleClose}
                     disableBackdropClick
-                    className="magicss-base-element magicss-dialog-search-icons magicss-dialog-search-icons-configuration"
+                    className="magicss-base-element magicss-material-ui-dialog magicss-dialog-search-icons magicss-dialog-search-icons-configuration"
                     PaperProps={{
                         style: {
                             maxWidth: 475
