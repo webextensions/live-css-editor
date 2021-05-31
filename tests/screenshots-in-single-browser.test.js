@@ -11,6 +11,8 @@ const puppeteer = require('puppeteer');
 const { toMatchImageSnapshot } = require('expect-mocha-image-snapshot');
 expect.extend({ toMatchImageSnapshot });
 
+const secrets = require('./secrets/secrets.js');
+
 const pathToExtension = path.resolve(__dirname, '..', 'extension');
 
 const _screenshot = async function (handle, options) {
@@ -458,6 +460,57 @@ describe('Cross site UI consistency', async function () {
                     await page.evaluate(async function (originalOverflow) {
                         document.documentElement.style.overflow = originalOverflow;
                     }, originalOverflow);
+                }
+            );
+
+            getItOrSkip('should set configuration data and type the text "arrow" in search icons UI', skipFrom)(
+                'should set configuration data and type the text "arrow" in search icons UI',
+                async function () {
+                    this.timeout(30 * 1000 * 1000);
+
+                    await page.click('.magicss-dialog-search-icons-configuration .MuiButton-containedPrimary');
+
+                    await page.waitForTimeout(250); // Wait for completion of material-ui transition effects
+
+                    await page.focus('.magicss-dialog-search-icons-main .MuiOutlinedInput-input');
+
+                    await page.keyboard.sendCharacter('arrow');
+
+                    await extensionContext.evaluate(async function (secrets) {
+                        window.redux_store.dispatch({
+                            // FIXME: Remove hard-coding
+                            type: 'APP_$_SEARCH_ICONS_CONFIGURATION_SET_ACCESS_KEY',
+                            payload: {
+                                accessKey: secrets.nounProjectApi.accessKey,
+                                skipPersistence: true
+                            }
+                        });
+                        window.redux_store.dispatch({
+                            // FIXME: Remove hard-coding
+                            type: 'APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET',
+                            payload: {
+                                secret: secrets.nounProjectApi.secret,
+                                skipPersistence: true
+                            }
+                        });
+                    }, secrets);
+
+                    await page.waitForTimeout(150); // Wait for completion of material-ui transition effects
+
+                    const elementHandle = await page.$('.magicss-dialog-search-icons-main .MuiDialog-paper');
+                    const searchIconsUiImage = await _screenshot(elementHandle, {
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'about-to-search-for-arrow-icon-' + fsNameForUrl + '.png')
+                    });
+
+                    expect(searchIconsUiImage).toMatchImageSnapshot(
+                        this,
+                        {
+                            ..._matchImageOptions,
+                            customDiffDir,
+                            customSnapshotIdentifier: 'about-to-search-for-arrow-icon-',
+                            failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                        }
+                    );
                 }
             );
         });
