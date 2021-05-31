@@ -41,22 +41,34 @@ const searchIconsReducer = (draft = searchIconsInitialState, action) => {
         case APP_$_CLOSE_SEARCH_ICONS_CONFIGURATION:
             draft.openConfiguration = false;
             break;
-        case APP_$_SEARCH_ICONS_CONFIGURATION_SET_ACCESS_KEY:
-            draft.accessKey = payload;
-            setTimeout(function () {
-                chromeStorageForExtensionData.set({
-                    [USER_PREFERENCE_NOUN_PROJECT_API_ACCESS_KEY]: payload
+        case APP_$_SEARCH_ICONS_CONFIGURATION_SET_ACCESS_KEY: {
+            const { accessKey, skipPersistence } = payload;
+            draft.accessKey = accessKey;
+            if (skipPersistence) { // Helpful for testing without persistent changes
+                // do nothing
+            } else {
+                setTimeout(function () {
+                    chromeStorageForExtensionData.set({
+                        [USER_PREFERENCE_NOUN_PROJECT_API_ACCESS_KEY]: accessKey
+                    });
                 });
-            });
+            }
             break;
-        case APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET:
-            draft.secret = payload;
-            setTimeout(function () {
-                chromeStorageForExtensionData.set({
-                    [USER_PREFERENCE_NOUN_PROJECT_API_SECRET]: payload
+        }
+        case APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET: {
+            const { secret, skipPersistence } = payload;
+            draft.secret = secret;
+            if (skipPersistence) { // Helpful for testing without persistent changes
+                // do nothing
+            } else {
+                setTimeout(function () {
+                    chromeStorageForExtensionData.set({
+                        [USER_PREFERENCE_NOUN_PROJECT_API_SECRET]: secret
+                    });
                 });
-            });
+            }
             break;
+        }
     }
 
     return draft;

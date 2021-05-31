@@ -51,7 +51,9 @@ const SearchIconsConfiguration = function (props) {
     const setAccessKey = function (accessKey) {
         props.dispatch({
             type: APP_$_SEARCH_ICONS_CONFIGURATION_SET_ACCESS_KEY,
-            payload: accessKey
+            payload: {
+                accessKey
+            }
         });
 
         setTestConnectionStatus({
@@ -61,7 +63,9 @@ const SearchIconsConfiguration = function (props) {
     const setSecret = function (secret) {
         props.dispatch({
             type: APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET,
-            payload: secret
+            payload: {
+                secret
+            }
         });
 
         setTestConnectionStatus({
