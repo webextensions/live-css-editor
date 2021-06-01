@@ -608,6 +608,67 @@ describe('Cross site UI consistency', async function () {
                     );
                 }
             );
+
+            getItOrSkip('click on "More" in icon search', skipFrom)(
+                'click on "More" in icon search',
+                async function () {
+                    this.timeout(15 * 1000 * 1000);
+
+                    await page.click('.magicssSearchResultEntryIcon + .MuiButton-root');
+
+                    await page.waitForFunction(async () => {
+                        const imgs = Array.from(document.querySelectorAll('.magicssSearchResultEntryIcon img'));
+
+                        if (imgs.length === 100) {
+                            let allImagesAreLoaded = imgs.every(function (img) {
+                                if (img.complete) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            });
+
+                            return allImagesAreLoaded;
+                        } else {
+                            return false;
+                        }
+                    });
+
+                    // Select 97th search result (first item in the last row)
+                    await page.click('.magicssSearchResultEntryIcon:nth-child(97)');
+
+                    await page.waitForFunction(async () => {
+                        const img = document.querySelector('.magicss-search-icon-preview img');
+                        const flagImgIsLoaded = img.complete;
+                        return flagImgIsLoaded;
+                    });
+
+                    const originalOverflow = await page.evaluate(async function () {
+                        const originalOverflow = document.documentElement.style.overflow;
+                        document.documentElement.style.overflow = 'hidden';
+                        return originalOverflow;
+                    });
+
+                    const elementHandle = await page.$('.magicss-dialog-search-icons-main .MuiDialog-paper');
+                    const searchIconsUiImage = await _screenshot(elementHandle, {
+                        path: path.resolve(__dirname, 'screenshots', 'all', 'hundred-search-results-and-one-result-selected-' + fsNameForUrl + '.png')
+                    });
+
+                    await page.evaluate(async function (originalOverflow) {
+                        document.documentElement.style.overflow = originalOverflow;
+                    }, originalOverflow);
+
+                    expect(searchIconsUiImage).toMatchImageSnapshot(
+                        this,
+                        {
+                            ..._matchImageOptions,
+                            customDiffDir,
+                            customSnapshotIdentifier: 'hundred-search-results-and-one-result-selected',
+                            failureThreshold: 0.01 // Below 0.01% threshold, there can be some intermittent test failures
+                        }
+                    );
+                }
+            );
         });
     }
 
