@@ -123,6 +123,7 @@
     padding: 1px !important;                           /* https://css-tricks.com/ */
     border-color: transparent !important;              /* https://css-tricks.com/ */
     line-height: normal !important;                    /* https://www.sitepoint.com/ */
+    font-family: Arial, sans-serif !important;         /* https://www.smashingmagazine.com/ */
 }
 
 .magicss-search-icon-preview {
@@ -136,5 +137,6 @@
 
 .magicss-search-icon-preview a {
     border-width: 0 !important;                        /* https://sass-lang.com/ */
+    padding: 0 !important;                             /* https://www.smashingmagazine.com/ */
     font-weight: normal !important;                    /* https://www.linkedin.com/feed/ */
 }

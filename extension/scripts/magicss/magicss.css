@@ -1777,6 +1777,20 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     /* Without this style, there were minor pixel level differences in text rendering on Chrome for a particular anchor
        tag in https://www.phpbb.com/ and notably, it didn't affect all possible anchor elements as such */
     unicode-bidi: unset; /* https://www.phpbb.com/ */
+
+    /* Without this style, the transition effect may take a little time, which can cause some puppeteer screenshots to
+       be different across sites. That can be handled by adding a delay when taking the puppeter screenshots or by
+       removing the transition delay (transition-duration) as done here, which apparently is also better in terms of UX.
+    */
+    transition-duration: unset !important; /* https://visualstudio.microsoft.com/ */
+
+    padding: 0 !important; /* https://www.smashingmagazine.com/ */
+}
+
+.magicss-base-element a:hover,
+.magicss-base-element a:focus {
+    opacity: 1 !important;       /* https://css-tricks.com/ */
+    outline-width: 0 !important; /* https://moderncss.dev/ */
 }
 
 .magicss-base-element .MuiTypography-h6 {
