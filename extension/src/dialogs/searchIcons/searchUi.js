@@ -273,7 +273,9 @@ const ListOfIcons = function (props) {
                                         <div>
                                             <div
                                                 style={{
-                                                    textTransform: 'none'
+                                                    textTransform: 'none',
+                                                    fontSize: 13,
+                                                    letterSpacing: 0.4 /* https://code.visualstudio.com/ */
                                                 }}
                                             >
                                                 More
@@ -283,7 +285,8 @@ const ListOfIcons = function (props) {
                                                     fontSize: 11,
                                                     textTransform: 'none',
                                                     color: '#444',
-                                                    textDecoration: 'underline'
+                                                    textDecoration: 'underline',
+                                                    letterSpacing: 0.4 /* https://code.visualstudio.com/ */
                                                 }}
                                             >
                                                 Retry
@@ -291,7 +294,17 @@ const ListOfIcons = function (props) {
                                         </div>
                                     );
                                 } else {
-                                    return 'More';
+                                    return (
+                                        <div
+                                            style={{
+                                                textTransform: 'none',
+                                                fontSize: 13,
+                                                letterSpacing: 0.4 /* https://code.visualstudio.com/ */
+                                            }}
+                                        >
+                                            More
+                                        </div>
+                                    );
                                 }
                             }
                         }()}
@@ -299,6 +312,7 @@ const ListOfIcons = function (props) {
                 }
             </div>
             <div
+                className="magicss-search-icon-preview"
                 style={{
                     width: 300,
                     overflow: 'auto',
@@ -337,7 +351,7 @@ const ListOfIcons = function (props) {
                                         <div>
                                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                                 <a target="_blank" rel="noreferrer" href={icon.icon_url}>
-                                                    <img src={icon.preview_url} style={{ width: 100 }} />
+                                                    <img src={icon.preview_url} style={{ display: 'block', width: 100, height: 100 }} />
                                                 </a>
                                             </div>
 
@@ -346,7 +360,7 @@ const ListOfIcons = function (props) {
                                                     <tbody>
                                                         <tr>
                                                             <td style={{ color: '#aaa', textAlign: 'right' }}>Download: </td>
-                                                            <td style={{ color: '#888' }}>
+                                                            <td style={{ color: '#888', textAlign: 'left' }}>
                                                                 <a style={{ textDecoration: 'none', color: '#3f51b5' }} target="_blank" rel="noreferrer" href={icon.icon_url}>
                                                                     {icon.term}
                                                                 </a>
@@ -354,7 +368,7 @@ const ListOfIcons = function (props) {
                                                         </tr>
                                                         <tr>
                                                             <td style={{ color: '#aaa', textAlign: 'right' }}>By: </td>
-                                                            <td>
+                                                            <td style={{ textAlign: 'left' }}>
                                                                 <a style={{ color: '#888', textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.uploader.permalink}/`}>
                                                                     {icon.uploader.name}
                                                                 </a>
@@ -362,7 +376,7 @@ const ListOfIcons = function (props) {
                                                         </tr>
                                                         <tr>
                                                             <td style={{ color: '#aaa', textAlign: 'right' }}>From: </td>
-                                                            <td>
+                                                            <td style={{ textAlign: 'left' }}>
                                                                 <a style={{ color: '#888', textDecoration: 'none' }} target="_blank" rel="noreferrer" href={`https://thenounproject.com${icon.permalink}/`}>
                                                                     Noun Project
                                                                 </a>
@@ -370,7 +384,7 @@ const ListOfIcons = function (props) {
                                                         </tr>
                                                         <tr>
                                                             <td style={{ color: '#aaa', textAlign: 'right' }}>License: </td>
-                                                            <td style={{ color: '#888' }}>
+                                                            <td style={{ color: '#888', textAlign: 'left' }}>
                                                                 {(
                                                                     icon.license_description === 'public-domain' ?
                                                                         'Public domain' :
@@ -398,6 +412,9 @@ const ListOfIcons = function (props) {
                                                                     color="primary"
                                                                     size="small"
                                                                     disabled={disabled}
+                                                                    style={{
+                                                                        fontSize: 13 /* https://code.visualstudio.com/ */
+                                                                    }}
                                                                     onClick={async () => {
                                                                         await ensureLoad(icon.icon_url);
 
@@ -461,6 +478,9 @@ const ListOfIcons = function (props) {
                                                                     color="primary"
                                                                     size="small"
                                                                     disabled={disabled}
+                                                                    style={{
+                                                                        fontSize: 13 /* https://code.visualstudio.com/ */
+                                                                    }}
                                                                     onClick={async () => {
                                                                         await ensureLoad(icon.icon_url);
 
@@ -494,6 +514,10 @@ const ListOfIcons = function (props) {
                                                                     color="primary"
                                                                     size="small"
                                                                     disabled={disabled}
+                                                                    style={{
+                                                                        marginLeft: 10,
+                                                                        fontSize: 13 /* https://code.visualstudio.com/ */
+                                                                    }}
                                                                     onClick={async () => {
                                                                         await ensureLoad(icon.icon_url);
 
@@ -520,7 +544,6 @@ const ListOfIcons = function (props) {
                                                                             }
                                                                         });
                                                                     }}
-                                                                    style={{ marginLeft: 10 }}
                                                                 >
                                                                     Copy Data URL
                                                                 </Button>

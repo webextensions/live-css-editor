@@ -106,3 +106,35 @@
     color: rgba(0, 0, 0, 0.87) !important;     /* https://www.linkedin.com/feed/ */
     opacity: 0.42 !important;                  /* https://www.linkedin.com/feed/ */
 }
+
+.magicss-icon-description {
+    -webkit-border-horizontal-spacing: 2px !important; /* https://css-tricks.com/ */
+    -webkit-border-vertical-spacing: 2px !important;   /* https://css-tricks.com/ */
+    border-collapse: separate;                         /* https://code.visualstudio.com/ */
+    border-width: 0 !important;                        /* https://css-tricks.com/ */
+    width: unset !important;                           /* https://css-tricks.com/ */
+    margin: 0 !important;                              /* https://css-tricks.com/ */
+}
+.magicss-icon-description tr {
+    background: transparent !important;                /* https://css-tricks.com/ */
+}
+.magicss-icon-description td {
+    border-width: 0 !important;                        /* https://css-tricks.com/ */
+    padding: 1px !important;                           /* https://css-tricks.com/ */
+    border-color: transparent !important;              /* https://css-tricks.com/ */
+    line-height: normal !important;                    /* https://www.sitepoint.com/ */
+}
+
+.magicss-search-icon-preview {
+    box-sizing: border-box;
+}
+
+.magicss-search-icon-preview img {
+    margin: 0 !important;                              /* https://moderncss.dev/ */
+    border: 0 !important;                              /* https://moderncss.dev/ */
+}
+
+.magicss-search-icon-preview a {
+    border-width: 0 !important;                        /* https://sass-lang.com/ */
+    font-weight: normal !important;                    /* https://www.linkedin.com/feed/ */
+}
