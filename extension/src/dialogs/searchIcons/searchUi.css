@@ -1,0 +1,142 @@
+.magicss-dialog-search-icons {
+    letter-spacing: normal; /* https://developer.mozilla.org/en-US/docs/Web */
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon * {
+    box-sizing: border-box;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon {
+    width: 80px;
+    height: 80px;
+    outline: none;
+}
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon > div {
+    border: 2px solid transparent;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon:focus > div,
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon.iconIsSelected > div {
+    border: 2px solid blue;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon .magicssSearchResultEntryIconBorderLayer {
+    border: 2px solid transparent;
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon:focus .magicssSearchResultEntryIconBorderLayer {
+    border: 2px solid rgb(139,139,192);
+}
+
+.magicss-dialog-search-icons .magicssSearchResultEntryIcon:hover {
+    background-color: #ddd;
+}
+
+.magicss-dialog-search-icons table.magicss-icon-description * {
+    font-size: 12px;;
+}
+
+.magicss-dialog-search-icons input.MuiInputBase-input {
+    font-size: 16px !important;        /* https://css-tricks.com/ */
+    line-height: 19px !important;      /* https://code.visualstudio.com/ */
+    letter-spacing: 0.15px !important; /* https://code.visualstudio.com/ */
+}
+
+.magicss-dialog-search-icons .MuiInputLabel-outlined {
+    font-size: 16px !important; /* https://code.visualstudio.com/ */
+}
+
+.magicss-dialog-search-icons .MuiInputBase-input {
+    height: 19px !important;    /* https://code.visualstudio.com/ */
+}
+
+.magicss-dialog-search-icons .MuiOutlinedInput-notchedOutline span {
+    font-size: 12px !important; /* https://code.visualstudio.com/ */
+}
+
+.magicss-dialog-search-icons .MuiOutlinedInput-notchedOutline {
+    background-color: unset !important; /* https://css-tricks.com/ */
+}
+.magicss-dialog-search-icons .MuiOutlinedInput-inputMarginDense {
+    padding-top: 10.5px !important;      /* https://css-tricks.com/ */
+    padding-bottom: 10.5px !important;   /* https://css-tricks.com/ */
+}
+.magicss-dialog-search-icons input[type=text].MuiOutlinedInput-inputMarginDense {
+    border-width: 0 !important;          /* https://css-tricks.com/ */
+}
+
+.magicss-dialog-search-icons input.MuiOutlinedInput-input[type=text] {
+    padding-left: 14px !important;             /* https://css-tricks.com/ */
+    padding-right: 14px !important;            /* https://css-tricks.com/ */
+
+    font-family: Arial, sans-serif !important; /* https://css-tricks.com/ */
+    background-color: #fff !important;         /* https://css-tricks.com/ */
+    box-shadow: none !important;               /* https://www.smashingmagazine.com/ */
+}
+
+.magicss-dialog-search-icons input[type=text]:focus {
+    box-shadow: unset !important               /* https://developer.mozilla.org/en-US/docs/Web */
+}
+
+.magicss-dialog-search-icons legend {
+    float: unset !important;                   /* https://getbootstrap.com/ */
+    font-weight: unset !important;             /* https://www.mozilla.org/ */
+}
+
+.magicss-dialog-search-icons label {
+    margin: 0 !important;                      /* https://www.linkedin.com/feed/ */
+}
+
+.magicss-dialog-search-icons .MuiFormLabel-root {
+    font-family: Arial, sans-serif !important; /* https://www.sitepoint.com/ */
+}
+
+/*
+    Notes:
+        * Somehow, for Chrome browser, the "::-webkit-input-placeholder" and "::-moz-placeholder" styles don't work
+          together inside a single selector group (for Firefox, that works), hence they have been split.
+        * The default colors are different for different browsers. #777 seems to suit well.
+          Ref: https://stackoverflow.com/questions/41900143/what-is-the-default-color-and-font-for-input-placeholders/41900282#41900282
+*/
+.magicss-dialog-search-icons ::-webkit-input-placeholder {
+    color: rgba(0, 0, 0, 0.87) !important;     /* https://www.linkedin.com/feed/ */
+    opacity: 0.42 !important;                  /* https://www.linkedin.com/feed/ */
+}
+.magicss-dialog-search-icons ::-moz-placeholder {
+    color: rgba(0, 0, 0, 0.87) !important;     /* https://www.linkedin.com/feed/ */
+    opacity: 0.42 !important;                  /* https://www.linkedin.com/feed/ */
+}
+
+.magicss-icon-description {
+    -webkit-border-horizontal-spacing: 2px !important; /* https://css-tricks.com/ */
+    -webkit-border-vertical-spacing: 2px !important;   /* https://css-tricks.com/ */
+    border-collapse: separate;                         /* https://code.visualstudio.com/ */
+    border-width: 0 !important;                        /* https://css-tricks.com/ */
+    width: unset !important;                           /* https://css-tricks.com/ */
+    margin: 0 !important;                              /* https://css-tricks.com/ */
+}
+.magicss-icon-description tr {
+    background: transparent !important;                /* https://css-tricks.com/ */
+}
+.magicss-icon-description td {
+    border-width: 0 !important;                        /* https://css-tricks.com/ */
+    padding: 1px !important;                           /* https://css-tricks.com/ */
+    border-color: transparent !important;              /* https://css-tricks.com/ */
+    line-height: normal !important;                    /* https://www.sitepoint.com/ */
+    font-family: Arial, sans-serif !important;         /* https://www.smashingmagazine.com/ */
+}
+
+.magicss-search-icon-preview {
+    box-sizing: border-box;
+}
+
+.magicss-search-icon-preview img {
+    margin: 0 !important;                              /* https://moderncss.dev/ */
+    border: 0 !important;                              /* https://moderncss.dev/ */
+}
+
+.magicss-search-icon-preview a {
+    border-width: 0 !important;                        /* https://sass-lang.com/ */
+    padding: 0 !important;                             /* https://www.smashingmagazine.com/ */
+    font-weight: normal !important;                    /* https://www.linkedin.com/feed/ */
+}

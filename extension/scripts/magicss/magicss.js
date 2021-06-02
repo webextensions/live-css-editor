@@ -54,6 +54,28 @@ window.magicssHostSessionUuid = (
     uuidv4()
 );
 
+if (!window.loadedConfigFromBrowserStorage) {
+    const loadedConfigFromBrowserStorage = {};
+    window.loadedConfigFromBrowserStorage = loadedConfigFromBrowserStorage;
+    setTimeout(async function () {
+        const chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
+
+        const chromeStorageForExtensionDataGet = async function (key) {
+            return new Promise((resolve) => {
+                chromeStorageForExtensionData.get(key, function (values) {
+                    resolve(values && values[key]);
+                });
+            });
+        };
+
+        const USER_PREFERENCE_NOUN_PROJECT_API_ACCESS_KEY = 'noun-project-api-access-key';
+        const USER_PREFERENCE_NOUN_PROJECT_API_SECRET     = 'noun-project-api-secret';
+
+        loadedConfigFromBrowserStorage[USER_PREFERENCE_NOUN_PROJECT_API_ACCESS_KEY] = String((await chromeStorageForExtensionDataGet(USER_PREFERENCE_NOUN_PROJECT_API_ACCESS_KEY)) || '');
+        loadedConfigFromBrowserStorage[USER_PREFERENCE_NOUN_PROJECT_API_SECRET]     = String((await chromeStorageForExtensionDataGet(USER_PREFERENCE_NOUN_PROJECT_API_SECRET))     || '');
+    });
+}
+
 var loadIfNotAvailable = async function (dependencyToLoad) {
     const
         pathDist = 'dist/',
@@ -91,6 +113,7 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
                 });
             }
         }
+
         return window.reactMain;
     }
 };
@@ -132,6 +155,7 @@ var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, pa
         );
     });
 };
+window.chromeRuntimeMessageToBackgroundScript = chromeRuntimeMessageToBackgroundScript;
 
 if (window.flagEditorInExternalWindow) {
     chromeRuntimeMessageIfRequired({
@@ -3182,6 +3206,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     bgColor: '99,113,186,1',
                     headerIcons: [
                         (function () {
+                            const
+                                manifest = chrome.runtime.getManifest(),
+                                __custom__ = manifest.__custom__ || {},
+                                hideRateUsHeaderIcon = __custom__ || false;
+                            // Hide rate us icon ; Useful for puppeteer based testing by maintaining screenshot consistency across different loads of the extension
+                            if (hideRateUsHeaderIcon) {
+                                return null;
+                            }
+
                             if (executionCounter < const_rateUsUsageCounterFrom || const_rateUsUsageCounterTo <= executionCounter) {
                                 return null;
                             } else {
@@ -3213,9 +3246,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }()),
                             cls: 'magicss-command-palette editor-gray-out',
                             onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
-                                const reactMain = await loadIfNotAvailable('main-bundle');
-                                reactMain({
-                                    open: true
+                                await loadIfNotAvailable('main-bundle');
+
+                                window.redux_store.dispatch({
+                                    type: 'APP_$_OPEN_COMMAND_PALETTE'
                                 });
                             },
                             afterrender: function () {
@@ -3240,10 +3274,25 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 event.preventDefault();
 
                                                 setTimeout(async () => {
-                                                    const reactMain = await loadIfNotAvailable('main-bundle');
-                                                    reactMain({
-                                                        open: true
-                                                    });
+                                                    await loadIfNotAvailable('main-bundle');
+
+                                                    const storeState = window.redux_store.getState();
+
+                                                    // If any dialog is open, don't launch the command palette
+                                                    if (
+                                                        storeState.app &&
+                                                        storeState.app.searchIcons &&
+                                                        (
+                                                            storeState.app.searchIcons.open ||
+                                                            storeState.app.searchIcons.openConfiguration
+                                                        )
+                                                    ) {
+                                                        // do nothing
+                                                    } else {
+                                                        window.redux_store.dispatch({
+                                                            type: 'APP_$_OPEN_COMMAND_PALETTE'
+                                                        });
+                                                    }
                                                 });
                                             }
                                         }

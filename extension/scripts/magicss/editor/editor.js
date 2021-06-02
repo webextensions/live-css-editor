@@ -744,6 +744,9 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             }
 
             var indentWithTabs = await thisOb.userPreference('use-tab-for-indentation') === 'yes';
+            window.indentWithTabs = indentWithTabs;
+            var indentUnit = (!indentWithTabs && parseInt(await thisOb.userPreference('indentation-spaces-count'), 10)) || 4;
+            window.indentUnit = indentUnit;
             var codemirrorOptions = {
                 value: thisOb.textarea.value,
                 placeholder: thisOb.getOption('placeholder'),
@@ -762,7 +765,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 showCursorWhenSelecting: true,
 
                 indentWithTabs: indentWithTabs,
-                indentUnit: (!indentWithTabs && parseInt(await thisOb.userPreference('indentation-spaces-count'), 10)) || 4,
+                indentUnit,
                 undoDepth: 1000,
 
                 extraKeys: {

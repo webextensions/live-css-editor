@@ -9,6 +9,7 @@ const renderCommand = function (suggestion) {
     const {
         name,
         iconCls,
+        isNew,
         style
     } = suggestion;
     return (
@@ -25,6 +26,10 @@ const renderCommand = function (suggestion) {
                 }}
             />
             <div>{name}</div>
+            {
+                isNew &&
+                <div className="magicss-palette-new">NEW</div>
+            }
         </div>
     );
 };
@@ -114,6 +119,12 @@ const CommandPalette = function (props) {
                 onRequestClose={function () {
                     if (props.onClose) {
                         props.onClose();
+                    }
+
+                    // Focus the editor when the command palette gets closed by pressing the "Escape" key
+                    // TODO: Ideally, the event should be passed from the library's end. For now, we can follow the standard way of utilizing "window.event".
+                    if (window.event && window.event.code === 'Escape') {
+                        editor.focus();
                     }
                 }}
                 onAfterOpen={function () {

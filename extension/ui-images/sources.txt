@@ -91,6 +91,9 @@ logo-mozilla-addons_edited.png
 logo-opera.svg
     https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg
 
+logo-thenounproject.svg
+    https://static.production.thenounproject.com/img/favicons/safari-pinned-tab.142c7645151a.svg
+
 mail.svg
     https://www.iconfinder.com/icons/1814108/email_envenlope_letter_mail_icon#size=128
     https://www.iconfinder.com/icons/1814108/download/svg/128
