@@ -637,11 +637,25 @@ describe('Cross site UI consistency', async function () {
                     // Select 97th search result (first item in the last row)
                     await page.click('.magicssSearchResultEntryIcon:nth-child(97)');
 
+                    await page.click('.magicss-search-icon-preview .magicss-search-icons-copy-data-url');
+
+                    // Again, select 97th search result (first item in the last row), to let it have "hover" effect when
+                    // we take the screenshot
+                    await page.click('.magicssSearchResultEntryIcon:nth-child(97)');
+
+                    await page.waitForTimeout(200); // Wait for completion of material-ui transition effects
+                                                    // Note: Most of the times, the following waits for network requests
+                                                    //       would take even longer than this delay, so, practically,
+                                                    //       this line wouldn't have any impact when testing with
+                                                    //       real-world network request.
+
                     await page.waitForFunction(async () => {
                         const img = document.querySelector('.magicss-search-icon-preview img');
                         const flagImgIsLoaded = img.complete;
                         return flagImgIsLoaded;
                     });
+
+                    await page.waitForSelector('.magicss-search-icon-preview .magicss-search-icons-svg-contents-copy-status');
 
                     const originalOverflow = await page.evaluate(async function () {
                         const originalOverflow = document.documentElement.style.overflow;

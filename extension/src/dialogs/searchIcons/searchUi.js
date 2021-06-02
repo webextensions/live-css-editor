@@ -478,6 +478,7 @@ const ListOfIcons = function (props) {
 
                                                             <div style={{ marginTop: 15 }}>
                                                                 <Button
+                                                                    className="magicss-search-icons-copy-svg"
                                                                     variant="text"
                                                                     color="primary"
                                                                     size="small"
@@ -514,6 +515,7 @@ const ListOfIcons = function (props) {
                                                                     Copy SVG
                                                                 </Button>
                                                                 <Button
+                                                                    className="magicss-search-icons-copy-data-url"
                                                                     variant="text"
                                                                     color="primary"
                                                                     size="small"
@@ -578,7 +580,10 @@ const ListOfIcons = function (props) {
                                                                 color = '#f00';
                                                             }
                                                             cmpStatus = (
-                                                                <div style={{ marginTop: 5, color, fontSize: 12 }}>
+                                                                <div
+                                                                    className="magicss-search-icons-svg-contents-copy-status"
+                                                                    style={{ marginTop: 5, color, fontSize: 12 }}
+                                                                >
                                                                     {svgContents['status']}
                                                                 </div>
                                                             );
