@@ -196,10 +196,14 @@ const ListOfIcons = function (props) {
                                     key={index}
                                     rowIndex={parseInt(index / columnCount)}
                                     onFocus={() => {
-                                        setSelectedIndex(index);
-                                        setSvgContents({
-                                            [READYSTATE]: UNINITIALIZED
-                                        });
+                                        if (selectedIndex === index) {
+                                            // do nothing
+                                        } else {
+                                            setSelectedIndex(index);
+                                            setSvgContents({
+                                                [READYSTATE]: UNINITIALIZED
+                                            });
+                                        }
                                     }}
                                     className={className}
                                 >
