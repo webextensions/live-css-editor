@@ -19,11 +19,36 @@ var matchVersions = function (expectedVersion, arrJsonPaths) {
         var jsonPath = arrJsonPaths[i];
         var json = require(jsonPath);
         var relativePath = getPathRelativeToCwd(jsonPath);
-        if (json.version !== expectedVersion) {
-            logger.warn(' ✗ ' + json.version    + ' : does not match the expected version (' + relativePath + ')');
-            mismatchFound = true;
-        } else {
+
+        var versionsStatus = (function () {
+            const statusOb = {
+                match: true
+            };
+
+            if (json.version !== expectedVersion) {
+                statusOb.match = false;
+            }
+
+            if(jsonPath.endsWith('package-lock.json')) {
+                // Note: The empty property name (['']) is added as per the package-lock.json syntax
+                if (json['packages']['']['version'] !== expectedVersion) {
+                    statusOb.match = false;
+                    statusOb.mismatchReason = 'package-lock.json > "packages" > "" > "version"';
+                }
+            }
+
+            return statusOb;
+        }());
+
+        if (versionsStatus.match) {
             logger.success(' ✓ ' + json.version + ' : matches the expected version (' + relativePath + ')');
+        } else {
+            if (versionsStatus.mismatchReason) {
+                logger.warn(' ✗ ' + json.version    + ' : does not match the expected version (' + relativePath + ') ' + logger.chalk.cyan('(Mismatch: ' + versionsStatus.mismatchReason + ')'));
+            } else {
+                logger.warn(' ✗ ' + json.version    + ' : does not match the expected version (' + relativePath + ')');
+            }
+            mismatchFound = true;
         }
     }
     return mismatchFound;
@@ -37,6 +62,8 @@ var mismatchFound = matchVersions(
         '../package-lock.json',
         '../live-css/package.json',
         '../live-css/package-lock.json',
+        '../tests/package.json',
+        '../tests/package-lock.json',
         '../extension/manifest.json',
         '../extension/manifest-chrome.json',
         '../extension/manifest-edge.json',
