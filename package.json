@@ -52,6 +52,7 @@
     "react-responsive": "^8.2.0",
     "react-roving-tabindex": "^3.1.0",
     "redux": "^4.1.0",
+    "rooks": "^5.0.2",
     "socket.io": "^2.3.0",
     "toastr": "^2.1.4",
     "webpack-cli": "^4.6.0"

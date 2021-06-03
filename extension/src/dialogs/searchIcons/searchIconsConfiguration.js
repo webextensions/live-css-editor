@@ -1,6 +1,10 @@
+/* globals chrome, utils */
+
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+
+import { useDidMount } from 'rooks';
 
 import TextField from '@material-ui/core/TextField/index.js';
 
@@ -43,6 +47,30 @@ const SearchIconsConfiguration = function (props) {
         accessKey,
         secret
     } = props;
+
+    const [extAccessToNounProjectApi, setExtAccessToNounProjectApi] = useState({
+        status: 'unknown'
+    });
+
+    useDidMount(async () => {
+        chrome.runtime.sendMessage(
+            {
+                type: 'checkPermissionForOrigin',
+                payload: 'https://api.thenounproject.com/'
+            },
+            function ({ flagPermissions }) {
+                if (flagPermissions) {
+                    setExtAccessToNounProjectApi({
+                        status: 'has-access'
+                    });
+                } else {
+                    setExtAccessToNounProjectApi({
+                        status: 'no-access'
+                    });
+                }
+            }
+        );
+    });
 
     const [testConnectionStatus, setTestConnectionStatus] = useState({
         [READYSTATE]: UNINITIALIZED
@@ -171,6 +199,86 @@ const SearchIconsConfiguration = function (props) {
                                     Step 1:
                                 </div>
                                 <div>
+                                    <React.Fragment>
+                                        {
+                                            extAccessToNounProjectApi.status === 'has-access' &&
+                                            <span style={{ color: 'green' }}>
+                                                ✔
+                                            </span>
+                                        }
+                                    </React.Fragment> <a
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={(function () {
+                                            const style = {
+                                                cursor: 'pointer',
+                                                color: '#3f51b5',
+                                                textDecoration: 'underline',
+                                                fontWeight: 'normal' /* https://www.linkedin.com/feed/ */
+                                            };
+
+                                            if (extAccessToNounProjectApi.status === 'has-access') {
+                                                style.color = 'rgba(0, 0, 0, 0.87)';
+                                            }
+
+                                            return style;
+                                        }())}
+                                        onClick={function () {
+                                            chrome.runtime.sendMessage(
+                                                {
+                                                    type: 'checkPermissionForOrigin',
+                                                    payload: 'https://api.thenounproject.com/'
+                                                },
+                                                function ({ flagPermissions }) {
+                                                    if (flagPermissions) {
+                                                        setExtAccessToNounProjectApi({
+                                                            status: 'has-access'
+                                                        });
+
+                                                        utils.alertNote('<span style="color:#3f51b5;">✔</span> The required permissions are already granted');
+                                                    } else {
+                                                        setExtAccessToNounProjectApi({
+                                                            status: 'no-access'
+                                                        });
+
+                                                        chrome.runtime.sendMessage(
+                                                            {
+                                                                requestPermissions: true,
+                                                                tabOriginWithSlash: 'https://api.thenounproject.com/'
+                                                            },
+                                                            async function asyncCallback(status) {
+                                                                // TODO: Check if this check for "chrome.runtime.lastError" is useful in some way
+                                                                if (chrome.runtime.lastError) {
+                                                                    console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                                    utils.alertNote(
+                                                                        'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                                        10000
+                                                                    );
+                                                                }
+
+                                                                if (status === 'request-granted') {
+                                                                    setExtAccessToNounProjectApi({
+                                                                        status: 'has-access'
+                                                                    });
+
+                                                                    utils.alertNote('<span style="color:#3f51b5;">✔</span> The required permissions have been granted');
+                                                                } else if (status === 'request-not-granted') {
+                                                                    utils.alertNote('<span style="color:#800000;">✘</span> You need to provide permissions for Noun Project API Configuration', 10000);
+                                                                }
+                                                            }
+                                                        );
+                                                    }
+                                                }
+                                            );
+                                        }}
+                                    >Allow this extension access</a> to api.thenounproject.com
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', marginTop: 4 }}>
+                                <div style={styleForStepTitle}>
+                                    Step 2:
+                                </div>
+                                <div>
                                     Go to the API page on <a
                                         target="_blank"
                                         rel="noreferrer"
@@ -185,7 +293,7 @@ const SearchIconsConfiguration = function (props) {
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
                                 <div style={styleForStepTitle}>
-                                    Step 2:
+                                    Step 3:
                                 </div>
                                 <div>
                                     Choose your plan and register for API access
@@ -193,7 +301,7 @@ const SearchIconsConfiguration = function (props) {
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
                                 <div style={styleForStepTitle}>
-                                    Step 3:
+                                    Step 4:
                                 </div>
                                 <div>
                                     Create an application under the <a
@@ -210,7 +318,7 @@ const SearchIconsConfiguration = function (props) {
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
                                 <div style={styleForStepTitle}>
-                                    Step 4:
+                                    Step 5:
                                 </div>
                                 <div>
                                     Paste below the &quot;Key&quot; and &quot;Secret&quot; from the Key Management section in the page for the application
@@ -227,6 +335,7 @@ const SearchIconsConfiguration = function (props) {
                                     value={accessKey}
                                     autoFocus
                                     spellCheck={false}
+                                    disabled={extAccessToNounProjectApi.status !== 'has-access'}
                                     onChange={(evt) => {
                                         setAccessKey(evt.target.value);
                                     }}
@@ -243,6 +352,7 @@ const SearchIconsConfiguration = function (props) {
                                     placeholder="e.g., 0123456789abcdef0123456789abcdef"
                                     value={secret}
                                     spellCheck={false}
+                                    disabled={extAccessToNounProjectApi.status !== 'has-access'}
                                     onChange={(evt) => {
                                         setSecret(evt.target.value);
                                     }}

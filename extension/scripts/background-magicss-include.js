@@ -281,6 +281,28 @@ if (!window.loadRemoteJsListenerAdded) {
     }
 }
 
+if (!window.apiHelperForContentScriptAdded) {
+    if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener(
+            function (request, sender, sendResponse) {
+                if (request.type === 'checkPermissionForOrigin') {
+                    const originWithSlash = request.payload;
+                    chrome.permissions.contains({
+                        origins: [originWithSlash]
+                    }, function (result) {
+                        sendResponse({ flagPermissions: result });
+                    });
+
+                    // https://developer.chrome.com/extensions/messaging
+                    // Need to return true from the event listener to indicate that we wish to send a response asynchronously
+                    return true;
+                }
+            }
+        );
+        window.apiHelperForContentScriptAdded = true;
+    }
+}
+
 var getFromChromeStorage = function (property, cb) {
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
