@@ -255,11 +255,15 @@ if (!window.loadRemoteJsListenerAdded) {
                         onDOMContentLoadedHandler();
                     } else {
                         var tabOriginWithSlash = request.tabOriginWithSlash;
+
+                        const permissionsOb = {};
+                        if (request.requestWebNavigation) {
+                            permissionsOb.permissions = ['webNavigation'];
+                        }
+                        permissionsOb.origins = [tabOriginWithSlash];
+
                         chrome.permissions.request(
-                            {
-                                permissions: ['webNavigation'],
-                                origins: [tabOriginWithSlash]
-                            },
+                            permissionsOb,
                             function (granted) {
                                 if (granted) {
                                     sendResponse('request-granted');

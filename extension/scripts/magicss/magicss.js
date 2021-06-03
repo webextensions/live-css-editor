@@ -3380,6 +3380,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 chrome.runtime.sendMessage(
                                                     {
                                                         requestPermissions: true,
+                                                        requestWebNavigation: true,
                                                         tabOriginWithSlash
                                                     },
                                                     async function asyncCallback(status) {
