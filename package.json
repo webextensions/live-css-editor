@@ -3,6 +3,8 @@
   "version": "8.13.2",
   "scripts": {
     "install-legacy-peer-deps": "npm install --legacy-peer-deps",
+    "version": "./scripts/build-and-release/prepare-version/prepare-version.sh",
+    "postversion": "git push --follow-tags",
     "lint": "eslint .",
     "manifest-generator": "node ./extension/manifest-generator.js",
     "copy-files-from-to": "copy-files-from-to",
