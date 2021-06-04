@@ -94,6 +94,7 @@ const SearchIcons = function (props) {
         return (
             <div style={styleHideIfNotOpen}>
                 <Dialog
+                    disableScrollLock // https://github.com/mui-org/material-ui/issues/10000#issuecomment-559116355
                     open={openedAtLeastOnce}
                     style={styleHideIfNotOpen}
 

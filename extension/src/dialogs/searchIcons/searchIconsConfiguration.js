@@ -166,6 +166,7 @@ const SearchIconsConfiguration = function (props) {
         return (
             <div>
                 <Dialog
+                    disableScrollLock // https://github.com/mui-org/material-ui/issues/10000#issuecomment-559116355
                     open={open}
                     onClose={handleClose}
                     disableBackdropClick
