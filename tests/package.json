@@ -1,6 +1,6 @@
 {
   "name": "live-css-editor-tests",
-  "version": "8.13.2",
+  "version": "8.13.3",
   "scripts": {
     "test": "cp ../extension/manifest-puppeteer.json ../extension/manifest.json ; mocha *.test.js ; cp ../extension/manifest-chrome.json ../extension/manifest.json",
     "test-inspect": "cp ../extension/manifest-puppeteer.json ../extension/manifest.json ; node --inspect-brk ./node_modules/.bin/mocha *.test.js ; cp ../extension/manifest-chrome.json ../extension/manifest.json"
