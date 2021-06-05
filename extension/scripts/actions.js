@@ -7,7 +7,6 @@
         var _gaq = window._gaq;
         _gaq.push(['_setAccount', 'UA-198813835-1']);
         _gaq.push(['_gat._forceSSL']); // https://stackoverflow.com/questions/37799578/google-analytics-force-https-to-prevent-307-internal-redirect/37799579#37799579
-        _gaq.push(['_trackPageview']);
 
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
         const getRandomIntInclusive = function (min, max) {
@@ -16,6 +15,8 @@
             return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
         };
 
+        // Some random delay which should not be too high since the background page of the extension can become inactive after a few seconds
+        const delay = getRandomIntInclusive(2250, 4500);
         setTimeout(
             function () {
                 var ga = document.createElement('script');
@@ -26,7 +27,7 @@
                 s.parentNode.insertBefore(ga, s);
             },
             // Load with a delay since this network request is not required for showing the UI of the extension
-            getRandomIntInclusive(40 * 1000, 400 * 1000)
+            delay
         );
     } catch (e) {
         // do nothing
