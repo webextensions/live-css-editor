@@ -88,6 +88,10 @@ var generateManifest = function (whichBrowser) {
         /* */
     };
 
+    if (whichBrowser !== "puppeteer") {
+        manifest["content_security_policy"] = "script-src 'self' https://ssl.google-analytics.com; object-src 'self'";
+    }
+
     if (whichBrowser === "puppeteer") {
         manifest["__custom__"] = {
             "hideRateUsHeaderIcon": true
