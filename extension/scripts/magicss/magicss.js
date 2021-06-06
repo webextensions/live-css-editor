@@ -2712,6 +2712,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                             // Clear the undo-redo hstory
                             editor.cm.clearHistory();
+
+                            sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'file']);
                         });
                     } else {
                         editor.options.rememberText = true;
@@ -2739,6 +2741,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (!options.skipNotifications) {
                                 utils.alertNote('Now editing code in LESS mode', 5000);
                             }
+                            sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'less']);
                         } else if (newLanguageMode === 'sass') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-sass');
                             await editor.userPreference('language-mode', 'sass');
@@ -2747,6 +2750,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (!options.skipNotifications) {
                                 utils.alertNote('Now editing code in SASS mode', 5000);
                             }
+                            sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'sass']);
                         } else {
                             setLanguageModeClass(editor, 'magicss-selected-mode-css');
                             await editor.userPreference('language-mode', 'css');
@@ -2754,6 +2758,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (!options.skipNotifications) {
                                 utils.alertNote('Now editing code in CSS mode', 5000);
                             }
+                            sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'css']);
                         }
                         await fnApplyTextAsCSS(editor, {
                             skipNotifications: options.skipNotifications
@@ -3026,6 +3031,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 type: 'magicss',
                                 subType: 'set-language-mode-to-css'
                             });
+                            sendMessageForGa(['_trackEvent', 'clickedSwitchSelectedMode', 'css']);
                         });
                         $(document).on('click', '.magicss-mode-less', async function () {
                             await setLanguageMode('less', editor);
@@ -3034,6 +3040,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 type: 'magicss',
                                 subType: 'set-language-mode-to-less'
                             });
+                            sendMessageForGa(['_trackEvent', 'clickedSwitchSelectedMode', 'less']);
                         });
                         $(document).on('click', '.magicss-mode-sass', async function () {
                             await setLanguageMode('sass', editor);
@@ -3042,10 +3049,12 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 type: 'magicss',
                                 subType: 'set-language-mode-to-sass'
                             });
+                            sendMessageForGa(['_trackEvent', 'clickedSwitchSelectedMode', 'sass']);
                         });
                         $(document).on('click', '.magicss-mode-file', async function () {
                             await setLanguageMode('file', editor);
                             editor.focus();
+                            sendMessageForGa(['_trackEvent', 'clickedSwitchSelectedMode', 'file']);
                         });
 
                         return $outer;
@@ -3267,6 +3276,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 window.redux_store.dispatch({
                                     type: 'APP_$_OPEN_COMMAND_PALETTE'
                                 });
+
+                                sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedShowMoreCommands']);
                             },
                             afterrender: function () {
                                 document.addEventListener(
@@ -3445,6 +3456,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             subType: 'reopen-main-editor'
                                         });
 
+                                        sendMessageForGa(['_trackEvent', 'fromHeader', 'moveEditorInsidePage']);
+
                                         window.close();
                                     }
                                 };
@@ -3467,6 +3480,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
                                     utils.alertNote('Please switch to editing code in CSS or Less mode to enable this feature', 5000);
                                     editor.focus();
+
+                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'movingEditorNotAvailableInMode']);
                                 }
                             };
                         }()),
@@ -3668,12 +3683,16 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 window.openExternalEditorListenerAdded = true;
                                             }
                                         }
+
+                                        sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedEditInExternalWindow']);
                                     } catch (e) {
                                         console.log('Error message reported by Magic CSS:', e);
                                         utils.alertNote(
                                             'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
                                             10000
                                         );
+
+                                        sendMessageForGa(['_trackEvent', 'error', 'couldNotEnableEditInExternalWindow']);
                                     }
                                 }
                             };
@@ -3689,12 +3708,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         type: 'magicss',
                                         subType: 'enableCss'
                                     });
+                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'enabledCss']);
                                 } else {
                                     await editor.disableEnableCSS('disable');
                                     chromeRuntimeMessageIfRequired({
                                         type: 'magicss',
                                         subType: 'disableCss'
                                     });
+                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'disabledCss']);
                                 }
 
                                 if (!runningInAndroidFirefox) {
@@ -3763,6 +3784,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             onclick: async function (evt, editor) {
                                                 await socketOb._stopWatchingFiles(editor);
                                                 editor.focus();
+
+                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedStopWatchingCssFiles']);
                                             }
                                         };
                                     } else {
@@ -3779,6 +3802,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             onclick: async function (evt, editor) {
                                                 await socketOb._startWatchingFiles(editor);
                                                 editor.focus();
+
+                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedWatchCssFiles']);
                                             },
                                             beforeShow: function (origin, tooltip) {
                                                 tooltip.addClass(socketOb.flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
@@ -3803,6 +3828,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             reloadAllCSSResourcesInPage();
                                         }
                                         editor.focus();
+
+                                        sendMessageForGa(['_trackEvent', 'fromHeader', 'reloadCssResources']);
                                     }
                                 }
                             ]
@@ -3818,6 +3845,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             onclick: function (evt, editor) {
                                 togglePointAndClick(editor);
                                 editor.focus();
+
+                                sendMessageForGa(['_trackEvent', 'fromHeader', 'pointAndClickActivated']);
                             }
                         }
                     ],
