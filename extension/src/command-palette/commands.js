@@ -1,4 +1,4 @@
-/* global extLib, utils */
+/* global extLib, utils, sendMessageForGa */
 
 import {
     APP_$_OPEN_SEARCH_ICONS
@@ -80,6 +80,8 @@ const commands = (
 
                 commandOb.command = function () {
                     window.open(href);
+
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'rateUsOn_' + browser]);
                 };
 
                 return commandOb;
@@ -99,6 +101,8 @@ const commands = (
                     window.redux_store.dispatch({
                         type: APP_$_OPEN_SEARCH_ICONS
                     });
+
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'openGetIcon']);
                 });
             }
         },
@@ -112,6 +116,8 @@ const commands = (
                     var editor = window.MagiCSSEditor;
 
                     await window.execConvertToCssAction(editor);
+
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'lessOrSassToCss']);
                 });
             }
         },
@@ -124,6 +130,8 @@ const commands = (
                     var editor = window.MagiCSSEditor;
 
                     await window.execBeautifyCssAction(editor);
+
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'beautifyCode']);
                 });
             }
         },
@@ -135,6 +143,8 @@ const commands = (
                     var editor = window.MagiCSSEditor;
 
                     await window.execMinifyCssAction(editor);
+
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'minifyCode']);
                 });
             }
         },
@@ -152,11 +162,14 @@ const commands = (
                         const flag = await copy(textValue);
                         if (flag) {
                             utils.alertNote('Copied code to clipboard', 2500);
+                            sendMessageForGa(['_trackEvent', 'commandPalette', 'copiedCodeToClipboard']);
                         } else {
                             utils.alertNote('Failed to copy to clipboard', 2500);
+                            sendMessageForGa(['_trackEvent', 'commandPalette', 'failedToCopyCodeToClipboard']);
                         }
                     } else {
                         utils.alertNote('There is no code to copy', 2500);
+                        sendMessageForGa(['_trackEvent', 'commandPalette', 'noCodeToCopyToClipboard']);
                     }
                 });
             }
@@ -171,6 +184,7 @@ const commands = (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execShowLineNumbersAction(editor);
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'showLineNumbers']);
                 });
             }
         },
@@ -183,6 +197,7 @@ const commands = (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execHideLineNumbersAction(editor);
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'hideLineNumbers']);
                 });
             }
         },
@@ -196,6 +211,7 @@ const commands = (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execEnableCssLintingAction(editor);
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'enableCssLinting']);
                 });
             }
         },
@@ -208,6 +224,7 @@ const commands = (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execDisableCssLintingAction(editor);
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'disableCssLinting']);
                 });
             }
         },
@@ -220,6 +237,7 @@ const commands = (
                 const extensionUrl = window.extensionUrl;
                 const url = 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions';
                 window.open(url);
+                sendMessageForGa(['_trackEvent', 'commandPalette', 'tweet']);
             }
         },
         {
@@ -230,6 +248,7 @@ const commands = (
                 const extensionUrl = window.extensionUrl;
                 const url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser);
                 window.open(url);
+                sendMessageForGa(['_trackEvent', 'commandPalette', 'shareOnFacebook']);
             }
         },
         {
@@ -238,6 +257,7 @@ const commands = (
             iconCls: 'magicss-use-logo-github-gray',
             command() {
                 window.open('https://github.com/webextensions/live-css-editor');
+                sendMessageForGa(['_trackEvent', 'commandPalette', 'openGithub']);
             }
         },
         ...(function () {
@@ -277,6 +297,7 @@ const commands = (
                     iconCls: 'magicss-use-icon-chrome',
                     command() {
                         window.open(extensionUrl.chrome);
+                        sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionForChrome']);
                     }
                 },
                 {
@@ -286,6 +307,7 @@ const commands = (
                     iconCls: 'magicss-use-icon-edge-gray',
                     command() {
                         window.open(extensionUrl.edge);
+                        sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionForEdge']);
                     }
                 },
                 {
@@ -295,6 +317,7 @@ const commands = (
                     iconCls: 'magicss-use-icon-firefox-gray',
                     command() {
                         window.open(extensionUrl.firefox);
+                        sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionForFirefox']);
                     }
                 },
                 {
@@ -304,6 +327,7 @@ const commands = (
                     iconCls: 'magicss-use-logo-opera-gray',
                     command() {
                         window.open(extensionUrl.opera);
+                        sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionForOpera']);
                     }
                 }
             ];
@@ -315,6 +339,7 @@ const commands = (
             command() {
                 var editor = window.MagiCSSEditor;
                 window.execMoreOptionsAction(editor);
+                sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionOptionsPage']);
             }
         }
     ]
