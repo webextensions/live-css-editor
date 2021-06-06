@@ -170,7 +170,13 @@ const sendMessageForGa = function (payload) {
 
 sendMessageForGa([
     '_trackPageview',
-    window.flagEditorInExternalWindow ? '/external-editor' : '/main'
+    window.flagEditorInExternalWindow ? '/external-editor' : '/in-page-editor'
+]);
+
+sendMessageForGa([
+    '_trackEvent',
+    'loadedEditor',
+    window.flagEditorInExternalWindow ? 'externalEditor' : 'inPageEditor'
 ]);
 
 if (window.flagEditorInExternalWindow) {
