@@ -1,12 +1,13 @@
+/* globals chrome */
+
 (function() {
     try {
         // https://developer.chrome.com/docs/extensions/mv2/tut_analytics/
         // https://developer.chrome.com/docs/extensions/mv3/tut_analytics/
 
         window._gaq = window._gaq || [];
-        var _gaq = window._gaq;
-        _gaq.push(['_setAccount', 'UA-198813835-1']);
-        _gaq.push(['_gat._forceSSL']); // https://stackoverflow.com/questions/37799578/google-analytics-force-https-to-prevent-307-internal-redirect/37799579#37799579
+        window._gaq.push(['_setAccount', 'UA-198813835-1']);
+        window._gaq.push(['_gat._forceSSL']); // https://stackoverflow.com/questions/37799578/google-analytics-force-https-to-prevent-307-internal-redirect/37799579#37799579
 
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
         const getRandomIntInclusive = function (min, max) {
@@ -31,5 +32,18 @@
         );
     } catch (e) {
         // do nothing
+    }
+
+    if (!window.gaListenerAdded) {
+        if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
+            chrome.runtime.onMessage.addListener(
+                function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
+                    if (request.type === 'ga') {
+                        window._gaq.push(request.payload);
+                    }
+                }
+            );
+            window.gaListenerAdded = true;
+        }
     }
 })();

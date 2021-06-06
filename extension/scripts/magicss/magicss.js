@@ -157,6 +157,22 @@ var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, pa
 };
 window.chromeRuntimeMessageToBackgroundScript = chromeRuntimeMessageToBackgroundScript;
 
+const sendMessageForGa = function (payload) {
+    try {
+        chrome.runtime.sendMessage({
+            type: 'ga',
+            payload
+        });
+    } catch (e) {
+        // do nothing
+    }
+};
+
+sendMessageForGa([
+    '_trackPageview',
+    window.flagEditorInExternalWindow ? '/external-editor' : '/main'
+]);
+
 if (window.flagEditorInExternalWindow) {
     chromeRuntimeMessageIfRequired({
         type: 'magicss',
