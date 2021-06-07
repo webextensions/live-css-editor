@@ -1452,6 +1452,12 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 #MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance .CodeMirror-gutters {
     box-shadow: unset !important;
 }
+
+/* https://github.com/webextensions/live-css-editor/issues/45#issuecomment-855552183 */
+#MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance .CodeMirror-linenumber {
+    color: #808080 !important;
+}
+
 /* End: Dark theme support */
 
 /*
