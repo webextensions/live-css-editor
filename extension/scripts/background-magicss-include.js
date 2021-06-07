@@ -137,6 +137,25 @@ if (window.flagEditorInExternalWindow) {
     }
 }
 
+if (window.flagEditorInExternalWindow) {
+    // do nothing
+} else {
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // Set icon for dark mode of browser
+        chrome.browserAction.setIcon({
+            path: {
+                "16":  "icons/icon-dark-scheme-16.png",
+                "24":  "icons/icon-dark-scheme-24.png",
+                "32":  "icons/icon-dark-scheme-32.png",
+                "40":  "icons/icon-dark-scheme-40.png",
+                "48":  "icons/icon-dark-scheme-48.png",
+                "128": "icons/icon-dark-scheme-128.png",
+                "256": "icons/icon-dark-scheme-256.png"
+            }
+        });
+    }
+}
+
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
 var runningInChromiumLikeEnvironment = function () {
     if (window.location.href.indexOf('chrome-extension://') === 0) {
