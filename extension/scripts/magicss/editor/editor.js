@@ -1,4 +1,4 @@
-/* global amplify: false, utils, CodeMirror, jQuery, chrome, runMigration */
+/* global amplify: false, utils, CodeMirror, jQuery, chrome, runMigration, sendMessageForGa */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
@@ -710,6 +710,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                     // This code will be used for functionality of providing free style draggability
                     // Clear corner positioning and allow free-style (jQuery uses top and left for draggable)
                     $(thisOb.container).css('bottom','').css('right','');
+
+                    sendMessageForGa([ '_trackEvent', 'dragEditor', 'start' ]);
                 },
                 stop: function (event, ui) {
                     setTimeout(async function () {
@@ -726,6 +728,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         if (!runningInAndroidFirefox) {
                             thisOb.focus();
                         }
+
+                        sendMessageForGa([ '_trackEvent', 'dragEditor', 'stop' ]);
                     });
                 }
             });
@@ -913,6 +917,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                 left: parseInt(thisOb.container.style.left, 10)
                             });
                         });
+
+                        sendMessageForGa([ '_trackEvent', 'resizeEditor', 'start' ]);
                     },
                     resize: function (event, ui) {
                         if (ui.size.width < CONSTANTS.USE_NORMAL_SIZE_EDITOR) {
@@ -932,6 +938,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                                     propagateTo: 'codemirror'
                                 }
                             );
+                            sendMessageForGa([ '_trackEvent', 'resizeEditor', 'stop' ]);
                         });
                     }
                 });
