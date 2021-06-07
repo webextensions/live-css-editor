@@ -1446,6 +1446,12 @@ html .cm-s-ambiance .CodeMirror-hint {
 html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     background-color: #444;
 }
+
+/* https://github.com/webextensions/live-css-editor/issues/45#issuecomment-855552183 */
+#MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance,
+#MagiCSS-bookmarklet .CodeMirror.cm-s-ambiance .CodeMirror-gutters {
+    box-shadow: unset !important;
+}
 /* End: Dark theme support */
 
 /*
