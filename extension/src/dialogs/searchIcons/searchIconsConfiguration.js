@@ -1,4 +1,4 @@
-/* globals chrome, utils */
+/* globals chrome, utils, sendMessageForGa */
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -108,6 +108,8 @@ const SearchIconsConfiguration = function (props) {
         };
 
         const doTestConnection = async function () {
+            sendMessageForGa(['_trackEvent', 'getIcons', 'testConnectionInitiated']);
+
             // http://lti.tools/oauth/
             const oauth = OAuth({
                 consumer: {
@@ -147,12 +149,14 @@ const SearchIconsConfiguration = function (props) {
                     [READYSTATE]: ERROR,
                     [STATUSCODE]: coreResponse.status,
                 });
+                sendMessageForGa(['_trackEvent', 'getIcons', 'testConnectionError']);
             } else {
                 setTestConnectionStatus({
                     [READYSTATE]: LOADED,
                     [STATUSCODE]: coreResponse.status,
                     data
                 });
+                sendMessageForGa(['_trackEvent', 'getIcons', 'testConnectionSuccess']);
             }
         };
 

@@ -91,7 +91,7 @@ const commands = (
         })(),
 
         {
-            name: 'Get icon from Noun Project',
+            name: 'Get icons',
             isNew: true,
             iconCls: 'magicss-use-logo-thenounproject-gray',
             command() {
