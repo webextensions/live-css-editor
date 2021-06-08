@@ -2422,50 +2422,76 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
                                 }
 
-                                try {
-                                    chrome.runtime.sendMessage(
-                                        {
-                                            loadRemoteJs: sassJsUrl,
-                                            preRunReplace: preRunReplace
-                                        },
-                                        function (error) {
-                                            window.isActiveLoadSassRequest = false;
-                                            if (chrome.runtime.lastError) {
-                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                utils.alertNote(
-                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                    10000
-                                                );
-                                            } else if (error) {
-                                                utils.alertNote(
-                                                    'Error! Failed to load Sass parser from:<br />' + sassJsUrl + '<br />Please ensure that you are connected to internet and Magic CSS will try again to load it when you make any code changes.',
-                                                    10000
-                                                );
-                                            } else {
-                                                if (!options.skipNotifications) {
-                                                    utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
-                                                }
-                                                setTimeout(function () {
-                                                    // Ensure that getLanguageMode() is still 'sass'
-                                                    if (getLanguageMode() === 'sass') {
-                                                        fnSassToCssAndApply();
-                                                    }
-                                                }, 300);
-                                            }
+                                if (window.flagEditorInExternalWindow) {
+                                    const script = document.createElement('script');
+                                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js';
+                                    script.onload = function () {
+                                        window.isActiveLoadSassRequest = false;
+                                        if (!options.skipNotifications) {
+                                            utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                            debugger;
                                         }
-                                    );
-                                } catch (e) {
-                                    window.isActiveLoadSassRequest = false;
-                                    console.log('Error message reported by Magic CSS:', e);
-                                    // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
-                                    //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
-                                    //               always gets fired
-                                    setTimeout(function() {
+                                        setTimeout(function () {
+                                            // Ensure that getLanguageMode() is still 'sass'
+                                            if (getLanguageMode() === 'sass') {
+                                                fnSassToCssAndApply();
+                                            }
+                                        }, 300);
+                                    };
+                                    script.onerror = function () {
+                                        window.isActiveLoadSassRequest = false;
                                         utils.alertNote(
-                                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                            'Error! Failed to load Sass parser from:<br />' + sassJsUrl + '<br />Please ensure that you are connected to internet and Magic CSS will try again to load it when you make any code changes.',
                                             10000
                                         );
-                                    }, 0);
+                                    };
+                                    document.body.appendChild(script);
+                                } else {
+                                    try {
+                                        chrome.runtime.sendMessage(
+                                            {
+                                                loadRemoteJs: sassJsUrl,
+                                                preRunReplace: preRunReplace
+                                            },
+                                            function (error) {
+                                                window.isActiveLoadSassRequest = false;
+                                                if (chrome.runtime.lastError) {
+                                                    console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                    utils.alertNote(
+                                                        'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                        10000
+                                                    );
+                                                } else if (error) {
+                                                    utils.alertNote(
+                                                        'Error! Failed to load Sass parser from:<br />' + sassJsUrl + '<br />Please ensure that you are connected to internet and Magic CSS will try again to load it when you make any code changes.',
+                                                        10000
+                                                    );
+                                                } else {
+                                                    if (!options.skipNotifications) {
+                                                        utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                                    }
+                                                    setTimeout(function () {
+                                                        // Ensure that getLanguageMode() is still 'sass'
+                                                        if (getLanguageMode() === 'sass') {
+                                                            fnSassToCssAndApply();
+                                                        }
+                                                    }, 300);
+                                                }
+                                            }
+                                        );
+                                    } catch (e) {
+                                        window.isActiveLoadSassRequest = false;
+                                        console.log('Error message reported by Magic CSS:', e);
+                                        // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
+                                        //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
+                                        //               always gets fired
+                                        setTimeout(function() {
+                                            utils.alertNote(
+                                                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                10000
+                                            );
+                                        }, 0);
+                                    }
                                 }
                             }
                         }
@@ -3483,10 +3509,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                             return {
                                 name: 'edit-in-external',
-                                title: 'Edit in external window\n\nNote: Available in CSS or Less mode',
+                                title: 'Edit in external window\n\nNote: Available in CSS / LESS / SASS mode',
                                 cls: 'magicss-external-window-is-not-available-for-mode editor-gray-out-as-disabled',
                                 onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
-                                    utils.alertNote('Please switch to editing code in CSS or Less mode to enable this feature', 5000);
+                                    utils.alertNote('Please switch to editing code in CSS / LESS / SASS mode to enable this feature', 5000);
                                     editor.focus();
 
                                     sendMessageForGa(['_trackEvent', 'fromHeader', 'movingEditorNotAvailableInMode']);
