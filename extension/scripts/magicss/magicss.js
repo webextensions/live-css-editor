@@ -42,6 +42,35 @@ var uuidv4 = function () {
     });
 };
 
+// TODO: Handle more such unrecoverable cases through this function
+var handleUnrecoverableError = function (e) {
+    // Kind of HACK: Show note after a timeout, otherwise in a particular case with loading SASS, the note about
+    //               matching existing selector might open up and override this
+    //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
+    //               always gets fired
+    setTimeout(function () {
+        // Note: Using console.trace(), rather than console.error() or console.warn() to mitigate those from showing up
+        //       in the section for the extension at chrome://extensions/ (useful/applicable when working with unpacked
+        //       extension mode)
+        if (e.message === 'Extension context invalidated.') {
+            console.info('An error was detected by Magic CSS!');
+            console.trace(e);
+            console.info('Warning: It appears that the Magic CSS extension has been updated or removed.\nYou may need to reload webpage & Magic CSS and try again.');
+            utils.alertNote(
+                'Warning: It appears that the Magic CSS extension has been updated or removed.<br />You may need to reload webpage & Magic CSS and try again.',
+                10000
+            );
+        } else {
+            console.info('An error was detected by Magic CSS!');
+            console.trace(e);
+            utils.alertNote(
+                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                10000
+            );
+        }
+    }, 0);
+};
+
 window.magicssHostSessionUuid = (
     window.magicssHostSessionUuid ||
     (function () {
@@ -1862,11 +1891,6 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     try {
                         chrome.runtime.sendMessage({openOptionsPage: true});
                     } catch (e) {
-                        console.log('Error message reported by Magic CSS:', e);
-                        utils.alertNote(
-                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                            10000
-                        );
                         try {
                             var href = chrome.runtime.getURL('options.html');
                             if (href) {
@@ -1876,7 +1900,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 );
                             }
                         } catch (e) {
-                            // do nothing
+                            handleUnrecoverableError(e);
                         }
                     }
                     editor.focus();
@@ -2333,34 +2357,38 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         var lessCode = editor.getTextValue(),
                             lessOptions = { sourceMap: true };
 
-                        const less = await loadIfNotAvailable('less');
-                        less.render(lessCode, lessOptions, async function asyncCallback(err, output) {
-                            smc = null;     // Unset old SourceMapConsumer
+                        try {
+                            const less = await loadIfNotAvailable('less');
+                            less.render(lessCode, lessOptions, async function asyncCallback(err, output) {
+                                smc = null;     // Unset old SourceMapConsumer
 
-                            if (err) {
-                                // FIXME: The following setTimeout is a temporary fix for alertNote getting hidden by 'delayedcursormove()'
-                                setTimeout(function () {
-                                    utils.alertNote(
-                                        'Invalid LESS syntax.' +
-                                        '<br />Error in line: ' + err.line + ' column: ' + err.column +
-                                        '<br />Error message: ' + err.message,
-                                        10000
-                                    );
-                                    highlightErroneousLineTemporarily(editor, err.line - 1);
-                                }, 0);
-                            } else {
-                                var strCssCode = output.css;
-                                newStyleTag.cssText = strCssCode;
-                                newStyleTag.disabled = disabled;
-                                let appliedCssText = newStyleTag.applyTag();
-                                await rememberLastAppliedCss(appliedCssText);
+                                if (err) {
+                                    // FIXME: The following setTimeout is a temporary fix for alertNote getting hidden by 'delayedcursormove()'
+                                    setTimeout(function () {
+                                        utils.alertNote(
+                                            'Invalid LESS syntax.' +
+                                            '<br />Error in line: ' + err.line + ' column: ' + err.column +
+                                            '<br />Error message: ' + err.message,
+                                            10000
+                                        );
+                                        highlightErroneousLineTemporarily(editor, err.line - 1);
+                                    }, 0);
+                                } else {
+                                    var strCssCode = output.css;
+                                    newStyleTag.cssText = strCssCode;
+                                    newStyleTag.disabled = disabled;
+                                    let appliedCssText = newStyleTag.applyTag();
+                                    await rememberLastAppliedCss(appliedCssText);
 
-                                var rawSourceMap = output.map;
-                                if (rawSourceMap) {
-                                    smc = new sourceMap.SourceMapConsumer(rawSourceMap);
+                                    var rawSourceMap = output.map;
+                                    if (rawSourceMap) {
+                                        smc = new sourceMap.SourceMapConsumer(rawSourceMap);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } catch (e) {
+                            handleUnrecoverableError(e);
+                        }
                     } else if (getLanguageMode() === 'sass') {
                         var fnSassToCssAndApply = function () {
                             var SassParser = window.Sass || (typeof Sass !== 'undefined' && Sass),
@@ -2481,16 +2509,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         );
                                     } catch (e) {
                                         window.isActiveLoadSassRequest = false;
-                                        console.log('Error message reported by Magic CSS:', e);
-                                        // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
-                                        //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
-                                        //               always gets fired
-                                        setTimeout(function() {
-                                            utils.alertNote(
-                                                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                10000
-                                            );
-                                        }, 0);
+                                        handleUnrecoverableError(e);
                                     }
                                 }
                             }
@@ -3305,13 +3324,17 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }()),
                             cls: 'magicss-command-palette editor-gray-out',
                             onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
-                                await loadIfNotAvailable('main-bundle');
+                                try {
+                                    await loadIfNotAvailable('main-bundle');
 
-                                window.redux_store.dispatch({
-                                    type: 'APP_$_OPEN_COMMAND_PALETTE'
-                                });
+                                    window.redux_store.dispatch({
+                                        type: 'APP_$_OPEN_COMMAND_PALETTE'
+                                    });
 
-                                sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedShowMoreCommands']);
+                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedShowMoreCommands']);
+                                } catch (e) {
+                                    handleUnrecoverableError(e);
+                                }
                             },
                             afterrender: function () {
                                 document.addEventListener(
@@ -3335,24 +3358,28 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 event.preventDefault();
 
                                                 setTimeout(async () => {
-                                                    await loadIfNotAvailable('main-bundle');
+                                                    try {
+                                                        await loadIfNotAvailable('main-bundle');
 
-                                                    const storeState = window.redux_store.getState();
+                                                        const storeState = window.redux_store.getState();
 
-                                                    // If any dialog is open, don't launch the command palette
-                                                    if (
-                                                        storeState.app &&
-                                                        storeState.app.searchIcons &&
-                                                        (
-                                                            storeState.app.searchIcons.open ||
-                                                            storeState.app.searchIcons.openConfiguration
-                                                        )
-                                                    ) {
-                                                        // do nothing
-                                                    } else {
-                                                        window.redux_store.dispatch({
-                                                            type: 'APP_$_OPEN_COMMAND_PALETTE'
-                                                        });
+                                                        // If any dialog is open, don't launch the command palette
+                                                        if (
+                                                            storeState.app &&
+                                                            storeState.app.searchIcons &&
+                                                            (
+                                                                storeState.app.searchIcons.open ||
+                                                                storeState.app.searchIcons.openConfiguration
+                                                            )
+                                                        ) {
+                                                            // do nothing
+                                                        } else {
+                                                            window.redux_store.dispatch({
+                                                                type: 'APP_$_OPEN_COMMAND_PALETTE'
+                                                            });
+                                                        }
+                                                    } catch (e) {
+                                                        handleUnrecoverableError(e);
                                                     }
                                                 });
                                             }
@@ -3442,39 +3469,43 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     }
                                                 }
 
-                                                chrome.runtime.sendMessage(
-                                                    {
-                                                        requestPermissions: true,
-                                                        requestWebNavigation: true,
-                                                        tabOriginWithSlash
-                                                    },
-                                                    async function asyncCallback(status) {
-                                                        if (chrome.runtime.lastError) {
-                                                            console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                            utils.alertNote(
-                                                                'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                                10000
-                                                            );
-                                                        }
-                                                        if (status === 'request-granted') {
-                                                            await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                            if (window.flagEditorInExternalWindow) {
-                                                                chromeRuntimeMessageIfRequired({
-                                                                    type: 'magicss',
-                                                                    subType: 'mark-as-pinned-without-notification'
-                                                                });
+                                                try {
+                                                    chrome.runtime.sendMessage(
+                                                        {
+                                                            requestPermissions: true,
+                                                            requestWebNavigation: true,
+                                                            tabOriginWithSlash
+                                                        },
+                                                        async function asyncCallback(status) {
+                                                            if (chrome.runtime.lastError) {
+                                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                                utils.alertNote(
+                                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                                    10000
+                                                                );
                                                             }
-                                                            utils.alertNote(
-                                                                '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
-                                                                10000
-                                                            );
-                                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinComplete']);
-                                                        } else if (status === 'request-not-granted') {
-                                                            utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
-                                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinIncompleteDueToPermission']);
+                                                            if (status === 'request-granted') {
+                                                                await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                                if (window.flagEditorInExternalWindow) {
+                                                                    chromeRuntimeMessageIfRequired({
+                                                                        type: 'magicss',
+                                                                        subType: 'mark-as-pinned-without-notification'
+                                                                    });
+                                                                }
+                                                                utils.alertNote(
+                                                                    '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
+                                                                    10000
+                                                                );
+                                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinComplete']);
+                                                            } else if (status === 'request-not-granted') {
+                                                                utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinIncompleteDueToPermission']);
+                                                            }
                                                         }
-                                                    }
-                                                );
+                                                    );
+                                                } catch (e) {
+                                                    handleUnrecoverableError(e);
+                                                }
                                             }
                                         }
                                         editor.focus();
@@ -3726,12 +3757,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                                         sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedEditInExternalWindow']);
                                     } catch (e) {
-                                        console.log('Error message reported by Magic CSS:', e);
-                                        utils.alertNote(
-                                            'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                            10000
-                                        );
-
+                                        handleUnrecoverableError(e);
                                         sendMessageForGa(['_trackEvent', 'error', 'couldNotEnableEditInExternalWindow']);
                                     }
                                 }
