@@ -15,6 +15,9 @@
     background-image: var(--cog-wheel-icon) !important;
     background-size: contain;
     width: 16px;
+    min-width: 16px; /* When rendered on a very low width page, the "width" styling isn't being respected, probably
+                        because the parent element is set as "display: flex". The "min-width" style is required to fix
+                        that. */
     height: 16px;
     margin-top: 6px;
     margin-left: 15px;
