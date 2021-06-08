@@ -207,8 +207,10 @@ if (window.flagEditorInExternalWindow) {
     utils.alertNote.setup({
         paddingRight: '25px',
         paddingBottom: '25px',
+        paddingLeft: '25px',
         verticalAlignment: 'bottom',
-        horizontalAlignment: 'right'
+        horizontalAlignment: 'right',
+        textAlignment: 'left'
     });
 }
 

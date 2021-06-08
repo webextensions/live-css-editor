@@ -409,14 +409,15 @@ if (!utils.defined) {
             paddingBottom: '',
             paddingLeft: '',
             verticalAlignment: 'top',
-            horizontalAlignment: 'center'
+            horizontalAlignment: 'center',
+            textAlignment: 'center'
         };
 
         var alertNote = function (msg, hideDelay, options) {
             options = options || {};
             var verticalAlignment = options.verticalAlignment || defaults.verticalAlignment || 'top',
                 horizontalAlignment = options.horizontalAlignment || defaults.horizontalAlignment || 'center',
-                textAlignment = options.textAlignment || horizontalAlignment,
+                textAlignment = options.textAlignment || defaults.textAlignment || 'center',
                 backgroundColor = options.backgroundColor || '#f9edbe',
                 borderColor = options.borderColor || '#eb7',
                 opacity = options.opacity || '1',
@@ -523,6 +524,7 @@ if (!utils.defined) {
         alertNote.setup = function (defaultsToSet) {
             if (typeof defaultsToSet.verticalAlignment   !== 'undefined' ) { defaults.verticalAlignment   = defaultsToSet.verticalAlignment;   }
             if (typeof defaultsToSet.horizontalAlignment !== 'undefined' ) { defaults.horizontalAlignment = defaultsToSet.horizontalAlignment; }
+            if (typeof defaultsToSet.textAlignment       !== 'undefined' ) { defaults.textAlignment       = defaultsToSet.textAlignment;       }
             if (typeof defaultsToSet.paddingTop          !== 'undefined' ) { defaults.paddingTop          = defaultsToSet.paddingTop;          }
             if (typeof defaultsToSet.paddingRight        !== 'undefined' ) { defaults.paddingRight        = defaultsToSet.paddingRight;        }
             if (typeof defaultsToSet.paddingBottom       !== 'undefined' ) { defaults.paddingBottom       = defaultsToSet.paddingBottom;       }
