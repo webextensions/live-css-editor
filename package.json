@@ -11,6 +11,7 @@
     "copy-files-from-to-outdated": "copy-files-from-to --outdated",
     "copy-files-from-to-dev-mode": "copy-files-from-to --mode dev",
     "postinstall": "npm run copy-files-from-to",
+    "get-latest-reviews": "node ./scripts/recipes/get-latest-reviews.js",
     "zip-chrome-extension": "node ./zip-extension.js chrome",
     "zip-edge-extension": "node ./zip-extension.js edge",
     "zip-firefox-extension": "node ./zip-extension.js firefox",

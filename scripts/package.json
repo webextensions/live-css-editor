@@ -1,0 +1,9 @@
+{
+  "name": "scripts",
+  "version": "0.0.1",
+  "devDependencies": {
+    "axios": "^0.21.1",
+    "chalk": "^4.1.1",
+    "word-wrap": "^1.2.3"
+  }
+}
