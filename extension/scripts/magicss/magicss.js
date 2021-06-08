@@ -3387,6 +3387,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         }
 
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
+                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyUnpinInitiate']);
                                             await markAsPinnedOrNotPinned(editor, 'not-pinned');
                                             if (window.flagEditorInExternalWindow) {
                                                 chromeRuntimeMessageIfRequired({
@@ -3398,7 +3399,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                 5000
                                             );
+                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyUnpinComplete']);
                                         } else {
+                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinInitiate']);
                                             if (isFirefox) {
                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
                                                 if (window.flagEditorInExternalWindow) {
@@ -3411,6 +3414,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically  <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                     10000
                                                 );
+                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinComplete']);
                                             } else {
                                                 // If the editor is in external window, then we may want to resize the window before requesting for permissions
                                                 if (window.flagEditorInExternalWindow) {
@@ -3464,8 +3468,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                                 10000
                                                             );
+                                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinComplete']);
                                                         } else if (status === 'request-not-granted') {
                                                             utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinIncompleteDueToPermission']);
                                                         }
                                                     }
                                                 );
