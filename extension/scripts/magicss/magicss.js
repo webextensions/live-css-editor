@@ -3731,55 +3731,6 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 }
                             };
                         })(),
-                        {
-                            name: 'disable',
-                            title: 'Deactivate code',
-                            cls: 'magicss-disable-css editor-gray-out',
-                            onclick: async function (evt, editor, divIcon) {
-                                if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
-                                    await editor.disableEnableCSS('enable');
-                                    chromeRuntimeMessageIfRequired({
-                                        type: 'magicss',
-                                        subType: 'enableCss'
-                                    });
-                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'enabledCss']);
-                                } else {
-                                    await editor.disableEnableCSS('disable');
-                                    chromeRuntimeMessageIfRequired({
-                                        type: 'magicss',
-                                        subType: 'disableCss'
-                                    });
-                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'disabledCss']);
-                                }
-
-                                if (!runningInAndroidFirefox) {
-                                    editor.focus();
-                                }
-                            },
-                            afterrender: function (editor, divIcon) {
-                                // TODO: Make the code independent of this setTimeout logic.
-                                setTimeout(function () {
-                                    if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
-                                        divIcon.title = 'Activate code';
-                                    } else {
-                                        divIcon.title = 'Deactivate code';
-                                    }
-                                }, 0);
-
-                                /* HACK: Remove this hack which is being used to handle "divIcon.title" change
-                                         for the case of "editor.disableEnableCSS('disable')" under "reInitialized()" */
-                                editor.originalDisableEnableCSS = editor.disableEnableCSS;
-                                editor.disableEnableCSS = async function (doWhat) {
-                                    var state = await editor.originalDisableEnableCSS(doWhat);
-                                    if (state === 'disabled') {
-                                        divIcon.title = 'Activate code';
-                                    } else {
-                                        divIcon.title = 'Deactivate code';
-                                    }
-                                    return state;
-                                };
-                            }
-                        },
                         /*
                         {
                             name: 'beautify',
@@ -3867,6 +3818,55 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     }
                                 }
                             ]
+                        },
+                        {
+                            name: 'disable',
+                            title: 'Deactivate code',
+                            cls: 'magicss-disable-css editor-gray-out',
+                            onclick: async function (evt, editor, divIcon) {
+                                if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
+                                    await editor.disableEnableCSS('enable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'enableCss'
+                                    });
+                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'enabledCss']);
+                                } else {
+                                    await editor.disableEnableCSS('disable');
+                                    chromeRuntimeMessageIfRequired({
+                                        type: 'magicss',
+                                        subType: 'disableCss'
+                                    });
+                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'disabledCss']);
+                                }
+
+                                if (!runningInAndroidFirefox) {
+                                    editor.focus();
+                                }
+                            },
+                            afterrender: function (editor, divIcon) {
+                                // TODO: Make the code independent of this setTimeout logic.
+                                setTimeout(function () {
+                                    if ($(divIcon).parents('#' + id).hasClass('indicate-disabled')) {
+                                        divIcon.title = 'Activate code';
+                                    } else {
+                                        divIcon.title = 'Deactivate code';
+                                    }
+                                }, 0);
+
+                                /* HACK: Remove this hack which is being used to handle "divIcon.title" change
+                                         for the case of "editor.disableEnableCSS('disable')" under "reInitialized()" */
+                                editor.originalDisableEnableCSS = editor.disableEnableCSS;
+                                editor.disableEnableCSS = async function (doWhat) {
+                                    var state = await editor.originalDisableEnableCSS(doWhat);
+                                    if (state === 'disabled') {
+                                        divIcon.title = 'Activate code';
+                                    } else {
+                                        divIcon.title = 'Deactivate code';
+                                    }
+                                    return state;
+                                };
+                            }
                         },
                         {
                             name: 'point-and-click',
