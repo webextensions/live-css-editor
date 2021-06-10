@@ -16,7 +16,7 @@ Notes about usage of 3rdparty code
 - Inside that `3rdparty` folder, the link to the original sources of all the files are placed along with those files as:
     `<3rd-party-filename>.<ext>.source.txt`
 - A list of most of those files and their origins can also be seen at:
-    https://github.com/webextensions/live-css-editor/blob/master/copy-third-party-front-end-scripts.cjson
+    https://github.com/webextensions/live-css-editor/blob/main/copy-third-party-front-end-scripts.cjson
 
 3rdparty code which is used "as-is" from GitHub
 -----------------------------------------------
@@ -24,7 +24,7 @@ Notes about usage of 3rdparty code
 
 3rdparty code which is used "as-is" from npm
 --------------------------------------------
-You would be able to see that in some of the `<3rd-party-filename>.<ext>.source.txt`, the 3rdparty code has been copied from the `node_modules/<package>/<path>` after performing the following `npm install` operations as described in https://github.com/webextensions/live-css-editor/blob/master/package.json
+You would be able to see that in some of the `<3rd-party-filename>.<ext>.source.txt`, the 3rdparty code has been copied from the `node_modules/<package>/<path>` after performing the following `npm install` operations as described in https://github.com/webextensions/live-css-editor/blob/main/package.json
 - `npm install codemirror@<version-mentioned-in-package.json>`
 - `npm install emmetio-codemirror-plugin-webextensions@<version-mentioned-in-package.json>`
 

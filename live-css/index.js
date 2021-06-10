@@ -145,7 +145,7 @@ var getLiveCssParams = function (configFilePath, argv) {
             logger.log('');
             logger.verbose(e);
             logger.warnHeading('\nUnable to read live-css configuration from ' + configFilePath);
-            logger.warn('The configuration file contents needs to follow JavaScript syntax.\neg: https://github.com/webextensions/live-css-editor/tree/master/live-css/default.live-css.config.js');
+            logger.warn('The configuration file contents needs to follow JavaScript syntax.\neg: https://github.com/webextensions/live-css-editor/tree/main/live-css/default.live-css.config.js');
         }
     } else {
         if (flagConfigFilePathProvidedByUser) {

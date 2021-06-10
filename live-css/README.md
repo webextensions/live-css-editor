@@ -84,7 +84,7 @@ if (codeIsRunningInDevelopmentMode) {
 ## Configuration file
 The configuration file can be generated using ```$ live-css --init```  
 
-*_Note:_* Configuration options are described in the [configuration file](https://github.com/webextensions/live-css-editor/blob/master/live-css/default.live-css.config.js)
+*_Note:_* Configuration options are described in the [configuration file](https://github.com/webextensions/live-css-editor/blob/main/live-css/default.live-css.config.js)
 
 ## TODO
 * Ability to auto-connect live-css server without launching the browser extension

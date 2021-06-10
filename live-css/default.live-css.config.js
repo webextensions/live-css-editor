@@ -10,12 +10,12 @@
         $ live-css --init
         --------OR--------
         Copy the default configuration file from:
-            https://github.com/webextensions/live-css-editor/tree/master/live-css/default.live-css.config.js
+            https://github.com/webextensions/live-css-editor/tree/main/live-css/default.live-css.config.js
         and save it as a file with name ".live-css.config.js" (note that the file name begins with a dot character)
 
     For further guidance, visit the following links:
         https://www.npmjs.com/package/@webextensions/live-css
-        https://github.com/webextensions/live-css-editor/tree/master/live-css
+        https://github.com/webextensions/live-css-editor/tree/main/live-css
         https://github.com/webextensions/live-css-editor
         https://github.com/webextensions/live-css-editor/issues
 */
