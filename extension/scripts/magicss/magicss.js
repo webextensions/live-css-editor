@@ -3565,202 +3565,210 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 return null;
                             }
 
+                            window.loadEditorInExternalWindow = async function (editor) {
+                                try {
+                                    chrome.runtime.sendMessage({
+                                        openExternalEditor: true,
+                                        magicssHostSessionUuid: window.magicssHostSessionUuid,
+                                        tabTitle: document.title,
+                                        width: editor.container.clientWidth,
+                                        height: editor.container.clientHeight
+                                    });
+
+                                    await editor.hide();
+                                    editor.container.classList.add('external-editor-also-exists');
+
+                                    if (!window.openExternalEditorListenerAdded) {
+                                        if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
+                                            chrome.runtime.onMessage.addListener(
+                                                function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+                                                    let flagAsyncResponse = false;
+                                                    if (
+                                                        request.magicssHostSessionUuid === window.magicssHostSessionUuid &&
+                                                        request.type === 'magicss'
+                                                    ) {
+                                                        if (request.subType === 'magicss-set-text-value') {
+                                                            setTimeout(async () => {
+                                                                await editor.setTextValue(request.payload);
+                                                                await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                            });
+                                                        } else if (request.subType === 'magicss-fnApplyTextAsCSS') {
+                                                            setTimeout(async () => {
+                                                                await fnApplyTextAsCSS(editor, (request.payload || {}).options);
+                                                            });
+                                                        } else if (request.subType === 'storage-data-to-initialize') {
+                                                            flagAsyncResponse = true;
+                                                            setTimeout(async () => {
+                                                                const propsToSync = [
+                                                                    USER_PREFERENCE_LAST_APPLIED_CSS,
+                                                                    USER_PREFERENCE_USE_CSS_LINTING,
+                                                                    USER_PREFERENCE_SHOW_LINE_NUMBERS,
+                                                                    USER_PREFERENCE_APPLY_STYLES_AUTOMATICALLY,
+                                                                    USER_PREFERENCE_LANGUAGE_MODE_NON_FILE,
+                                                                    USER_PREFERENCE_LANGUAGE_MODE,
+                                                                    USER_PREFERENCE_TEXTAREA_VALUE,
+                                                                    USER_PREFERENCE_DISABLE_STYLES
+                                                                ];
+
+                                                                const responseToSend = {};
+                                                                for (const prop of propsToSync) {
+                                                                    responseToSend[prop] = await editor.userPreference(prop);
+                                                                }
+                                                                return sendResponse(responseToSend);
+                                                            });
+                                                        } else if (request.subType === 'update-code-and-apply-css') {
+                                                            setTimeout(async () => {
+                                                                await editor.setTextValue(request.payload.cssCodeToUse);
+                                                                await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                                await fnApplyTextAsCSS(editor);
+                                                            });
+                                                        } else if (request.subType === 'reopen-main-editor') {
+                                                            flagAsyncResponse = true;
+                                                            window.focus();
+                                                            setTimeout(async () => {
+                                                                await window.MagiCSSEditor.reposition(function () {
+                                                                    // Since the editor would have been hidden, upon showing it again, it wouldn't have updated. Hence, this refresh is required, otherwise, the view would get updated upon clicking inside the editor in host tab.
+                                                                    window.MagiCSSEditor.cm.refresh();
+
+                                                                    checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+                                                                    sendResponse(); // Note: This "sendResponse()" call is for indicating that the execution if this part is complete and we are not sending any data in the response
+                                                                });
+
+                                                                chromeStorageForExtensionData.set({'last-time-editor-was-in-external-window': false}, function() {
+                                                                    // do nothing
+                                                                });
+                                                            });
+                                                        } else if (request.subType === 'enableCss') {
+                                                            setTimeout(async () => {
+                                                                await editor.disableEnableCSS('enable');
+                                                            });
+                                                        } else if (request.subType === 'disableCss') {
+                                                            setTimeout(async () => {
+                                                                await editor.disableEnableCSS('disable');
+                                                            });
+                                                        } else if (request.subType === 'magicss-handle-delayedcursormove') {
+                                                            var cssSelector = processSplitText({
+                                                                splitText: request.payload.theSplittedText,
+                                                                useAlertNote: true
+                                                            });
+                                                            if (!cssSelector) {
+                                                                utils.alertNote.hide();
+                                                            }
+
+                                                            if (!editor.styleHighlightingSelector) {
+                                                                editor.styleHighlightingSelector = new utils.StyleTag({
+                                                                    id: 'magicss-highlight-by-selector',
+                                                                    parentTag: 'body',
+                                                                    attributes: [{
+                                                                        name: 'data-style-created-by',
+                                                                        value: 'magicss'
+                                                                    }],
+                                                                    overwriteExistingStyleTagWithSameId: true
+                                                                });
+                                                            }
+
+                                                            if (cssSelector) {
+                                                                // Helps in highlighting SVG elements
+                                                                editor.styleHighlightingSelector.cssText = cssSelector + '{outline: 1px dashed red !important; fill: red !important; }';
+                                                            } else {
+                                                                editor.styleHighlightingSelector.cssText = '';
+                                                            }
+                                                            editor.styleHighlightingSelector.applyTag();
+                                                        } else if (request.subType === 'magicss-get-selector-match-count') {
+                                                            flagAsyncResponse = true;
+                                                            setTimeout(async () => {
+                                                                var count = null;
+                                                                try {
+                                                                    const { cssSelector } = request.payload;
+                                                                    count = $(cssSelector).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
+                                                                } catch (e) {
+                                                                    // do nothing
+                                                                }
+                                                                return sendResponse(count);
+                                                            });
+                                                        } else if (request.subType === 'get-css-selectors-autocomplete-objects') {
+                                                            flagAsyncResponse = true;
+                                                            setTimeout(async () => {
+                                                                return sendResponse(existingCSSSelectorsWithAutocompleteObjects);
+                                                            });
+                                                        } else if (request.subType === 'showLineNumbers') {
+                                                            setTimeout(async () => {
+                                                                editor.cm.setOption('lineNumbers', true);
+                                                                await editor.userPreference('show-line-numbers', 'yes');
+                                                            });
+                                                        } else if (request.subType === 'hideLineNumbers') {
+                                                            setTimeout(async () => {
+                                                                editor.cm.setOption('lineNumbers', false);
+                                                                await editor.userPreference('show-line-numbers', 'no');
+                                                            });
+                                                        } else if (request.subType === 'enable-css-linting') {
+                                                            if (getLanguageMode() === 'css') {
+                                                                setTimeout(async () => {
+                                                                    await setCodeMirrorCSSLinting(editor, 'enable');
+                                                                });
+                                                            }
+                                                        } else if (request.subType === 'disable-css-linting') {
+                                                            if (getLanguageMode() === 'css') {
+                                                                setTimeout(async () => {
+                                                                    await setCodeMirrorCSSLinting(editor, 'disable');
+                                                                });
+                                                            }
+                                                        } else if (request.subType === 'external-editor-window-is-loading') {
+                                                            editor.container.classList.add('external-editor-also-exists');
+                                                        } else if (
+                                                            request.subType === 'magicss-closed-editor' ||
+                                                            request.subType === 'external-editor-window-is-closing'
+                                                        ) {
+                                                            editor.container.classList.remove('external-editor-also-exists');
+                                                        } else if (request.subType === 'set-language-mode-to-css') {
+                                                            setTimeout(async () => {
+                                                                await setLanguageMode('css', editor, { skipNotifications: true });
+                                                            });
+                                                        } else if (request.subType === 'set-language-mode-to-less') {
+                                                            setTimeout(async () => {
+                                                                await setLanguageMode('less', editor, { skipNotifications: true });
+                                                            });
+                                                        } else if (request.subType === 'set-language-mode-to-sass') {
+                                                            setTimeout(async () => {
+                                                                await setLanguageMode('sass', editor, { skipNotifications: true });
+                                                            });
+                                                        } else if (request.subType === 'mark-as-pinned-without-notification') {
+                                                            setTimeout(async () => {
+                                                                await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                            });
+                                                        } else if (request.subType === 'mark-as-not-pinned-without-notification') {
+                                                            setTimeout(async () => {
+                                                                await markAsPinnedOrNotPinned(editor, 'not-pinned');
+                                                            });
+                                                        } else if (request.subType === 'magicss-reload-all-css-resources') {
+                                                            reloadAllCSSResourcesInPage();
+                                                        } else {
+                                                            console.log(`Received an unexpected event with subType: ${request.subType}`);
+                                                        }
+
+                                                        // Need to return true to run "sendResponse" in async manner
+                                                        // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                                                        return flagAsyncResponse;
+                                                    }
+                                                }
+                                            );
+                                            window.openExternalEditorListenerAdded = true;
+                                        }
+                                    }
+
+                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedEditInExternalWindow']);
+                                } catch (e) {
+                                    handleUnrecoverableError(e);
+                                    sendMessageForGa(['_trackEvent', 'error', 'couldNotEnableEditInExternalWindow']);
+                                }
+                            };
+
                             return {
                                 name: 'edit-in-external',
                                 title: 'Edit in external window',
                                 cls: 'magicss-external-window editor-gray-out',
                                 onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
-                                    try {
-                                        chrome.runtime.sendMessage({
-                                            openExternalEditor: true,
-                                            magicssHostSessionUuid: window.magicssHostSessionUuid,
-                                            tabTitle: document.title,
-                                            width: editor.container.clientWidth,
-                                            height: editor.container.clientHeight
-                                        });
-
-                                        await editor.hide();
-                                        editor.container.classList.add('external-editor-also-exists');
-
-                                        if (!window.openExternalEditorListenerAdded) {
-                                            if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
-                                                chrome.runtime.onMessage.addListener(
-                                                    function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
-                                                        let flagAsyncResponse = false;
-                                                        if (
-                                                            request.magicssHostSessionUuid === window.magicssHostSessionUuid &&
-                                                            request.type === 'magicss'
-                                                        ) {
-                                                            if (request.subType === 'magicss-set-text-value') {
-                                                                setTimeout(async () => {
-                                                                    await editor.setTextValue(request.payload);
-                                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                                });
-                                                            } else if (request.subType === 'magicss-fnApplyTextAsCSS') {
-                                                                setTimeout(async () => {
-                                                                    await fnApplyTextAsCSS(editor, (request.payload || {}).options);
-                                                                });
-                                                            } else if (request.subType === 'storage-data-to-initialize') {
-                                                                flagAsyncResponse = true;
-                                                                setTimeout(async () => {
-                                                                    const propsToSync = [
-                                                                        USER_PREFERENCE_LAST_APPLIED_CSS,
-                                                                        USER_PREFERENCE_USE_CSS_LINTING,
-                                                                        USER_PREFERENCE_SHOW_LINE_NUMBERS,
-                                                                        USER_PREFERENCE_APPLY_STYLES_AUTOMATICALLY,
-                                                                        USER_PREFERENCE_LANGUAGE_MODE_NON_FILE,
-                                                                        USER_PREFERENCE_LANGUAGE_MODE,
-                                                                        USER_PREFERENCE_TEXTAREA_VALUE,
-                                                                        USER_PREFERENCE_DISABLE_STYLES
-                                                                    ];
-
-                                                                    const responseToSend = {};
-                                                                    for (const prop of propsToSync) {
-                                                                        responseToSend[prop] = await editor.userPreference(prop);
-                                                                    }
-                                                                    return sendResponse(responseToSend);
-                                                                });
-                                                            } else if (request.subType === 'update-code-and-apply-css') {
-                                                                setTimeout(async () => {
-                                                                    await editor.setTextValue(request.payload.cssCodeToUse);
-                                                                    await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                                                    await fnApplyTextAsCSS(editor);
-                                                                });
-                                                            } else if (request.subType === 'reopen-main-editor') {
-                                                                flagAsyncResponse = true;
-                                                                window.focus();
-                                                                setTimeout(async () => {
-                                                                    await window.MagiCSSEditor.reposition(function () {
-                                                                        // Since the editor would have been hidden, upon showing it again, it wouldn't have updated. Hence, this refresh is required, otherwise, the view would get updated upon clicking inside the editor in host tab.
-                                                                        window.MagiCSSEditor.cm.refresh();
-
-                                                                        checkIfMagicCssLoadedFine(window.MagiCSSEditor);
-                                                                        sendResponse(); // Note: This "sendResponse()" call is for indicating that the execution if this part is complete and we are not sending any data in the response
-                                                                    });
-                                                                });
-                                                            } else if (request.subType === 'enableCss') {
-                                                                setTimeout(async () => {
-                                                                    await editor.disableEnableCSS('enable');
-                                                                });
-                                                            } else if (request.subType === 'disableCss') {
-                                                                setTimeout(async () => {
-                                                                    await editor.disableEnableCSS('disable');
-                                                                });
-                                                            } else if (request.subType === 'magicss-handle-delayedcursormove') {
-                                                                var cssSelector = processSplitText({
-                                                                    splitText: request.payload.theSplittedText,
-                                                                    useAlertNote: true
-                                                                });
-                                                                if (!cssSelector) {
-                                                                    utils.alertNote.hide();
-                                                                }
-
-                                                                if (!editor.styleHighlightingSelector) {
-                                                                    editor.styleHighlightingSelector = new utils.StyleTag({
-                                                                        id: 'magicss-highlight-by-selector',
-                                                                        parentTag: 'body',
-                                                                        attributes: [{
-                                                                            name: 'data-style-created-by',
-                                                                            value: 'magicss'
-                                                                        }],
-                                                                        overwriteExistingStyleTagWithSameId: true
-                                                                    });
-                                                                }
-
-                                                                if (cssSelector) {
-                                                                    // Helps in highlighting SVG elements
-                                                                    editor.styleHighlightingSelector.cssText = cssSelector + '{outline: 1px dashed red !important; fill: red !important; }';
-                                                                } else {
-                                                                    editor.styleHighlightingSelector.cssText = '';
-                                                                }
-                                                                editor.styleHighlightingSelector.applyTag();
-                                                            } else if (request.subType === 'magicss-get-selector-match-count') {
-                                                                flagAsyncResponse = true;
-                                                                setTimeout(async () => {
-                                                                    var count = null;
-                                                                    try {
-                                                                        const { cssSelector } = request.payload;
-                                                                        count = $(cssSelector).not('#MagiCSS-bookmarklet, #MagiCSS-bookmarklet *, #topCenterAlertNote, #topCenterAlertNote *').length;
-                                                                    } catch (e) {
-                                                                        // do nothing
-                                                                    }
-                                                                    return sendResponse(count);
-                                                                });
-                                                            } else if (request.subType === 'get-css-selectors-autocomplete-objects') {
-                                                                flagAsyncResponse = true;
-                                                                setTimeout(async () => {
-                                                                    return sendResponse(existingCSSSelectorsWithAutocompleteObjects);
-                                                                });
-                                                            } else if (request.subType === 'showLineNumbers') {
-                                                                setTimeout(async () => {
-                                                                    editor.cm.setOption('lineNumbers', true);
-                                                                    await editor.userPreference('show-line-numbers', 'yes');
-                                                                });
-                                                            } else if (request.subType === 'hideLineNumbers') {
-                                                                setTimeout(async () => {
-                                                                    editor.cm.setOption('lineNumbers', false);
-                                                                    await editor.userPreference('show-line-numbers', 'no');
-                                                                });
-                                                            } else if (request.subType === 'enable-css-linting') {
-                                                                if (getLanguageMode() === 'css') {
-                                                                    setTimeout(async () => {
-                                                                        await setCodeMirrorCSSLinting(editor, 'enable');
-                                                                    });
-                                                                }
-                                                            } else if (request.subType === 'disable-css-linting') {
-                                                                if (getLanguageMode() === 'css') {
-                                                                    setTimeout(async () => {
-                                                                        await setCodeMirrorCSSLinting(editor, 'disable');
-                                                                    });
-                                                                }
-                                                            } else if (request.subType === 'external-editor-window-is-loading') {
-                                                                editor.container.classList.add('external-editor-also-exists');
-                                                            } else if (
-                                                                request.subType === 'magicss-closed-editor' ||
-                                                                request.subType === 'external-editor-window-is-closing'
-                                                            ) {
-                                                                editor.container.classList.remove('external-editor-also-exists');
-                                                            } else if (request.subType === 'set-language-mode-to-css') {
-                                                                setTimeout(async () => {
-                                                                    await setLanguageMode('css', editor, { skipNotifications: true });
-                                                                });
-                                                            } else if (request.subType === 'set-language-mode-to-less') {
-                                                                setTimeout(async () => {
-                                                                    await setLanguageMode('less', editor, { skipNotifications: true });
-                                                                });
-                                                            } else if (request.subType === 'set-language-mode-to-sass') {
-                                                                setTimeout(async () => {
-                                                                    await setLanguageMode('sass', editor, { skipNotifications: true });
-                                                                });
-                                                            } else if (request.subType === 'mark-as-pinned-without-notification') {
-                                                                setTimeout(async () => {
-                                                                    await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                                });
-                                                            } else if (request.subType === 'mark-as-not-pinned-without-notification') {
-                                                                setTimeout(async () => {
-                                                                    await markAsPinnedOrNotPinned(editor, 'not-pinned');
-                                                                });
-                                                            } else if (request.subType === 'magicss-reload-all-css-resources') {
-                                                                reloadAllCSSResourcesInPage();
-                                                            } else {
-                                                                console.log(`Received an unexpected event with subType: ${request.subType}`);
-                                                            }
-
-                                                            // Need to return true to run "sendResponse" in async manner
-                                                            // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
-                                                            return flagAsyncResponse;
-                                                        }
-                                                    }
-                                                );
-                                                window.openExternalEditorListenerAdded = true;
-                                            }
-                                        }
-
-                                        sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedEditInExternalWindow']);
-                                    } catch (e) {
-                                        handleUnrecoverableError(e);
-                                        sendMessageForGa(['_trackEvent', 'error', 'couldNotEnableEditInExternalWindow']);
-                                    }
+                                    await window.loadEditorInExternalWindow(editor);
                                 }
                             };
                         })(),
