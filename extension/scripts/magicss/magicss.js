@@ -618,6 +618,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 chrome.runtime.sendMessage({
                     closeExternalEditor: true
                 });
+
+                chromeStorageForExtensionData.set({'last-time-editor-was-in-external-window': false}, function() {
+                    // do nothing
+                });
             });
         }
         return;
@@ -2767,6 +2771,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             // Clear the undo-redo hstory
                             editor.cm.clearHistory();
 
+                            window.languageModeIsIntermittent = false;
                             sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'file']);
                         });
                     } else {
@@ -4346,6 +4351,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 var previousNonFileLanguageMode = await editor.userPreference('language-mode-non-file') || 'css';
                                 await setLanguageMode(previousNonFileLanguageMode, editor, {skipNotifications: true});
 
+                                // "window.languageModeIsIntermittent" would be set to false (or removed) inside setLanguageMode('file', ...)
+                                // TODO: Make "await setLanguageMode('file', ...)" async in proper manner so that
+                                //       "window.languageModeIsIntermittent" can be set to false from within this block of code.
+                                window.languageModeIsIntermittent = true;
+
                                 await setLanguageMode('file', editor, {skipNotifications: true});
                             } else {
                                 window.setTimeout(function () {
@@ -4768,7 +4778,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 await window.MagiCSSEditor.create();
 
-                checkIfMagicCssLoadedFine(window.MagiCSSEditor);
+                const magicCssLoadedFine = checkIfMagicCssLoadedFine(window.MagiCSSEditor);
 
                 window.MagiCSSEditor.markLiveCssServerConnectionStatus(false);
 
@@ -4839,6 +4849,38 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     };
                     document.addEventListener('mousemove', mousemoveListener, false);
                 }
+
+                chromeStorageForExtensionData.get('last-time-editor-was-in-external-window', function (values) {
+                    setTimeout(async () => {
+                        const editor = window.MagiCSSEditor;
+                        const targetEditMode = await editor.userPreference('language-mode');
+                        const targetEditModeIsNotFile = (
+                            !window.languageModeIsIntermittent &&
+                            targetEditMode !== 'file'
+                        );
+                        const notInsideIframe = (window === window.parent);
+                        if (
+                            values &&
+                            values['last-time-editor-was-in-external-window'] === true &&
+                            targetEditModeIsNotFile &&
+                            notInsideIframe
+                        ) {
+                            window.loadEditorInExternalWindow(editor);
+                        }
+
+                        if (magicCssLoadedFine) {
+                            if (window.flagEditorInExternalWindow) {
+                                chromeStorageForExtensionData.set({'last-time-editor-was-in-external-window': true}, function() {
+                                    // do nothing
+                                });
+                            } else {
+                                chromeStorageForExtensionData.set({'last-time-editor-was-in-external-window': false}, function() {
+                                    // do nothing
+                                });
+                            }
+                        }
+                    });
+                });
             }
         });
     };
