@@ -2457,7 +2457,6 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         window.isActiveLoadSassRequest = false;
                                         if (!options.skipNotifications) {
                                             utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
-                                            debugger;
                                         }
                                         setTimeout(function () {
                                             // Ensure that getLanguageMode() is still 'sass'
