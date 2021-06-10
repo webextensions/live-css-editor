@@ -597,7 +597,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 '<br/>Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>',
                 10000
             );
+            return false;
         }
+        return true;
     };
 
     var strAboutToBeInstantiated = '<about-to-be-instantiated>';
