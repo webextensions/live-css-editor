@@ -292,7 +292,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         var serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
             serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort;
 
-        var backEndPath = serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
+        var protocolValue = 'http:';
+        var backEndPath = protocolValue + '//' + serverHostnameValue + ':' + serverPortValue + constants.liveCssServer.apiVersionPath;
         var backEndPathToShowToUser = serverHostnameValue + ':' + serverPortValue;
 
         socketOb.socket = io(backEndPath, {
@@ -686,8 +687,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
     }
     constants.appMajorVersion = parseInt(constants.appVersion, 10);
     constants.liveCssServer = {
-        defaultProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
-        defaultHostname: window.location.hostname || '127.0.0.1',
+        // defaultProtocol: (window.location.protocol === 'https:') ? 'https:' : 'http:',
+        // defaultHostname: window.location.hostname || '127.0.0.1',
+        defaultProtocol: 'http:',
+        defaultHostname: 'localhost',
+
         defaultPort: '3456',
         apiVersionPath: '/api/v' + constants.appMajorVersion
     };
@@ -2591,7 +2595,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }()),
 
                         data: await (async function () {
-                            var protocolValue = (window.location.protocol === 'https:') ? 'https:' : 'http:',
+                            // var protocolValue = (window.location.protocol === 'https:') ? 'https:' : 'http:',
+                            var protocolValue = 'http:',
                                 serverHostnameValue = await editor.userPreference('live-css-server-hostname') || constants.liveCssServer.defaultHostname,
                                 serverPortValue = await editor.userPreference('live-css-server-port') || constants.liveCssServer.defaultPort,
                                 backEndPath = serverHostnameValue + ':' + serverPortValue + '/',
