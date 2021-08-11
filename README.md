@@ -62,7 +62,7 @@ Visit https://webextensions.org/ for further details
 * The CSS reloader watches CSS files and live updates them immediately
 * The Sass parser is loaded remotely from https://cdnjs.cloudflare.com/ajax/libs/sass.js/...
 * With this styling code tester, you can develop and test the code at the same time
-* The code is saved in file/browser as soon as you write it
+* The code is saved in browser/file as soon as you write it
 * The code editor is resizable and draggable
 * The code you write is auto-saved at site level and can be used again for same or different pages
 * You can use "TAB" key to indent your code
