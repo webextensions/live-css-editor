@@ -203,6 +203,33 @@ const commands = (
         },
 
         {
+            id: 'enable-line-wrap',
+            operationId: 'toggle-line-wrap',
+            name: 'Enable line wrap',
+            iconCls: 'magicss-use-icon-enable-line-wrap-gray',
+            command() {
+                setTimeout(async function () {
+                    var editor = window.MagiCSSEditor;
+                    await window.execEnableLineWrapAction(editor);
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'enableLineWrap']);
+                });
+            }
+        },
+        {
+            id: 'disable-line-wrap',
+            operationId: 'toggle-line-wrap',
+            name: 'Disable line wrap',
+            iconCls: 'magicss-use-icon-disable-line-wrap-gray',
+            command() {
+                setTimeout(async function () {
+                    var editor = window.MagiCSSEditor;
+                    await window.execDisableLineWrapAction(editor);
+                    sendMessageForGa(['_trackEvent', 'commandPalette', 'disableLineWrap']);
+                });
+            }
+        },
+
+        {
             id: 'enable-css-linting',
             operationId: 'toggle-css-linting',
             name: 'Enable CSS linting',

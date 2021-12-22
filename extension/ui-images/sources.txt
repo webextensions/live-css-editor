@@ -27,6 +27,13 @@ hash.svg
 hash_edited.svg
     Slightly edited version of "hash.svg"
 
+line-wrap.svg
+    https://www.iconfinder.com/icons/8726514/wrap_text_icon
+    https://www.iconfinder.com/icons/8726514/download/svg/4096
+
+line-wrap_edited.svg
+    Slightly edited version of "line-wrap.svg" (with help of https://editor.method.ac/)
+
 link-external.svg
     https://github.com/primer/octicons/blob/bb60b8475dd1e03041416c406007a625d50a64d1/svg/link-external.svg
 link-external_edited-yellow.svg

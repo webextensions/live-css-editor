@@ -17,6 +17,7 @@ var
     USER_PREFERENCE_LAST_APPLIED_CSS = 'last-applied-css',
     USER_PREFERENCE_USE_CSS_LINTING = 'use-css-linting',
     USER_PREFERENCE_SHOW_LINE_NUMBERS = 'show-line-numbers',
+    USER_PREFERENCE_ENABLE_LINE_WRAP = 'enable-line-wrap',
     USER_PREFERENCE_APPLY_STYLES_AUTOMATICALLY = 'apply-styles-automatically',
     USER_PREFERENCE_LANGUAGE_MODE_NON_FILE = 'language-mode-non-file',
     USER_PREFERENCE_LANGUAGE_MODE = 'language-mode',
@@ -1858,7 +1859,6 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                     editor.focus();
                 };
-
                 window.execHideLineNumbersAction = async function (editor) {
                     editor.cm.setOption('lineNumbers', false);
                     await editor.userPreference('show-line-numbers', 'no');
@@ -1866,6 +1866,29 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     chromeRuntimeMessageIfRequired({
                         type: 'magicss',
                         subType: 'hideLineNumbers'
+                    });
+
+                    editor.focus();
+                };
+
+                window.execEnableLineWrapAction = async function (editor) {
+                    editor.cm.setOption('lineWrapping', true);
+                    await editor.userPreference('enable-line-wrap', 'yes');
+
+                    chromeRuntimeMessageIfRequired({
+                        type: 'magicss',
+                        subType: 'enableLineWrap'
+                    });
+
+                    editor.focus();
+                };
+                window.execDisableLineWrapAction = async function (editor) {
+                    editor.cm.setOption('lineWrapping', false);
+                    await editor.userPreference('enable-line-wrap', 'no');
+
+                    chromeRuntimeMessageIfRequired({
+                        type: 'magicss',
+                        subType: 'disableLineWrap'
                     });
 
                     editor.focus();
@@ -3613,6 +3636,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     USER_PREFERENCE_LAST_APPLIED_CSS,
                                                                     USER_PREFERENCE_USE_CSS_LINTING,
                                                                     USER_PREFERENCE_SHOW_LINE_NUMBERS,
+                                                                    USER_PREFERENCE_ENABLE_LINE_WRAP,
                                                                     USER_PREFERENCE_APPLY_STYLES_AUTOMATICALLY,
                                                                     USER_PREFERENCE_LANGUAGE_MODE_NON_FILE,
                                                                     USER_PREFERENCE_LANGUAGE_MODE,
@@ -3710,6 +3734,16 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                             setTimeout(async () => {
                                                                 editor.cm.setOption('lineNumbers', false);
                                                                 await editor.userPreference('show-line-numbers', 'no');
+                                                            });
+                                                        } else if (request.subType === 'enableLineWrap') {
+                                                            setTimeout(async () => {
+                                                                editor.cm.setOption('lineWrapping', true);
+                                                                await editor.userPreference('enable-line-wrap', 'yes');
+                                                            });
+                                                        } else if (request.subType === 'disableLineWrap') {
+                                                            setTimeout(async () => {
+                                                                editor.cm.setOption('lineWrapping', false);
+                                                                await editor.userPreference('enable-line-wrap', 'no');
                                                             });
                                                         } else if (request.subType === 'enable-css-linting') {
                                                             if (getLanguageMode() === 'css') {

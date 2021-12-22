@@ -758,6 +758,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 gutters: [],
                 lint: false,
                 lineNumbers: await thisOb.userPreference('show-line-numbers') === 'yes' ? true : false,   // Eventually, lineNumbers also adds a value in "gutters" array
+                lineWrapping: await thisOb.userPreference('enable-line-wrap') === 'yes' ? true : false,
 
                 styleActiveLine: {
                     nonEmpty: true
@@ -1608,6 +1609,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
         [USER_PREFERENCE_FONT_SIZE_IN_PX]: '12',
         'syntax-highlighting': 'yes',
         'show-line-numbers': 'no',
+        'enable-line-wrap': 'no',
         'textarea-value': '',
         'ui-position-left': 20,
         'ui-position-top': 20,

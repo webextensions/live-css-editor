@@ -14,6 +14,7 @@ var dataMigration = {
         'live-css-server-hostname',
         'live-css-server-port',
         'show-line-numbers',
+        'enable-line-wrap',
         'textarea-value',
         'ui-position-left',
         'ui-position-top',

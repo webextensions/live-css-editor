@@ -99,6 +99,14 @@ const CommandPalette = function (props) {
             if (!editor.cm.getOption('lineNumbers')) {
                 return false;
             }
+        } else if (item.id === 'enable-line-wrap') {
+            if (editor.cm.getOption('lineWrapping')) {
+                return false;
+            }
+        } else if (item.id === 'disable-line-wrap') {
+            if (!editor.cm.getOption('lineWrapping')) {
+                return false;
+            }
         } else if (item.id === 'enable-css-linting') {
             if (editor.cm.getOption('lint')) {
                 return false;
