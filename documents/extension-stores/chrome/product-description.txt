@@ -126,7 +126,7 @@ Visit https://webextensions.org/ for further details.
 Created by:
 ➤ Priyank Parashar - https://linkedin.com/in/ParasharPriyank/
 
-Connect to us at:
+Connect with us:
 ➤ https://webextensions.org/
 ➤ https://github.com/webextensions/live-css-editor
 ➤ https://twitter.com/webextensions
