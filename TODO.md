@@ -8,6 +8,8 @@
 * Provide a scalable way to share CSS across computers. The current approach of chrome.storage.sync is limited. May use a solution via a custom or third-party service like "GitHub Gist".
 * If technically possible, allow loading editor in a separate panel along with the extension icon.
 * Add a keyboard shortcut to reload all CSS resources.
+* Add support for converting from/to HTML-and-CSS to Tailwind-HTML (https://github.com/webextensions/live-css-editor/issues/76)
+* Add support for converting from/to CSS to Tailwind classes (https://github.com/webextensions/live-css-editor/issues/76)
 
 #### Improvements
 * Set a different icon when the styles are applied.
