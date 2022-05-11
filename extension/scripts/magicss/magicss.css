@@ -118,7 +118,7 @@
 
 .magic-css-header .magicss-title {
     display: flex;
-    background-color: #4458ae;
+    background-color: #152c4a;
     border-radius: 5px 5px 0 0;
     font-weight: bold;
     color: #fff;
@@ -151,7 +151,7 @@
 .magicss-mode-file {
     font-weight: bold;
     color: #ffffff;
-    opacity: 0.5;
+    opacity: 0.66;
     -webkit-transform: translateZ(0);   /* https://stackoverflow.com/questions/7582567/css-opacity-change-on-hover-flickering/7623025#7623025 */
 }
 

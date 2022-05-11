@@ -3315,7 +3315,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }
                     },
                     // bgColor: '68,88,174,0.85',
-                    bgColor: '99,113,186,1',
+                    bgColor: '42,74,117,1',
                     headerIcons: [
                         (function () {
                             const
