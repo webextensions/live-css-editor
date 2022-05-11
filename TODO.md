@@ -32,6 +32,7 @@
 * Move some functionalities into their own projects, for example, generate selectors, get existing selectors, point-and-click etc
 * Use Web Components and Shadow DOM for Magic CSS UI (and remove some code which would not be required after that).  
   **Dependency:** Currently `customElements` cannot be defined in Chrome / Chromium extensions (See: https://bugs.chromium.org/p/chromium/issues/detail?id=390807)
+* Once https://github.com/sass/dart-sass/issues/25 is fixed, then start using it in place of https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js (https://github.com/medialize/sass.js)
 
 #### Language Support
 * Add translations/internationalization
