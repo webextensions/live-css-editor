@@ -1297,6 +1297,7 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                 $(thisOb.container).addClass(options.cls);
             }
             $(thisOb.container).addClass('magic-css-container');
+            $(thisOb.container).addClass('notranslate'); // https://stackoverflow.com/questions/12238396/how-to-disable-google-translate-from-html-in-chrome#comment28428600_12238414
             thisOb.container.style.position = 'fixed';
             if (rememberDimensions) {
                 thisOb.container.style.top = await thisOb.userPreference('ui-position-top') + 'px';
