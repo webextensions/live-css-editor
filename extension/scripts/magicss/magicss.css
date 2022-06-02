@@ -128,6 +128,14 @@
     cursor: default;
 }
 
+.magic-css-header .magicss-title div:first-child {
+    margin-left: 5px;
+}
+
+.magic-css-header .magicss-title div:last-child {
+    margin-right: 5px;
+}
+
 .magicss-editor-is-small .magicss-title {
     text-transform: uppercase;
 }
