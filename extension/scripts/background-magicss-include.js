@@ -137,6 +137,9 @@ if (window.flagEditorInExternalWindow) {
     }
 }
 
+/*
+// Not used anymore
+
 if (window.flagEditorInExternalWindow) {
     // do nothing
 } else {
@@ -155,6 +158,7 @@ if (window.flagEditorInExternalWindow) {
         });
     }
 }
+/* */
 
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
 var runningInChromiumLikeEnvironment = function () {
