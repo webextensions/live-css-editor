@@ -13,6 +13,50 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_STORAGE_MODE = 'storage-mode',
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
 
+var manageClassListForWidth = function ({ classList, width }) {
+    const floorWidthTo50 = parseInt(width, 10) - (parseInt(width, 10) % 50);
+
+    switch(floorWidthTo50) {
+        /* eslint-disable no-fallthrough */
+        case 950: classList.add('magicss-w-950-plus');
+        case 900: classList.add('magicss-w-900-plus');
+        case 850: classList.add('magicss-w-850-plus');
+        case 800: classList.add('magicss-w-800-plus');
+        case 750: classList.add('magicss-w-750-plus');
+        case 700: classList.add('magicss-w-700-plus');
+        case 650: classList.add('magicss-w-650-plus');
+        case 600: classList.add('magicss-w-600-plus');
+        case 550: classList.add('magicss-w-550-plus');
+        case 500: classList.add('magicss-w-500-plus');
+        case 450: classList.add('magicss-w-450-plus');
+        case 400: classList.add('magicss-w-400-plus');
+        case 350: classList.add('magicss-w-350-plus');
+        case 300: classList.add('magicss-w-300-plus');
+        case 250: classList.add('magicss-w-250-plus');
+        /* eslint-enable no-fallthrough */
+    }
+
+    switch(floorWidthTo50) {
+        /* eslint-disable no-fallthrough */
+        case  200: classList.remove('magicss-w-250-plus');
+        case  250: classList.remove('magicss-w-300-plus');
+        case  300: classList.remove('magicss-w-350-plus');
+        case  350: classList.remove('magicss-w-400-plus');
+        case  400: classList.remove('magicss-w-450-plus');
+        case  450: classList.remove('magicss-w-500-plus');
+        case  500: classList.remove('magicss-w-550-plus');
+        case  550: classList.remove('magicss-w-600-plus');
+        case  600: classList.remove('magicss-w-650-plus');
+        case  650: classList.remove('magicss-w-700-plus');
+        case  700: classList.remove('magicss-w-750-plus');
+        case  750: classList.remove('magicss-w-800-plus');
+        case  800: classList.remove('magicss-w-850-plus');
+        case  850: classList.remove('magicss-w-900-plus');
+        case  900: classList.remove('magicss-w-950-plus');
+        /* eslint-enable no-fallthrough */
+    }
+};
+
 (function ($) {
     'use strict';
 
@@ -901,6 +945,22 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
             $(cm.getWrapperElement()).addClass('cancelDragHandle');
             if (document.documentElement.classList.contains('full-screen-editor')) {
                 // do nothing
+
+                if (window.flagEditorInExternalWindow) {
+                    window.addEventListener('resize', function () {
+                        // https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window/11744120#11744120
+                        const width = (
+                            window.innerWidth ||
+                            document.documentElement.clientWidth ||
+                            document.body.clientWidth
+                        );
+
+                        manageClassListForWidth({
+                            classList: thisOb.container.classList,
+                            width
+                        });
+                    });
+                }
             } else {
                 $(cm.getWrapperElement()).resizable({
                     handles: 'se',
@@ -927,6 +987,11 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
                         } else {
                             thisOb.container.classList.remove('magicss-editor-is-small');
                         }
+
+                        manageClassListForWidth({
+                            classList: thisOb.container.classList,
+                            width: ui.size.width
+                        });
                     },
                     stop: function (event, ui) {
                         setTimeout(async function () {
@@ -1194,6 +1259,24 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
 
             if (parseInt(textarea.style.width, 10) < CONSTANTS.USE_NORMAL_SIZE_EDITOR) {
                 thisOb.container.classList.add('magicss-editor-is-small');
+            }
+
+            if (window.flagEditorInExternalWindow) {
+                // https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window/11744120#11744120
+                const width = (
+                    window.innerWidth ||
+                    document.documentElement.clientWidth ||
+                    document.body.clientWidth
+                );
+                manageClassListForWidth({
+                    classList: thisOb.container.classList,
+                    width
+                });
+            } else {
+                manageClassListForWidth({
+                    classList: thisOb.container.classList,
+                    width: parseInt(textarea.style.width, 10)
+                });
             }
 
             var textareaWrapAttr = 'off';

@@ -318,5 +318,58 @@ var extLib = {
                 }
             }
         );
+    },
+
+    chromeStorageGet: function (storageObject, prop) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.get(prop, function (values) {
+                resolve(values[prop]);
+            });
+        });
+    },
+
+    chromeStorageSet: function (storageObject, prop, value) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.set(
+                {
+                    [prop]: value
+                },
+                function () {
+                    resolve();
+                }
+            );
+        });
+    },
+
+    chromeStorageRemove: function (storageObject, prop) {
+        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
+            storageObject.remove(prop, function () {
+                resolve();
+            });
+        });
+    },
+
+    chromeStorageLocalGet: async function (prop) {
+        const value = await extLib.chromeStorageGet(chrome.storage.local, prop);
+        return value;
+    },
+    chromeStorageSyncGet: async function (prop) {
+        const value = await extLib.chromeStorageGet(chrome.storage.sync, prop);
+        return value;
+    },
+
+    chromeStorageLocalSet: async function (prop, value) {
+        await extLib.chromeStorageSet(chrome.storage.local, prop, value);
+    },
+    chromeStorageSyncSet: async function (prop, value) {
+        await extLib.chromeStorageSet(chrome.storage.sync, prop, value);
+    },
+
+    chromeStorageLocalRemove: async function (prop, value) {
+        await extLib.chromeStorageRemove(chrome.storage.local, prop, value);
+    },
+    chromeStorageSyncRemove: async function (prop, value) {
+        await extLib.chromeStorageRemove(chrome.storage.sync, prop, value);
     }
+
 };

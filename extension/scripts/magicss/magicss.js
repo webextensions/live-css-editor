@@ -72,6 +72,35 @@ var handleUnrecoverableError = function (e) {
     }, 0);
 };
 
+var isFeatureEnabled = function (enabledOrConditions) {
+    let flag = false;
+
+    const instanceUuid = window.instanceUuid;
+    const basisNumber = window.instanceBasisNumber;
+
+    if (enabledOrConditions === true) {
+        flag = true;
+    } else if (Array.isArray(enabledOrConditions)) {
+        const conditions = enabledOrConditions;
+        for (const condition of conditions) {
+            if (Array.isArray(condition)) {
+                const [from, to] = condition;
+                if (from <= basisNumber && basisNumber <= to) {
+                    flag = true;
+                    break;
+                }
+            } else if (typeof condition === 'string') {
+                if (instanceUuid.indexOf(condition) >= 0) {
+                    flag = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return flag;
+};
+
 window.magicssHostSessionUuid = (
     window.magicssHostSessionUuid ||
     (function () {
@@ -146,6 +175,77 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
 
         return window.reactMain;
     }
+};
+
+var flagDevMode = (function () {
+    let flag = false;
+    try {
+        // TODO: Verify that this works well across browsers
+        // https://stackoverflow.com/questions/12830649/check-if-chrome-extension-installed-in-unpacked-mode/20227975#20227975
+        flag = (!('update_url' in chrome.runtime.getManifest()));
+    } catch (e) {
+        // do nothing
+    }
+    return flag;
+})();
+
+window.instanceUuid = window.instanceUuid || null;
+window.instanceBasisNumber = window.instanceBasisNumber || null;
+
+var fetchInstanceInfo = function () {
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+            { type: 'magicss-instance-info' },
+            function ([instanceUuid, instanceBasisNumber]) {
+                return resolve([instanceUuid, instanceBasisNumber]);
+            }
+        );
+    });
+};
+var getInstanceInfo = async function () {
+    let instanceUuid = null,
+        instanceBasisNumber = null;
+
+    if (window.instanceUuid && window.instanceBasisNumber) {
+        instanceUuid = window.instanceUuid;
+        instanceBasisNumber = window.instanceBasisNumber;
+    } else {
+        [
+            instanceUuid,
+            instanceBasisNumber
+        ] = await fetchInstanceInfo();
+    }
+
+    return [
+        instanceUuid,
+        instanceBasisNumber
+    ];
+};
+var initializeInstanceInfo = async function () {
+    const [ instanceUuid, instanceBasisNumber ] = await getInstanceInfo();
+    window.instanceUuid = instanceUuid;
+    window.instanceBasisNumber = instanceBasisNumber;
+};
+
+var getConfigFromRemote = async function () {
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+            { type: 'magicss-config' },
+            function (remoteConfig) {
+                return resolve(remoteConfig);
+            }
+        );
+    });
+};
+
+window.remoteConfig = window.remoteConfig || null;
+window.basisNumber = window.basisNumber || -1;
+
+var getConfig = async function () {
+    if (flagDevMode || !window.remoteConfig) {
+        window.remoteConfig = await getConfigFromRemote();
+    }
+    return window.remoteConfig;
 };
 
 var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload }) {
@@ -1776,6 +1876,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 // do nothing
             },
             fnSuccess: async function () {
+                const remoteConfig = await getConfig();
+                await initializeInstanceInfo();
+
                 var beautifyCSS = async function (cssCode) {
                     var options = {};
                     if (await window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes') {
@@ -2948,6 +3051,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (options.addOpaqueOnHoverClass) {
                                 icon.cls += ' editor-opaque-on-hover';
                             }
+                            icon.cls += ' show-for-w-400-plus';
                         }
                     }
                     return icon;
@@ -3096,7 +3200,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 var options = {
                     id: id,
                     title: function ($, editor) {
-                        var $outer = $('<div></div>'),
+                        var $outer = $('<div style="display:flex"></div>'),
                             $titleItems = $('<div class="magicss-title"></div>');
                         $outer.append($titleItems);
                         $titleItems.append(
@@ -3110,6 +3214,23 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             '<div class="magicss-mode-button magicss-mode-less" title="Less mode">l<span class="hide-when-magicss-editor-is-small">ess</span></div>' +
                             (flagAllowSassUi ? '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">s<span class="hide-when-magicss-editor-is-small">ass</span></div>' : '')
                         );
+
+                        const showAccountStatusEnabled = remoteConfig?.features?.showAccountStatus?.enabled;
+                        const signInUrl = remoteConfig?.account?.signInUrl;
+                        if (isFeatureEnabled(showAccountStatusEnabled)) {
+                            /* eslint-disable indent */
+                            $outer.append([
+                                '<div class="webextensions-login-icon-in-header">',
+                                    '<a',
+                                        ' href="' + signInUrl + '"',
+                                        ' title="Sign In"',
+                                        ' target="_blank"',
+                                        ' rel="nofollow noopener noreferrer"',
+                                    '/>',
+                                '</div>'
+                            ].join(''));
+                            /* eslint-enable indent */
+                        }
 
                         $(document).on('click', '.magicss-mode-css', async function () {
                             await setLanguageMode('css', editor);
@@ -4904,7 +5025,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             targetEditModeIsNotFile &&
                             notInsideIframe
                         ) {
-                            window.loadEditorInExternalWindow(editor);
+                            if (!window.flagEditorInExternalWindow) {
+                                window.loadEditorInExternalWindow(editor);
+                            }
                         }
 
                         if (magicCssLoadedFine) {

@@ -6,6 +6,174 @@ var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
 
 var TR = extLib.TR;
 
+var remoteConfig = {
+    "mode": "offline",
+    "account": {
+        "signInUrl": "https://www.webextensions.org/sign-in"
+    },
+    "nextUpdate": 7 * 24 * 60 * 60 * 1000,
+    "features": {
+        "showAccountStatus": {
+            "enabled": [ 0, 0 ]
+        }
+    },
+    "version": "8.18.0"
+};
+var instanceUuid = null;
+var instanceBasisNumber = -1;
+
+if (window.flagEditorInExternalWindow) {
+    // do nothing
+} else {
+    const isValidUuidV4 = function (str) {
+        const v4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (v4Regex.test(str)) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    const randomUUID = function () {
+        let uuid;
+        if (typeof crypto.randomUUID === 'function') {
+            uuid = crypto.randomUUID();
+        } else {
+            // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid/2117523#2117523
+            uuid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
+        return uuid;
+    };
+
+    // Use this for the cases where the code should never reach in imaginable scenarios.
+    const requestUserViaConsoleToReportUnexpectedError = function (e) {
+        console.error(e);
+        console.error([
+            'An unexpected error was encountered by Magic CSS.',
+            'Kindly report this issue at:',
+            '    https://github.com/webextensions/live-css-editor/issues'
+        ].join('\n'));
+    };
+
+    const flagDevMode = (function () {
+        let flag = false;
+        try {
+            // TODO: Verify that this works well across browsers
+            // https://stackoverflow.com/questions/12830649/check-if-chrome-extension-installed-in-unpacked-mode/20227975#20227975
+            flag = (!('update_url' in chrome.runtime.getManifest()));
+        } catch (e) {
+            requestUserViaConsoleToReportUnexpectedError(e);
+        }
+        return flag;
+    })();
+
+    const ajaxGet = async function ({ url }) {
+        return new Promise((resolve) => {
+            jQuery.ajax({
+                url,
+                method: 'get',
+                success: function (data) {
+                    resolve([null, data]);
+                },
+                error: function (err) {
+                    resolve([err]);
+                }
+            });
+        });
+    };
+
+    const fetchRemoteConfig = async function () {
+        let configUrl;
+        const extensionVersion = chrome.runtime.getManifest().version;
+        if (flagDevMode) {
+            configUrl = `http://localapi.webextensions.org:3400/magic-css/config?version=latest`;
+        } else {
+            configUrl = `https://api.webextensions.org/magic-css/config?version=${extensionVersion}`;
+        }
+
+        let [err, fetchedConfig] = await ajaxGet({ url: configUrl });
+        if (err) {
+            console.log(err);
+        }
+        return [err, fetchedConfig];
+    };
+
+    const updateRemoteConfig = async function () {
+        const [err, fetchedConfig] = await fetchRemoteConfig();
+
+        if (err) {
+            // do nothing
+        } else {
+            remoteConfig = fetchedConfig;
+        }
+    };
+
+    setTimeout(async () => {
+        const INSTANCE_UUID = 'instance-uuid';
+        instanceUuid = await extLib.chromeStorageLocalGet(INSTANCE_UUID);
+
+        if (!isValidUuidV4(instanceUuid)) {
+            instanceUuid = randomUUID();
+            await extLib.chromeStorageLocalSet(INSTANCE_UUID, instanceUuid);
+        }
+
+        const instanceUuidWithoutHyphen = instanceUuid.replace(/-/g, '');
+        let basisString = BigInt(`0x${instanceUuidWithoutHyphen}`).toString();
+        basisString = basisString.slice(basisString.length - 4);
+        instanceBasisNumber = parseInt(basisString) + 1;
+
+        await updateRemoteConfig();
+    });
+
+    chrome.runtime.onMessage.addListener(
+        function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
+            const { type } = request;
+
+            if (type === 'magicss-config') {
+                chrome.tabs.sendMessage(
+                    sender.tab.id,
+                    {},
+                    function() {
+                        // This if condition check is required to avoid unwanted warnings
+                        // TODO: FIXME: Is there some better solution possible?
+                        if (chrome.runtime.lastError) {
+                            // Currently doing nothing
+                        }
+
+                        if (flagDevMode) {
+                            setTimeout(async () => {
+                                await updateRemoteConfig();
+                                sendResponse(remoteConfig);
+                            });
+                        } else {
+                            sendResponse(remoteConfig);
+                        }
+                    }
+                );
+            } else if (type === 'magicss-instance-info') {
+                chrome.tabs.sendMessage(
+                    sender.tab.id,
+                    {},
+                    function() {
+                        // This if condition check is required to avoid unwanted warnings
+                        // TODO: FIXME: Is there some better solution possible?
+                        if (chrome.runtime.lastError) {
+                            // Currently doing nothing
+                        }
+
+                        sendResponse([instanceUuid, instanceBasisNumber]);
+                    }
+                );
+            }
+            // Need to return true to run "sendResponse" in async manner
+            // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+            return true;
+        }
+    );
+}
+
 const tabConnectivityMap = {};
 if (window.flagEditorInExternalWindow) {
     // do nothing
