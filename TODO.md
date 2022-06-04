@@ -1,4 +1,5 @@
 #### New Features
+* Add functionality to export/import data (https://github.com/webextensions/live-css-editor/issues/69)
 * Add Autoprefixer (References: https://github.com/postcss/autoprefixer https://autoprefixer.github.io/)
 * Add link in the suggested selectors list, so that the user can directly edit the file containing the suggested selector.
 * Add a "copy-to-clipboard" button
