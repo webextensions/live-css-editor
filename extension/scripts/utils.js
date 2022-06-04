@@ -582,8 +582,8 @@ if (!utils.defined) {
         //     return YAHOO.compressor.cssmin(cssCode);
     };
 
-    utils.sassToCSS = function (sassCode, cb) {
-        Sass.compile(sassCode, function (output) {
+    utils.sassToCSS = function (sassCode, options, cb) {
+        Sass.compile(sassCode, options, function (output) {
             if (output.message) {
                 cb(output);
             }  else {

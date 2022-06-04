@@ -22,7 +22,8 @@ var
     USER_PREFERENCE_LANGUAGE_MODE_NON_FILE = 'language-mode-non-file',
     USER_PREFERENCE_LANGUAGE_MODE = 'language-mode',
     USER_PREFERENCE_TEXTAREA_VALUE = 'textarea-value',
-    USER_PREFERENCE_DISABLE_STYLES = 'disable-styles';
+    USER_PREFERENCE_DISABLE_STYLES = 'disable-styles',
+    USER_PREFERENCE_USE_SASS_SYNTAX = 'use-sass-syntax';
 
 var const_rateUsUsageCounterFrom = 20,
     const_rateUsUsageCounterTo = 100;
@@ -688,6 +689,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
     };
 
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
+
+    const getExtensionDataAsync = function (property) {
+        return new Promise(function (resolve) {
+            chromeStorageForExtensionData.get(property, function (values) {
+                resolve(values[property]);
+            });
+        });
+    };
 
     var checkIfMagicCssLoadedFine = function (MagiCSSEditor) {
         if (!MagiCSSEditor.container.clientHeight) {
@@ -1860,6 +1869,13 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             sessionStorageDataForInitialization = sessionStorageData;
         }
 
+        const prefUseSassSyntax = await getExtensionDataAsync(USER_PREFERENCE_USE_SASS_SYNTAX);
+        const flagUseSassSyntax = (prefUseSassSyntax === 'yes');
+        const sassCompileOptions = {};
+        if (flagUseSassSyntax) {
+            sassCompileOptions.indentedSyntax = true;
+        }
+
         await utils.delayFunctionUntilTestFunction({
             tryLimit: 100,
             waitFor: 500,
@@ -2084,7 +2100,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             utils.alertNote('Please type some SASS code to use this feature', 5000);
                             editor.focus();
                         } else {
-                            utils.sassToCSS(sassCode, async function asyncCallback(err, cssCode) {
+                            utils.sassToCSS(sassCode, sassCompileOptions, async function asyncCallback(err, cssCode) {
                                 if (err) {
                                     utils.alertNote(
                                         'Invalid SASS syntax.' +
@@ -2530,7 +2546,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             var SassParser = window.Sass || (typeof Sass !== 'undefined' && Sass),
                                 sassCode = editor.getTextValue() || ' ';    // Sass compiler throws an error for empty code string
 
-                            SassParser.compile(sassCode, async function asyncCallback(result) {
+                            SassParser.compile(sassCode, sassCompileOptions, async function asyncCallback(result) {
                                 smc = null;     // Unset old SourceMapConsumer
 
                                 if (result.status === 0) {
@@ -3336,14 +3352,6 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             } else {
                                 options.mode = 'text/css';
                             }
-
-                            const getExtensionDataAsync = function (property) {
-                                return new Promise(function (resolve) {
-                                    chromeStorageForExtensionData.get(property, function (values) {
-                                        resolve(values[property]);
-                                    });
-                                });
-                            };
 
                             var theme = await getExtensionDataAsync(USER_PREFERENCE_THEME);
                             options.theme = (function () {

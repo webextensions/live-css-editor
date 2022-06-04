@@ -10,7 +10,8 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_FONT_SIZE_IN_PX = 'font-size-in-px',
     USER_PREFERENCE_STORAGE_MODE = 'storage-mode',
     USER_PREFERENCE_THEME = 'theme',
-    USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout';
+    USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT = 'hide-on-page-mouseout',
+    USER_PREFERENCE_USE_SASS_SYNTAX = 'use-sass-syntax';
 
 jQuery(function ($) {
     // TODO: DUPLICATE: Code duplication for browser detection in commands.js, ext-lib.js, magicss.js and options.js
@@ -155,6 +156,23 @@ jQuery(function ($) {
             valueToSet = 'yes';
         }
         chromeStorageForExtensionData.set({[USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT]: valueToSet});
+        notifyUser();
+    });
+
+    chromeStorageForExtensionData.get(USER_PREFERENCE_USE_SASS_SYNTAX, function (values) {
+        var $hideOnPageMouseOut = $('#use-sass-syntax'),
+            markChecked = false;
+        if (values && values[USER_PREFERENCE_USE_SASS_SYNTAX] === 'yes') {
+            markChecked = true;
+        }
+        $hideOnPageMouseOut.prop('checked', markChecked);
+    });
+    $('#use-sass-syntax').on('click', function () {
+        var valueToSet = 'no';
+        if($(this).is(':checked')) {
+            valueToSet = 'yes';
+        }
+        chromeStorageForExtensionData.set({[USER_PREFERENCE_USE_SASS_SYNTAX]: valueToSet});
         notifyUser();
     });
 
