@@ -3568,6 +3568,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             );
                                         }
 
+                                        if (tabOriginWithSlash === 'file://') {
+                                            tabOriginWithSlash = 'file://*';
+                                        }
+
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
                                             sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyUnpinInitiate']);
                                             await markAsPinnedOrNotPinned(editor, 'not-pinned');
