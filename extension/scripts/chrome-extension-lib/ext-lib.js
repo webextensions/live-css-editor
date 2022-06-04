@@ -323,7 +323,11 @@ var extLib = {
     chromeStorageGet: function (storageObject, prop) {
         return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
             storageObject.get(prop, function (values) {
-                resolve(values[prop]);
+                if (prop === null) {
+                    resolve(values);
+                } else {
+                    resolve(values[prop]);
+                }
             });
         });
     },

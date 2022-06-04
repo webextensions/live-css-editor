@@ -6,7 +6,7 @@ var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
 
 var TR = extLib.TR;
 
-var remoteConfig = {
+var fallbackConfig = {
     "mode": "offline",
     "account": {
         "signInUrl": "https://www.webextensions.org/sign-in"
@@ -19,8 +19,50 @@ var remoteConfig = {
     },
     "version": "8.18.0"
 };
+var remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
 var instanceUuid = null;
 var instanceBasisNumber = -1;
+
+// eslint-disable-next-line no-unused-vars
+var devHelper = function () {
+    // Running the code under a setTimeout so that in the console, the return value of this function (undefined) is
+    // logged first and doesn't come in between the other log entries
+    setTimeout(async function () {
+        console.log('========================================');
+
+        console.log('    instanceUuid:', instanceUuid);
+        console.log('    instanceBasisNumber:', instanceBasisNumber);
+
+        console.log('    fallbackConfig:', fallbackConfig);
+
+        const storedConfig = await extLib.chromeStorageLocalGet('remoteConfig');
+        console.log('    storedConfig:', storedConfig);
+
+        console.log('    remoteConfig:', remoteConfig);
+
+        const executionCounterLocal = await extLib.chromeStorageLocalGet('magicss-execution-counter');
+        console.log('    executionCounterLocal:', executionCounterLocal);
+
+        const executionCounterSync = await extLib.chromeStorageSyncGet('magicss-execution-counter');
+        console.log('    executionCounterSync:', executionCounterSync);
+
+        const allChromeStorageLocalData = await extLib.chromeStorageLocalGet(null);
+        console.log('    allChromeStorageLocalData:', allChromeStorageLocalData);
+
+        const allChromeStorageSyncData = await extLib.chromeStorageSyncGet(null);
+        console.log('    allChromeStorageSyncData:', allChromeStorageSyncData);
+
+        console.log('========================================');
+    });
+};
+devHelper.clearSomeStorage = async function () {
+    await extLib.chromeStorageLocalRemove('magicss-execution-counter');
+    await extLib.chromeStorageSyncRemove('magicss-execution-counter');
+
+    await extLib.chromeStorageLocalRemove('instance-uuid');
+
+    await extLib.chromeStorageLocalRemove('remoteConfig');
+};
 
 if (window.flagEditorInExternalWindow) {
     // do nothing
@@ -95,18 +137,98 @@ if (window.flagEditorInExternalWindow) {
 
         let [err, fetchedConfig] = await ajaxGet({ url: configUrl });
         if (err) {
-            console.log(err);
+            console.error('Error in fetching remoteConfig:');
+            console.error(err);
         }
         return [err, fetchedConfig];
     };
 
-    const updateRemoteConfig = async function () {
-        const [err, fetchedConfig] = await fetchRemoteConfig();
+    const getStoredConfigIfValid = async function () {
+        const storedConfig = await extLib.chromeStorageLocalGet('remoteConfig');
 
-        if (err) {
-            // do nothing
+        // https://github.com/substack/semver-compare/blob/152c863e7c2615f9e9e81a9a370b672afaa3819a/index.js
+        const semverCompare = function (a, b) {
+            var pa = a.split('.');
+            var pb = b.split('.');
+            for (var i = 0; i < 3; i++) {
+                var na = Number(pa[i]);
+                var nb = Number(pb[i]);
+                if (na > nb) return 1;
+                if (nb > na) return -1;
+                if (!isNaN(na) && isNaN(nb)) return 1;
+                if (isNaN(na) && !isNaN(nb)) return -1;
+            }
+            return 0;
+        };
+        const semverGte = function (a, b) {
+            if (semverCompare(a, b) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+
+        const isValid = function (config) {
+            const extensionVersion = chrome.runtime.getManifest().version;
+
+            if (semverGte(config.version, extensionVersion)) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+
+        const isRecent = function (config) {
+            const
+                now = Date.now(),
+                timeDiff = config.nextUpdateAt - now,
+                absoluteTimeDiff = Math.abs(timeDiff);
+            if (config.nextUpdateAt) {
+                if (timeDiff <= 0) {
+                    return false;
+                } else {
+                    if (absoluteTimeDiff < config.nextUpdate) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+        };
+
+        if (storedConfig && isValid(storedConfig) && isRecent(storedConfig)) {
+            return storedConfig;
         } else {
-            remoteConfig = fetchedConfig;
+            return null;
+        }
+    };
+
+    const updateRemoteConfig = async function () {
+        const storedConfig = await getStoredConfigIfValid();
+
+        if (storedConfig) {
+            remoteConfig = storedConfig;
+            console.info('Applied stored config:', storedConfig);
+        } else {
+            const [err, fetchedConfig] = await fetchRemoteConfig();
+
+            if (err) {
+                // do nothing
+            } else {
+                fetchedConfig.nextUpdateAt = Date.now() + fetchedConfig.nextUpdate;
+                remoteConfig = fetchedConfig;
+                console.info('Applied config from remote:', fetchedConfig);
+
+                try {
+                    chrome.storage.local.set({ 'remoteConfig': remoteConfig }, function() {
+                        // do nothing
+                    });
+                } catch (e) {
+                    // do nothing
+                }
+            }
         }
     };
 
@@ -124,7 +246,14 @@ if (window.flagEditorInExternalWindow) {
         basisString = basisString.slice(basisString.length - 4);
         instanceBasisNumber = parseInt(basisString) + 1;
 
-        await updateRemoteConfig();
+        const fn = async function () {
+            await updateRemoteConfig();
+
+            setTimeout(async function () {
+                fn();
+            }, (remoteConfig.nextUpdate || 7 * 24 * 60 * 60 * 1000));
+        };
+        await fn();
     });
 
     chrome.runtime.onMessage.addListener(
