@@ -22,6 +22,7 @@
 * Autocompleting a CSS property adds `: ` (colon and space) characters, while autocompleting using Emmet expansion adds `: ;` (colon, space and semicolon) characters and puts the cursor before the semicolon character (for example, typing `p`, `d` and `<Tab>` expands to `padding: ;` ). We may make this behavior consistent.
 
 ## Environments
+* Publish the latest versions for different browsers
 * Make "editor" a standalone project, so that it can be added to an HTML page as well
 * Make "Magic CSS" a standalone project, so that it can be added to an HTML page as well
 
