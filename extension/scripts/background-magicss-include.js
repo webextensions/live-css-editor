@@ -67,6 +67,7 @@ devHelper.clearSomeStorage = async function () {
 if (window.flagEditorInExternalWindow) {
     // do nothing
 } else {
+    // TODO: REUSE: Move this under "extLib"
     const isValidUuidV4 = function (str) {
         const v4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
         if (v4Regex.test(str)) {
@@ -197,6 +198,11 @@ if (window.flagEditorInExternalWindow) {
                 return false;
             }
         };
+
+        // // DEV-HELPER: Useful when developing / debugging
+        // if (flagDevMode) {
+        //     return null;
+        // }
 
         if (storedConfig && isValid(storedConfig) && isRecent(storedConfig)) {
             return storedConfig;

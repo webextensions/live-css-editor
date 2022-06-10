@@ -3248,6 +3248,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             /* eslint-enable indent */
                         }
 
+                        $(document).on('click', '.webextensions-login-icon-in-header', async function () {
+                            sendMessageForGa(['_trackEvent', 'trigger-to-site', 'login-icon-in-header']);
+                        });
+
                         $(document).on('click', '.magicss-mode-css', async function () {
                             await setLanguageMode('css', editor);
                             editor.focus();
