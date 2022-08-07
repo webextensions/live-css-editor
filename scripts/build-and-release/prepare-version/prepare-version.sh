@@ -66,6 +66,10 @@ git add extension/manifest-*.json
 sed -i --regexp-extended 's/const magicCssVersion = ['\''0-9.;]+/const magicCssVersion = '\'''$packageVersionWithoutQuotes''\'';/' ./extension/scripts/appVersion.js
 git add ./extension/scripts/appVersion.js
 
+# Update and add ./extension/scripts/background-magicss-include.js
+sed -i --regexp-extended 's/"version": "[0-9.]+"/"version": '$packageVersionWithQuotes'/' ./extension/scripts/background-magicss-include.js
+git add ./extension/scripts/background-magicss-include.js
+
 # Update and add ./live-css/default.live-css.config.js
 sed -i --regexp-extended 's/"version": "[0-9.]+"/"version": '$packageVersionWithQuotes'/' ./live-css/default.live-css.config.js
 git add ./live-css/default.live-css.config.js

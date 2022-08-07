@@ -14,14 +14,22 @@ var fallbackConfig = {
     "nextUpdate": 7 * 24 * 60 * 60 * 1000,
     "features": {
         "showAccountStatus": {
-            "enabled": [ 0, 0 ]
+            "enabled": false
+        },
+        "useUninstallUrl": {
+            "enabled": false
         }
     },
-    "version": "8.18.0"
+    "version": "8.18.3"
 };
 var remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
 var instanceUuid = null;
 var instanceBasisNumber = -1;
+
+window.remoteConfigLoadedFromRemote = new Promise((resolve, reject) => {
+    window.remoteConfigLoadedFromRemoteResolve = resolve;
+    window.remoteConfigLoadedFromRemoteReject = reject;
+});
 
 // eslint-disable-next-line no-unused-vars
 var devHelper = function () {
@@ -140,6 +148,10 @@ if (window.flagEditorInExternalWindow) {
         if (err) {
             console.error('Error in fetching remoteConfig:');
             console.error(err);
+        } else {
+            (async () => {
+                await window.mainFnMetricsHandler({ event: 'configFetch' });
+            })();
         }
         return [err, fetchedConfig];
     };
@@ -199,10 +211,10 @@ if (window.flagEditorInExternalWindow) {
             }
         };
 
-        // // DEV-HELPER: Useful when developing / debugging
-        // if (flagDevMode) {
-        //     return null;
-        // }
+        const flagDebug = false; // DEV-HELPER: Useful when developing / debugging
+        if (flagDebug) {
+            return null;
+        }
 
         if (storedConfig && isValid(storedConfig) && isRecent(storedConfig)) {
             return storedConfig;
@@ -217,11 +229,14 @@ if (window.flagEditorInExternalWindow) {
         if (storedConfig) {
             remoteConfig = storedConfig;
             console.info('Applied stored config:', storedConfig);
+            if (storedConfig.mode === 'online') {
+                window.remoteConfigLoadedFromRemoteResolve();
+            }
         } else {
             const [err, fetchedConfig] = await fetchRemoteConfig();
 
             if (err) {
-                // do nothing
+                window.remoteConfigLoadedFromRemoteReject();
             } else {
                 fetchedConfig.nextUpdateAt = Date.now() + fetchedConfig.nextUpdate;
                 remoteConfig = fetchedConfig;
@@ -234,11 +249,12 @@ if (window.flagEditorInExternalWindow) {
                 } catch (e) {
                     // do nothing
                 }
+                window.remoteConfigLoadedFromRemoteResolve();
             }
         }
     };
 
-    setTimeout(async () => {
+    (async () => {
         const INSTANCE_UUID = 'instance-uuid';
         instanceUuid = await extLib.chromeStorageLocalGet(INSTANCE_UUID);
 
@@ -247,10 +263,7 @@ if (window.flagEditorInExternalWindow) {
             await extLib.chromeStorageLocalSet(INSTANCE_UUID, instanceUuid);
         }
 
-        const instanceUuidWithoutHyphen = instanceUuid.replace(/-/g, '');
-        let basisString = BigInt(`0x${instanceUuidWithoutHyphen}`).toString();
-        basisString = basisString.slice(basisString.length - 4);
-        instanceBasisNumber = parseInt(basisString) + 1;
+        instanceBasisNumber = window.basisNumberFromUuid(instanceUuid);
 
         const fn = async function () {
             await updateRemoteConfig();
@@ -260,7 +273,7 @@ if (window.flagEditorInExternalWindow) {
             }, (remoteConfig.nextUpdate || 7 * 24 * 60 * 60 * 1000));
         };
         await fn();
-    });
+    })();
 
     chrome.runtime.onMessage.addListener(
         function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
@@ -277,7 +290,8 @@ if (window.flagEditorInExternalWindow) {
                             // Currently doing nothing
                         }
 
-                        if (flagDevMode) {
+                        // DEV-HELPER: Useful when developing / debugging
+                        if (false) { // eslint-disable-line no-constant-condition
                             setTimeout(async () => {
                                 await updateRemoteConfig();
                                 sendResponse(remoteConfig);

@@ -178,18 +178,6 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
     }
 };
 
-var flagDevMode = (function () {
-    let flag = false;
-    try {
-        // TODO: Verify that this works well across browsers
-        // https://stackoverflow.com/questions/12830649/check-if-chrome-extension-installed-in-unpacked-mode/20227975#20227975
-        flag = (!('update_url' in chrome.runtime.getManifest()));
-    } catch (e) {
-        // do nothing
-    }
-    return flag;
-})();
-
 window.instanceUuid = window.instanceUuid || null;
 window.instanceBasisNumber = window.instanceBasisNumber || null;
 
@@ -243,7 +231,8 @@ window.remoteConfig = window.remoteConfig || null;
 window.basisNumber = window.basisNumber || -1;
 
 var getConfig = async function () {
-    if (flagDevMode || !window.remoteConfig) {
+    const flagDebug = false; // DEV-HELPER: Useful when developing / debugging
+    if (flagDebug || !window.remoteConfig) {
         window.remoteConfig = await getConfigFromRemote();
     }
     return window.remoteConfig;
@@ -292,6 +281,16 @@ var sendMessageForGa = function (payload) {
     try {
         chrome.runtime.sendMessage({
             type: 'ga',
+            payload
+        });
+    } catch (e) {
+        // do nothing
+    }
+};
+var sendMessageForMetrics = function (payload) {
+    try {
+        chrome.runtime.sendMessage({
+            type: 'metrics',
             payload
         });
     } catch (e) {
@@ -4973,7 +4972,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 if (executionCounter && !isNaN(executionCounter)) {
                     try {
                         chromeStorageForExtensionData.set({'magicss-execution-counter': executionCounter}, function() {
-                            // do nothing
+                            sendMessageForMetrics({ event: 'launch' });
                         });
                     } catch (e) {
                         // do nothing

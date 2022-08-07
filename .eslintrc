@@ -16,6 +16,14 @@
     },
 
     "rules": {
+        // https://eslint.org/docs/latest/rules/no-restricted-globals
+        "no-restricted-globals": [
+            "error",
+            {
+                "name": "event",
+                "message": "Use local parameter instead."
+            }
+        ],
         "indent": ["error", 4, { "SwitchCase": 1, "ignoreComments": true }],
         "linebreak-style": ["error", "unix"],
         "semi": ["error", "always"],
