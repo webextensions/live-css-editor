@@ -73,7 +73,20 @@ const getOS = function () {
             windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
             iosPlatforms = ['iPhone', 'iPad', 'iPod'];
 
-        if (macosPlatforms.indexOf(platform) !== -1) {
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-CH-UA-Platform#directives
+        if (
+            [
+                'Android',
+                'Chrome OS',
+                'Chromium OS',
+                'iOS',
+                'Linux',
+                'macOS',
+                'Windows'
+            ].includes(platform)
+        ) {
+            os = platform;
+        } else if (macosPlatforms.indexOf(platform) !== -1) {
             os = 'macOS';
         } else if (iosPlatforms.indexOf(platform) !== -1) {
             os = 'iOS';
