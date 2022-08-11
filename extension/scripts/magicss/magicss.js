@@ -3230,8 +3230,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             (flagAllowSassUi ? '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">s<span class="hide-when-magicss-editor-is-small">ass</span></div>' : '')
                         );
 
-                        const showAccountStatusEnabled = remoteConfig?.features?.showAccountStatus?.enabled;
-                        const signInUrl = remoteConfig?.account?.signInUrl;
+                        const showAccountStatusEnabled = (((remoteConfig || {}).features || {}).showAccountStatus || {}).enabled;
+                        const signInUrl = ((remoteConfig || {}).account || {}).signInUrl;
                         if (isFeatureEnabled(showAccountStatusEnabled)) {
                             /* eslint-disable indent */
                             $outer.append([
