@@ -1,6 +1,6 @@
 // Just a block
 {
-    const magicCssVersion = '8.18.5';
+    const magicCssVersion = '8.18.6';
     if (typeof window === 'undefined') {
         module.exports = {
             version: magicCssVersion
