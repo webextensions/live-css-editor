@@ -3453,7 +3453,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             const
                                 manifest = chrome.runtime.getManifest(),
                                 __custom__ = manifest.__custom__ || {},
-                                hideRateUsHeaderIcon = __custom__ || false;
+                                hideRateUsHeaderIcon = __custom__.hideRateUsHeaderIcon || false;
                             // Hide rate us icon ; Useful for puppeteer based testing by maintaining screenshot consistency across different loads of the extension
                             if (hideRateUsHeaderIcon) {
                                 return null;
