@@ -18,6 +18,13 @@ var fallbackConfig = {
         },
         "useUninstallUrl": {
             "enabled": false
+        },
+        "rateUs": {
+            "enabled": false,
+            "range": {
+                "from": -1,
+                "to": -1
+            }
         }
     },
     "version": "8.18.5"

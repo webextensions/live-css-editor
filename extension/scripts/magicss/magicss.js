@@ -3459,10 +3459,18 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 return null;
                             }
 
-                            if (executionCounter < const_rateUsUsageCounterFrom || const_rateUsUsageCounterTo <= executionCounter) {
-                                return null;
-                            } else {
+                            const rateUsConfig = ((remoteConfig || {}).features || {}).rateUs || {};
+                            const rateUsEnabled = rateUsConfig.enabled;
+                            const rateUsRange = rateUsConfig.range || {};
+                            const from = rateUsRange.from || const_rateUsUsageCounterFrom;
+                            const to = rateUsRange.to || const_rateUsUsageCounterTo;
+                            if (
+                                rateUsEnabled &&
+                                (from <= executionCounter && executionCounter <= to)
+                            ) {
                                 return iconForRateUs({addOpaqueOnHoverClass: true});
+                            } else {
+                                return null;
                             }
                         }()),
 
