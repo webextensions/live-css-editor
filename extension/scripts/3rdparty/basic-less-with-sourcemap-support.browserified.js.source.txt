@@ -1,1 +1,1 @@
-https://raw.githubusercontent.com/webextensions/less.js/ffd4f094cff8288e0fc5155b6e299e5699b890e9/dist/basic-less-with-sourcemap-support.browserified.js
+https://raw.githubusercontent.com/webextensions/less.js/1bf6a495a11dee77bb0f773149ff6261a4718c4d/packages/less/dist/basic-less-with-sourcemap-support.browserified.js

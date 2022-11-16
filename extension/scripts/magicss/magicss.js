@@ -2510,7 +2510,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                         try {
                             const less = await loadIfNotAvailable('less');
-                            less.render(lessCode, lessOptions, async function asyncCallback(err, output) {
+                            less.default.render(lessCode, lessOptions, async function asyncCallback(err, output) {
                                 smc = null;     // Unset old SourceMapConsumer
 
                                 if (err) {

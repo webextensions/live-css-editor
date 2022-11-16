@@ -594,7 +594,7 @@ if (!utils.defined) {
     };
 
     utils.lessToCSS = function (lessCode, cb) {
-        less.render(
+        less.default.render(
             lessCode,
             function (err, output) {
                 if (err) {
