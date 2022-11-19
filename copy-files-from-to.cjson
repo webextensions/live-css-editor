@@ -8,7 +8,7 @@
             "from": {
                 "default": {
                     "src": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.10/addon/colorpicker/colorpicker.css",
-                    "latest": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorpicker.css"
+                    "latest": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/main/addon/colorpicker/colorpicker.css"
                 }
             },
             "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorpicker.css"
@@ -17,7 +17,7 @@
             "from": {
                 "default": {
                     "src": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.10/addon/colorpicker/colorpicker.js",
-                    "latest": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorpicker.js"
+                    "latest": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/main/addon/colorpicker/colorpicker.js"
                 }
             },
             "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorpicker.js"
@@ -26,7 +26,7 @@
             "from": {
                 "default": {
                     "src": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/v1.0.10/addon/colorpicker/colorview.js",
-                    "latest": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/master/addon/colorpicker/colorview.js"
+                    "latest": "https://raw.githubusercontent.com/easylogic/codemirror-colorpicker/main/addon/colorpicker/colorview.js"
                 }
             },
             "to": "extension/scripts/3rdparty/codemirror/addons/colorpicker/colorview.js"
