@@ -6,13 +6,13 @@ import { connect } from 'react-redux';
 
 import { useDidMount } from 'rooks';
 
-import TextField from '@material-ui/core/TextField/index.js';
+import TextField from '@mui/material/TextField/index.js';
 
-import Button from '@material-ui/core/Button/index.js';
-import Dialog from '@material-ui/core/Dialog/index.js';
-import DialogActions from '@material-ui/core/DialogActions/index.js';
-import DialogContent from '@material-ui/core/DialogContent/index.js';
-import DialogTitle from '@material-ui/core/DialogTitle/index.js';
+import Button from '@mui/material/Button/index.js';
+import Dialog from '@mui/material/Dialog/index.js';
+import DialogActions from '@mui/material/DialogActions/index.js';
+import DialogContent from '@mui/material/DialogContent/index.js';
+import DialogTitle from '@mui/material/DialogTitle/index.js';
 
 import OAuth from 'oauth-1.0a';
 import hmacSha1 from 'crypto-js/hmac-sha1.js';
@@ -173,7 +173,6 @@ const SearchIconsConfiguration = function (props) {
                     disableScrollLock // https://github.com/mui-org/material-ui/issues/10000#issuecomment-559116355
                     open={open}
                     onClose={handleClose}
-                    disableBackdropClick
                     className="magicss-base-element magicss-material-ui-dialog magicss-dialog-search-icons magicss-dialog-search-icons-configuration"
                     PaperProps={{
                         style: {
@@ -181,7 +180,11 @@ const SearchIconsConfiguration = function (props) {
                         }
                     }}
                 >
-                    <DialogTitle id="alert-dialog-title">
+                    <DialogTitle
+                        style={{
+                            padding: '16px 24px'
+                        }}
+                    >
                         <span
                             style={{
                                 fontSize: 20,                /* https://code.visualstudio.com/ */

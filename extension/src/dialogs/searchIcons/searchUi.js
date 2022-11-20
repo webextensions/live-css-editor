@@ -6,9 +6,9 @@ import { connect } from 'react-redux';
 
 import classNames from 'classnames';
 
-import TextField from '@material-ui/core/TextField/index.js';
-import Button from '@material-ui/core/Button/index.js';
-import SearchIcon from '@material-ui/icons/Search.js';
+import TextField from '@mui/material/TextField/index.js';
+import Button from '@mui/material/Button/index.js';
+import SearchIcon from '@mui/icons-material/Search.js';
 
 import OAuth from 'oauth-1.0a';
 import hmacSha1 from 'crypto-js/hmac-sha1.js';
@@ -254,7 +254,7 @@ const ListOfIcons = function (props) {
                     ) &&
                     <Button
                         variant="contained"
-                        color="default"
+                        color="inherit"
                         size="medium"
                         style={{
                             paddingTop: 8,

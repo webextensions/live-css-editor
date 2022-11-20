@@ -57,10 +57,13 @@
 .magicss-dialog-search-icons .MuiOutlinedInput-notchedOutline {
     background-color: unset !important; /* https://css-tricks.com/ */
 }
+/*
+// https://css-tricks.com/
 .magicss-dialog-search-icons .MuiOutlinedInput-inputMarginDense {
-    padding-top: 10.5px !important;      /* https://css-tricks.com/ */
-    padding-bottom: 10.5px !important;   /* https://css-tricks.com/ */
+    padding-top: 10.5px !important;
+    padding-bottom: 10.5px !important;
 }
+*/
 .magicss-dialog-search-icons input[type=text].MuiOutlinedInput-inputMarginDense {
     border-width: 0 !important;          /* https://css-tricks.com/ */
 }
@@ -72,6 +75,9 @@
     font-family: Arial, sans-serif !important; /* https://css-tricks.com/ */
     background-color: #fff !important;         /* https://css-tricks.com/ */
     box-shadow: none !important;               /* https://www.smashingmagazine.com/ */
+
+    padding-top: 10.5px !important;            /* Required for better look */
+    padding-bottom: 10.5px !important;         /* Required for better look */
 }
 
 .magicss-dialog-search-icons input[type=text]:focus {

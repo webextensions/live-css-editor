@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import Dialog from '@material-ui/core/Dialog/index.js';
-import DialogContent from '@material-ui/core/DialogContent/index.js';
-import DialogTitle from '@material-ui/core/DialogTitle/index.js';
+import Dialog from '@mui/material/Dialog/index.js';
+import DialogContent from '@mui/material/DialogContent/index.js';
+import DialogTitle from '@mui/material/DialogTitle/index.js';
 
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import IconButton from '@mui/material/IconButton/index.js';
+import CloseIcon from '@mui/icons-material/Close';
 
 import Joyride from 'react-joyride';
 
@@ -56,8 +56,11 @@ const SearchIcons = function (props) {
 
     const [joyrideCompleted, setJoyrideCompleted] = useState(false);
 
-    const handleClose = () => {
-        props.dispatch({ type: APP_$_CLOSE_SEARCH_ICONS });
+    const handleClose = (evt, reason) => {
+        // https://stackoverflow.com/questions/69991556/mui-v5-disablebackdropclick-in-createtheme-equivalent/69992442#69992442
+        if (reason !== 'backdropClick') {
+            props.dispatch({ type: APP_$_CLOSE_SEARCH_ICONS });
+        }
     };
 
     let showJoyride = true;
@@ -99,7 +102,6 @@ const SearchIcons = function (props) {
                     style={styleHideIfNotOpen}
 
                     onClose={handleClose}
-                    disableBackdropClick
 
                     disableAutoFocus={!open || (showJoyride && !joyrideCompleted)}
                     disableEnforceFocus={!open || (showJoyride && !joyrideCompleted)}
@@ -116,7 +118,11 @@ const SearchIcons = function (props) {
                     }}
                     maxWidth={false} // Without this, a max-width limit would be applicable which would limit `width: 90vw`
                 >
-                    <DialogTitle id="alert-dialog-title">
+                    <DialogTitle
+                        style={{
+                            padding: '16px 24px'
+                        }}
+                    >
                         <div style={{ display: 'flex' }}>
                             <div style={{ flexGrow: 1, display: 'flex' }}>
                                 <div
