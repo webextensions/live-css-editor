@@ -27,7 +27,7 @@ var fallbackConfig = {
             }
         }
     },
-    "version": "8.19.0"
+    "version": "8.19.1"
 };
 var remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
 var instanceUuid = null;
