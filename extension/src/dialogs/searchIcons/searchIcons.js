@@ -151,9 +151,6 @@ const SearchIcons = function (props) {
                                 <IconButton
                                     onClick={handleClose}
                                     size="small"
-                                    style={{
-                                        display: 'block' // Required for consistent behavior across sites (Seemingly the "display: inline-flex" behaves in inconsistent manner across different HTML pages. Haven't investigated why it is so.)
-                                    }}
                                 >
                                     <CloseIcon
                                         style={{
