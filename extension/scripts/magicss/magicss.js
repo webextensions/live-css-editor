@@ -2583,7 +2583,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             });
                         };
                         if (
-                            isOpera ||
+                            // isOpera || // Commented out so that Opera users can use Sass the way it is loaded in Chrome (when installed from Chrome Web Store)
                             isFirefox ||
                             window.Sass ||
                             (typeof Sass !== 'undefined' && Sass)

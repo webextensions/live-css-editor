@@ -857,10 +857,11 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
                 // // TODO: Remove this piece of commented out code. Now loading 'less' dynamically via `loadIfNotAvailable`
                 // path3rdparty + 'basic-less-with-sourcemap-support.browserified.js',
 
-                {
-                    src: path3rdparty + 'sass/sass.sync.min.js',
-                    skip: (runningInBrowserExtension && isOpera) ? false : true
-                },
+                // Commented out so that Opera users can use Sass the way it is loaded in Chrome (when installed from Chrome Web Store)
+                // {
+                //     src: path3rdparty + 'sass/sass.sync.min.js',
+                //     skip: (runningInBrowserExtension && isOpera) ? false : true
+                // },
 
                 path3rdparty + 'source-map.js',
 
