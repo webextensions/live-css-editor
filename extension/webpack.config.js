@@ -84,7 +84,6 @@ module.exports = function (env) {
                             loader: 'babel-loader',
                             options: BABEL_OPTIONS
                         }
-                        // 'eslint-loader'
                     ]
                 },
                 {
