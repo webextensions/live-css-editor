@@ -1,5 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
+
 
 import { Provider } from 'react-redux';
 
@@ -23,10 +24,11 @@ const Main = function () {
 };
 
 window.reactMain = function () {
-    ReactDOM.render(
-        <Main />,
-        document.getElementsByClassName('magicss-command-palette-root')[0]
-    );
+    // https://reactjs.org/blog/2022/03/08/react-18-upgrade-guide.html
+    const container = document.getElementsByClassName('magicss-command-palette-root')[0];
+    const root = createRoot(container); // createRoot(container!) if you use TypeScript
+
+    root.render(<Main />);
 };
 
 window.reactMain();
