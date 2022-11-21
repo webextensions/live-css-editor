@@ -21,10 +21,10 @@
     "all-is-well": "./scripts/all-is-well.sh",
     "test": "npm run all-is-well",
     "test:puppeteer": "cd tests ; npm test",
-    "start:build": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='publish'",
-    "start:build-with-sourcemap": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
-    "start:build-inspect-brk": "cd extension/ ; node --inspect-brk ../node_modules/.bin/webpack --config ./webpack.config.js --env build.watch --env build.buildFor='development'",
-    "start:build-extension": "cd extension/ ; node ../node_modules/.bin/webpack --config ./webpack.config.js --env build.buildFor='publish'",
+    "start:build": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack/webpack.config.js --env build.watch --env build.buildFor='publish'",
+    "start:build-with-sourcemap": "cd extension/ ; ../node_modules/.bin/webpack --config ./webpack/webpack.config.js --env build.watch --env build.buildFor='development'",
+    "start:build-inspect-brk": "cd extension/ ; node --inspect-brk ../node_modules/.bin/webpack --config ./webpack/webpack.config.js --env build.watch --env build.buildFor='development'",
+    "start:build-extension": "cd extension/ ; node ../node_modules/.bin/webpack --config ./webpack/webpack.config.js --env build.buildFor='publish'",
     "start": "npm run start:build"
   },
   "dependencies": {
@@ -72,6 +72,7 @@
     "eslint-plugin-react": "^7.31.11",
     "git-hooks": "^1.1.10",
     "jsonfile": "^6.1.0",
+    "node-notifier": "^10.0.1",
     "note-down": "^0.2.3",
     "webpack": "^5.75.0"
   }

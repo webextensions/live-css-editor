@@ -4,6 +4,9 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveSourceMapUrlWebpackPlugin = require('@rbarilani/remove-source-map-url-webpack-plugin');
 
+const notifyCompletionStatus = require('./utils/notify-completion-status.js');
+
+
 const projectRoot = path.join(__dirname, '..');
 const nodeModulesAtProjectRoot = path.resolve(projectRoot, 'node_modules');
 
@@ -49,7 +52,7 @@ module.exports = function (env) {
         mode: 'development',
         entry: './src/main.js',
         output: {
-            path: __dirname + '/dist',
+            path: __dirname + '/../dist',
             publicPath: '/',
             filename: 'main.bundle.js',
             clean: true
@@ -137,6 +140,17 @@ module.exports = function (env) {
             //     attempt to load the sourcemap from an invalid path which would lead to a warning in console.
             new RemoveSourceMapUrlWebpackPlugin({
                 test: /main\.bundle\.js$/
+            }),
+
+            // https://webpack.js.org/api/compiler-hooks/#hooks
+            // https://github.com/kossnocorp/on-build-webpack/issues/5#issuecomment-432192978
+            // https://stackoverflow.com/questions/30312715/run-command-after-webpack-build/49786887#49786887
+            ({
+                apply: (compiler) => {
+                    compiler.hooks.done.tap('done', (stats) => {
+                        notifyCompletionStatus(stats);
+                    });
+                }
             })
         ]
     };

@@ -1,0 +1,11 @@
+error.png
+    https://www.iconfinder.com/icons/282471/cross_delete_remove_icon
+    https://www.iconfinder.com/icons/282471/download/png/256
+
+info.png
+    https://www.iconfinder.com/icons/1398911/check_correct_mark_success_tick_valid_yes_icon
+    https://www.iconfinder.com/icons/1398911/download/png/256
+
+warning.png
+    https://www.iconfinder.com/icons/183416/download/png/256
+    https://www.iconfinder.com/icons/183416/warning_icon
