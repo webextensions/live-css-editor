@@ -50,11 +50,14 @@ module.exports = function (env) {
     return {
         watch,
         mode: 'development',
-        entry: './src/main.js',
+        entry: {
+            main: './src/main.js',
+            options: './src/options/options.js'
+        },
         output: {
             path: __dirname + '/../dist',
             publicPath: '/',
-            filename: 'main.bundle.js',
+            filename: '[name].bundle.js',
             clean: true
         },
 
@@ -123,7 +126,7 @@ module.exports = function (env) {
             }),
 
             new MiniCssExtractPlugin({
-                filename: 'main.bundle.css'
+                filename: '[name].bundle.css'
             }),
 
             // This plugin is useful for removing (unwanted) sourcemap references. Which otherwise can lead to warnings in

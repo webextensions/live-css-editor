@@ -89,7 +89,7 @@ var generateManifest = function (whichBrowser) {
     };
 
     if (whichBrowser !== "puppeteer") {
-        manifest["content_security_policy"] = "script-src 'self' https://cdnjs.cloudflare.com https://ssl.google-analytics.com; object-src 'self'";
+        manifest["content_security_policy"] = "script-src 'unsafe-eval' 'self' https://cdnjs.cloudflare.com https://ssl.google-analytics.com; object-src 'self'";
     }
 
     if (whichBrowser === "puppeteer") {

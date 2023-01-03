@@ -12,6 +12,10 @@ extension-opera/
 tmp
 temp
 
+# Root level "node_modules" directory
+# Ensure that "node_modules/" is not enabled elsewhere in this file if we want to allow custom node_modules at sub-level
+/node_modules/
+
 # Logs
 logs
 *.log
@@ -41,7 +45,6 @@ coverage
 build/Release
 
 # Dependency directories
-node_modules
 jspm_packages
 
 # Optional npm cache directory
