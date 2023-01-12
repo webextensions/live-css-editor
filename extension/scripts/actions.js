@@ -9,6 +9,7 @@ const USER_PREFERENCE_INDENTATION_SPACES_COUNT = 'indentation-spaces-count';
 
 const INSTANCE_UUID = 'instance-uuid';
 
+/*
 const flagDevMode = (function () {
     let flag = false;
     try {
@@ -20,6 +21,7 @@ const flagDevMode = (function () {
     }
     return flag;
 })();
+/* */
 
 const ajaxGet = async function ({ url }) {
     return new Promise((resolve) => {

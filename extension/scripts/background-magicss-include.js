@@ -732,20 +732,6 @@ try {
 }
 
 var main = function (tab) {     // eslint-disable-line no-unused-vars
-    var isChrome = false,       // eslint-disable-line no-unused-vars
-        isEdge = false,         // eslint-disable-line no-unused-vars
-        isFirefox = false,      // eslint-disable-line no-unused-vars
-        isOpera = false;
-    if (/Edge/.test(navigator.appVersion)) {            // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
-        isEdge = true;          // eslint-disable-line no-unused-vars
-    } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
-        isOpera = true;
-    } else if (/Chrome/.test(navigator.appVersion)) {
-        isChrome = true;        // eslint-disable-line no-unused-vars
-    } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
-        isFirefox = true;       // eslint-disable-line no-unused-vars
-    }
-
     getAllFrames(function (allFrames) {
         var pathDist = 'dist/',
             pathScripts = 'scripts/',

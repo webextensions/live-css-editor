@@ -7,6 +7,7 @@ import {
 
 const DefaultMode = function () {
     const [defaultMode, setDefaultMode] = useState('');
+    const [flagSassUiAllowed, setFlagSassUiAllowed] = useState(null);
 
     useEffect(() => {
         chromeStorageForExtensionData.get('default-language-mode', function (values) {
@@ -22,6 +23,11 @@ const DefaultMode = function () {
             }
             setDefaultMode(valueToSet);
         });
+
+        (async () => {
+            const isSassUiAllowedValue = await isSassUiAllowed();
+            setFlagSassUiAllowed(isSassUiAllowedValue);
+        })();
     }, []);
 
     const handleDefaultModeChange = function (evt) {
@@ -58,7 +64,7 @@ const DefaultMode = function () {
                     </label>
                 </div>
                 {
-                    isSassUiAllowed() &&
+                    flagSassUiAllowed &&
                     <div className="option-value">
                         <label>
                             <input

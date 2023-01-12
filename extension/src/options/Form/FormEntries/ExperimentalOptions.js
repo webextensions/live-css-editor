@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
     chromeStorageForExtensionData,
-    notifyUser
+    notifyUser,
+    isSassUiAllowed
 } from '../helpers.js';
 
 import {
@@ -10,6 +11,14 @@ import {
 } from '../../../../constants.js';
 
 const ExperimentalOptions = function () {
+    const [flagSassUiAllowed, setFlagSassUiAllowed] = useState(null);
+    useEffect(() => {
+        (async () => {
+            const isSassUiAllowedValue = await isSassUiAllowed();
+            setFlagSassUiAllowed(isSassUiAllowedValue);
+        })();
+    }, []);
+
     const [hideOnPageMouseOut, setHideOnPageMouseOut] = useState('');
     useEffect(() => {
         chromeStorageForExtensionData.get(USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT, function (values) {
@@ -67,17 +76,20 @@ const ExperimentalOptions = function () {
                     </label>
                 </div>
             </div>
-            <div style={{ marginLeft: 20 }}>
-                <div className="option-value">
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={useSassSyntax === 'yes'}
-                            onChange={handleUseSassSyntaxChange}
-                        /> <div>Use Sass syntax (rather than SCSS syntax)</div>
-                    </label>
+            {
+                flagSassUiAllowed &&
+                <div style={{ marginLeft: 20 }}>
+                    <div className="option-value">
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={useSassSyntax === 'yes'}
+                                onChange={handleUseSassSyntaxChange}
+                            /> <div>Use Sass syntax (rather than SCSS syntax)</div>
+                        </label>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     );
 };
