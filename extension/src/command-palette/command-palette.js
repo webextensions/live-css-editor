@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import ReactCommandPalette from 'react-command-palette';
 
-import { commands } from './commands.js';
+import { getCommands } from './getCommands.js';
 
 const renderCommand = function (suggestion) {
     const {
@@ -90,34 +90,43 @@ const theme = {
 
 const CommandPalette = function (props) {
     const editor = window.MagiCSSEditor;
-    const filteredCommands = commands.filter((item) => {
-        if (item.id === 'show-line-numbers') {
-            if (editor.cm.getOption('lineNumbers')) {
-                return false;
-            }
-        } else if (item.id === 'hide-line-numbers') {
-            if (!editor.cm.getOption('lineNumbers')) {
-                return false;
-            }
-        } else if (item.id === 'enable-line-wrap') {
-            if (editor.cm.getOption('lineWrapping')) {
-                return false;
-            }
-        } else if (item.id === 'disable-line-wrap') {
-            if (!editor.cm.getOption('lineWrapping')) {
-                return false;
-            }
-        } else if (item.id === 'enable-css-linting') {
-            if (editor.cm.getOption('lint')) {
-                return false;
-            }
-        } else if (item.id === 'disable-css-linting') {
-            if (!editor.cm.getOption('lint')) {
-                return false;
-            }
-        }
-        return true;
-    });
+
+    const [commandsToUse, setCommandsToUse] = useState([]);
+
+    useEffect(() => {
+        (async () => {
+            const commands = await getCommands();
+            const filteredCommands = commands.filter((item) => {
+                if (item.id === 'show-line-numbers') {
+                    if (editor.cm.getOption('lineNumbers')) {
+                        return false;
+                    }
+                } else if (item.id === 'hide-line-numbers') {
+                    if (!editor.cm.getOption('lineNumbers')) {
+                        return false;
+                    }
+                } else if (item.id === 'enable-line-wrap') {
+                    if (editor.cm.getOption('lineWrapping')) {
+                        return false;
+                    }
+                } else if (item.id === 'disable-line-wrap') {
+                    if (!editor.cm.getOption('lineWrapping')) {
+                        return false;
+                    }
+                } else if (item.id === 'enable-css-linting') {
+                    if (editor.cm.getOption('lint')) {
+                        return false;
+                    }
+                } else if (item.id === 'disable-css-linting') {
+                    if (!editor.cm.getOption('lint')) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            setCommandsToUse(filteredCommands);
+        })();
+    }, []);
 
     return (
         <div className="CommandPalette">
@@ -143,7 +152,7 @@ const CommandPalette = function (props) {
                         });
                     }
                 }}
-                commands={filteredCommands}
+                commands={commandsToUse}
                 renderCommand={renderCommand}
                 closeOnSelect={true}
                 resetInputOnOpen={true}

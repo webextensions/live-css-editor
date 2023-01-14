@@ -43,7 +43,7 @@
     "crypto-js": "^4.1.1",
     "css-loader": "^6.7.2",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
-    "helpmate": "^1.1.1",
+    "helpmate": "^1.1.2",
     "immer": "^9.0.16",
     "jquery": "^3.6.1",
     "mini-css-extract-plugin": "^2.7.0",

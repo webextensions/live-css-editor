@@ -1,18 +1,11 @@
 /* global extLib, utils, sendMessageForGa */
 
+import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
+import { copyToClipboard } from 'helpmate/dist/misc/copyToClipboard.js';
+
 import {
     APP_$_OPEN_SEARCH_ICONS
 } from 'reducers/actionTypes.js';
-
-// TODO: DUPLICATE: This piece of code is duplicated in searchUi.js
-const copy = async function (simpleText) {
-    try {
-        await navigator.clipboard.writeText(simpleText);
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
 
 const timeout = function (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -30,12 +23,51 @@ const forceBlur = async function () {
     document.body.removeChild(input);
 };
 
-const commands = (
-    [
-        (function () {
-            var editor = window.MagiCSSEditor;
+const extensionUrl = {
+    chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
+    edge: 'https://microsoftedge.microsoft.com/addons/detail/live-editor-for-css-less/ahibbdhoijcafelmfepfpcmmdifchpdg',
+    firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/',
+    opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
+};
+const getExecIconToShowForRateUs = async function () {
+    let icon = null;
+    const browserDetails = await getBrowser();
+    const browserName = browserDetails.name;
+    if (
+        browserName === 'chrome' ||
+        browserName === 'edge' ||
+        browserName === 'firefox' ||
+        browserName === 'opera'
+    ) {
+        if (browserName === 'chrome') {
+            icon = {
+                browser: 'chrome',
+                href: extensionUrl.chrome + '/reviews'
+            };
+        } else if (browserName === 'edge') {
+            icon = {
+                browser: 'edge',
+                href: extensionUrl.edge
+            };
+        } else if (browserName === 'firefox') {
+            icon = {
+                browser: 'firefox',
+                href: extensionUrl.firefox + 'reviews/'
+            };
+        } else if (browserName === 'opera') {
+            icon = {
+                browser: 'opera',
+                href: extensionUrl.opera + '#feedback-container'
+            };
+        }
+    }
+    return icon;
+};
 
-            const iconOb = window.execIconToShowForRateUs(editor);
+const getCommands = async () => (
+    [
+        await (async function () {
+            const iconOb = await getExecIconToShowForRateUs();
 
             const
                 CHROME  = 'chrome',
@@ -159,7 +191,7 @@ const commands = (
                     const textValue = editor.getTextValue();
 
                     if (textValue) {
-                        const flag = await copy(textValue);
+                        const flag = await copyToClipboard(textValue);
                         if (flag) {
                             utils.alertNote('Copied code to clipboard', 2500);
                             sendMessageForGa(['_trackEvent', 'commandPalette', 'copiedCodeToClipboard']);
@@ -287,38 +319,14 @@ const commands = (
                 sendMessageForGa(['_trackEvent', 'commandPalette', 'openGithub']);
             }
         },
-        ...(function () {
-            // TODO: DUPLICATE: Code duplication for browser detection in commands.js, ext-lib.js, magicss.js and options.js
-            var isChrome = false,
-                isEdge = false,
-                isFirefox = false,
-                isOpera = false,
-                isChromiumBased = false;
-
-            // Note that we are checking for "Edg/" which is the test required for identifying Chromium based Edge browser
-            if (/Edg\//.test(navigator.appVersion)) {           // Test for "Edge" before Chrome, because Microsoft Edge browser also adds "Chrome" in navigator.appVersion
-                isEdge = true;
-            } else if (/OPR\//.test(navigator.appVersion)) {    // Test for "Opera" before Chrome, because Opera browser also adds "Chrome" in navigator.appVersion
-                isOpera = true;
-            } else if (/Chrome/.test(navigator.appVersion)) {
-                isChrome = true;
-            } else if (/Firefox/.test(navigator.userAgent)) {   // For Mozilla Firefox browser, navigator.appVersion is not useful, so we need to fallback to navigator.userAgent
-                isFirefox = true;
-            }
-            if (isEdge || isOpera || isChrome) {
-                isChromiumBased = true; // eslint-disable-line no-unused-vars
-            }
-
-            var extensionUrl = {
-                chrome: 'https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol',
-                edge: 'https://microsoftedge.microsoft.com/addons/detail/live-editor-for-css-less/ahibbdhoijcafelmfepfpcmmdifchpdg',
-                firefox: 'https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/',
-                opera: 'https://addons.opera.com/extensions/details/live-editor-for-css-and-less-magic-css/'
-            };
+        ...(await (async function () {
+            const browserDetails = await getBrowser();
+            const browserName = browserDetails.name;
 
             return [
                 {
-                    skip: isChrome ? true : false,
+                    // skip: isChrome ? true : false,
+                    skip: browserName === 'chrome',
                     operationId: 'link-chrome',
                     name: 'Magic CSS for Chrome',
                     iconCls: 'magicss-use-icon-chrome',
@@ -328,7 +336,7 @@ const commands = (
                     }
                 },
                 {
-                    skip: isEdge ? true : false,
+                    skip: browserName === 'edge',
                     operationId: 'link-edge',
                     name: 'Magic CSS for Edge',
                     iconCls: 'magicss-use-icon-edge-gray',
@@ -338,7 +346,7 @@ const commands = (
                     }
                 },
                 {
-                    skip: isFirefox ? true : false,
+                    skip: browserName === 'firefox',
                     operationId: 'link-firefox',
                     name: 'Magic CSS for Firefox',
                     iconCls: 'magicss-use-icon-firefox-gray',
@@ -348,7 +356,7 @@ const commands = (
                     }
                 },
                 {
-                    skip: isOpera ? true : false,
+                    skip: browserName === 'opera',
                     operationId: 'link-opera',
                     name: 'Magic CSS for Opera',
                     iconCls: 'magicss-use-logo-opera-gray',
@@ -358,7 +366,7 @@ const commands = (
                     }
                 }
             ];
-        }()),
+        }())),
         {
             operationId: 'more-options',
             name: 'More options',
@@ -380,4 +388,4 @@ const commands = (
         }
     });
 
-export { commands };
+export { getCommands };

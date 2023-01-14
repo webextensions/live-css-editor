@@ -22,6 +22,8 @@ import {
 
 import { useWindowSize } from '@react-hook/window-size';
 
+import { copyToClipboard } from 'helpmate/dist/misc/copyToClipboard.js';
+
 import { Loading } from 'Loading/Loading.js';
 
 import './searchUi.css';
@@ -35,16 +37,6 @@ import { READYSTATE, STATUSCODE, UNINITIALIZED, LOADING, LOADED, ERROR } from 'c
 
 const READYSTATE_FURTHER = 'READYSTATE_FURTHER';
 const STATUSCODE_FURTHER = 'STATUSCODE_FURTHER';
-
-// TODO: DUPLICATE: This piece of code is duplicated in commands.js
-const copy = async function (simpleText) {
-    try {
-        await navigator.clipboard.writeText(simpleText);
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
 
 const IconEntry = ({ children, rowIndex, onFocus, className }) => {
     // The ref of the input to be controlled.
@@ -500,7 +492,7 @@ const ListOfIcons = function (props) {
                                                                         setSvgContents(function (prevState) {
                                                                             if (prevState[READYSTATE] === LOADED) {
                                                                                 setTimeout(async function () {
-                                                                                    const flag = await copy(prevState['svgXml']);
+                                                                                    const flag = await copyToClipboard(prevState['svgXml']);
                                                                                     if (!flag) {
                                                                                         sendMessageForGa(['_trackEvent', 'getIcons', 'svgIconCopyError']);
                                                                                         setSvgContents(function (prevState) {
@@ -541,7 +533,7 @@ const ListOfIcons = function (props) {
                                                                             if (prevState[READYSTATE] === LOADED) {
                                                                                 setTimeout(async function () {
                                                                                     const dataUrl = `data:${prevState['contentType']};base64,` + btoa(prevState['svgXml']);
-                                                                                    const flag = await copy(dataUrl);
+                                                                                    const flag = await copyToClipboard(dataUrl);
                                                                                     if (!flag) {
                                                                                         sendMessageForGa(['_trackEvent', 'getIcons', 'svgIconCopyDataUrlError']);
                                                                                         setSvgContents(function (prevState) {
