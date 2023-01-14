@@ -1,7 +1,10 @@
 /* global extLib, utils, sendMessageForGa */
 
 import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
-import { copyToClipboard } from 'helpmate/dist/misc/copyToClipboard.js';
+import {
+    isCopyToClipboardSupported,
+    copyToClipboard
+} from 'helpmate/dist/misc/copyToClipboard.js';
 
 import {
     APP_$_OPEN_SEARCH_ICONS
@@ -182,6 +185,7 @@ const getCommands = async () => (
         },
 
         {
+            skip: isCopyToClipboardSupported() ? false : true,
             operationId: 'copy-code',
             name: 'Copy code',
             iconCls: 'magicss-use-icon-copy-gray',
