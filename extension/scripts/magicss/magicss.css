@@ -1765,6 +1765,7 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 
 .magicss-command-palette-overlay .atom-suggestion {
     padding: 7px 10px;
+    color: #ccc;
 }
 
 .magicss-command-palette-overlay .atom-modal {
