@@ -30,7 +30,6 @@ const LoadForIframe = function () {
     };
     return (
         <div className="option">
-            <div className="option-heading">Load for frame/iframe:</div>
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
                     <label>

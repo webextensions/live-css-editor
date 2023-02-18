@@ -39,7 +39,6 @@ const DefaultMode = function () {
 
     return (
         <div className="option">
-            <div className="option-heading">Default mode:</div>
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
                     <label>

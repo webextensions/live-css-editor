@@ -18,3 +18,11 @@
         width: 954px;
     }
 }
+
+.inputSection:not(:first-child) {
+    margin-top: 10px;
+}
+
+.accordionSummary {
+    margin-left: 10px;
+}

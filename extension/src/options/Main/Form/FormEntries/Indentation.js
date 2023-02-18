@@ -54,7 +54,6 @@ const Indentation = function () {
 
     return (
         <div className="option">
-            <div className="option-heading">Indentation:</div>
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
                     <label>

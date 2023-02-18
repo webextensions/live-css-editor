@@ -56,7 +56,6 @@ const Autocomplete = function () {
 
     return (
         <div className="option">
-            <div className="option-heading">Autocomplete:</div>
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
                     <label>

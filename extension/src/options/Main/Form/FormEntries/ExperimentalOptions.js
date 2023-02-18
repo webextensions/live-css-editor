@@ -62,7 +62,6 @@ const ExperimentalOptions = function () {
     return (
         <div className="option">
             <div className="option-heading">
-                Experimental options:
                 <div style={{ fontSize: '1.1rem', fontWeight: 'normal' }}>These options may not work perfectly in all the scenarios.</div>
             </div>
             <div style={{ marginLeft: 20 }}>

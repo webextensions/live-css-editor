@@ -27,7 +27,6 @@ const CodeEditorTheme = function () {
 
     return (
         <div className="option">
-            <div className="option-heading">Code editor theme:</div>
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
                     <label>

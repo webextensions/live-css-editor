@@ -36,7 +36,6 @@ const Storage = function () {
     return (
         <div className="option">
             <div className="option-heading">
-                Storage:
                 <div style={{ fontSize: '1.1rem', fontWeight: 'normal' }}>If you change this option, the data would be auto-migrated between these storages per site when used.</div>
             </div>
             <div style={{ marginLeft: 20 }}>
