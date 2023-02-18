@@ -64,6 +64,10 @@ module.exports = function (env) {
         // https://stackoverflow.com/questions/15097945/do-source-maps-work-for-chrome-extensions/23438324#23438324
         // https://bugs.chromium.org/p/chromium/issues/detail?id=212374
         devtool: (function () {
+            // Note: Getting the same value for `devtool` to work for `CSS` and `JS` does not seem to be working.
+            //       'source-map' works for `CSS`, but not for `JS` (for a WebExtension).
+            //       'eval-cheap-module-source-map' does not work for `CSS`.
+
             if (buildFor === 'web') {
                 return 'source-map';                   // Recommended for production mode for a webpage (this mode does not work well for a WebExtension)
             } else if (buildFor === 'development') {
@@ -99,7 +103,32 @@ module.exports = function (env) {
                         //     loader: MiniCssExtractPlugin.loader
                         // },
                         MiniCssExtractPlugin.loader,
-                        'css-loader'
+                        //
+                        // 'css-loader'
+                        {
+                            // https://adamrackis.dev/css-modules/
+                            loader: 'css-loader',
+                            options: {
+                                // sourceMap: true, // The sourcemap generation (with relatively simple configuration)
+                                //                  // depends on `devtool` option's value, which has some issues (added
+                                //                  // note under the `devtool` option)
+                                // https://webpack.js.org/loaders/css-loader/#object-2
+                                modules: {
+                                    // auto: function (resourcePath) {
+                                    //     if (
+                                    //         // TODO: Create a separate "vendor.css" or similarly named file
+                                    //         resourcePath.indexOf('frontend/node_modules/')             >= 0 ||
+                                    //         resourcePath.indexOf('frontend/src/resources/3rdparty/')   >= 0
+                                    //     ) {
+                                    //         return false;
+                                    //     } else {
+                                    //         return true;
+                                    //     }
+                                    // },
+                                    localIdentName: '[name]__[local]--[hash:base64:5]'
+                                }
+                            }
+                        }
                     ]
                 },
             ]

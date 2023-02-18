@@ -10,12 +10,11 @@ import { LoadForIframe       } from "./FormEntries/LoadForIframe.js";
 import { NotificationsForPin } from "./FormEntries/NotificationsForPin.js";
 import { ExperimentalOptions } from "./FormEntries/ExperimentalOptions.js";
 
-import './Form.css';
-// import styles from './Form.css';
+import styles from './Form.css';
 
 const Form = function () {
     return (
-        <div className="baseBlock">
+        <div className={styles.baseBlock}>
             <div>
                 <div>
                     <DefaultMode />
