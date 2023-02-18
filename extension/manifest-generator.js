@@ -76,6 +76,7 @@ var generateManifest = function (whichBrowser) {
             }
         },
         "options_ui": {
+            "open_in_tab": true,
             "page": "options.html",
             "chrome_style": true
         }

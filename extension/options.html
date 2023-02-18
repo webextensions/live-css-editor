@@ -7,8 +7,40 @@
     <title>Live editor for CSS, Less &amp; Sass - Magic CSS</title>
 
     <style>
-        html {
+        /*
+            CSS breakpoints to be used in general:
+                * 320px
+                * 640px
+                * 768px
+                * 1024px
+        */
+
+        *,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* html {
             width: 410px;
+        }
+        @media screen and (min-width: 640px) {
+            html {
+                width: 570px;
+            }
+        }
+        @media screen and (min-width: 768px) {
+            html {
+                width: 698px;
+            }
+        }
+        @media screen and (min-width: 1024px) {
+            html {
+                width: 954px;
+            }
+        } */
+
+        html {
             font-size: 62.5%;
         }
         body {
@@ -51,6 +83,7 @@
 
     <script src="scripts/utils.js"></script>
 
+    <link rel="stylesheet" href="dist/options.bundle.css" />
     <script src="dist/options.bundle.js"></script>
 </body>
 

@@ -15,7 +15,22 @@
         }
     },
 
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended"
+    ],
+    "plugins": [
+        "import"
+    ],
+
     "rules": {
+        "import/no-unresolved": [
+            "error",
+            {
+                "commonjs": true,
+                "amd": true
+            }
+        ],
         // https://eslint.org/docs/latest/rules/no-restricted-globals
         "no-restricted-globals": [
             "error",
@@ -32,10 +47,5 @@
         "no-console": "off",
         "no-debugger": "off",
         "no-shadow": "off"
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended"
-    ],
-    "plugins": []
+    }
 }

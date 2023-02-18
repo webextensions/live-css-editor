@@ -4,7 +4,7 @@ import {
     notifyUser
 } from '../helpers.js';
 
-import { USER_PREFERENCE_STORAGE_MODE } from '../../../../constants.js';
+import { USER_PREFERENCE_STORAGE_MODE } from '../../../../../constants.js';
 
 const Storage = function () {
     const [storageMode, setStorageMode] = useState('');

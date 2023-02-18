@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import {
     chromeStorageForExtensionData,
     notifyUser
-} from '../../helpers/helpers.js';
+} from '../../../helpers/helpers.js';
 import {
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION,
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT
-} from '../../../../constants.js';
+} from '../../../../../constants.js';
 
 const NotificationsForPin = function () {
     const [showNotification, setShowNotification] = useState(false);

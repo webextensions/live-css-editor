@@ -8,7 +8,7 @@ import {
 import {
     USER_PREFERENCE_HIDE_ON_PAGE_MOUSEOUT,
     USER_PREFERENCE_USE_SASS_SYNTAX
-} from '../../../../constants.js';
+} from '../../../../../constants.js';
 
 const ExperimentalOptions = function () {
     const [flagSassUiAllowed, setFlagSassUiAllowed] = useState(null);

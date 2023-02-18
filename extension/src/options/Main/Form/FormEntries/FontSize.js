@@ -7,7 +7,7 @@ import {
 import {
     USER_PREFERENCE_USE_CUSTOM_FONT_SIZE,
     USER_PREFERENCE_FONT_SIZE_IN_PX
-} from '../../../../constants.js';
+} from '../../../../../constants.js';
 
 const FontSize = function () {
     const [useCustomFontSize, setUseCustomFontSize] = useState('');

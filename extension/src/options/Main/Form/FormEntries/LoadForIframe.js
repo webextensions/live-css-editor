@@ -4,7 +4,7 @@ import {
     notifyUser
 } from '../helpers.js';
 
-import { USER_PREFERENCE_ALL_FRAMES } from '../../../../constants.js';
+import { USER_PREFERENCE_ALL_FRAMES } from '../../../../../constants.js';
 
 const LoadForIframe = function () {
     const [allFrames, setAllFrames] = useState('');

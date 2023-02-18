@@ -3,7 +3,7 @@ import {
     chromeStorageForExtensionData,
     notifyUser
 } from '../helpers.js';
-import { USER_PREFERENCE_THEME } from '../../../../constants.js';
+import { USER_PREFERENCE_THEME } from '../../../../../constants.js';
 
 const CodeEditorTheme = function () {
     const [codeEditorTheme, setCodeEditorTheme] = useState('');

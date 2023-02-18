@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 import { DefaultMode         } from "./FormEntries/DefaultMode.js";
 import { CodeEditorTheme     } from "./FormEntries/CodeEditorTheme.js";
@@ -10,11 +10,14 @@ import { LoadForIframe       } from "./FormEntries/LoadForIframe.js";
 import { NotificationsForPin } from "./FormEntries/NotificationsForPin.js";
 import { ExperimentalOptions } from "./FormEntries/ExperimentalOptions.js";
 
+import './Form.css';
+// import styles from './Form.css';
+
 const Form = function () {
     return (
-        <div>
+        <div className="baseBlock">
             <div>
-                <div style={{ marginTop: 35 }}>
+                <div>
                     <DefaultMode />
                 </div>
 

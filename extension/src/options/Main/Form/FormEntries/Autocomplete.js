@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import {
     chromeStorageForExtensionData,
     notifyUser
-} from '../../helpers/helpers.js';
+} from '../../../helpers/helpers.js';
 import {
     USER_PREFERENCE_AUTOCOMPLETE_SELECTORS,
     USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES
-} from '../../../../constants.js';
+} from '../../../../../constants.js';
 
 const Autocomplete = function () {
     const [autocompleteSelectors, setAutocompleteSelectors] = useState('');
