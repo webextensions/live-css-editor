@@ -48,9 +48,9 @@ const Storage = function () {
                                 value="chrome.storage.local"
                                 checked={storageMode === 'chrome.storage.local'}
                                 onChange={handleStorageModeChange}
-                            /> Extension Storage <span style={{ color: '#aaa' }}>&nbsp;(browser.storage.local)</span>
+                            /> Extension Storage <span style={{ color: '#777' }}>&nbsp;(browser.storage.local)</span>
                         </div>
-                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', color: '#aaa', marginBottom: 8 }}>Remember all your changes and keep them accessible only through this extension.</div>
+                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', color: '#777', marginBottom: 8 }}>Remember all your changes and keep them accessible only through this extension.</div>
                     </label>
                 </div>
 
@@ -63,9 +63,9 @@ const Storage = function () {
                                 value="localStorage"
                                 checked={storageMode === 'localStorage'}
                                 onChange={handleStorageModeChange}
-                            /> Web Storage <span style={{ color: '#aaa' }}>&nbsp;(localStorage)</span>
+                            /> Web Storage <span style={{ color: '#777' }}>&nbsp;(localStorage)</span>
                         </div>
-                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', color: '#aaa', marginBottom: 8 }}>
+                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', color: '#777', marginBottom: 8 }}>
                             {'Your changes might be cleared/overwritten by "Clear History" feature of the browser or by JavaScript on the web page.'}
                         </div>
                     </label>
@@ -80,7 +80,7 @@ const Storage = function () {
                                 value="chrome.storage.sync"
                                 checked={storageMode === 'chrome.storage.sync'}
                                 onChange={handleStorageModeChange}
-                            /> Extension Storage Sync (Alpha) <span style={{ color: '#aaa' }}>&nbsp;(browser.storage.sync)</span>
+                            /> Extension Storage Sync (Alpha) <span style={{ color: '#777' }}>&nbsp;(browser.storage.sync)</span>
                         </div>
                         <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', marginBottom: 8, color: '#555' }}>
                             <span style={{ fontWeight: 'bold' }}>EXPERIMENTAL:</span> Try only if you use it for less than 25 sites.
@@ -88,7 +88,7 @@ const Storage = function () {
                             <br />
                             <a target="_blank" rel="noreferrer" href="https://developer.chrome.com/docs/extensions/reference/storage/#property-sync" style={{ color: '#555', textDecoration: 'none' }}><span style={{ textDecoration: 'underline' }}>Click here</span> to understand the storage limits</a>
                         </div>
-                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', color: '#aaa' }}>Remember all your changes on your connected computers and keep them accessible only through this extension.</div>
+                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', color: '#777' }}>Remember all your changes on your connected computers and keep them accessible only through this extension.</div>
                     </label>
                 </div>
             </div>

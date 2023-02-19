@@ -65,7 +65,7 @@ const Autocomplete = function () {
                                 checked={autocompleteSelectors === 'yes'}
                                 onChange={handleAutocompleteSelectorsChange}
                             /> &nbsp;CSS selectors
-                            <div style={{ marginLeft: 24, fontSize: '1.1rem', fontWeight: 'normal', color: '#aaa' }}>
+                            <div style={{ marginLeft: 24, fontSize: '1.1rem', fontWeight: 'normal', color: '#777' }}>
                                 If your selectors are pre-processed, you may wish to uncheck it.
                             </div>
                         </div>
@@ -81,7 +81,7 @@ const Autocomplete = function () {
                                 checked={autocompleteCssPropertiesAndValues === 'yes'}
                                 onChange={handleAutocompleteCssPropertiesAndValuesChange}
                             /> &nbsp;CSS properties and values
-                            <div style={{ marginLeft: 24, fontSize: '1.1rem', fontWeight: 'normal', color: '#aaa' }}>
+                            <div style={{ marginLeft: 24, fontSize: '1.1rem', fontWeight: 'normal', color: '#777' }}>
                                 If you mostly use Emmet autocomplete, you may wish to uncheck it.
                             </div>
                         </div>
