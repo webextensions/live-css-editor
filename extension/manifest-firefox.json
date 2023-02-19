@@ -46,8 +46,7 @@
     },
     "options_ui": {
         "open_in_tab": true,
-        "page": "options.html",
-        "chrome_style": true
+        "page": "options.html"
     },
     "content_security_policy": "script-src 'unsafe-eval' 'self' https://cdnjs.cloudflare.com https://ssl.google-analytics.com; object-src 'self'",
     "applications": {

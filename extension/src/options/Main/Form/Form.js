@@ -10,6 +10,8 @@ import BaseAccordion from '@mui/material/Accordion/index.js';
 import AccordionSummary from '@mui/material/AccordionSummary/index.js';
 import AccordionDetails from '@mui/material/AccordionDetails/index.js';
 
+import Button from '@mui/material/Button/index.js';
+
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore.js';
 
 import CodeIcon from '@mui/icons-material/Code.js';
@@ -191,14 +193,22 @@ const Form = function () {
                     </GenericAccordion>
                 </div>
 
-                <div style={{ marginTop: 30 }}>
-                    <button
-                        onClick={() => {
-                            window.close();
-                        }}
-                    >
-                        Done
-                    </button>
+                <div style={{ marginTop: 20 }}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Button
+                            onClick={() => {
+                                window.close();
+                            }}
+                            variant="contained"
+                            color="primary"
+                            size="medium"
+                            style={{
+                                fontSize: 14 /* https://code.visualstudio.com/ */
+                            }}
+                        >
+                            Done
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

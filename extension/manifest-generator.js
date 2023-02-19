@@ -77,8 +77,7 @@ var generateManifest = function (whichBrowser) {
         },
         "options_ui": {
             "open_in_tab": true,
-            "page": "options.html",
-            "chrome_style": true
+            "page": "options.html"
         }
         /*
         // "web_accessible_resources" might be required on some platforms (but currently we are using data-uri for images, so no need yet)

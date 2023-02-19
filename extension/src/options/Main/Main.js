@@ -5,6 +5,8 @@ import React from 'react';
 // import { FLAG_DEV_MODE } from '../helpers/helpers.js';
 import { Form } from './Form/Form.js';
 
+import styles from './Main.css';
+
 // const optionsPageUrl = (
 //     typeof chrome !== 'undefined' &&
 //     typeof chrome.runtime !== 'undefined' &&
@@ -13,7 +15,7 @@ import { Form } from './Form/Form.js';
 
 const Main = function () {
     return (
-        <div>
+        <div className={styles.Main}>
             <Form />
 
             {/* {
