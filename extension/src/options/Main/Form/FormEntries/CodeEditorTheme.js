@@ -29,25 +29,35 @@ const CodeEditorTheme = function () {
         <div className="option">
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="radio"
-                            name="theme"
-                            value="light"
-                            checked={codeEditorTheme === 'light'}
-                            onChange={handleCodeEditorThemeChange}
-                        /> &nbsp; Light
+                    <label style={{ display: 'flex' }}>
+                        <div>
+                            <input
+                                type="radio"
+                                name="theme"
+                                value="light"
+                                checked={codeEditorTheme === 'light'}
+                                onChange={handleCodeEditorThemeChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Light
+                        </div>
                     </label>
                 </div>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="radio"
-                            name="theme"
-                            value="dark"
-                            checked={codeEditorTheme === 'dark'}
-                            onChange={handleCodeEditorThemeChange}
-                        /> &nbsp; Dark
+                    <label style={{ display: 'flex' }}>
+                        <div>
+                            <input
+                                type="radio"
+                                name="theme"
+                                value="dark"
+                                checked={codeEditorTheme === 'dark'}
+                                onChange={handleCodeEditorThemeChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Dark
+                        </div>
                     </label>
                 </div>
             </div>

@@ -15,8 +15,26 @@ import styles from './Main.css';
 
 const Main = function () {
     return (
-        <div className={styles.Main}>
-            <Form />
+        <div className={styles.Main + ' ' + styles.baseBlock}>
+            <div className={styles.MainUiWrapper}>
+                <div>
+                    <div>
+                        <div
+                            style={{
+                                fontSize: 32,
+                                fontWeight: 700,
+                                fontFamily: 'Tahoma,Arial,Helvetica,sans-serif',
+                                color: '#152c4a'
+                            }}
+                        >
+                            More options
+                        </div>
+                    </div>
+                    <div style={{ marginTop: 30 }}>
+                        <Form />
+                    </div>
+                </div>
+            </div>
 
             {/* {
                 FLAG_DEV_MODE &&

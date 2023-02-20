@@ -91,7 +91,7 @@ GenericAccordion.propTypes = {
 
 const Form = function () {
     return (
-        <div className={styles.baseBlock}>
+        <div className={styles.Form}>
             <div>
                 <div className={styles.inputSection}>
                     <GenericAccordion

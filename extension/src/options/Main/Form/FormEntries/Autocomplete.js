@@ -60,11 +60,18 @@ const Autocomplete = function () {
                 <div className="option-value">
                     <label>
                         <div>
-                            <input
-                                type="checkbox"
-                                checked={autocompleteSelectors === 'yes'}
-                                onChange={handleAutocompleteSelectorsChange}
-                            /> &nbsp;CSS selectors
+                            <div style={{ display: 'flex' }}>
+                                <div style={{ marginTop: 1 }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={autocompleteSelectors === 'yes'}
+                                        onChange={handleAutocompleteSelectorsChange}
+                                    />
+                                </div>
+                                <div style={{ marginLeft: 5 }}>
+                                    CSS selectors
+                                </div>
+                            </div>
                             <div style={{ marginLeft: 24, fontSize: '1.1rem', fontWeight: 'normal', color: '#777' }}>
                                 If your selectors are pre-processed, you may wish to uncheck it.
                             </div>
@@ -72,15 +79,22 @@ const Autocomplete = function () {
                     </label>
                 </div>
             </div>
-            <div style={{ marginLeft: 20 }}>
+            <div style={{ marginLeft: 20, marginTop: 10 }}>
                 <div className="option-value">
                     <label>
                         <div>
-                            <input
-                                type="checkbox"
-                                checked={autocompleteCssPropertiesAndValues === 'yes'}
-                                onChange={handleAutocompleteCssPropertiesAndValuesChange}
-                            /> &nbsp;CSS properties and values
+                            <div style={{ display: 'flex' }}>
+                                <div style={{ marginTop: 1 }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={autocompleteCssPropertiesAndValues === 'yes'}
+                                        onChange={handleAutocompleteCssPropertiesAndValuesChange}
+                                    />
+                                </div>
+                                <div style={{ marginLeft: 5 }}>
+                                    CSS properties and values
+                                </div>
+                            </div>
                             <div style={{ marginLeft: 24, fontSize: '1.1rem', fontWeight: 'normal', color: '#777' }}>
                                 If you mostly use Emmet autocomplete, you may wish to uncheck it.
                             </div>

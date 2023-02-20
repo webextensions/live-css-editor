@@ -64,27 +64,40 @@ const ExperimentalOptions = function () {
             <div className="option-heading">
                 <div style={{ fontSize: '1.1rem', fontWeight: 'normal' }}>These options may not work perfectly in all the scenarios.</div>
             </div>
-            <div style={{ marginLeft: 20 }}>
+            <div style={{ marginLeft: 20, marginTop: 10 }}>
                 <div className="option-value">
-                    <label title="This may not work well when you are working in &quot;no mouse support&quot; mode.&#013;&#010;&#013;&#010;It should work well in &quot;Responsive&quot; mode of browser's &quot;Developer tools&quot; when having support for touch and mouse, both.">
-                        <input
-                            type="checkbox"
-                            checked={hideOnPageMouseOut === 'yes'}
-                            onChange={handleHideOnPageMouseOutChange}
-                        /> <div>Hide editor when mouse pointer is outside the webpage</div>
+                    <label
+                        title="This may not work well when you are working in &quot;no mouse support&quot; mode.&#013;&#010;&#013;&#010;It should work well in &quot;Responsive&quot; mode of browser's &quot;Developer tools&quot; when having support for touch and mouse, both."
+                        style={{ display: 'flex' }}
+                    >
+                        <div style={{ marginTop: 1 }}>
+                            <input
+                                type="checkbox"
+                                checked={hideOnPageMouseOut === 'yes'}
+                                onChange={handleHideOnPageMouseOutChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Hide editor when mouse pointer is outside the webpage
+                        </div>
                     </label>
                 </div>
             </div>
             {
                 flagSassUiAllowed &&
-                <div style={{ marginLeft: 20 }}>
+                <div style={{ marginLeft: 20, marginTop: 10 }}>
                     <div className="option-value">
                         <label>
-                            <input
-                                type="checkbox"
-                                checked={useSassSyntax === 'yes'}
-                                onChange={handleUseSassSyntaxChange}
-                            /> <div>Use Sass syntax (rather than SCSS syntax)</div>
+                            <div style={{ marginTop: 1 }}>
+                                <input
+                                    type="checkbox"
+                                    checked={useSassSyntax === 'yes'}
+                                    onChange={handleUseSassSyntaxChange}
+                                />
+                            </div>
+                            <div style={{ marginLeft: 5 }}>
+                                Use Sass syntax (rather than SCSS syntax)
+                            </div>
                         </label>
                     </div>
                 </div>

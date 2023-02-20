@@ -62,29 +62,40 @@ const FontSize = function () {
         <div className="option">
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="radio"
-                            name="font-size-setting"
-                            value="default"
-                            checked={useCustomFontSize === 'no'}
-                            onChange={handleFontSizeSettingChange}
-                        /> &nbsp; Default
+                    <label style={{ display: 'flex' }}>
+                        <div>
+                            <input
+                                type="radio"
+                                name="font-size-setting"
+                                value="default"
+                                checked={useCustomFontSize === 'no'}
+                                onChange={handleFontSizeSettingChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Default
+                        </div>
                     </label>
                 </div>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="radio"
-                            name="font-size-setting"
-                            value="custom"
-                            checked={useCustomFontSize === 'yes'}
-                            onChange={handleFontSizeSettingChange}
-                        /> &nbsp; Custom: &nbsp;
+                    <label style={{ display: 'flex' }}>
+                        <div>
+                            <input
+                                type="radio"
+                                name="font-size-setting"
+                                value="custom"
+                                checked={useCustomFontSize === 'yes'}
+                                onChange={handleFontSizeSettingChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Custom:
+                        </div>
                     </label>
                     <select
                         className="font-size-in-px"
                         value={fontSizeInPx}
+                        style={{ marginLeft: 5 }}
                         onChange={handleFontSizeChange}
                     >
                         <option value="8">8</option>

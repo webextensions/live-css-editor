@@ -1,2 +1,29 @@
 .Main {
 }
+
+.baseBlock {
+    width: 410px;
+    margin: 0 auto;
+    padding: 20px;
+}
+@media screen and (min-width: 640px) {
+    .baseBlock {
+        width: 570px;
+    }
+}
+@media screen and (min-width: 768px) {
+    .baseBlock {
+        width: 698px;
+    }
+}
+@media screen and (min-width: 1024px) {
+    .baseBlock {
+        width: 954px;
+    }
+}
+
+.MainUiWrapper {
+    border-radius: 5px;
+    box-shadow: 2px 4px 10px 0 rgb(0 0 0 / 25%);
+    padding: 40px;
+}

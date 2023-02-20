@@ -32,12 +32,19 @@ const LoadForIframe = function () {
         <div className="option">
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={allFrames === 'yes'}
-                            onChange={handleAllFramesChange}
-                        /> &nbsp; Load separate instances for each frame/iframe
+                    <label
+                        style={{ display: 'flex' }}
+                    >
+                        <div style={{ marginTop: 1 }}>
+                            <input
+                                type="checkbox"
+                                checked={allFrames === 'yes'}
+                                onChange={handleAllFramesChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Load separate instances for each frame/iframe
+                        </div>
                     </label>
                 </div>
             </div>

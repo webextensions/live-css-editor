@@ -56,29 +56,40 @@ const Indentation = function () {
         <div className="option">
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="radio"
-                            name="indentation"
-                            value="tab"
-                            checked={indentation === 'tab'}
-                            onChange={handleIndentationChange}
-                        /> &nbsp; Tab character
+                    <label style={{ display: 'flex' }}>
+                        <div>
+                            <input
+                                type="radio"
+                                name="indentation"
+                                value="tab"
+                                checked={indentation === 'tab'}
+                                onChange={handleIndentationChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Tab character
+                        </div>
                     </label>
                 </div>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="radio"
-                            name="indentation"
-                            value="spaces"
-                            checked={indentation === 'spaces'}
-                            onChange={handleIndentationChange}
-                        /> &nbsp; Space characters: &nbsp;
+                    <label style={{ display: 'flex' }}>
+                        <div>
+                            <input
+                                type="radio"
+                                name="indentation"
+                                value="spaces"
+                                checked={indentation === 'spaces'}
+                                onChange={handleIndentationChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Space characters:
+                        </div>
                     </label>
                     <select
                         className="indentation-spaces-count"
                         value={spacesCount}
+                        style={{ marginLeft: 10,  width: 50 }}
                         onChange={handleSpacesCountChange}
                     >
                         <option value="1">1</option>

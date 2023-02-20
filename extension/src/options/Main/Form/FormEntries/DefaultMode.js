@@ -41,38 +41,53 @@ const DefaultMode = function () {
         <div className="option">
             <div style={{ marginLeft: 20 }}>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="radio"
-                            name="default-language-mode"
-                            value="css"
-                            checked={defaultMode === 'css'}
-                            onChange={handleDefaultModeChange}
-                        /> &nbsp; CSS
+                    <label style={{ display: 'flex' }}>
+                        <div>
+                            <input
+                                type="radio"
+                                name="default-language-mode"
+                                value="css"
+                                checked={defaultMode === 'css'}
+                                onChange={handleDefaultModeChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            CSS
+                        </div>
                     </label>
                 </div>
                 <div className="option-value">
-                    <label>
-                        <input
-                            type="radio"
-                            name="default-language-mode"
-                            value="less"
-                            checked={defaultMode === 'less'}
-                            onChange={handleDefaultModeChange}
-                        /> &nbsp; Less
+                    <label style={{ display: 'flex' }}>
+                        <div>
+                            <input
+                                type="radio"
+                                name="default-language-mode"
+                                value="less"
+                                checked={defaultMode === 'less'}
+                                onChange={handleDefaultModeChange}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Less
+                        </div>
                     </label>
                 </div>
                 {
                     flagSassUiAllowed &&
                     <div className="option-value">
-                        <label>
-                            <input
-                                type="radio"
-                                name="default-language-mode"
-                                value="sass"
-                                checked={defaultMode === 'sass'}
-                                onChange={handleDefaultModeChange}
-                            /> &nbsp; Sass
+                        <label style={{ display: 'flex' }}>
+                            <div>
+                                <input
+                                    type="radio"
+                                    name="default-language-mode"
+                                    value="sass"
+                                    checked={defaultMode === 'sass'}
+                                    onChange={handleDefaultModeChange}
+                                />
+                            </div>
+                            <div style={{ marginLeft: 5 }}>
+                                Sass
+                            </div>
                         </label>
                     </div>
                 }

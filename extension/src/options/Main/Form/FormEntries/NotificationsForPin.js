@@ -35,29 +35,35 @@ const NotificationsForPin = function () {
 
     return (
         <div className="option">
-            <div className="option-heading">When applying styles automatically:</div>
-            <div style={{ marginLeft: 20 }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 'normal' }}>When applying styles automatically:</div>
+            <div style={{ marginLeft: 20, marginTop: 10 }}>
                 <div className="option-value">
                     <label>
-                        <input
-                            type="checkbox"
-                            checked={showNotification}
-                            onChange={function (evt) {
-                                let valueToSet = 'yes';
-                                if(!evt.target.checked) {
-                                    valueToSet = 'no';
-                                }
-                                setShowNotification(evt.target.checked);
-                                chromeStorageForExtensionData.set({ [USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION] : valueToSet });
-                                notifyUser();
-                            }}
-                        /> &nbsp; Show notification at: &nbsp;
+                        <div style={{ marginTop: 1 }}>
+                            <input
+                                type="checkbox"
+                                checked={showNotification}
+                                onChange={function (evt) {
+                                    let valueToSet = 'yes';
+                                    if(!evt.target.checked) {
+                                        valueToSet = 'no';
+                                    }
+                                    setShowNotification(evt.target.checked);
+                                    chromeStorageForExtensionData.set({ [USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION] : valueToSet });
+                                    notifyUser();
+                                }}
+                            />
+                        </div>
+                        <div style={{ marginLeft: 5 }}>
+                            Show notification at:
+                        </div>
                     </label>
                     {
                         notificationAtCorner &&
                         <select
                             className="notification-at-corner"
                             value={notificationAtCorner}
+                            style={{ marginLeft: 10 }}
                             onChange={function (evt) {
                                 var value = evt.target.value,
                                     valueToSet = 'top-right'; // default value
@@ -74,10 +80,10 @@ const NotificationsForPin = function () {
                                 notifyUser();
                             }}
                         >
-                            <option value="top-right">top-right corner</option>
-                            <option value="bottom-right">bottom-right corner</option>
-                            <option value="bottom-left">bottom-left corner</option>
-                            <option value="top-left">top-left corner</option>
+                            <option value="top-right">top-right</option>
+                            <option value="bottom-right">bottom-right</option>
+                            <option value="bottom-left">bottom-left</option>
+                            <option value="top-left">top-left</option>
                         </select>
                     }
                 </div>
