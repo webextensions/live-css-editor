@@ -50,7 +50,7 @@ const GenericAccordion = function ({
     title,
     icon
 }) {
-    const [expanded, setExpanded] = useLocalStorage(localStorageIdForExpanded, localStorageDefaultValueForExpanded);
+    const [expanded, setExpanded] = useLocalStorage(localStorageIdForExpanded, localStorageDefaultValueForExpanded || 'no');
     const [initialized, setInitialized] = useState(expanded === 'yes');
 
     return (
@@ -84,7 +84,7 @@ const GenericAccordion = function ({
 GenericAccordion.propTypes = {
     children: PropTypes.node.isRequired,
     localStorageIdForExpanded: PropTypes.string.isRequired,
-    localStorageDefaultValueForExpanded: PropTypes.string.isRequired,
+    localStorageDefaultValueForExpanded: PropTypes.string,
     title: PropTypes.string.isRequired,
     icon: PropTypes.node.isRequired
 };
@@ -118,7 +118,6 @@ const Form = function () {
                 <div className={styles.inputSection}>
                     <GenericAccordion
                         localStorageIdForExpanded="flagPanelCodeEditorTheme"
-                        localStorageDefaultValueForExpanded="yes"
                         title="Code editor theme"
                         icon={<DarkModeIcon />}
                     >
@@ -129,7 +128,6 @@ const Form = function () {
                 <div className={styles.inputSection}>
                     <GenericAccordion
                         localStorageIdForExpanded="flagPanelLoadForIframe"
-                        localStorageDefaultValueForExpanded="no"
                         title="Load for &lt;iframe&gt;"
                         icon={<WebIcon />}
                     >
@@ -140,7 +138,6 @@ const Form = function () {
                 <div className={styles.inputSection}>
                     <GenericAccordion
                         localStorageIdForExpanded="flagPanelFontSize"
-                        localStorageDefaultValueForExpanded="no"
                         title="Font size"
                         icon={<FormatSizeIcon />}
                     >
@@ -151,7 +148,6 @@ const Form = function () {
                 <div className={styles.inputSection}>
                     <GenericAccordion
                         localStorageIdForExpanded="flagPanelNotificationsForPin"
-                        localStorageDefaultValueForExpanded="no"
                         // title="Notifications for pin"
                         title="Notifications"
                         icon={<AnnouncementIcon />}
@@ -163,7 +159,6 @@ const Form = function () {
                 <div className={styles.inputSection}>
                     <GenericAccordion
                         localStorageIdForExpanded="flagPanelAutocomplete"
-                        localStorageDefaultValueForExpanded="no"
                         title="Autocomplete"
                         icon={<KeyboardIcon />}
                     >
@@ -174,7 +169,6 @@ const Form = function () {
                 <div className={styles.inputSection}>
                     <GenericAccordion
                         localStorageIdForExpanded="flagPanelStorage"
-                        localStorageDefaultValueForExpanded="no"
                         title="Storage"
                         icon={<StorageIcon />}
                     >
@@ -185,7 +179,6 @@ const Form = function () {
                 <div className={styles.inputSection}>
                     <GenericAccordion
                         localStorageIdForExpanded="flagPanelExperimentalOptions"
-                        localStorageDefaultValueForExpanded="no"
                         title="Experimental options"
                         icon={<ScienceIcon />}
                     >
