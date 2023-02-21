@@ -63,7 +63,7 @@ const NotificationsForPin = function () {
                         <select
                             className="notification-at-corner"
                             value={notificationAtCorner}
-                            style={{ marginLeft: 10 }}
+                            style={{ marginLeft: 10, minWidth: 125, paddingLeft: 5, paddingRight: 5 }}
                             onChange={function (evt) {
                                 var value = evt.target.value,
                                     valueToSet = 'top-right'; // default value
@@ -81,9 +81,9 @@ const NotificationsForPin = function () {
                             }}
                         >
                             <option value="top-right">top-right</option>
+                            <option value="top-left">top-left</option>
                             <option value="bottom-right">bottom-right</option>
                             <option value="bottom-left">bottom-left</option>
-                            <option value="top-left">top-left</option>
                         </select>
                     }
                 </div>

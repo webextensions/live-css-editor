@@ -95,7 +95,7 @@ const FontSize = function () {
                     <select
                         className="font-size-in-px"
                         value={fontSizeInPx}
-                        style={{ marginLeft: 5 }}
+                        style={{ marginLeft: 10, minWidth: 50, paddingLeft: 5, paddingRight: 5 }}
                         onChange={handleFontSizeChange}
                     >
                         <option value="8">8</option>

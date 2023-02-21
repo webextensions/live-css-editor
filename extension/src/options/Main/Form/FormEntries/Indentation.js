@@ -89,7 +89,7 @@ const Indentation = function () {
                     <select
                         className="indentation-spaces-count"
                         value={spacesCount}
-                        style={{ marginLeft: 10,  width: 50 }}
+                        style={{ marginLeft: 10, minWidth: 50, paddingLeft: 5, paddingRight: 5 }}
                         onChange={handleSpacesCountChange}
                     >
                         <option value="1">1</option>
