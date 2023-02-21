@@ -106,17 +106,6 @@ const Form = function () {
 
                 <div className={styles.inputSection}>
                     <GenericAccordion
-                        localStorageIdForExpanded="flagPanelCodeEditorTheme"
-                        localStorageDefaultValueForExpanded="yes"
-                        title="Code editor theme"
-                        icon={<DarkModeIcon />}
-                    >
-                        <CodeEditorTheme />
-                    </GenericAccordion>
-                </div>
-
-                <div className={styles.inputSection}>
-                    <GenericAccordion
                         localStorageIdForExpanded="flagPanelIndentation"
                         localStorageDefaultValueForExpanded="yes"
                         title="Indentation"
@@ -128,12 +117,23 @@ const Form = function () {
 
                 <div className={styles.inputSection}>
                     <GenericAccordion
-                        localStorageIdForExpanded="flagPanelStorage"
-                        localStorageDefaultValueForExpanded="no"
-                        title="Storage"
-                        icon={<StorageIcon />}
+                        localStorageIdForExpanded="flagPanelCodeEditorTheme"
+                        localStorageDefaultValueForExpanded="yes"
+                        title="Code editor theme"
+                        icon={<DarkModeIcon />}
                     >
-                        <Storage />
+                        <CodeEditorTheme />
+                    </GenericAccordion>
+                </div>
+
+                <div className={styles.inputSection}>
+                    <GenericAccordion
+                        localStorageIdForExpanded="flagPanelLoadForIframe"
+                        localStorageDefaultValueForExpanded="no"
+                        title="Load for &lt;iframe&gt;"
+                        icon={<WebIcon />}
+                    >
+                        <LoadForIframe />
                     </GenericAccordion>
                 </div>
 
@@ -145,17 +145,6 @@ const Form = function () {
                         icon={<FormatSizeIcon />}
                     >
                         <FontSize />
-                    </GenericAccordion>
-                </div>
-
-                <div className={styles.inputSection}>
-                    <GenericAccordion
-                        localStorageIdForExpanded="flagPanelLoadForIframe"
-                        localStorageDefaultValueForExpanded="no"
-                        title="Load for iframe"
-                        icon={<WebIcon />}
-                    >
-                        <LoadForIframe />
                     </GenericAccordion>
                 </div>
 
@@ -179,6 +168,17 @@ const Form = function () {
                         icon={<KeyboardIcon />}
                     >
                         <Autocomplete />
+                    </GenericAccordion>
+                </div>
+
+                <div className={styles.inputSection}>
+                    <GenericAccordion
+                        localStorageIdForExpanded="flagPanelStorage"
+                        localStorageDefaultValueForExpanded="no"
+                        title="Storage"
+                        icon={<StorageIcon />}
+                    >
+                        <Storage />
                     </GenericAccordion>
                 </div>
 
