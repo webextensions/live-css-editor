@@ -97,13 +97,15 @@ const Storage = function () {
                                 Extension Storage Sync (Alpha)&nbsp; <span style={{ color: '#777' }}>(browser.storage.sync)</span>
                             </div>
                         </div>
-                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', marginTop: 5, marginBottom: 8, color: '#555' }}>
-                            <span style={{ fontWeight: 'bold' }}>EXPERIMENTAL:</span> Try only if you use it for less than 25 sites.
-                            <br />
-                            <br />
-                            <a target="_blank" rel="noreferrer" href="https://developer.chrome.com/docs/extensions/reference/storage/#property-sync" style={{ color: '#555', textDecoration: 'none' }}><span style={{ textDecoration: 'underline' }}>Click here</span> to understand the storage limits</a>
+                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', marginTop: 5, color: '#555' }}>
+                            <div>
+                                <span style={{ fontWeight: 'bold' }}>EXPERIMENTAL:</span> Try only if you use it for less than 25 sites.
+                            </div>
+                            <div style={{ marginTop: 5 }}>
+                                <a target="_blank" rel="noreferrer" href="https://developer.chrome.com/docs/extensions/reference/storage/#property-sync" style={{ color: '#555', textDecoration: 'none' }}><span style={{ textDecoration: 'underline' }}>Click here</span> to understand the storage limits.</a>
+                            </div>
                         </div>
-                        <div style={{ marginLeft: 22, fontSize: '1.1rem', fontWeight: 'normal', color: '#777' }}>Remember all your changes on your connected computers and keep them accessible only through this extension.</div>
+                        <div style={{ marginLeft: 22, marginTop: 5, fontSize: '1.1rem', fontWeight: 'normal', color: '#777' }}>Remember all your changes on your connected computers and keep them accessible only through this extension.</div>
                     </label>
                 </div>
             </div>
