@@ -8,7 +8,7 @@
   "devDependencies": {
     "expect": "^26.6.2",
     "expect-mocha-image-snapshot": "^2.0.3",
-    "mocha": "^8.4.0",
+    "mocha": "^10.2.0",
     "puppeteer": "^9.1.1"
   }
 }
