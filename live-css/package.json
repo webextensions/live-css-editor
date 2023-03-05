@@ -10,8 +10,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "nodemon": "nodemon ./index.js",
-    "nodemon-debug": "nodemon ./index.js -- --debug",
+    "nodemon": "      nodemon ./index.js",
+    "nodemon:debug": "nodemon ./index.js -- --debug",
     "forever": "forever --minUptime 1000 --spinSleepTime 1000 -c node index.js --color",
     "test": "echo \"Warning: no test specified\""
   },

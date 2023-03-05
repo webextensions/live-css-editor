@@ -6,7 +6,6 @@ const RemoveSourceMapUrlWebpackPlugin = require('@rbarilani/remove-source-map-ur
 
 const notifyCompletionStatus = require('./utils/notify-completion-status.js');
 
-
 const projectRoot = path.join(__dirname, '..');
 const nodeModulesAtProjectRoot = path.resolve(projectRoot, 'node_modules');
 
