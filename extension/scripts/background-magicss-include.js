@@ -153,7 +153,8 @@ if (window.flagEditorInExternalWindow) {
 
         let [err, fetchedConfig] = await ajaxGet({ url: configUrl });
         if (err) {
-            console.error('Error in fetching remoteConfig:');
+            console.error(`Error in fetching remoteConfig from: ${configUrl}`);
+            console.error('Error details:');
             console.error(err);
         } else {
             (async () => {
@@ -483,6 +484,8 @@ if (window.flagEditorInExternalWindow) {
     }
 }
 /* */
+
+console.log('Welcome :)');
 
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
 var runningInChromiumLikeEnvironment = function () {
