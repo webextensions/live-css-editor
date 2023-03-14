@@ -335,7 +335,7 @@
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/ban_edited-yellow.svg */
     --icon-ban-yellow: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB3aWR0aD0iMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQ0MCA4OTNxMC0xNjEtODctMjk1bC03NTQgNzUzcTEzNyA4OSAyOTcgODkgMTExIDAgMjExLjUtNDMuNXQxNzMuNS0xMTYuNSAxMTYtMTc0LjUgNDMtMjEyLjV6bS05OTkgMjk5bDc1NS03NTRxLTEzNS05MS0zMDAtOTEtMTQ4IDAtMjczIDczdC0xOTggMTk5LTczIDI3NHEwIDE2MiA4OSAyOTl6bTEyMjMtMjk5cTAgMTU3LTYxIDMwMHQtMTYzLjUgMjQ2LTI0NSAxNjQtMjk4LjUgNjEtMjk4LjUtNjEtMjQ1LTE2NC0xNjMuNS0yNDYtNjEtMzAwIDYxLTI5OS41IDE2My41LTI0NS41IDI0NS0xNjQgMjk4LjUtNjEgMjk4LjUgNjEgMjQ1IDE2NCAxNjMuNSAyNDUuNSA2MSAyOTkuNXoiIGZpbGw9IiNGQ0Q2NEQiLz48L3N2Zz4K");
 
-    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/reload_edited.svg */
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/reload_edited-yellow.svg */
     --icon-reload: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iI2ZlZDEzOCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4=");
 
 
@@ -412,12 +412,12 @@
 
 
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/reload_edited.svg */
-    --icon-reload-all: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iIzAwMDAwMCIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4=");
-
-    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/watch.svg */
-    --icon-watch: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgZmlsbD0ibm9uZSIgaGVpZ2h0PSIyNCIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iNyIvPjxwb2x5bGluZSBwb2ludHM9IjEyIDkgMTIgMTIgMTMuNSAxMy41Ii8+PHBhdGggZD0iTTE2LjUxIDE3LjM1bC0uMzUgMy44M2EyIDIgMCAwIDEtMiAxLjgySDkuODNhMiAyIDAgMCAxLTItMS44MmwtLjM1LTMuODNtLjAxLTEwLjdsLjM1LTMuODNBMiAyIDAgMCAxIDkuODMgMWg0LjM1YTIgMiAwIDAgMSAyIDEuODJsLjM1IDMuODMiLz48L3N2Zz4=");
+    --icon-reload-all: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMnB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNiAyMiIgd2lkdGg9IjE2cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iI2ZmZiIgaWQ9Ikljb25zLUFWIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48ZyBpZD0ibG9vcCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEyLjAwMDAwMCwgMC4wMDAwMDApIj48cGF0aCBkPSJNOCwzIEw4LDAgTDQsNCBMOCw4IEw4LDUgQzExLjMsNSAxNCw3LjcgMTQsMTEgQzE0LDEyIDEzLjcsMTMgMTMuMywxMy44IEwxNC44LDE1LjMgQzE1LjUsMTQgMTYsMTIuNiAxNiwxMSBDMTYsNi42IDEyLjQsMyA4LDMgTDgsMyBaIE04LDE3IEM0LjcsMTcgMiwxNC4zIDIsMTEgQzIsMTAgMi4zLDkgMi43LDguMiBMMS4yLDYuNyBDMC41LDggMCw5LjQgMCwxMSBDMCwxNS40IDMuNiwxOSA4LDE5IEw4LDIyIEwxMiwxOCBMOCwxNCBMOCwxNyBMOCwxNyBaIiBpZD0iU2hhcGUiLz48L2c+PC9nPjwvZz48L3N2Zz4=");
 
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/watch_edited.svg */
+    --icon-watch: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgZmlsbD0ibm9uZSIgaGVpZ2h0PSIyNCIgc3Ryb2tlPSIjZmZmIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iNyIvPjxwb2x5bGluZSBwb2ludHM9IjEyIDkgMTIgMTIgMTMuNSAxMy41Ii8+PHBhdGggZD0iTTE2LjUxIDE3LjM1bC0uMzUgMy44M2EyIDIgMCAwIDEtMiAxLjgySDkuODNhMiAyIDAgMCAxLTItMS44MmwtLjM1LTMuODNtLjAxLTEwLjdsLjM1LTMuODNBMiAyIDAgMCAxIDkuODMgMWg0LjM1YTIgMiAwIDAgMSAyIDEuODJsLjM1IDMuODMiLz48L3N2Zz4=");
+
+    /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/watch_edited-yellow.svg */
     --icon-watch-yellow: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgZmlsbD0ibm9uZSIgaGVpZ2h0PSIyNCIgc3Ryb2tlPSIjZmVkMTM4IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iNyIvPjxwb2x5bGluZSBwb2ludHM9IjEyIDkgMTIgMTIgMTMuNSAxMy41Ii8+PHBhdGggZD0iTTE2LjUxIDE3LjM1bC0uMzUgMy44M2EyIDIgMCAwIDEtMiAxLjgySDkuODNhMiAyIDAgMCAxLTItMS44MmwtLjM1LTMuODNtLjAxLTEwLjdsLjM1LTMuODNBMiAyIDAgMCAxIDkuODMgMWg0LjM1YTIgMiAwIDAgMSAyIDEuODJsLjM1IDMuODMiLz48L3N2Zz4=");
 
 
@@ -426,6 +426,12 @@
 
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/settings-server.svg */
     --cog-wheel-icon: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSIyMHB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjIwcHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48dGl0bGUvPjxkZXNjLz48ZGVmcy8+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSI+PGcgZmlsbD0iIzAwMDAwMCIgaWQ9IkNvcmUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NjQuMDAwMDAwLCAtMzgwLjAwMDAwMCkiPjxnIGlkPSJzZXR0aW5ncyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDY0LjAwMDAwMCwgMzgwLjAwMDAwMCkiPjxwYXRoIGQ9Ik0xNy40LDExIEMxNy40LDEwLjcgMTcuNSwxMC40IDE3LjUsMTAgQzE3LjUsOS42IDE3LjUsOS4zIDE3LjQsOSBMMTkuNSw3LjMgQzE5LjcsNy4xIDE5LjcsNi45IDE5LjYsNi43IEwxNy42LDMuMiBDMTcuNSwzLjEgMTcuMywzIDE3LDMuMSBMMTQuNSw0LjEgQzE0LDMuNyAxMy40LDMuNCAxMi44LDMuMSBMMTIuNCwwLjUgQzEyLjUsMC4yIDEyLjIsMCAxMiwwIEw4LDAgQzcuOCwwIDcuNSwwLjIgNy41LDAuNCBMNy4xLDMuMSBDNi41LDMuMyA2LDMuNyA1LjQsNC4xIEwzLDMuMSBDMi43LDMgMi41LDMuMSAyLjMsMy4zIEwwLjMsNi44IEMwLjIsNi45IDAuMyw3LjIgMC41LDcuNCBMMi42LDkgQzIuNiw5LjMgMi41LDkuNiAyLjUsMTAgQzIuNSwxMC40IDIuNSwxMC43IDIuNiwxMSBMMC41LDEyLjcgQzAuMywxMi45IDAuMywxMy4xIDAuNCwxMy4zIEwyLjQsMTYuOCBDMi41LDE2LjkgMi43LDE3IDMsMTYuOSBMNS41LDE1LjkgQzYsMTYuMyA2LjYsMTYuNiA3LjIsMTYuOSBMNy42LDE5LjUgQzcuNiwxOS43IDcuOCwxOS45IDguMSwxOS45IEwxMi4xLDE5LjkgQzEyLjMsMTkuOSAxMi42LDE5LjcgMTIuNiwxOS41IEwxMywxNi45IEMxMy42LDE2LjYgMTQuMiwxNi4zIDE0LjcsMTUuOSBMMTcuMiwxNi45IEMxNy40LDE3IDE3LjcsMTYuOSAxNy44LDE2LjcgTDE5LjgsMTMuMiBDMTkuOSwxMyAxOS45LDEyLjcgMTkuNywxMi42IEwxNy40LDExIEwxNy40LDExIFogTTEwLDEzLjUgQzguMSwxMy41IDYuNSwxMS45IDYuNSwxMCBDNi41LDguMSA4LjEsNi41IDEwLDYuNSBDMTEuOSw2LjUgMTMuNSw4LjEgMTMuNSwxMCBDMTMuNSwxMS45IDExLjksMTMuNSAxMCwxMy41IEwxMCwxMy41IFoiIGlkPSJTaGFwZSIvPjwvZz48L2c+PC9nPjwvc3ZnPg==");
+
+
+    --magic-css-bg-color: rgba(42, 74, 117, 1);
+    --magic-css-bg-color-for-borders: rgba(32, 54, 100, 1);
+
+    --magic-css-bg-color-for-hover: rgba(22, 34, 70, 1);
 }
 
 .magicss-command-palette-overlay .atom-suggestion * {
@@ -556,21 +562,21 @@
 }
 
 .magic-css-tooltipster.tooltipster-default .tooltipster-box {
-    background-color: #7A89C6;
+    background-color: var(--magic-css-bg-color);
 }
 .magic-css-tooltipster.tooltipster-top .tooltipster-arrow-background {
-    border-top-color: #7A89C6;
+    border-top-color: var(--magic-css-bg-color);
 }
 .magic-css-tooltipster.tooltipster-bottom .tooltipster-arrow-background {
-    border-bottom-color: #7A89C6;
+    border-bottom-color: var(--magic-css-bg-color);
 }
 
 .magic-css-tooltipster.tooltipster-default .tooltipster-box {
-    border-color: #475A9B !important;
+    border-color: var(--magic-css-bg-color-for-borders) !important;
 }
 .magic-css-tooltipster .tooltipster-arrow-border {
-    border-top-color: #475A9B !important;
-    border-bottom-color: #475A9B !important;
+    border-top-color: var(--magic-css-bg-color-for-borders) !important;
+    border-bottom-color: var(--magic-css-bg-color-for-borders) !important;
 }
 
 .magic-css-tooltipster .tooltipster-content::-webkit-scrollbar {
@@ -598,7 +604,7 @@
 }
 
 .magic-css-tooltipster .tooltipster-content ul li:hover {
-    background-color: #5A69A6 !important;
+    background-color: var(--magic-css-bg-color-for-hover) !important;
 }
 
 .magic-css-tooltipster.tooltipster-base ul li a {
@@ -618,7 +624,6 @@
     background-repeat: no-repeat !important;
     padding-left: 30px !important;
     min-height: 20px;
-    font-weight: bold;
     text-align: left;
     background-size: 16px !important;
 }
@@ -1194,7 +1199,7 @@ html .magicss-mouse-over-dom-element {
     text-align: right;
 
     /* The following styles help in avoiding some flickering when this text/element is animated */
-    background-color: rgba(99,113,186,1);
+    background-color: var(--magic-css-bg-color);
     -webkit-backface-visibility: hidden;
 }
 

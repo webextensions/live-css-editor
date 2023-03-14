@@ -126,6 +126,7 @@ reload.svg
     https://www.iconfinder.com/icons/326543/loop_reload_replay_icon#size=128
 
 reload_edited.svg
+reload_edited-yellow.svg
     Slightly edited version of "reload.svg"
 
 smiley.svg
@@ -172,4 +173,5 @@ watch.svg
     https://www.iconfinder.com/icons/2561502/download/svg/128
 
 watch_edited.svg
-    Slightly edited version of "watch.svg"
+watch_edited-yellow.svg
+    Slightly edited versions of "watch.svg"
