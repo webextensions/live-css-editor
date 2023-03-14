@@ -51,7 +51,10 @@ module.exports = function (env) {
         mode: 'development',
         entry: {
             main: './src/main.js',
-            options: './src/options/options.js'
+            'background-magicss': './background-magicss.js',
+            options: './src/options/options.js',
+            'load-editor': './scripts/load-editor.js',
+            'load-reapply': './scripts/load-reapply.js'
         },
         output: {
             path: __dirname + '/../dist',

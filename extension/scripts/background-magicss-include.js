@@ -1,4 +1,7 @@
-/* global chrome, extLib, jQuery */
+/* global chrome */
+
+import { extLib } from './chrome-extension-lib/ext-lib.js';
+import * as jQuery from './3rdparty/jquery.js';
 
 var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
@@ -692,8 +695,9 @@ var reapplyCss = function (tabId) {
                 showReapplyingStylesNotificationAt = value;
             }
             getAllFrames(function (allFrames) {
-                var pathScripts = 'scripts/',
-                    path3rdparty = pathScripts + '3rdparty/';
+                var // pathScripts = 'scripts/',
+                    // path3rdparty = pathScripts + '3rdparty/',
+                    pathDist = 'dist/';
 
                 var arrScripts = [];
                 if (!showReapplyingStylesNotification) {
@@ -707,10 +711,12 @@ var reapplyCss = function (tabId) {
                         sourceText: 'window.showReapplyingStylesNotificationAt = "' + showReapplyingStylesNotificationAt + '";'
                     });
                 }
-                arrScripts.push(path3rdparty + 'amplify-store.js');
-                arrScripts.push(pathScripts + 'utils.js');
-                arrScripts.push(pathScripts + 'migrate-storage.js');
-                arrScripts.push(pathScripts + 'reapply-css.js');
+
+                // arrScripts.push(path3rdparty + 'amplify-store.js');
+                // arrScripts.push(pathScripts + 'utils.js');
+                // arrScripts.push(pathScripts + 'migrate-storage.js');
+                // arrScripts.push(pathScripts + 'reapply-css.js');
+                arrScripts.push(pathDist + 'load-reapply.bundle.js');
 
                 extLib.loadMultipleJsCss({
                     treatAsNormalWebpage: window.treatAsNormalWebpage,
@@ -737,14 +743,15 @@ try {
 var main = function (tab) {     // eslint-disable-line no-unused-vars
     getAllFrames(function (allFrames) {
         var pathDist = 'dist/',
-            pathScripts = 'scripts/',
-            path3rdparty = pathScripts + '3rdparty/',
-            path3rdpartyCustomFixes = pathScripts + '3rdparty-custom-fixes/',
-            pathMagicss = pathScripts + 'magicss/',
-            pathEditor = pathMagicss + 'editor/',
-            pathCodeMirror = path3rdparty + 'codemirror/';
+            pathScripts = 'scripts/'
+            // path3rdparty = pathScripts + '3rdparty/',
+            // path3rdpartyCustomFixes = pathScripts + '3rdparty-custom-fixes/',
+            // pathMagicss = pathScripts + 'magicss/',
+            // pathEditor = pathMagicss + 'editor/',
+            // pathCodeMirror = path3rdparty + 'codemirror/'
+            ;
 
-        var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:" || document.location.protocol === "ms-browser-extension:") ? true : false;
+        // var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:" || document.location.protocol === "ms-browser-extension:") ? true : false;
         // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
@@ -767,14 +774,18 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
                 //     sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
                 // },
 
+                pathDist + 'load-editor.bundle.js',
+                pathDist + 'load-editor.bundle.css'
+
+                /*
                 {
                     src: path3rdparty + 'jquery.js',
                     skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
                 },
-                {
-                    src: pathScripts + 'chrome-extension-lib/ext-lib.js',
-                    skip: typeof extLib !== "undefined" || runningInBrowserExtension ? false : true
-                },
+                // {
+                //     src: pathScripts + 'chrome-extension-lib/ext-lib.js',
+                //     skip: typeof extLib !== "undefined" || runningInBrowserExtension ? false : true
+                // },
 
                 pathScripts + 'utils.js',
                 pathScripts + 'loading-magic-css.js',
@@ -867,6 +878,7 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
                 pathMagicss + 'generate-selector.js',
 
                 pathMagicss + 'magicss.js'
+                /* */
             ],
             allFrames,
             tabId: undefined,

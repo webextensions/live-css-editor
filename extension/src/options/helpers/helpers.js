@@ -1,4 +1,6 @@
-/* global utils, chrome */
+/* global chrome */
+
+import { utils } from '../../../scripts/utils.js';
 
 // TODO: DUPLICATE: Move this to a common file (Used elsewhere with name "flagDevMode")
 const FLAG_DEV_MODE = (function () {

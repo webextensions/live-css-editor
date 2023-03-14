@@ -1,7 +1,12 @@
-/* global amplify: false, utils, CodeMirror, jQuery, chrome, runMigration, sendMessageForGa */
+/* global CodeMirror, jQuery, chrome */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
+
+import { utils } from '../../utils.js';
+import { runMigration } from '../../migrate-storage.js';
+import { sendMessageForGa } from '../magicss.js';
+import { amplify } from '../../3rdparty/amplify-store.js';
 
 // TODO: If remember text option is on, detect text change in another instance of this extension in some different tab
 

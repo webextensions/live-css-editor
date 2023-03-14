@@ -1,12 +1,15 @@
-/* global chrome, jQuery, less, Sass, csspretty */
+/* global chrome, jQuery, less, Sass */
 
 'use strict';
+
+import { csspretty } from 'helpmate-css/dist/format/csspretty.js';
 
 var utils = window.utils || {};
 
 if (!utils.defined) {
     utils.defined = true;
 
+    const thiosOb = this || {};
     /* eslint-disable no-undef */
     // https://github.com/hydiak/a-sync-waterfall/blob/master/index.js
     // MIT license (by Elan Shanker).
@@ -91,9 +94,9 @@ if (!utils.defined) {
         } else {
             globals.waterfall = waterfall; // <script>
         }
-    })(this);
+    })(thiosOb);
     /* eslint-enable no-undef */
-    utils.waterfall = this.waterfall;
+    utils.waterfall = thiosOb.waterfall;
 
     utils.attachPublishSubscribe = function (attachToObject) {
         var o = jQuery({});
@@ -625,4 +628,7 @@ if (!utils.attachPublishSubscribeDone) {
     }
 }
 
-'This string is added to the end of this file to handle a weird bug/behavior for Firefox. Without this, if "reapply styles automatically" feature is activated, then it would not work and an error would occur in the background script. Reference: https://stackoverflow.com/questions/44567525/inject-scripts-error-script-returned-non-structured-clonable-data-on-firefox-ex/56597154#56597154';
+// // The following line has been commented out temporarily. See: FIXME.md
+// 'This string is added to the end of this file to handle a weird bug/behavior for Firefox. Without this, if "reapply styles automatically" feature is activated, then it would not work and an error would occur in the background script. Reference: https://stackoverflow.com/questions/44567525/inject-scripts-error-script-returned-non-structured-clonable-data-on-firefox-ex/56597154#56597154';
+
+export { utils };

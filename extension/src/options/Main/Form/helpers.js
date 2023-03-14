@@ -1,6 +1,7 @@
-/* global utils, chrome */
+/* global chrome */
 
 import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
+import { utils } from '../../../../scripts/utils.js';
 
 const chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 

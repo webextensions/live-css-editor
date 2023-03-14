@@ -1,10 +1,12 @@
-/* global extLib, utils, sendMessageForGa */
+/* global extLib, sendMessageForGa */
 
 import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
 import {
     isCopyToClipboardSupported,
     copyToClipboard
 } from 'helpmate/dist/misc/copyToClipboard.js';
+
+import { utils } from '../../scripts/utils.js';
 
 import {
     APP_$_OPEN_SEARCH_ICONS

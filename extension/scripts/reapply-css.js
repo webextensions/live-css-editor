@@ -1,4 +1,9 @@
-/* global chrome, utils, amplify, runMigration */
+/* global chrome */
+
+import { runMigration } from './migrate-storage.js';
+import { utils } from './utils.js';
+
+import { amplify } from './3rdparty/amplify-store.js';
 
 (async function () {
     await runMigration();

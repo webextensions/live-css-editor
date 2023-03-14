@@ -1,9 +1,13 @@
-/* global jQuery, Sass, utils, sourceMap, chrome, CodeMirror, io, toastr, extLib */
+/* global jQuery, Sass, chrome, CodeMirror, io, toastr */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
+
+import { utils } from '../utils.js';
+import { extLib } from '../chrome-extension-lib/ext-lib.js';
+import sourceMap from '../3rdparty/source-map.js';
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
@@ -287,6 +291,7 @@ var sendMessageForGa = function (payload) {
         // do nothing
     }
 };
+window.sendMessageForGa = sendMessageForGa;
 var sendMessageForMetrics = function (payload) {
     try {
         chrome.runtime.sendMessage({
@@ -5095,3 +5100,5 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         });
     }
 }(jQuery));
+
+export { sendMessageForGa };

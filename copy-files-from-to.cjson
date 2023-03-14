@@ -366,12 +366,12 @@
         {
             "from": {
                 "default": {
-                    "src": "node_modules/socket.io-client/dist/socket.io.slim.js"
+                    "src": "node_modules/socket.io-client/dist/socket.io.slim.dev.js"
                 }
             },
             "to": {
                 "default": {
-                    "dest": "extension/scripts/3rdparty/socket.io/socket.io.slim.js",
+                    "dest": "extension/scripts/3rdparty/socket.io/socket.io.slim.dev.js",
                     "removeSourceMappingURL": true
                 }
             }

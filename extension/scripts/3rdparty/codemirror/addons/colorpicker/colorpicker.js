@@ -720,7 +720,7 @@
             }
 
             dom = null;
-            delete dom;
+            // delete dom;
 
             return rtrnVal;
         }

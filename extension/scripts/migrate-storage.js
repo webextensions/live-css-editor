@@ -1,6 +1,8 @@
-/* global chrome, utils */
+/* global chrome */
 
 /* eslint-disable require-atomic-updates */
+
+import { utils } from './utils.js';
 
 var USER_PREFERENCE_STORAGE_MODE = 'storage-mode';
 
@@ -166,3 +168,5 @@ var runMigration = async function () {
 (async function () {
     await runMigration();
 }());
+
+export { runMigration };

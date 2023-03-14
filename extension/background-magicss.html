@@ -6,11 +6,21 @@
 
     <title>Live editor for CSS, Less &amp; Sass - Magic CSS</title>
 
+    <!--
     <script src="scripts/3rdparty/jquery.js"></script>
     <script src="scripts/actions.js"></script>
     <script src="scripts/chrome-extension-lib/ext-lib.js"></script>
     <script src="scripts/background-magicss-include.js"></script>
     <script src="scripts/background-operations.js"></script>
+    -->
+
+    <!--
+        "module" based script isn't supported as of March 2023
+        https://bugs.chromium.org/p/chromium/issues/detail?id=783757
+    -->
+    <!-- <script src="./background-magicss.js" type="module"></script> -->
+
+    <script src="./dist/background-magicss.bundle.js"></script>
 </head>
 
 <body>
