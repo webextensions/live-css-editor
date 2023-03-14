@@ -18,7 +18,7 @@ import {
     APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
 } from 'reducers/actionTypes.js';
 
-import './searchIcons.css';
+import styles from './searchIcons.css';
 
 function mapStateToProps(state) {
     return {
@@ -109,7 +109,12 @@ const SearchIcons = function (props) {
                     // disableAutoFocus={true}
                     // disableEnforceFocus={true}
 
-                    className="magicss-base-element magicss-material-ui-dialog magicss-dialog-search-icons magicss-dialog-search-icons-main"
+                    className={
+                        'magicss-base-element' + ' ' +
+                        styles['magicss-material-ui-dialog'] + ' ' +
+                        styles['magicss-dialog-search-icons'] + ' ' +
+                        styles['magicss-dialog-search-icons-main']
+                    }
                     PaperProps={{
                         style: {
                             height: '90vh',
@@ -143,7 +148,10 @@ const SearchIcons = function (props) {
                                             type: APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
                                         });
                                     }}
-                                    className="magicss-cog-wheel-icon magicss-joyride-configure-icon-search-api"
+                                    className={
+                                        'magicss-joyride-configure-icon-search-api' + ' ' +
+                                        styles['magicss-cog-wheel-icon']
+                                    }
                                     title="Configure Access"
                                 />
                             </div>

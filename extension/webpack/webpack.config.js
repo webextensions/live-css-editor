@@ -124,6 +124,18 @@ module.exports = function (env) {
                                     //         return true;
                                     //     }
                                     // },
+                                    auto: function (resourcePath) {
+                                        if (
+                                            // // TODO: Create a separate "vendor.css" or similarly named file
+                                            resourcePath.includes('extension/scripts/') ||
+                                            resourcePath.includes('extension/dist/') ||
+                                            resourcePath.includes('extension/src/node_modules/Loading/Loading.css')
+                                        ) {
+                                            return false;
+                                        } else {
+                                            return true;
+                                        }
+                                    },
                                     localIdentName: '[name]__[local]--[hash:base64:5]'
                                 }
                             }
