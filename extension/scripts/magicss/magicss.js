@@ -4496,7 +4496,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 cssText: (
                                     // Setting display style for UI components generated using this extension
                                     '#' + id + ','
-                                    + 'html>body #' + id
+                                    // + 'html>body #' + id
+                                    + 'html>body .magic-css-container#' + id // `.magic-css-container` is added for higher specificity for page https://www.bing.com/search?q=Bing+AI&showconv=1
                                     + '{'
                                         + 'display: block;'
                                     + '}'

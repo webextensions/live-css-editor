@@ -130,9 +130,29 @@ const CommandPalette = function (props) {
         })();
     }, [refreshedAt]);
 
+    // Effectively, `gotRendered` is used as a hack for page https://www.bing.com/search?q=Bing+AI&showconv=1
+    const [gotRendered, setGotRendered] = useState('maybe');
+    useEffect(() => {
+        requestAnimationFrame(() => {
+            const commandPaletteEl = document.querySelector('.magicss-command-palette-overlay');
+
+            // If `commandPaletteEl` is visible (check via getComputedStyle), then it means that the command palette has been rendered
+            if (
+                commandPaletteEl &&
+                commandPaletteEl.parentNode &&
+                window.getComputedStyle(commandPaletteEl.parentNode).display !== 'none'
+            ) {
+                setGotRendered('yes');
+            } else {
+                setGotRendered('no');
+            }
+        });
+    }, []);
+
     return (
         <div className="CommandPalette">
             <ReactCommandPalette
+                reactModalParentSelector={gotRendered === 'no' ? 'html' : undefined}
                 hotKeys={[]}
                 open={props.open}
                 onRequestClose={function () {
