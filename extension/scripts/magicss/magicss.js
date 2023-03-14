@@ -1842,7 +1842,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
     var isMac = false;
     try {
-        isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+        isMac = (
+            navigator.platform.toUpperCase().indexOf('MAC') >= 0 ||
+            navigator.userAgent.indexOf('Mac') >= 0
+        );
     } catch (e) {
         // do nothing
     }
