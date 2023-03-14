@@ -93,9 +93,11 @@ const CommandPalette = function (props) {
 
     const [commandsToUse, setCommandsToUse] = useState([]);
 
+    const [refreshedAt, setRefreshedAt] = useState(0);
+
     useEffect(() => {
         (async () => {
-            const commands = await getCommands();
+            const commands = await getCommands(setRefreshedAt);
             const filteredCommands = commands.filter((item) => {
                 if (item.id === 'show-line-numbers') {
                     if (editor.cm.getOption('lineNumbers')) {
@@ -126,7 +128,7 @@ const CommandPalette = function (props) {
             });
             setCommandsToUse(filteredCommands);
         })();
-    }, []);
+    }, [refreshedAt]);
 
     return (
         <div className="CommandPalette">

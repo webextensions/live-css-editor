@@ -67,7 +67,7 @@ const getExecIconToShowForRateUs = async function () {
     return icon;
 };
 
-const getCommands = async () => (
+const getCommands = async (setRefreshedAt) => (
     [
         await (async function () {
             const iconOb = await getExecIconToShowForRateUs();
@@ -221,6 +221,7 @@ const getCommands = async () => (
                     var editor = window.MagiCSSEditor;
                     await window.execShowLineNumbersAction(editor);
                     sendMessageForGa(['_trackEvent', 'commandPalette', 'showLineNumbers']);
+                    setRefreshedAt(Date.now());
                 });
             }
         },
@@ -234,6 +235,7 @@ const getCommands = async () => (
                     var editor = window.MagiCSSEditor;
                     await window.execHideLineNumbersAction(editor);
                     sendMessageForGa(['_trackEvent', 'commandPalette', 'hideLineNumbers']);
+                    setRefreshedAt(Date.now());
                 });
             }
         },
@@ -248,6 +250,7 @@ const getCommands = async () => (
                     var editor = window.MagiCSSEditor;
                     await window.execEnableLineWrapAction(editor);
                     sendMessageForGa(['_trackEvent', 'commandPalette', 'enableLineWrap']);
+                    setRefreshedAt(Date.now());
                 });
             }
         },
@@ -261,6 +264,7 @@ const getCommands = async () => (
                     var editor = window.MagiCSSEditor;
                     await window.execDisableLineWrapAction(editor);
                     sendMessageForGa(['_trackEvent', 'commandPalette', 'disableLineWrap']);
+                    setRefreshedAt(Date.now());
                 });
             }
         },
@@ -275,6 +279,7 @@ const getCommands = async () => (
                     var editor = window.MagiCSSEditor;
                     await window.execEnableCssLintingAction(editor);
                     sendMessageForGa(['_trackEvent', 'commandPalette', 'enableCssLinting']);
+                    setRefreshedAt(Date.now());
                 });
             }
         },
@@ -288,6 +293,7 @@ const getCommands = async () => (
                     var editor = window.MagiCSSEditor;
                     await window.execDisableCssLintingAction(editor);
                     sendMessageForGa(['_trackEvent', 'commandPalette', 'disableCssLinting']);
+                    setRefreshedAt(Date.now());
                 });
             }
         },
