@@ -1,6 +1,6 @@
 {
   "name": "magic-css",
-  "version": "8.20.2",
+  "version": "8.20.3",
   "scripts": {
     "install:legacy-peer-deps": "npm install --legacy-peer-deps",
     "version": "./scripts/build-and-release/prepare-version/prepare-version.sh",
