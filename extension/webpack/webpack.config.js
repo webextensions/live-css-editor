@@ -131,7 +131,6 @@ module.exports = function (env) {
                                         if (
                                             // // TODO: Create a separate "vendor.css" or similarly named file
                                             resourcePath.includes('extension/scripts/') ||
-                                            resourcePath.includes('extension/dist/') ||
                                             resourcePath.includes('extension/src/node_modules/Loading/Loading.css')
                                         ) {
                                             return false;

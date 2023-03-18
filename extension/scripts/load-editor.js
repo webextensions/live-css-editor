@@ -84,7 +84,6 @@ import './magicss/editor/editor.css';
 import './magicss/editor/editor.js';
 
 import './magicss/magicss.css';
-import '../dist/main.bundle.css'; // TODO: FIXME: Ideally, this should be loaded only on demand, like main.bundle.js
 
 import './magicss/generate-selector.js';
 
