@@ -1873,14 +1873,6 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     outline-width: 0 !important; /* https://www.smashingmagazine.com/ */
 }
 
-.magicss-material-ui-dialog {
-    font-size: 16px;     /* https://code.visualstudio.com/ */
-}
-
-.magicss-material-ui-dialog .MuiInputBase-input {
-    color: rgba(0, 0, 0, 0.87); /* https://visualstudio.microsoft.com/ */
-}
-
 /* End: Generic (not targeting specific components via CSS selector) fixes */
 
 
