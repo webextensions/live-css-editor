@@ -1,4 +1,6 @@
 .magicss-material-ui-dialog {
+    -z-index: 2147483646 !important;
+    z-index: 2147483647 !important;
 }
 
 /* Begin: Generic (not targeting specific components via CSS selector) fixes */
