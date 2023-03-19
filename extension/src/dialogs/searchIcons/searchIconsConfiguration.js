@@ -31,7 +31,9 @@ import {
     APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET
 } from 'reducers/actionTypes.js';
 
-import './searchIconsConfiguration.css';
+import commonStyles from '../../common-styles/common-styles.css';
+
+import styles from './searchIconsConfiguration.css';
 
 function mapStateToProps(state) {
     return {
@@ -168,12 +170,21 @@ const SearchIconsConfiguration = function (props) {
         };
 
         return (
-            <div>
+            <div className={styles.SearchIconsConfiguration}>
                 <Dialog
                     disableScrollLock // https://github.com/mui-org/material-ui/issues/10000#issuecomment-559116355
                     open={open}
                     onClose={handleClose}
-                    className="magicss-base-element magicss-material-ui-dialog magicss-dialog-search-icons magicss-dialog-search-icons-configuration"
+                    className={
+                        'magicss-base-element' + ' ' +
+                        commonStyles['magicss-material-ui-dialog'] + ' ' +
+
+                        // TODO: Use only the `styles[]` one
+                        'magicss-dialog-search-icons' + ' ' +
+                        styles['magicss-dialog-search-icons'] + ' ' +
+
+                        'magicss-dialog-search-icons-configuration'
+                    }
                     PaperProps={{
                         style: {
                             maxWidth: 475

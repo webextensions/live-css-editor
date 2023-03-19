@@ -26,7 +26,7 @@ import { copyToClipboard } from 'helpmate/dist/misc/copyToClipboard.js';
 
 import { Loading } from 'Loading/Loading.js';
 
-import './searchUi.css';
+import styles from './searchUi.css';
 
 import {
     APP_$_CLOSE_SEARCH_ICONS,
@@ -185,8 +185,11 @@ const ListOfIcons = function (props) {
                             } = icon;
 
                             const className = classNames({
-                                magicssSearchResultEntryIcon: true,
-                                iconIsSelected: selectedIndex === index ? true : false
+                                // TODO: Use only the `styles[]` one
+                                ['magicssSearchResultEntryIcon']: true,
+                                [styles['magicssSearchResultEntryIcon']]: true,
+
+                                [styles['iconIsSelected']]: selectedIndex === index ? true : false
                             });
 
                             return (
@@ -212,7 +215,7 @@ const ListOfIcons = function (props) {
                                         }}
                                     >
                                         <div
-                                            className="magicssSearchResultEntryIconBorderLayer"
+                                            className={styles['magicssSearchResultEntryIconBorderLayer']}
                                             style={{
                                                 width: '100%',
                                                 height: '100%',
@@ -314,7 +317,11 @@ const ListOfIcons = function (props) {
                 }
             </div>
             <div
-                className="magicss-search-icon-preview"
+                className={
+                    // TODO: Use only the `styles[]` one
+                    'magicss-search-icon-preview' + ' ' +
+                    styles['magicss-search-icon-preview']
+                }
                 style={{
                     width: 300,
                     overflow: 'auto',
@@ -358,7 +365,7 @@ const ListOfIcons = function (props) {
                                             </div>
 
                                             <div style={{ marginTop: 20, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
-                                                <table className="magicss-icon-description">
+                                                <table className={styles['magicss-icon-description']}>
                                                     <tbody>
                                                         <tr>
                                                             <td style={{ color: '#aaa', textAlign: 'right' }}>Download: </td>
@@ -478,7 +485,7 @@ const ListOfIcons = function (props) {
 
                                                             <div style={{ marginTop: 15 }}>
                                                                 <Button
-                                                                    className="magicss-search-icons-copy-svg"
+                                                                    className={styles['magicss-search-icons-copy-svg']}
                                                                     variant="text"
                                                                     color="primary"
                                                                     size="small"
@@ -517,7 +524,11 @@ const ListOfIcons = function (props) {
                                                                     Copy SVG
                                                                 </Button>
                                                                 <Button
-                                                                    className="magicss-search-icons-copy-data-url"
+                                                                    className={
+                                                                        // TODO: Use only `styles[]` one
+                                                                        'magicss-search-icons-copy-svg' + ' ' +
+                                                                        styles['magicss-search-icons-copy-data-url']
+                                                                    }
                                                                     variant="text"
                                                                     color="primary"
                                                                     size="small"
@@ -585,7 +596,7 @@ const ListOfIcons = function (props) {
                                                             }
                                                             cmpStatus = (
                                                                 <div
-                                                                    className="magicss-search-icons-svg-contents-copy-status"
+                                                                    className={styles['magicss-search-icons-svg-contents-copy-status']}
                                                                     style={{ marginTop: 5, color, fontSize: 12 }}
                                                                 >
                                                                     {svgContents['status']}
@@ -688,7 +699,7 @@ const SearchOutput = function (props) {
                         if (statusCode === 401 || statusCode === 403) {
                             return (
                                 <React.Fragment>
-                                    <div className="magic-css-unable-to-access-noun-project-api">
+                                    <div className={styles['magic-css-unable-to-access-noun-project-api']}>
                                         Error: Unable to access API
                                     </div>
                                     <div style={{ marginTop: 10, maxWidth: 450 }}>
@@ -944,14 +955,18 @@ const SearchUi = function (props) {
                                     }
                                 }
                             }}
-                            className="magicss-search-for-icons-input"
+                            className={
+                                // TODO: Use only `styles[]` one
+                                'magicss-search-for-icons-input' + ' ' +
+                                styles['magicss-search-for-icons-input']
+                            }
                             style={{ width: '100%' }}
                         />
                     </div>
 
                     <div style={{ marginLeft: 20 }}>
                         <Button
-                            className="magicss-search-icons-button"
+                            className={styles['magicss-search-icons-button']}
                             variant="contained"
                             color="primary"
                             size="medium"
