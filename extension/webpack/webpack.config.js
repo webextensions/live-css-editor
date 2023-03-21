@@ -99,6 +99,14 @@ module.exports = function (env) {
                     ]
                 },
                 {
+                    test: /\.svg$/,
+                    type: 'asset/inline'
+                },
+                {
+                    test: /\.png$/,
+                    type: 'asset/inline'
+                },
+                {
                     test: /\.css$/,
                     use: [
                         // {

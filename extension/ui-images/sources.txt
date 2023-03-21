@@ -27,6 +27,20 @@ hash.svg
 hash_edited.svg
     Slightly edited version of "hash.svg"
 
+icon-login_edited.svg
+    Slightly edited version of https://thenounproject.com/term/user/134099/
+
+icon-settings.svg
+    https://www.iconfinder.com/icons/326699/settings_icon#size=128
+    https://www.iconfinder.com/icons/326699/download/svg/128
+
+icon-shiny-check-green.svg
+    https://www.iconfinder.com/icons/282474/check_done_ok_icon#size=128
+
+icon-smile.svg
+    https://www.iconfinder.com/icons/1608409/o_smile_icon#size=128
+    https://www.iconfinder.com/icons/1608409/download/svg/128
+
 line-wrap.svg
     https://www.iconfinder.com/icons/8726514/wrap_text_icon
     https://www.iconfinder.com/icons/8726514/download/svg/4096
@@ -41,6 +55,9 @@ link-external_edited-yellow.svg
 link-internal_edited-yellow.svg
     Slightly edited version of "link-external_edited-yellow.svg"
 
+logo-chrome.svg
+    https://upload.wikimedia.org/wikipedia/commons/e/e2/Google_Chrome_icon_%282011%29.svg
+
 logo-chrome-web-store.png
     https://ssl.gstatic.com/chrome/webstore/images/icon_48px.png
 
@@ -51,6 +68,9 @@ logo-chrome-grayscale.svg
     https://www.iconfinder.com/icons/2559815/download/svg/512
 logo-chrome-grayscale_edited.svg
     Slightly edited version of "logo-chrome-grayscale.svg"
+
+logo-extension-mirror-image.png
+    Mirror image of extension logo
 
 logo-facebook.svg
     https://upload.wikimedia.org/wikipedia/commons/c/c2/F_icon.svg
@@ -101,12 +121,22 @@ logo-opera.svg
 logo-thenounproject.svg
     https://static.production.thenounproject.com/img/favicons/safari-pinned-tab.142c7645151a.svg
 
+logo-twitter-black.png
+    https://dev.twitter.com/sites/default/files/images_documentation/bird_black_16_0.png
+
 mail.svg
     https://www.iconfinder.com/icons/1814108/email_envenlope_letter_mail_icon#size=128
     https://www.iconfinder.com/icons/1814108/download/svg/128
 
 mail_edited.svg
     Slightly edited version (using http://vectorpaint.yaks.co.nz/) of "mail.svg"
+
+pin.svg
+    https://www.iconfinder.com/icons/299069/pin_icon#size=128
+    https://www.iconfinder.com/icons/299069/download/svg/128
+
+pin_edited.svg
+    Slightly edited version of "pin.svg"
 
 plus.svg
     https://www.iconfinder.com/icons/103172/add_plus_icon#size=128
