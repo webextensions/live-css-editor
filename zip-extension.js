@@ -30,8 +30,8 @@ switch (whichBrowser) {
         process.exit(1);
 }
 
-if (fs.readFileSync(__dirname + '/extension/manifest.json', 'utf8') !== fs.readFileSync(__dirname + '/extension/manifest-chrome.json', 'utf8')) {
-    console.log(chalk.yellow('Warning: extension/manifest.json & extension/manifest-chrome.json do not match.\nThey must have same contents before zipping the extension with this script. Exiting.'));
+if (fs.readFileSync(__dirname + '/extension-dist/manifest.json', 'utf8') !== fs.readFileSync(__dirname + '/extension-dist/manifest-chrome.json', 'utf8')) {
+    console.log(chalk.yellow('Warning: extension-dist/manifest.json & extension-dist/manifest-chrome.json do not match.\nThey must have same contents before zipping the extension with this script. Exiting.'));
     process.exit(1);
 }
 
@@ -42,15 +42,15 @@ var archive = archiver('zip', {
 });
 
 var warnUserToCheckManifestFile = function (e) {
-    console.log(chalk.yellow('\nWarning: Due to this error, the file extension/manifest.json might have been modified/deleted. Please check manually.\n'));
+    console.log(chalk.yellow('\nWarning: Due to this error, the file extension-dist/manifest.json might have been modified/deleted. Please check manually.\n'));
     throw e;
 };
 
 // listen for all archive data to be written
 output.on('close', function() {
     try {
-        del.sync(['extension/manifest.json']);
-        cpFile.sync('extension/manifest-chrome.json', 'extension/manifest.json', {overwrite: false});
+        del.sync(['extension-dist/manifest.json']);
+        cpFile.sync('extension-dist/manifest-chrome.json', 'extension-dist/manifest.json', {overwrite: false});
 
         console.log(chalk.green('The extension has been zipped as: ' + zipFileName + ' (' + archive.pointer() + ' bytes)'));
     } catch (e) {
@@ -68,9 +68,9 @@ archive.on('error', function(e) {
 archive.pipe(output);
 
 try {
-    del.sync(['extension/manifest.json']);
+    del.sync(['extension-dist/manifest.json']);
     cpFile.sync(
-        'extension/' +
+        'extension-dist/' +
             (function () {
                 switch (whichBrowser) {
                     case 'chrome':  return 'manifest-chrome.json';
@@ -80,21 +80,22 @@ try {
                     default:        return 'manifest-chrome.json';
                 }
             }()),
-        'extension/manifest.json',
+        'extension-dist/manifest.json',
         {overwrite: false}
     );
 
     archive.glob('**/*', {
-        cwd: __dirname + '/extension',
+        cwd: __dirname + '/extension-dist',
         ignore: (function () {
             var pathsToIgnore = [
-                'manifest-generator.js',
+                // 'manifest-generator.js',
                 'manifest-chrome.json',
                 'manifest-edge.json',
                 'manifest-firefox.json',
                 'manifest-opera.json',
-                'ui-images/**/*.*',     // Exclude files in "ui-images" folder
-                'ui-images'             // Avoid "ui-images" folder from getting created
+                'manifest-puppeteer.json'
+                // 'ui-images/**/*.*',     // Exclude files in "ui-images" folder
+                // 'ui-images'             // Avoid "ui-images" folder from getting created
             ];
             if (whichBrowser !== 'opera') {
                 pathsToIgnore.push('scripts/3rdparty/sass/**');

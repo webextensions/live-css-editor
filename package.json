@@ -26,7 +26,7 @@
     "zip:extension:firefox": "node ./zip-extension.js firefox",
     "zip:extension:opera": "  node ./zip-extension.js opera",
     "zip:extension": "npm run zip:extension:chrome && npm run zip:extension:edge && npm run zip:extension:firefox && npm run zip:extension:opera",
-    "publish:build-and-zip": "npm run start:build:publish && npm run zip:extension",
+    "publish:build-and-zip": "npm run clean && npm run start:build:publish && npm run zip:extension",
     "get-latest-reviews": "node ./scripts/recipes/get-latest-reviews.js"
   },
   "dependencies": {
