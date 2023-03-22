@@ -1,4 +1,4 @@
-/* globals chrome, utils, sendMessageForGa */
+/* globals chrome */
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -30,6 +30,10 @@ import {
     APP_$_SEARCH_ICONS_CONFIGURATION_SET_ACCESS_KEY,
     APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET
 } from 'reducers/actionTypes.js';
+
+import { sendMessageForGa } from '../../../scripts/magicss/metrics/sendMessageForGa.js';
+
+import { utils } from '../../../scripts/utils.js';
 
 import commonStyles from '../../common-styles/common-styles.css';
 

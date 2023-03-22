@@ -9,6 +9,8 @@ import { utils } from '../utils.js';
 import { extLib } from '../chrome-extension-lib/ext-lib.js';
 import sourceMap from '../3rdparty/source-map.js';
 
+import { sendMessageForGa } from './metrics/sendMessageForGa.js';
+
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
     USER_PREFERENCE_AUTOCOMPLETE_CSS_PROPERTIES_AND_VALUES = 'autocomplete-css-properties-and-values',
@@ -290,17 +292,6 @@ var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, pa
 };
 window.chromeRuntimeMessageToBackgroundScript = chromeRuntimeMessageToBackgroundScript;
 
-var sendMessageForGa = function (payload) {
-    try {
-        chrome.runtime.sendMessage({
-            type: 'ga',
-            payload
-        });
-    } catch (e) {
-        // do nothing
-    }
-};
-window.sendMessageForGa = sendMessageForGa;
 var sendMessageForMetrics = function (payload) {
     try {
         chrome.runtime.sendMessage({
@@ -5109,5 +5100,3 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         });
     }
 }(jQuery));
-
-export { sendMessageForGa };

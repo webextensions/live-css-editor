@@ -5,7 +5,7 @@
 
 import { utils } from '../../utils.js';
 import { runMigration } from '../../migrate-storage.js';
-import { sendMessageForGa } from '../magicss.js';
+import { sendMessageForGa } from '../metrics/sendMessageForGa.js';
 import { amplify } from '../../3rdparty/amplify-store.js';
 
 // TODO: If remember text option is on, detect text change in another instance of this extension in some different tab

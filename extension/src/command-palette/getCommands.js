@@ -1,10 +1,12 @@
-/* global extLib, sendMessageForGa */
+/* global extLib */
 
 import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
 import {
     isCopyToClipboardSupported,
     copyToClipboard
 } from 'helpmate/dist/misc/copyToClipboard.js';
+
+import { sendMessageForGa } from '../../scripts/magicss/metrics/sendMessageForGa.js';
 
 import { utils } from '../../scripts/utils.js';
 
