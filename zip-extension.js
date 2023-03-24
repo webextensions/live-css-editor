@@ -38,7 +38,11 @@ if (fs.readFileSync(__dirname + '/extension-dist/manifest.json', 'utf8') !== fs.
 // create a file to stream archive data to.
 var output = fs.createWriteStream(__dirname + '/' + zipFileName);
 var archive = archiver('zip', {
-    zlib: { level: 9 } // Sets the compression level.
+    zlib: {
+        // Sets the compression level.
+        // level: 9 // More compression, but slower
+        level: 1    // Less compression, but faster
+    }
 });
 
 var warnUserToCheckManifestFile = function (e) {
