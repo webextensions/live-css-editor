@@ -781,6 +781,11 @@ const SearchOutput = function (props) {
         );
     }
 };
+SearchOutput.propTypes = {
+    flagConfigurationDone: PropTypes.bool.isRequired,
+    output: PropTypes.object.isRequired,
+    doSearch: PropTypes.func.isRequired
+};
 
 function mapStateToProps(state) {
     return {

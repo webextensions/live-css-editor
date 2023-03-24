@@ -224,6 +224,8 @@ const SearchIcons = function (props) {
 };
 SearchIcons.propTypes = {
     open: PropTypes.bool,
+    accessKey: PropTypes.string,
+    secret: PropTypes.string,
     dispatch: PropTypes.func
 };
 
