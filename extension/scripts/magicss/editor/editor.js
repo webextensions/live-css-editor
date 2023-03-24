@@ -1348,29 +1348,34 @@ var manageClassListForWidth = function ({ classList, width }) {
 
             await thisOb._createSyntaxHighlighting();
 
-            // Prevent scrolling on page body when mouse is scrolling '.section.tags .section-contents'
-            $(thisOb.container).bind('mousewheel DOMMouseScroll', function (e) {
-                var that = this,
-                    $that = $(that),
-                    delta = e.originalEvent.wheelDelta || -e.originalEvent.detail,
-                    vScrollBar;
+            // Note: For editor in external window, it was observed that mouse wheel scrolling was getting blocked due
+            //       to the following code. Didn't analyze the issue in the code below, but, since we don't need this
+            //       code for external window, we are skipping its execution in that case.
+            if (!window.flagEditorInExternalWindow) {
+                // Prevent scrolling on page body when mouse is scrolling '.section.tags .section-contents'
+                $(thisOb.container).bind('mousewheel DOMMouseScroll', function (e) {
+                    var that = this,
+                        $that = $(that),
+                        delta = e.originalEvent.wheelDelta || -e.originalEvent.detail,
+                        vScrollBar;
 
-                vScrollBar = $that.find('.CodeMirror-vscrollbar');
-                if (delta > 0) {
-                    if (vScrollBar[0].scrollTop === 0) {
-                        e.preventDefault();
-                    }
-                } else {
-                    var originalScroll = vScrollBar.scrollTop();
-                    vScrollBar.scrollTop(originalScroll + 1);
-                    var newScroll = vScrollBar.scrollTop();
-                    vScrollBar.scrollTop(originalScroll);
+                    vScrollBar = $that.find('.CodeMirror-vscrollbar');
+                    if (delta > 0) {
+                        if (vScrollBar[0].scrollTop === 0) {
+                            e.preventDefault();
+                        }
+                    } else {
+                        var originalScroll = vScrollBar.scrollTop();
+                        vScrollBar.scrollTop(originalScroll + 1);
+                        var newScroll = vScrollBar.scrollTop();
+                        vScrollBar.scrollTop(originalScroll);
 
-                    if (originalScroll === newScroll) {
-                        e.preventDefault();
+                        if (originalScroll === newScroll) {
+                            e.preventDefault();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         async initialize(options) {
