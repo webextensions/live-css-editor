@@ -22,7 +22,7 @@ import {
 
 import { useWindowSize } from '@react-hook/window-size';
 
-import { copyToClipboard } from 'helpmate/dist/misc/copyToClipboard.js';
+import { copyToClipboard } from 'helpmate/dist/browser/copyToClipboard.js';
 
 import { Loading } from 'Loading/Loading.js';
 

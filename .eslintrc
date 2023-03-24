@@ -23,6 +23,14 @@
         "import"
     ],
 
+    // https://eslint.org/docs/latest/use/configure/configuration-files#adding-shared-settings
+    "settings": {
+        "react": {
+            // https://github.com/jsx-eslint/eslint-plugin-react#configuration-legacy-eslintrc
+            "version": "detect"
+        }
+    },
+
     "rules": {
         "import/no-unresolved": [
             "error",

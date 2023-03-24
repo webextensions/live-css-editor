@@ -30,14 +30,14 @@
     "get-latest-reviews": "node ./scripts/recipes/get-latest-reviews.js"
   },
   "dependencies": {
-    "@babel/cli": "^7.20.7",
-    "@babel/core": "^7.20.12",
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.3",
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-react": "^7.18.6",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@mui/icons-material": "^5.11.9",
-    "@mui/material": "^5.11.9",
+    "@mui/icons-material": "^5.11.11",
+    "@mui/material": "^5.11.14",
     "@react-hook/window-size": "^3.1.1",
     "babel-loader": "^9.1.2",
     "classnames": "^2.3.2",
@@ -45,11 +45,11 @@
     "crypto-js": "^4.1.1",
     "css-loader": "^6.7.3",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
-    "helpmate": "^1.3.2",
+    "helpmate": "^1.5.0",
     "helpmate-css": "=0.1.0",
-    "immer": "^9.0.19",
-    "jquery": "^3.6.3",
-    "mini-css-extract-plugin": "^2.7.2",
+    "immer": "^9.0.21",
+    "jquery": "^3.6.4",
+    "mini-css-extract-plugin": "^2.7.5",
     "oauth-1.0a": "^2.2.6",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -61,10 +61,9 @@
     "react-roving-tabindex": "^3.2.0",
     "react-use": "^17.4.0",
     "redux": "^4.2.1",
-    "rooks": "^7.4.3",
+    "rooks": "^7.8.4",
     "socket.io": "=2.5.0",
-    "toastr": "^2.1.4",
-    "webpack-cli": "^4.10.0"
+    "toastr": "^2.1.4"
   },
   "devDependencies": {
     "@rbarilani/remove-source-map-url-webpack-plugin": "=1.1.0",
@@ -74,13 +73,14 @@
     "copy-webpack-plugin": "^11.0.0",
     "cp-file": "=9.1.0",
     "del": "=6.1.1",
-    "eslint": "^8.34.0",
+    "eslint": "^8.36.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-react": "^7.32.2",
     "git-hooks": "^1.1.10",
     "jsonfile": "^6.1.0",
     "node-notifier": "^10.0.1",
     "note-down": "^0.3.1",
-    "webpack": "^5.75.0"
+    "webpack": "^5.76.3",
+    "webpack-cli": "^4.10.0"
   }
 }

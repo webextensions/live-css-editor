@@ -4,7 +4,7 @@ import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
 import {
     isCopyToClipboardSupported,
     copyToClipboard
-} from 'helpmate/dist/misc/copyToClipboard.js';
+} from 'helpmate/dist/browser/copyToClipboard.js';
 
 import { sendMessageForGa } from '../../scripts/magicss/metrics/sendMessageForGa.js';
 
