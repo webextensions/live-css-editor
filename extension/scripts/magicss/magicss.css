@@ -206,11 +206,9 @@
 }
 
 .magicss-command-palette {
-    background-image: var(--icon-triple-dots) !important;
+    background-image: var(--icon-plus-yellow) !important;
     background-size: contain;
     background-repeat: no-repeat;
-    background-size: 16px 4px;
-    background-position: 0px 6px;
 }
 
 .magicss-external-window,
@@ -322,7 +320,7 @@
 :root {
     /* Source: chrome-extension://__MSG_@@extension_id__/ui-images/filename.ext */
 
-    --icon-triple-dots: url("../../ui-images/triple-dots_edited.svg");
+    --icon-plus-yellow: url("../../ui-images/icon-plus-yellow_edited.svg");
 
     --icon-pin: url("../../ui-images/pin_edited.svg");
 

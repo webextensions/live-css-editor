@@ -30,6 +30,12 @@ hash_edited.svg
 icon-login_edited.svg
     Slightly edited version of https://thenounproject.com/term/user/134099/
 
+icon-plus.svg
+    https://www.iconfinder.com/icons/9054962/bx_plus_medical_icon
+    https://www.iconfinder.com/icons/9054962/download/svg/4096
+icon-plus-yellow_edited.svg
+    Slightly edited version of "icon-plus.svg"
+
 icon-settings.svg
     https://www.iconfinder.com/icons/326699/settings_icon#size=128
     https://www.iconfinder.com/icons/326699/download/svg/128
