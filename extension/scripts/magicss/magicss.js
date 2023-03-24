@@ -3548,7 +3548,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             ) {
                                                 event.preventDefault();
 
-                                                setTimeout(async () => {
+                                                (async () => {
                                                     try {
                                                         await loadIfNotAvailable('main-bundle');
 
@@ -3572,7 +3572,35 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     } catch (e) {
                                                         handleUnrecoverableError(e);
                                                     }
-                                                });
+                                                })();
+                                            }
+
+                                            if (
+                                                (
+                                                    event.ctrlKey ||
+                                                    event.metaKey
+                                                ) &&
+                                                event.shiftKey &&
+                                                (
+                                                    event.key === 'r' ||
+                                                    event.key === 'R' ||
+                                                    event.code === 'KeyR' ||
+                                                    event.keyCode === 82 ||
+                                                    event.which === 82
+                                                )
+                                            ) {
+                                                event.preventDefault();
+
+                                                if (window.flagEditorInExternalWindow) {
+                                                    chromeRuntimeMessageIfRequired({
+                                                        type: 'magicss',
+                                                        subType: 'magicss-reload-all-css-resources'
+                                                    });
+                                                } else {
+                                                    reloadAllCSSResourcesInPage();
+                                                }
+
+                                                sendMessageForGa(['_trackEvent', 'fromKeyboardShortcut', 'reloadCssResources']);
                                             }
                                         }
                                     },
@@ -4046,7 +4074,20 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 }()),
                                 {
                                     name: 'reload-css-resources',
-                                    title: 'Reload all CSS resources',
+                                    title: (function () {
+                                        const titleText = 'Reload all CSS resources';
+                                        if (runningInAndroidFirefox) {
+                                            return titleText;
+                                        } else {
+                                            const flagMacOs = (navigator.platform || '').toLowerCase().indexOf('mac') >= 0 ? true : false;
+
+                                            if (flagMacOs) {
+                                                return `${titleText} <span style="color:#ccc">(Cmd + Shift + R)</span>`;
+                                            } else {
+                                                return `${titleText} <span style="color:#ccc">(Ctrl + Shift + R)</span>`;
+                                            }
+                                        }
+                                    }()),
                                     // hoverTitle: 'Reload all CSS resources',
                                     cls: 'magicss-reload-all-css-resources',
                                     uniqCls: 'magicss-reload-all-css-resources',
