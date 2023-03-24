@@ -64,8 +64,15 @@ const SearchIcons = function (props) {
         }
     };
 
+    const [flagAccessConfigObserved, setFlagAccessConfigObserved] = useState(accessKey && secret);
+    useEffect(() => {
+        if (accessKey && secret) {
+            setFlagAccessConfigObserved(true);
+        }
+    }, [accessKey, secret]);
+
     let showJoyride = true;
-    if (accessKey && secret) {
+    if (flagAccessConfigObserved) {
         showJoyride = false;
     }
 
