@@ -1,12 +1,12 @@
 /* global chrome */
 
 import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
-import { utils } from '../../../../scripts/utils.js';
+import { alertNote } from '../../../../scripts/utils/alertNote.js';
 
 const chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
 const notifyUser = function () {
-    utils.alertNote('Your change would apply next time onwards :-)', 2500);
+    alertNote('Your change would apply next time onwards :-)', 2500);
 };
 
 const isSassUiAllowed = (function () {

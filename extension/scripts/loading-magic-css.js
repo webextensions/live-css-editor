@@ -1,3 +1,3 @@
-import { utils } from './utils.js';
+import { alertNote } from './utils/alertNote.js';
 
-utils.alertNote('Loading Magic CSS ... Please wait :-)', 10000);
+alertNote('Loading Magic CSS ... Please wait :-)', 10000);

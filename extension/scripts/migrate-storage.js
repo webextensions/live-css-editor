@@ -2,7 +2,15 @@
 
 /* eslint-disable require-atomic-updates */
 
-import { utils } from './utils.js';
+import {
+    chromeStorageGet,
+    chromeStorageLocalGet,
+    chromeStorageSyncGet,
+    chromeStorageLocalSet,
+    chromeStorageSyncSet,
+    chromeStorageLocalRemove,
+    chromeStorageSyncRemove
+} from './utils/chromeStorage.js';
 
 var USER_PREFERENCE_STORAGE_MODE = 'storage-mode';
 
@@ -41,7 +49,7 @@ dataMigration.arrPropNamesForChromeStorage = dataMigration.arrPropNames.map(func
 var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
 var runMigration = async function () {
-    var whichStoreToUse = await utils.chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
+    var whichStoreToUse = await chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
     if (whichStoreToUse === 'localStorage') {
         // do nothing
     } else if (whichStoreToUse === 'chrome.storage.sync') {
@@ -57,9 +65,9 @@ var runMigration = async function () {
             let valueFromLocalStorage = localStorage[propNameForLocalStorage];
             let valueFromChromeStorage;
             if (chromeStorageType === 'chrome.storage.sync') {
-                valueFromChromeStorage = await utils.chromeStorageSyncGet(propNameForChromeStorage);
+                valueFromChromeStorage = await chromeStorageSyncGet(propNameForChromeStorage);
             } else {
-                valueFromChromeStorage = await utils.chromeStorageLocalGet(propNameForChromeStorage);
+                valueFromChromeStorage = await chromeStorageLocalGet(propNameForChromeStorage);
             }
 
             if (!valueFromChromeStorage) {
@@ -71,9 +79,9 @@ var runMigration = async function () {
                 }
                 if (json.data) {
                     if (chromeStorageType === 'chrome.storage.sync') {
-                        await utils.chromeStorageSyncSet(propNameForChromeStorage, json.data);
+                        await chromeStorageSyncSet(propNameForChromeStorage, json.data);
                     } else {
-                        await utils.chromeStorageLocalSet(propNameForChromeStorage, json.data);
+                        await chromeStorageLocalSet(propNameForChromeStorage, json.data);
                     }
                 }
             }
@@ -88,9 +96,9 @@ var runMigration = async function () {
             let valueFromLocalStorage = localStorage[propNameForLocalStorage];
             let valueFromChromeStorage;
             if (chromeStorageType === 'chrome.storage.sync') {
-                valueFromChromeStorage = await utils.chromeStorageSyncGet(propNameForChromeStorage);
+                valueFromChromeStorage = await chromeStorageSyncGet(propNameForChromeStorage);
             } else {
-                valueFromChromeStorage = await utils.chromeStorageLocalGet(propNameForChromeStorage);
+                valueFromChromeStorage = await chromeStorageLocalGet(propNameForChromeStorage);
             }
 
             if (!valueFromLocalStorage) {
@@ -103,9 +111,9 @@ var runMigration = async function () {
             }
             if (typeof valueFromChromeStorage !== 'undefined') {
                 if (chromeStorageType === 'chrome.storage.sync') {
-                    await utils.chromeStorageSyncRemove(propNameForChromeStorage);
+                    await chromeStorageSyncRemove(propNameForChromeStorage);
                 } else {
-                    await utils.chromeStorageLocalRemove(propNameForChromeStorage);
+                    await chromeStorageLocalRemove(propNameForChromeStorage);
                 }
             }
         }
@@ -117,33 +125,33 @@ var runMigration = async function () {
 
             let valueFromSourceStorage;
             if (sourceChromeStorageType === 'chrome.storage.sync') {
-                valueFromSourceStorage = await utils.chromeStorageSyncGet(propNameForChromeStorage);
+                valueFromSourceStorage = await chromeStorageSyncGet(propNameForChromeStorage);
             } else {
-                valueFromSourceStorage = await utils.chromeStorageLocalGet(propNameForChromeStorage);
+                valueFromSourceStorage = await chromeStorageLocalGet(propNameForChromeStorage);
             }
 
             let valueFromDestinationStorage;
             if (destinationChromeStorageType === 'chrome.storage.sync') {
-                valueFromDestinationStorage = await utils.chromeStorageSyncGet(propNameForChromeStorage);
+                valueFromDestinationStorage = await chromeStorageSyncGet(propNameForChromeStorage);
             } else {
-                valueFromDestinationStorage = await utils.chromeStorageLocalGet(propNameForChromeStorage);
+                valueFromDestinationStorage = await chromeStorageLocalGet(propNameForChromeStorage);
             }
 
             if (!valueFromDestinationStorage) {
                 if (valueFromSourceStorage) {
                     if (destinationChromeStorageType === 'chrome.storage.sync') {
-                        await utils.chromeStorageSyncSet(propNameForChromeStorage, valueFromSourceStorage);
+                        await chromeStorageSyncSet(propNameForChromeStorage, valueFromSourceStorage);
                     } else {
-                        await utils.chromeStorageLocalSet(propNameForChromeStorage, valueFromSourceStorage);
+                        await chromeStorageLocalSet(propNameForChromeStorage, valueFromSourceStorage);
                     }
                 }
             }
 
             if (typeof valueFromSourceStorage !== 'undefined') {
                 if (sourceChromeStorageType === 'chrome.storage.sync') {
-                    await utils.chromeStorageSyncRemove(propNameForChromeStorage);
+                    await chromeStorageSyncRemove(propNameForChromeStorage);
                 } else {
-                    await utils.chromeStorageLocalRemove(propNameForChromeStorage);
+                    await chromeStorageLocalRemove(propNameForChromeStorage);
                 }
             }
         }

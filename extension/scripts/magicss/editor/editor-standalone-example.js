@@ -1,4 +1,4 @@
-/* global utils */
+import { delayFunctionUntilTestFunction } from '../../../scripts/utils/delayFunctionUntilTestFunction.js';
 
 // Here goes the functional code
 (async function(){
@@ -15,7 +15,7 @@
 
     // Just a block
     {
-        await utils.delayFunctionUntilTestFunction({
+        await delayFunctionUntilTestFunction({
             tryLimit: 100,
             waitFor: 500,
             fnTest: function () {

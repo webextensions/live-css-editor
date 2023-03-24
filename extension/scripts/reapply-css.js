@@ -1,7 +1,10 @@
 /* global chrome */
 
 import { runMigration } from './migrate-storage.js';
-import { utils } from './utils.js';
+
+import { alertNote } from './utils/alertNote.js';
+import { chromeStorageGet } from './utils/chromeStorage.js';
+import { StyleTag } from './utils/StyleTag.js';
 
 import { amplify } from './3rdparty/amplify-store.js';
 
@@ -17,7 +20,7 @@ import { amplify } from './3rdparty/amplify-store.js';
 
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
-    var whichStoreToUse = await utils.chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
+    var whichStoreToUse = await chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
     if (whichStoreToUse === 'localStorage') {
         // do nothing
     } else if (whichStoreToUse === 'chrome.storage.sync') {
@@ -71,7 +74,7 @@ import { amplify } from './3rdparty/amplify-store.js';
         try {
             var id = 'MagiCSS-bookmarklet',
                 newStyleTagId = id + '-html-id',
-                newStyleTag = new utils.StyleTag({
+                newStyleTag = new StyleTag({
                     id: newStyleTagId,
                     parentTag: 'body',
                     attributes: [{
@@ -92,7 +95,7 @@ import { amplify } from './3rdparty/amplify-store.js';
             });
 
             if (showReapplyingStylesNotification) {
-                utils.alertNote(
+                alertNote(
                     'Activated styles provided in Magic CSS.<br/><span style="font-weight:normal;">Run Magic CSS extension to make any changes.</span>',
                     5000,
                     alertNoteConfig
@@ -103,7 +106,7 @@ import { amplify } from './3rdparty/amplify-store.js';
             console.log('An unexpected error was encountered by Magic CSS.');
             console.log(e);
             console.log('Kindly report this issue at:\n    https://github.com/webextensions/live-css-editor/issues');
-            utils.alertNote(
+            alertNote(
                 'Error: Unable to auto-apply Magic CSS styles' +
                 '<br/>Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>',
                 10000

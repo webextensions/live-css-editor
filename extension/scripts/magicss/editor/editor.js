@@ -4,6 +4,8 @@
 /* eslint require-atomic-updates: "off" */
 
 import { utils } from '../../utils.js';
+import { alertNote } from '../../utils/alertNote.js';
+import { waterfall } from '../../utils/waterfall.js';
 import { runMigration } from '../../migrate-storage.js';
 import { sendMessageForGa } from '../metrics/sendMessageForGa.js';
 import { amplify } from '../../3rdparty/amplify-store.js';
@@ -487,7 +489,7 @@ var manageClassListForWidth = function ({ classList, width }) {
                                             .replace(/>/g, '&gt;');
                                     };
 
-                                    utils.alertNote(
+                                    alertNote(
                                         [
                                             'Error! An error was encountered by Magic CSS extension while saving your changes.',
                                             '',
@@ -674,7 +676,7 @@ var manageClassListForWidth = function ({ classList, width }) {
                 options = thisOb.options;
 
             // If it already exists
-            if (options.id && utils.gEBI(options.id)) {
+            if (options.id && document.getElementById(options.id)) {
                 console.error('Error: Trying to create a new instance while an instance of "Editor" already exists with id: ' + options.id);
                 return;
             }
@@ -697,7 +699,7 @@ var manageClassListForWidth = function ({ classList, width }) {
             thisOb.options.editorOb = thisOb;
             thisOb.container = container;
 
-            utils.gEBTN('body')[0].appendChild(container);
+            document.getElementsByTagName('body')[0].appendChild(container);
 
             if (options.draggable) {
                 thisOb._makeDraggable();
@@ -1722,7 +1724,6 @@ var manageClassListForWidth = function ({ classList, width }) {
     window.Editor = Editor;
 
     try {
-        var waterfall = utils.waterfall;
         waterfall([
             // If there is an error, it would get caught in the first function itself
             // With the waterfall() function being used currently, errors in any of

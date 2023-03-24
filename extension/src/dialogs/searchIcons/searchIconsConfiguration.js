@@ -33,7 +33,7 @@ import {
 
 import { sendMessageForGa } from '../../../scripts/magicss/metrics/sendMessageForGa.js';
 
-import { utils } from '../../../scripts/utils.js';
+import { alertNote } from '../../../scripts/utils/alertNote.js';
 
 import commonStyles from '../../common-styles/common-styles.css';
 
@@ -258,7 +258,7 @@ const SearchIconsConfiguration = function (props) {
                                                             status: 'has-access'
                                                         });
 
-                                                        utils.alertNote('<span style="color:#3f51b5;">✔</span> The required permissions are already granted');
+                                                        alertNote('<span style="color:#3f51b5;">✔</span> The required permissions are already granted');
                                                     } else {
                                                         setExtAccessToNounProjectApi({
                                                             status: 'no-access'
@@ -273,7 +273,7 @@ const SearchIconsConfiguration = function (props) {
                                                                 // TODO: Check if this check for "chrome.runtime.lastError" is useful in some way
                                                                 if (chrome.runtime.lastError) {
                                                                     console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                                    utils.alertNote(
+                                                                    alertNote(
                                                                         'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
                                                                         10000
                                                                     );
@@ -284,9 +284,9 @@ const SearchIconsConfiguration = function (props) {
                                                                         status: 'has-access'
                                                                     });
 
-                                                                    utils.alertNote('<span style="color:#3f51b5;">✔</span> The required permissions have been granted');
+                                                                    alertNote('<span style="color:#3f51b5;">✔</span> The required permissions have been granted');
                                                                 } else if (status === 'request-not-granted') {
-                                                                    utils.alertNote('<span style="color:#800000;">✘</span> You need to provide permissions for Noun Project API Configuration', 10000);
+                                                                    alertNote('<span style="color:#800000;">✘</span> You need to provide permissions for Noun Project API Configuration', 10000);
                                                                 }
                                                             }
                                                         );
