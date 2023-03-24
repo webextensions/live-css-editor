@@ -294,7 +294,7 @@ const SearchIconsConfiguration = function (props) {
                                                 }
                                             );
                                         }}
-                                    >Allow this extension access</a> to api.thenounproject.com
+                                    >Click here</a> for allowing access to api.thenounproject.com
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
