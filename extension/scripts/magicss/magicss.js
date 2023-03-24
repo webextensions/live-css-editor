@@ -4047,6 +4047,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 {
                                     name: 'reload-css-resources',
                                     title: 'Reload all CSS resources',
+                                    // hoverTitle: 'Reload all CSS resources',
                                     cls: 'magicss-reload-all-css-resources',
                                     uniqCls: 'magicss-reload-all-css-resources',
                                     onclick: function (evt, editor) {

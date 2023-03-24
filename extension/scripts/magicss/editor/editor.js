@@ -1149,7 +1149,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                             iconOptions.icons = (iconOptions.icons || []).filter(function (item) { return !!item; });
                             iconOptions.icons.forEach(function (iconOptions) {
                                 tooltipContent.push(
-                                    '<li class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '">' +
+                                    '<li ' +
+                                        (iconOptions.hoverTitle ? ('title="' + iconOptions.hoverTitle + '" ') : '') +
+                                        'class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '"' +
+                                    '>' +
                                         '<a' +
                                         ' class="more-icons ' + (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + '"' +
                                         ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
