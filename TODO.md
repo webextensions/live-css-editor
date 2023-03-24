@@ -8,7 +8,6 @@
 * Optimize the data structure for improved usage of chrome.storage.sync
 * Provide a scalable way to share CSS across computers. The current approach of chrome.storage.sync is limited. May use a solution via a custom or third-party service like "GitHub Gist"
 * If technically possible, allow loading editor in a separate panel along with the extension icon
-* Add a keyboard shortcut to reload all CSS resources
 * Add support for customizing keyboard shortcuts
 * Add support for converting from/to HTML-and-CSS to Tailwind-HTML (https://github.com/webextensions/live-css-editor/issues/76)
 * Add support for converting from/to CSS to Tailwind classes (https://github.com/webextensions/live-css-editor/issues/76)
@@ -28,7 +27,7 @@
 * Make "Magic CSS" a standalone project, so that it can be added to an HTML page as well
 
 ## Compilation and Build
-* Add webpack based compilation (currently, it is split into too many files, which increases load time)
+* Add on-demand loading of some scripts via `webpack` with `await import()` based syntax. (Ref: [One](https://bugzilla.mozilla.org/show_bug.cgi?id=1536094) [Two](https://stackoverflow.com/questions/48104433/how-to-import-es6-modules-in-content-script-for-chrome-extension) [Three](https://stackoverflow.com/questions/54446283/modules-and-dynamic-importing-in-mozilla-addon))
 
 ## Refactoring
 * Refactor code

@@ -4,7 +4,8 @@
 **/node_modules
 
 extension/scripts/3rdparty/
-extension/dist/
+
+extension-dist/
 
 extension-chrome/
 extension-edge/

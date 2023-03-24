@@ -1,3 +1,5 @@
+@value magicss-dialog-search-icons from "./searchIcons.css";
+
 .magicss-dialog-search-icons {
     letter-spacing: normal; /* https://developer.mozilla.org/en-US/docs/Web */
 }
@@ -33,42 +35,42 @@
 }
 
 .magicss-dialog-search-icons table.magicss-icon-description * {
-    font-size: 12px;;
+    font-size: 12px;
 }
 
-.magicss-dialog-search-icons input.MuiInputBase-input {
+.magicss-dialog-search-icons :global(input.MuiInputBase-input) {
     font-size: 16px !important;        /* https://css-tricks.com/ */
     line-height: 19px !important;      /* https://code.visualstudio.com/ */
     letter-spacing: 0.15px !important; /* https://code.visualstudio.com/ */
 }
 
-.magicss-dialog-search-icons .MuiInputLabel-outlined {
+.magicss-dialog-search-icons :global(.MuiInputLabel-outlined) {
     font-size: 16px !important; /* https://code.visualstudio.com/ */
 }
 
-.magicss-dialog-search-icons .MuiInputBase-input {
+.magicss-dialog-search-icons :global(.MuiInputBase-input) {
     height: 19px !important;    /* https://code.visualstudio.com/ */
 }
 
-.magicss-dialog-search-icons .MuiOutlinedInput-notchedOutline span {
+.magicss-dialog-search-icons :global(.MuiOutlinedInput-notchedOutline) span {
     font-size: 12px !important; /* https://code.visualstudio.com/ */
 }
 
-.magicss-dialog-search-icons .MuiOutlinedInput-notchedOutline {
+.magicss-dialog-search-icons :global(.MuiOutlinedInput-notchedOutline) {
     background-color: unset !important; /* https://css-tricks.com/ */
 }
 /*
 // https://css-tricks.com/
-.magicss-dialog-search-icons .MuiOutlinedInput-inputMarginDense {
+.magicss-dialog-search-icons :global(.MuiOutlinedInput-inputMarginDense) {
     padding-top: 10.5px !important;
     padding-bottom: 10.5px !important;
 }
 */
-.magicss-dialog-search-icons input[type=text].MuiOutlinedInput-inputMarginDense {
+.magicss-dialog-search-icons :global(input[type=text].MuiOutlinedInput-inputMarginDense) {
     border-width: 0 !important;          /* https://css-tricks.com/ */
 }
 
-.magicss-dialog-search-icons input.MuiOutlinedInput-input[type=text] {
+.magicss-dialog-search-icons :global(input.MuiOutlinedInput-input[type=text]) {
     padding-left: 14px !important;             /* https://css-tricks.com/ */
     padding-right: 14px !important;            /* https://css-tricks.com/ */
 
@@ -93,7 +95,7 @@
     margin: 0 !important;                      /* https://www.linkedin.com/feed/ */
 }
 
-.magicss-dialog-search-icons .MuiFormLabel-root {
+.magicss-dialog-search-icons :global(.MuiFormLabel-root) {
     font-family: Arial, sans-serif !important; /* https://www.sitepoint.com/ */
 }
 
@@ -145,4 +147,13 @@
     border-width: 0 !important;                        /* https://sass-lang.com/ */
     padding: 0 !important;                             /* https://www.smashingmagazine.com/ */
     font-weight: normal !important;                    /* https://www.linkedin.com/feed/ */
+}
+
+.magicss-search-icons-copy-svg {
+}
+
+.magicss-search-icons-copy-svg {
+}
+
+.magicss-search-for-icons-input {
 }

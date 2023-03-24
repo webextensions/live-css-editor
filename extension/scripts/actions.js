@@ -1,4 +1,7 @@
-/* globals chrome, extLib, jQuery, remoteConfig */
+/* globals chrome, remoteConfig */
+
+import { extLib } from './chrome-extension-lib/ext-lib.js';
+import * as jQuery from './3rdparty/jquery.js';
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 const USER_PREFERENCE_THEME = 'theme';

@@ -10857,3 +10857,5 @@ CSSLint.addFormatter({
 
 return CSSLint;
 })();
+
+window.CSSLint = CSSLint;

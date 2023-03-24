@@ -1,4 +1,6 @@
-/* global utils, chrome */
+/* global chrome */
+
+import { alertNote } from '../../../scripts/utils/alertNote.js';
 
 // TODO: DUPLICATE: Move this to a common file (Used elsewhere with name "flagDevMode")
 const FLAG_DEV_MODE = (function () {
@@ -17,7 +19,7 @@ const FLAG_DEV_MODE = (function () {
 const chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
 const notifyUser = function () {
-    utils.alertNote('Your change would apply next time onwards :-)', 2500);
+    alertNote('Your change would apply next time onwards :-)', 2500);
 };
 
 export {

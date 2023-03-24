@@ -1,7 +1,14 @@
-/* global amplify: false, utils, CodeMirror, jQuery, chrome, runMigration, sendMessageForGa */
+/* global CodeMirror, jQuery, chrome */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
+
+import { utils } from '../../utils.js';
+import { alertNote } from '../../utils/alertNote.js';
+import { waterfall } from '../../utils/waterfall.js';
+import { runMigration } from '../../migrate-storage.js';
+import { sendMessageForGa } from '../metrics/sendMessageForGa.js';
+import { amplify } from '../../3rdparty/amplify-store.js';
 
 // TODO: If remember text option is on, detect text change in another instance of this extension in some different tab
 
@@ -482,7 +489,7 @@ var manageClassListForWidth = function ({ classList, width }) {
                                             .replace(/>/g, '&gt;');
                                     };
 
-                                    utils.alertNote(
+                                    alertNote(
                                         [
                                             'Error! An error was encountered by Magic CSS extension while saving your changes.',
                                             '',
@@ -669,7 +676,7 @@ var manageClassListForWidth = function ({ classList, width }) {
                 options = thisOb.options;
 
             // If it already exists
-            if (options.id && utils.gEBI(options.id)) {
+            if (options.id && document.getElementById(options.id)) {
                 console.error('Error: Trying to create a new instance while an instance of "Editor" already exists with id: ' + options.id);
                 return;
             }
@@ -692,7 +699,7 @@ var manageClassListForWidth = function ({ classList, width }) {
             thisOb.options.editorOb = thisOb;
             thisOb.container = container;
 
-            utils.gEBTN('body')[0].appendChild(container);
+            document.getElementsByTagName('body')[0].appendChild(container);
 
             if (options.draggable) {
                 thisOb._makeDraggable();
@@ -1142,7 +1149,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                             iconOptions.icons = (iconOptions.icons || []).filter(function (item) { return !!item; });
                             iconOptions.icons.forEach(function (iconOptions) {
                                 tooltipContent.push(
-                                    '<li class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '">' +
+                                    '<li ' +
+                                        (iconOptions.hoverTitle ? ('title="' + iconOptions.hoverTitle + '" ') : '') +
+                                        'class="' + (iconOptions.cls ? ('li-' + iconOptions.cls) : '') + ' ' + (iconOptions.uniqCls ? ('li-' + iconOptions.uniqCls) : '') + '"' +
+                                    '>' +
                                         '<a' +
                                         ' class="more-icons ' + (iconOptions.cls || '') + ' ' + (iconOptions.uniqCls || '') + '"' +
                                         ' href="' + (iconOptions.href || 'javascript:void(0)') + '"' +
@@ -1338,29 +1348,34 @@ var manageClassListForWidth = function ({ classList, width }) {
 
             await thisOb._createSyntaxHighlighting();
 
-            // Prevent scrolling on page body when mouse is scrolling '.section.tags .section-contents'
-            $(thisOb.container).bind('mousewheel DOMMouseScroll', function (e) {
-                var that = this,
-                    $that = $(that),
-                    delta = e.originalEvent.wheelDelta || -e.originalEvent.detail,
-                    vScrollBar;
+            // Note: For editor in external window, it was observed that mouse wheel scrolling was getting blocked due
+            //       to the following code. Didn't analyze the issue in the code below, but, since we don't need this
+            //       code for external window, we are skipping its execution in that case.
+            if (!window.flagEditorInExternalWindow) {
+                // Prevent scrolling on page body when mouse is scrolling '.section.tags .section-contents'
+                $(thisOb.container).bind('mousewheel DOMMouseScroll', function (e) {
+                    var that = this,
+                        $that = $(that),
+                        delta = e.originalEvent.wheelDelta || -e.originalEvent.detail,
+                        vScrollBar;
 
-                vScrollBar = $that.find('.CodeMirror-vscrollbar');
-                if (delta > 0) {
-                    if (vScrollBar[0].scrollTop === 0) {
-                        e.preventDefault();
-                    }
-                } else {
-                    var originalScroll = vScrollBar.scrollTop();
-                    vScrollBar.scrollTop(originalScroll + 1);
-                    var newScroll = vScrollBar.scrollTop();
-                    vScrollBar.scrollTop(originalScroll);
+                    vScrollBar = $that.find('.CodeMirror-vscrollbar');
+                    if (delta > 0) {
+                        if (vScrollBar[0].scrollTop === 0) {
+                            e.preventDefault();
+                        }
+                    } else {
+                        var originalScroll = vScrollBar.scrollTop();
+                        vScrollBar.scrollTop(originalScroll + 1);
+                        var newScroll = vScrollBar.scrollTop();
+                        vScrollBar.scrollTop(originalScroll);
 
-                    if (originalScroll === newScroll) {
-                        e.preventDefault();
+                        if (originalScroll === newScroll) {
+                            e.preventDefault();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         async initialize(options) {
@@ -1717,7 +1732,6 @@ var manageClassListForWidth = function ({ classList, width }) {
     window.Editor = Editor;
 
     try {
-        var waterfall = utils.waterfall;
         waterfall([
             // If there is an error, it would get caught in the first function itself
             // With the waterfall() function being used currently, errors in any of

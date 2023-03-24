@@ -18,6 +18,7 @@ import {
     APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
 } from 'reducers/actionTypes.js';
 
+import commonStyles from '../../common-styles/common-styles.css';
 import styles from './searchIcons.css';
 
 function mapStateToProps(state) {
@@ -63,8 +64,15 @@ const SearchIcons = function (props) {
         }
     };
 
+    const [flagAccessConfigObserved, setFlagAccessConfigObserved] = useState(accessKey && secret);
+    useEffect(() => {
+        if (accessKey && secret) {
+            setFlagAccessConfigObserved(true);
+        }
+    }, [accessKey, secret]);
+
     let showJoyride = true;
-    if (accessKey && secret) {
+    if (flagAccessConfigObserved) {
         showJoyride = false;
     }
 
@@ -111,9 +119,13 @@ const SearchIcons = function (props) {
 
                     className={
                         'magicss-base-element' + ' ' +
-                        styles['magicss-material-ui-dialog'] + ' ' +
+                        commonStyles['magicss-material-ui-dialog'] + ' ' +
+
+                        // TODO: Use only the `styles[]` one
+                        'magicss-dialog-search-icons' + ' ' +
                         styles['magicss-dialog-search-icons'] + ' ' +
-                        styles['magicss-dialog-search-icons-main']
+
+                        'magicss-dialog-search-icons-main'
                     }
                     PaperProps={{
                         style: {
@@ -150,6 +162,9 @@ const SearchIcons = function (props) {
                                     }}
                                     className={
                                         'magicss-joyride-configure-icon-search-api' + ' ' +
+
+                                        // TODO: Use only the `styles[]` one
+                                        'magicss-cog-wheel-icon' + ' ' +
                                         styles['magicss-cog-wheel-icon']
                                     }
                                     title="Configure Access"
@@ -216,6 +231,8 @@ const SearchIcons = function (props) {
 };
 SearchIcons.propTypes = {
     open: PropTypes.bool,
+    accessKey: PropTypes.string,
+    secret: PropTypes.string,
     dispatch: PropTypes.func
 };
 

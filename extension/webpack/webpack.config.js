@@ -4,6 +4,8 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveSourceMapUrlWebpackPlugin = require('@rbarilani/remove-source-map-url-webpack-plugin');
 
+const copyWebpackPlugin = require('copy-webpack-plugin');
+
 const notifyCompletionStatus = require('./utils/notify-completion-status.js');
 
 const projectRoot = path.join(__dirname, '..');
@@ -46,15 +48,19 @@ module.exports = function (env) {
     const build = env && env.build || {};
     const watch = build.watch || false;
     const buildFor = build.buildFor || 'publish'; // 'web' / 'development' / 'publish'
-    return {
+
+    const webpackConfig = {
         watch,
         mode: 'development',
         entry: {
             main: './src/main.js',
-            options: './src/options/options.js'
+            'background-magicss': './background-magicss.js',
+            options: './src/options/options.js',
+            'load-editor': './scripts/load-editor.js',
+            'load-reapply': './scripts/load-reapply.js'
         },
         output: {
-            path: __dirname + '/../dist',
+            path: __dirname + '/../../extension-dist/dist',
             publicPath: '/',
             filename: '[name].bundle.js',
             clean: true
@@ -96,6 +102,14 @@ module.exports = function (env) {
                     ]
                 },
                 {
+                    test: /\.svg$/,
+                    type: 'asset/inline'
+                },
+                {
+                    test: /\.png$/,
+                    type: 'asset/inline'
+                },
+                {
                     test: /\.css$/,
                     use: [
                         // {
@@ -128,7 +142,6 @@ module.exports = function (env) {
                                         if (
                                             // // TODO: Create a separate "vendor.css" or similarly named file
                                             resourcePath.includes('extension/scripts/') ||
-                                            resourcePath.includes('extension/dist/') ||
                                             resourcePath.includes('extension/src/node_modules/Loading/Loading.css')
                                         ) {
                                             return false;
@@ -157,44 +170,84 @@ module.exports = function (env) {
                 // modules ('crypto' in this case)
                 crypto: false
             }
-        },
-
-        plugins: [
-            // https://stackoverflow.com/questions/42196819/disable-hide-download-the-react-devtools/48324794#48324794
-            new webpack.DefinePlugin({
-                '__REACT_DEVTOOLS_GLOBAL_HOOK__': '({ isDisabled: true })'
-            }),
-
-            new MiniCssExtractPlugin({
-                filename: '[name].bundle.css'
-            }),
-
-            // This plugin is useful for removing (unwanted) sourcemap references. Which otherwise can lead to warnings in
-            // console.
-            // For example:
-            //     When including some libraries, there might be references to "//# sourceMappingURL=..." which might not be
-            //     possible to load / map-into-another-form for WebExtensions (Ref:
-            //     https://bugs.chromium.org/p/chromium/issues/detail?id=212374)
-            //
-            //     Without this plugin, if you import 'react-command-palette' (Ref:
-            //     https://www.unpkg.com/react-command-palette@0.16.2/dist/index.js) and the sourcemap reference from inside
-            //     that library file (eg: "//# sourceMappingURL=index.js.map") is not transformed into another appropriate
-            //     sourcemap (probably because sourcemaps are kept disabled when building for WebExtension), then it would
-            //     attempt to load the sourcemap from an invalid path which would lead to a warning in console.
-            new RemoveSourceMapUrlWebpackPlugin({
-                test: /main\.bundle\.js$/
-            }),
-
-            // https://webpack.js.org/api/compiler-hooks/#hooks
-            // https://github.com/kossnocorp/on-build-webpack/issues/5#issuecomment-432192978
-            // https://stackoverflow.com/questions/30312715/run-command-after-webpack-build/49786887#49786887
-            ({
-                apply: (compiler) => {
-                    compiler.hooks.done.tap('done', (stats) => {
-                        notifyCompletionStatus(stats);
-                    });
-                }
-            })
-        ]
+        }
     };
+
+    const plugins = [
+        // https://stackoverflow.com/questions/42196819/disable-hide-download-the-react-devtools/48324794#48324794
+        new webpack.DefinePlugin({
+            '__REACT_DEVTOOLS_GLOBAL_HOOK__': '({ isDisabled: true })'
+        }),
+
+        new MiniCssExtractPlugin({
+            filename: '[name].bundle.css'
+        }),
+
+        // This plugin is useful for removing (unwanted) sourcemap references. Which otherwise can lead to warnings in
+        // console.
+        // For example:
+        //     When including some libraries, there might be references to "//# sourceMappingURL=..." which might not be
+        //     possible to load / map-into-another-form for WebExtensions (Ref:
+        //     https://bugs.chromium.org/p/chromium/issues/detail?id=212374)
+        //
+        //     Without this plugin, if you import 'react-command-palette' (Ref:
+        //     https://www.unpkg.com/react-command-palette@0.16.2/dist/index.js) and the sourcemap reference from inside
+        //     that library file (eg: "//# sourceMappingURL=index.js.map") is not transformed into another appropriate
+        //     sourcemap (probably because sourcemaps are kept disabled when building for WebExtension), then it would
+        //     attempt to load the sourcemap from an invalid path which would lead to a warning in console.
+        new RemoveSourceMapUrlWebpackPlugin({
+            test: /main\.bundle\.js$/
+        }),
+
+        // https://webpack.js.org/api/compiler-hooks/#hooks
+        // https://github.com/kossnocorp/on-build-webpack/issues/5#issuecomment-432192978
+        // https://stackoverflow.com/questions/30312715/run-command-after-webpack-build/49786887#49786887
+        ({
+            apply: (compiler) => {
+                compiler.hooks.done.tap('done', (stats) => {
+                    notifyCompletionStatus(stats);
+                });
+            }
+        })
+    ];
+
+    // Just a block
+    {
+        const projectRoot = path.resolve(__dirname, '..', '..');
+        const extensionRoot = path.resolve(projectRoot, 'extension');
+        const targetExtensionDir = path.resolve(projectRoot, 'extension-dist');
+        plugins.push(
+            new copyWebpackPlugin(
+                {
+                    patterns: (function () {
+                        const arr = [
+                            { from: path.join(extensionRoot, 'README-FOR-EXTENSION-REVIEWERS.md'),        to: targetExtensionDir                           },
+                            { from: path.join(extensionRoot, 'external-editor.css'),                      to: targetExtensionDir                           },
+                            { from: path.join(extensionRoot, 'external-editor-base.js'),                  to: targetExtensionDir                           },
+                            { from: path.join(extensionRoot, '*.html'),                                   to: targetExtensionDir                           },
+                            { from: path.join(extensionRoot, 'manifest*.json'),                           to: targetExtensionDir                           },
+                            { from: path.join(extensionRoot, 'icons/*.png'),                              to: path.resolve(targetExtensionDir)             },
+                            { from: path.join(extensionRoot, 'icons/*.svg'),                              to: path.resolve(targetExtensionDir)             },
+                            { from: path.join(extensionRoot, '_locales'),                                 to: path.resolve(targetExtensionDir, '_locales') },
+                            { from: path.join(extensionRoot, 'scripts', 'appVersion.js'),                 to: path.resolve(targetExtensionDir, 'scripts', 'appVersion.js') },
+                            { from: path.join(extensionRoot, 'scripts', 'platformInfoOs-android.js'),     to: path.resolve(targetExtensionDir, 'scripts', 'platformInfoOs-android.js') },
+                            { from: path.join(extensionRoot, 'scripts', 'platformInfoOs-non-android.js'), to: path.resolve(targetExtensionDir, 'scripts', 'platformInfoOs-non-android.js') },
+                            {
+                                from: path.join(extensionRoot,       'scripts', '3rdparty', 'basic-less-with-sourcemap-support.browserified.js'),
+                                to: path.resolve(targetExtensionDir, 'scripts', '3rdparty', 'basic-less-with-sourcemap-support.browserified.js')
+                            },
+                        ];
+                        return arr;
+                    }())
+                },
+                {
+                    copyUnmodified: false
+                }
+            )
+        );
+    }
+
+    webpackConfig.plugins = plugins;
+
+    return webpackConfig;
 };

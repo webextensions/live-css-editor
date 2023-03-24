@@ -1,10 +1,14 @@
-/* global extLib, utils, sendMessageForGa */
+/* global extLib */
 
 import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
 import {
     isCopyToClipboardSupported,
     copyToClipboard
 } from 'helpmate/dist/misc/copyToClipboard.js';
+
+import { sendMessageForGa } from '../../scripts/magicss/metrics/sendMessageForGa.js';
+
+import { alertNote } from '../../scripts/utils/alertNote.js';
 
 import {
     APP_$_OPEN_SEARCH_ICONS
@@ -197,14 +201,14 @@ const getCommands = async (setRefreshedAt) => (
                     if (textValue) {
                         const flag = await copyToClipboard(textValue);
                         if (flag) {
-                            utils.alertNote('Copied code to clipboard', 2500);
+                            alertNote('Copied code to clipboard', 2500);
                             sendMessageForGa(['_trackEvent', 'commandPalette', 'copiedCodeToClipboard']);
                         } else {
-                            utils.alertNote('Failed to copy to clipboard', 2500);
+                            alertNote('Failed to copy to clipboard', 2500);
                             sendMessageForGa(['_trackEvent', 'commandPalette', 'failedToCopyCodeToClipboard']);
                         }
                     } else {
-                        utils.alertNote('There is no code to copy', 2500);
+                        alertNote('There is no code to copy', 2500);
                         sendMessageForGa(['_trackEvent', 'commandPalette', 'noCodeToCopyToClipboard']);
                     }
                 });

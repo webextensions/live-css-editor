@@ -1,6 +1,4 @@
 .magicss-dialog-search-icons {
-    -z-index: 2147483646 !important;
-    z-index: 2147483647 !important;
 }
 
 .magicss-dialog-search-icons {
@@ -32,21 +30,21 @@
 }
 
 /* FIXME: Make this selector specific to Magic CSS */
-#react-joyride-step-0  {
+:global(#react-joyride-step-0)  {
     direction: ltr;                                        /* https://www.google.ae/ */
 }
 
 /* FIXME: Make this selector specific to Magic CSS */
-#react-joyride-step-0 .react-joyride__tooltip button[data-action=primary] {
+:global(#react-joyride-step-0 .react-joyride__tooltip button[data-action=primary]) {
     font-weight: 400 !important;                           /* https://code.visualstudio.com/ */
     font-family: Arial, sans-serif !important;             /* https://css-tricks.com/ */
 }
 /* FIXME: Make this selector specific to Magic CSS */
-#react-joyride-step-0 .react-joyride__tooltip button[data-action=primary]:focus {
+:global(#react-joyride-step-0 .react-joyride__tooltip button[data-action=primary]:focus) {
     outline: -webkit-focus-ring-color auto 1px !important; /* https://www.smashingmagazine.com/ */
 }
 /* FIXME: Make this selector specific to Magic CSS */
-#react-joyride-step-0 .react-joyride__tooltip button[data-action=close] {
+:global(#react-joyride-step-0 .react-joyride__tooltip button[data-action=close]) {
     font-family: Arial, sans-serif !important;             /* https://getbootstrap.com/ */
 }
 
@@ -68,7 +66,7 @@
     width: unset; /* https://www.mozilla.org/en-US/ */
 }
 
-.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+:global(.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline) {
     border-color: #3f51b5 !important; /* https://css-tricks.com/ */
     border-width: 2px !important;     /* https://css-tricks.com/ */
 }

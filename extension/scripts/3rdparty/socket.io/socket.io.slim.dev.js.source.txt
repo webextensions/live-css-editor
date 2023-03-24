@@ -1,0 +1,3 @@
+node_modules/socket.io-client/dist/socket.io.slim.dev.js
+
+Note: Removed "sourceMappingURL"

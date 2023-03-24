@@ -1,9 +1,24 @@
-/* global jQuery, Sass, utils, sourceMap, chrome, CodeMirror, io, toastr, extLib */
+/* global jQuery, Sass, chrome, CodeMirror, io, toastr */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
+
+import { alertNote } from '../utils/alertNote.js';
+import { delayFunctionUntilTestFunction } from '../utils/delayFunctionUntilTestFunction.js';
+import { minifyCss } from '../utils/minifyCss.js';
+import { beautifyCss } from '../utils/beautifyCss.js';
+import { sassToCss } from '../utils/sassToCss.js';
+import { lessToCss } from '../utils/lessToCss.js';
+import {
+    addStyleTag,
+    StyleTag
+} from '../utils/StyleTag.js';
+import { extLib } from '../chrome-extension-lib/ext-lib.js';
+import sourceMap from '../3rdparty/source-map.js';
+
+import { sendMessageForGa } from './metrics/sendMessageForGa.js';
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
@@ -58,14 +73,14 @@ var handleUnrecoverableError = function (e) {
             console.info('An error was detected by Magic CSS!');
             console.trace(e);
             console.info('Warning: It appears that the Magic CSS extension has been updated or removed.\nYou may need to reload webpage & Magic CSS and try again.');
-            utils.alertNote(
+            alertNote(
                 'Warning: It appears that the Magic CSS extension has been updated or removed.<br />You may need to reload webpage & Magic CSS and try again.',
                 10000
             );
         } else {
             console.info('An error was detected by Magic CSS!');
             console.trace(e);
-            utils.alertNote(
+            alertNote(
                 'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
                 10000
             );
@@ -161,11 +176,20 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
     } else if (dependencyToLoad === 'main-bundle') {
         if (typeof window.reactMain === 'undefined') {
             if (window.treatAsNormalWebpage) {
-                const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
+                const [errCss] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
+                    treatAsNormalWebpage: true,
+                    source: pathDist + 'main.bundle.css'
+                });
+                const [errJs] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
                     treatAsNormalWebpage: true,
                     source: pathDist + 'main.bundle.js'
                 });
             } else {
+                await chromeRuntimeMessageToBackgroundScript({
+                    type: 'magicss-dependency',
+                    subType: 'load-dependency',
+                    payload: pathDist + 'main.bundle.css'
+                });
                 await chromeRuntimeMessageToBackgroundScript({
                     type: 'magicss-dependency',
                     subType: 'load-dependency',
@@ -277,16 +301,6 @@ var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, pa
 };
 window.chromeRuntimeMessageToBackgroundScript = chromeRuntimeMessageToBackgroundScript;
 
-var sendMessageForGa = function (payload) {
-    try {
-        chrome.runtime.sendMessage({
-            type: 'ga',
-            payload
-        });
-    } catch (e) {
-        // do nothing
-    }
-};
 var sendMessageForMetrics = function (payload) {
     try {
         chrome.runtime.sendMessage({
@@ -334,7 +348,7 @@ if (window.flagEditorInExternalWindow) {
 }
 
 if (window.flagEditorInExternalWindow) {
-    utils.alertNote.setup({
+    alertNote.setup({
         paddingRight: '25px',
         paddingBottom: '25px',
         paddingLeft: '25px',
@@ -553,7 +567,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     });
                 } else {
                     // The code should never reach here
-                    utils.alertNote(
+                    alertNote(
                         'Unexpected scenario occurred in reloading some CSS resources.' +
                         '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
                         10000
@@ -596,13 +610,13 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             async function callback (err) {
                 if (err) {
                     // The user cancelled watching files
-                    utils.alertNote('You cancelled watching CSS files for changes');
+                    alertNote('You cancelled watching CSS files for changes');
                     await editor.userPreference('watching-css-files', 'no');
                 } else {
                     // TODO: This code is duplicated elsewhere
                     if (!socketOb.flagWatchingCssFiles) {
                         socketOb.flagWatchingCssFiles = true;
-                        utils.alertNote(
+                        alertNote(
                             'Watching CSS files for changes.' +
                             '<br />' +
                             '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
@@ -630,7 +644,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             // TODO: This code is duplicated elsewhere
             if (!socketOb.flagWatchingCssFiles) {
                 socketOb.flagWatchingCssFiles = true;
-                utils.alertNote(
+                alertNote(
                     'Watching CSS files for changes.' +
                     '<br />' +
                     '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
@@ -651,7 +665,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             await socketOb._connectServerHelper(editor, async function () {
                 if (!socketOb.flagWatchingCssFiles) {
                     socketOb.flagWatchingCssFiles = true;
-                    utils.alertNote(
+                    alertNote(
                         'Watching CSS files for changes.' +
                         '<br />' +
                         '<span style="font-weight:normal;">When a file gets saved, live-css server notifies Magic CSS to reload the CSS file\'s &lt;link&gt; tag.</span>',
@@ -671,7 +685,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
     socketOb._updateUiMentioningNotWatchingCssFiles = async function (editor, asyncCallback) {
         if (socketOb.flagWatchingCssFiles) {
             socketOb.flagWatchingCssFiles = false;
-            utils.alertNote('Stopped watching CSS files for changes');
+            alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
             editor.adjustUiPosition();
             await editor.userPreference('watching-css-files', 'no');
@@ -702,7 +716,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             // Cases where this condition would be true:
             //     - When the <body> element itself is implemented as shadow-dom. eg: http://www.firstpost.com (when this change was initially added)
             //     - If the user tries to use following CSS via this extension: #MagiCSS-bookmarklet {display: none !important;}
-            utils.alertNote(
+            alertNote(
                 'Error: Unable to load Magic CSS properly' +
                 '<br/>Kindly report this issue at <a target="_blank" href="https://github.com/webextensions/live-css-editor/issues">GitHub repository for Magic CSS</a>',
                 10000
@@ -717,7 +731,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         if (window.MagiCSSEditor === strAboutToBeInstantiated) {
             // do nothing
         } else {
-            utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
+            alertNote.hide();     // Hide the note which says that Magic CSS is loading
 
             setTimeout(async function () {
                 // 'Magic CSS window is already there. Repositioning it.'
@@ -832,7 +846,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         if (cssText) {
             var id = 'MagiCSS-bookmarklet',
                 newStyleTagId = id + '-html-id',
-                newStyleTag = new utils.StyleTag({
+                newStyleTag = new StyleTag({
                     id: newStyleTagId,
                     parentTag: 'body',
                     attributes: [{
@@ -976,7 +990,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         var successCount = 0,
             errorCount = 0;
         var checkCompletion = function () {
-            utils.alertNote(
+            alertNote(
                 '<span style="font-weight:normal;">' +
                     htmlEscape('Reloading active CSS <link> tags.') +
                 '</span>' +
@@ -992,7 +1006,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             msg = htmlEscape(errorCount + ' of the CSS <link> tags failed to reload.');
                         }
                         msg += '<br/><span style="font-weight:normal;">Please check availability of the CSS resources included in this page.</span>';
-                        utils.alertNote(
+                        alertNote(
                             msg,
                             undefined,
                             {
@@ -1002,9 +1016,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         );
                     } else {
                         if (successCount === 1) {
-                            utils.alertNote(htmlEscape(successCount + ' active CSS <link> tag got reloaded successfully :-)'));
+                            alertNote(htmlEscape(successCount + ' active CSS <link> tag got reloaded successfully :-)'));
                         } else {
-                            utils.alertNote(htmlEscape(successCount + ' active CSS <link> tags got reloaded successfully :-)'));
+                            alertNote(htmlEscape(successCount + ' active CSS <link> tags got reloaded successfully :-)'));
                         }
                     }
                 }, 750);
@@ -1058,7 +1072,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 $newLink.attr('href', newHref);
             });
         } else {
-            utils.alertNote(
+            alertNote(
                 ((extraInfo && extraInfo.noMatchesPrepend) ? (extraInfo.noMatchesPrepend + '<br />') : '') +
                 htmlEscape('There are no active CSS <link> tags that need to be reloaded.')
             );
@@ -1300,13 +1314,13 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 "files": files
             }),
             error: function () {
-                utils.alertNote('An unexpected error has occured.<br />We could not reach GitHub Gist.', 10000);
+                alertNote('An unexpected error has occured.<br />We could not reach GitHub Gist.', 10000);
             },
             success: function (json, textStatus) {
                 if (textStatus === 'success') {
                     cb(json.html_url);
                 } else {
-                    utils.alertNote('An unexpected error has occured.<br />We could not access GitHub Gist.', 10000);
+                    alertNote('An unexpected error has occured.<br />We could not access GitHub Gist.', 10000);
                 }
             }
         });
@@ -1317,9 +1331,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
         return function (text, languageMode) {
             text = $.trim(text);
             if (text === '') {
-                utils.alertNote('Please type some code to be shared', 5000);
+                alertNote('Please type some code to be shared', 5000);
             } else if (lastMailedValue === text) {
-                utils.alertNote(lastSuccessNote, 20000);
+                alertNote(lastSuccessNote, 20000);
             } else {
                 var wishToContinue = window.confirm('The code you have entered would be uploaded to\n        https://gist.github.com/\nand a link would be generated for sharing.\n\nDo you wish to continue?');
                 if (!wishToContinue) {
@@ -1333,9 +1347,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         '<br/>Share code: <a href="' + 'mailto:?subject=Use this code for styling - ' + gistUrl + '&body=' +
                         encodeURIComponent(text.replace(/\t/g,'  ').substr(0,140) + '\r\n...\r\n...\r\n\r\n' + gistUrl + '\r\n\r\n-- ' + strCreatedVia + '') +
                         '">Send e-mail</a>';
-                    utils.alertNote(lastSuccessNote, 10000);
+                    alertNote(lastSuccessNote, 10000);
                 });
-                utils.alertNote('Request initiated. It might take a few moments. Please wait.', 5000);
+                alertNote('Request initiated. It might take a few moments. Please wait.', 5000);
             }
         };
     }());
@@ -1353,11 +1367,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
     var showCSSSelectorMatches = function (cssSelector, editor) {
         var cssSelectorString = (cssSelector && cssSelector.originalSelector) || cssSelector;
         if (!cssSelectorString) {
-            utils.alertNote.hide();
+            alertNote.hide();
         }
 
         if (!editor.styleHighlightingSelector) {
-            editor.styleHighlightingSelector = new utils.StyleTag({
+            editor.styleHighlightingSelector = new StyleTag({
                 id: 'magicss-highlight-by-selector',
                 parentTag: 'body',
                 attributes: [{
@@ -1396,9 +1410,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             var cssSelectorToShow = htmlEscape(trunc(cssSelectorString, 100));
             var sourcesToShow = (cssSelector && cssSelector.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(decodeURIComponent(cssSelector.sources)) + '</span></span>') : '';
             if (count) {
-                utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
+                alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
             } else {
-                utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>' + sourcesToShow, 2500);
+                alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>' + sourcesToShow, 2500);
             }
         }
     };
@@ -1726,7 +1740,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
     var updateUiMentioningNotWatchingCssFiles = async function (editor) {
         if (socketOb.flagWatchingCssFiles) {
             socketOb.flagWatchingCssFiles = false;
-            utils.alertNote('Stopped watching CSS files for changes');
+            alertNote('Stopped watching CSS files for changes');
             $(editor.container).removeClass('watching-css-files');
             editor.adjustUiPosition();
         }
@@ -1878,7 +1892,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             sassCompileOptions.indentedSyntax = true;
         }
 
-        await utils.delayFunctionUntilTestFunction({
+        await delayFunctionUntilTestFunction({
             tryLimit: 100,
             waitFor: 500,
             fnTest: function () {
@@ -1897,36 +1911,36 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 const remoteConfig = await getConfig();
                 await initializeInstanceInfo();
 
-                var beautifyCSS = async function (cssCode) {
+                var beautifyCssWrapper = async function (cssCode) {
                     var options = {};
                     if (await window.MagiCSSEditor.userPreference('use-tab-for-indentation') === 'yes') {
                         options.useTabs = true;
                     } else {
                         options.useSpaceCount = parseInt(await window.MagiCSSEditor.userPreference('indentation-spaces-count'), 10) || 4;
                     }
-                    return utils.beautifyCSS(cssCode, options);
+                    return beautifyCss(cssCode, options);
                 };
 
                 window.execBeautifyCssAction = async function (editor) {
                     var textValue = editor.getTextValue();
                     if (!textValue.trim()) {
-                        utils.alertNote('Please type some code to be beautified', 5000);
+                        alertNote('Please type some code to be beautified', 5000);
                     } else {
-                        var beautifiedCSS = await beautifyCSS(textValue);
-                        if (textValue.trim() !== beautifiedCSS.trim()) {
-                            await editor.setTextValue(beautifiedCSS);
+                        var beautifiedCss = await beautifyCssWrapper(textValue);
+                        if (textValue.trim() !== beautifiedCss.trim()) {
+                            await editor.setTextValue(beautifiedCss);
                             await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
                             chromeRuntimeMessageIfRequired({
                                 type: 'magicss',
                                 subType: 'update-code-and-apply-css',
                                 payload: {
-                                    cssCodeToUse: beautifiedCSS
+                                    cssCodeToUse: beautifiedCss
                                 }
                             });
 
-                            utils.alertNote('Your code has been beautified :-)', 5000);
+                            alertNote('Your code has been beautified :-)', 5000);
                         } else {
-                            utils.alertNote('Your code already looks beautiful :-)', 5000);
+                            alertNote('Your code already looks beautiful :-)', 5000);
                         }
                     }
                     editor.focus();
@@ -1946,9 +1960,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         });
 
-                        utils.alertNote('Please type some code to be minified', 5000);
+                        alertNote('Please type some code to be minified', 5000);
                     } else {
-                        var minifiedCSS = utils.minifyCSS(textValue);
+                        var minifiedCSS = minifyCss(textValue);
                         if (textValue !== minifiedCSS) {
                             await editor.setTextValue(minifiedCSS);
                             await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
@@ -1961,9 +1975,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 }
                             });
 
-                            utils.alertNote('Your code has been minified' + noteForUndo, 5000);
+                            alertNote('Your code has been minified' + noteForUndo, 5000);
                         } else {
-                            utils.alertNote('Your code is already minified', 5000);
+                            alertNote('Your code is already minified', 5000);
                         }
                     }
                     editor.focus();
@@ -2023,7 +2037,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             subType: 'enable-css-linting'
                         });
                     } else {
-                        utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                        alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                     }
                     editor.focus();
                 };
@@ -2036,7 +2050,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             subType: 'disable-css-linting'
                         });
                     } else {
-                        utils.alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
+                        alertNote('Please switch to editing code in CSS mode to enable this feature', 5000);
                     }
                     editor.focus();
                 };
@@ -2048,7 +2062,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         try {
                             var href = chrome.runtime.getURL('options.html');
                             if (href) {
-                                utils.alertNote(
+                                alertNote(
                                     'Configure more options for Magic CSS by going to the following address in a new tab:<br />' + href,
                                     15000
                                 );
@@ -2065,12 +2079,12 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         var lessCode = editor.getTextValue();
                         if (!lessCode.trim()) {
                             await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                            utils.alertNote('Please type some LESS code to use this feature', 5000);
+                            alertNote('Please type some LESS code to use this feature', 5000);
                             editor.focus();
                         } else {
-                            utils.lessToCSS(lessCode, async function asyncCallback(err, cssCode) {
+                            lessToCss(lessCode, async function asyncCallback(err, cssCode) {
                                 if (err) {
-                                    utils.alertNote(
+                                    alertNote(
                                         'Invalid LESS syntax.' +
                                         '<br />Error in line: ' + err.line + ' column: ' + err.column +
                                         '<br />Error message: ' + err.message,
@@ -2079,17 +2093,17 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     highlightErroneousLineTemporarily(editor, err.line - 1);
                                     editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                 } else {
-                                    let minifiedLessCode = lessCode ? utils.minifyCSS(lessCode) : '';
-                                    let beautifiedLessCode = minifiedLessCode ? await beautifyCSS(minifiedLessCode) : '';
-                                    let minifiedCssCode = cssCode ? utils.minifyCSS(cssCode) : '';
-                                    cssCode = minifiedCssCode ? await beautifyCSS(minifiedCssCode) : '';
+                                    let minifiedLessCode = lessCode ? minifyCss(lessCode) : '';
+                                    let beautifiedLessCode = minifiedLessCode ? await beautifyCssWrapper(minifiedLessCode) : '';
+                                    let minifiedCssCode = cssCode ? minifyCss(cssCode) : '';
+                                    cssCode = minifiedCssCode ? await beautifyCssWrapper(minifiedCssCode) : '';
 
                                     if (cssCode === beautifiedLessCode) {
-                                        utils.alertNote('Your code is already CSS compatible', 5000);
+                                        alertNote('Your code is already CSS compatible', 5000);
                                     } else {
                                         await editor.setTextValue(cssCode);
                                         await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
+                                        alertNote('Your code has been converted from Less to CSS :-)' + noteForUndo, 5000);
                                     }
                                 }
                                 editor.focus();
@@ -2099,12 +2113,12 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         var sassCode = editor.getTextValue();
                         if (!sassCode.trim()) {
                             await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                            utils.alertNote('Please type some SASS code to use this feature', 5000);
+                            alertNote('Please type some SASS code to use this feature', 5000);
                             editor.focus();
                         } else {
-                            utils.sassToCSS(sassCode, sassCompileOptions, async function asyncCallback(err, cssCode) {
+                            sassToCss(sassCode, sassCompileOptions, async function asyncCallback(err, cssCode) {
                                 if (err) {
-                                    utils.alertNote(
+                                    alertNote(
                                         'Invalid SASS syntax.' +
                                         '<br />Error in line: ' + err.line + ' column: ' + err.column +
                                         '<br />Error message: ' + err.message,
@@ -2113,24 +2127,24 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     highlightErroneousLineTemporarily(editor, err.line - 1);
                                     editor.setCursor({line: err.line - 1, ch: err.column}, {pleaseIgnoreCursorActivity: true});
                                 } else {
-                                    let minifiedSassCode = sassCode ? utils.minifyCSS(sassCode) : '';
-                                    let beautifiedSassCode = minifiedSassCode ? await beautifyCSS(minifiedSassCode) : '';
-                                    let minifiedCssCode = cssCode ? utils.minifyCSS(cssCode) : '';
-                                    cssCode = minifiedCssCode ? await beautifyCSS(minifiedCssCode) : '';
+                                    let minifiedSassCode = sassCode ? minifyCss(sassCode) : '';
+                                    let beautifiedSassCode = minifiedSassCode ? await beautifyCssWrapper(minifiedSassCode) : '';
+                                    let minifiedCssCode = cssCode ? minifyCss(cssCode) : '';
+                                    cssCode = minifiedCssCode ? await beautifyCssWrapper(minifiedCssCode) : '';
 
                                     if (cssCode === beautifiedSassCode) {
-                                        utils.alertNote('Your code is already CSS compatible', 5000);
+                                        alertNote('Your code is already CSS compatible', 5000);
                                     } else {
                                         await editor.setTextValue(cssCode);
                                         await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
+                                        alertNote('Your code has been converted from Sass to CSS :-)' + noteForUndo, 5000);
                                     }
                                 }
                                 editor.focus();
                             });
                         }
                     } else {
-                        utils.alertNote('Please switch to editing code in Less/Sass mode to enable this feature', 5000);
+                        alertNote('Please switch to editing code in Less/Sass mode to enable this feature', 5000);
                         editor.focus();
                     }
                 };
@@ -2165,7 +2179,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         // Kind of HACK: Show note after a timeout, otherwise the note about matching existing selector might open up and override this
                         //               and trying to solve it without timeout would be a bit tricky because currently, in CodeMirror, the select event
                         //               always gets fired
-                        setTimeout(function() { utils.alertNote(errorMessageHTML, 10000); }, 0);
+                        setTimeout(function() { alertNote(errorMessageHTML, 10000); }, 0);
                         console.log(errorMessageConsole);
                         console.log(e);     // The user might wish to add these detais for the report/issue in GitHub about this error.
                     }
@@ -2207,7 +2221,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             // do nothing
                         } else {
                             removeMouseOverDomElementEffect();
-                            utils.alertNote.hide();     // Hide the suggestions shown previously (for other elements)
+                            alertNote.hide();     // Hide the suggestions shown previously (for other elements)
                             if (currentNode.get(0) !== $('#MagiCSS-bookmarklet').get(0) && !$(currentNode).parents('#MagiCSS-bookmarklet').length) {
                                 window.clearTimeout(timerActiveSelectorCalculation);
                                 timerActiveSelectorCalculation = window.setTimeout(function () {
@@ -2235,7 +2249,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     // $(currentNode).attr('title', title);
                                     title += '<span style="font-weight:normal;">' + '<br />' + matchingAndSuggestedSelectors.join('<br />') + '</span>';
 
-                                    utils.alertNote(
+                                    alertNote(
                                         title,
                                         5000,
                                         {
@@ -2441,7 +2455,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 var id = 'MagiCSS-bookmarklet',
                     newStyleTagId = id + '-html-id',
-                    newStyleTag = new utils.StyleTag({
+                    newStyleTag = new StyleTag({
                         id: newStyleTagId,
                         parentTag: 'body',
                         attributes: [{
@@ -2494,7 +2508,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     } else {
                                         $fileEditStatus.html('✘ Save failed');
 
-                                        utils.alertNote(
+                                        alertNote(
                                             '<span style="font-weight:normal">Your recent changes are not saved. Please try again.</span>' +
                                             '<br/>Probable cause: <span style="font-weight:normal">live-css server encountered an unexpected error in saving the file</span>',
                                             7500,
@@ -2519,7 +2533,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 if (err) {
                                     // FIXME: The following setTimeout is a temporary fix for alertNote getting hidden by 'delayedcursormove()'
                                     setTimeout(function () {
-                                        utils.alertNote(
+                                        alertNote(
                                             'Invalid LESS syntax.' +
                                             '<br />Error in line: ' + err.line + ' column: ' + err.column +
                                             '<br />Error message: ' + err.message,
@@ -2565,7 +2579,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     var err = result;
                                     // FIXME: The following setTimeout is a temporary fix for alertNote getting hidden by 'delayedcursormove()'
                                     setTimeout(function () {
-                                        utils.alertNote(
+                                        alertNote(
                                             'Invalid SASS syntax.' +
                                             '<br />Error in line: ' + err.line + ' column: ' + err.column +
                                             '<br />Error message: ' + err.message,
@@ -2576,7 +2590,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 } else {
                                     // FIXME: The following setTimeout is a temporary fix for alertNote getting hidden by 'delayedcursormove()'
                                     setTimeout(function () {
-                                        utils.alertNote(
+                                        alertNote(
                                             'Unexpected error in parsing Sass.' +
                                             '<br />Please report this bug at <a href="https://github.com/webextensions/live-css-editor/issues">https://github.com/webextensions/live-css-editor/issues</a>',
                                             10000
@@ -2601,7 +2615,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 var sassJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js',
                                     preRunReplace = [{oldText: 'this,function', newText: 'window,function'}];   // Required for making Sass load in Firefox - Reference: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Xray_vision
                                 if (!options.skipNotifications) {
-                                    utils.alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
+                                    alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
                                 }
 
                                 if (window.flagEditorInExternalWindow) {
@@ -2610,7 +2624,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     script.onload = function () {
                                         window.isActiveLoadSassRequest = false;
                                         if (!options.skipNotifications) {
-                                            utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                            alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
                                         }
                                         setTimeout(function () {
                                             // Ensure that getLanguageMode() is still 'sass'
@@ -2621,7 +2635,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     };
                                     script.onerror = function () {
                                         window.isActiveLoadSassRequest = false;
-                                        utils.alertNote(
+                                        alertNote(
                                             'Error! Failed to load Sass parser from:<br />' + sassJsUrl + '<br />Please ensure that you are connected to internet and Magic CSS will try again to load it when you make any code changes.',
                                             10000
                                         );
@@ -2638,18 +2652,18 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 window.isActiveLoadSassRequest = false;
                                                 if (chrome.runtime.lastError) {
                                                     console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                    utils.alertNote(
+                                                    alertNote(
                                                         'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
                                                         10000
                                                     );
                                                 } else if (error) {
-                                                    utils.alertNote(
+                                                    alertNote(
                                                         'Error! Failed to load Sass parser from:<br />' + sassJsUrl + '<br />Please ensure that you are connected to internet and Magic CSS will try again to load it when you make any code changes.',
                                                         10000
                                                     );
                                                 } else {
                                                     if (!options.skipNotifications) {
-                                                        utils.alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
+                                                        alertNote('Loaded Sass parser from:<br />' + sassJsUrl, 2000);
                                                     }
                                                     setTimeout(function () {
                                                         // Ensure that getLanguageMode() is still 'sass'
@@ -2904,7 +2918,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 .fadeOut(100)
                                 .fadeIn(750);
                             if (!options.skipNotifications) {
-                                utils.alertNote(
+                                alertNote(
                                     'Auto-save changes for: <span style="font-weight:normal;">' + htmlEscape(file.path) + '</span>',
                                     5000,
                                     {
@@ -2947,7 +2961,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             editor.cm.setOption('mode', 'text/x-less');
                             await setCodeMirrorCSSLinting(editor, 'disable');
                             if (!options.skipNotifications) {
-                                utils.alertNote('Now editing code in LESS mode', 5000);
+                                alertNote('Now editing code in LESS mode', 5000);
                             }
                             sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'less']);
                         } else if (newLanguageMode === 'sass') {
@@ -2956,7 +2970,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             editor.cm.setOption('mode', 'text/x-scss');
                             await setCodeMirrorCSSLinting(editor, 'disable');
                             if (!options.skipNotifications) {
-                                utils.alertNote('Now editing code in SASS mode', 5000);
+                                alertNote('Now editing code in SASS mode', 5000);
                             }
                             sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'sass']);
                         } else {
@@ -2964,7 +2978,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             await editor.userPreference('language-mode', 'css');
                             editor.cm.setOption('mode', 'text/css');
                             if (!options.skipNotifications) {
-                                utils.alertNote('Now editing code in CSS mode', 5000);
+                                alertNote('Now editing code in CSS mode', 5000);
                             }
                             sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'css']);
                         }
@@ -3158,7 +3172,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         }
 
-                        utils.alertNote(
+                        alertNote(
                             (
                                 runningInAndroidFirefox ?
                                     'Select an element in the page to generate its CSS selector' :
@@ -3172,7 +3186,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                 var focusChangeInformationLoggedInConsoleJustNow = false;
                 var informUserAboutProblematicFocus = function () {
-                    utils.alertNote(
+                    alertNote(
                         'Typing in the Magic CSS editor may not work well.' +
                         '<br />It appears that some JavaScript code running on the page steals focus.' +
                         '<br />Check the "Console" in "Developer tools" for more information.',
@@ -3326,7 +3340,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             onCssHintShownForSelector: function () {    // As per current CodeMirror/css-hint architecture,
                                                                         // "select" is called before "shown".
                                                                         // The "select" operation would also show the number  e are hiding the alertNote
-                                utils.alertNote.hide();
+                                alertNote.hide();
                             }
                         },
                         /* */
@@ -3429,9 +3443,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 var cssSelectorToShow = htmlEscape(trunc(cssSelector, 100));
                                                 var sourcesToShow = (selectedText && selectedText.sources) ? ('<br /><span style="color:#888">Source: <span style="font-weight:normal;">' + htmlEscape(decodeURIComponent(selectedText.sources)) + '</span></span>') : '';
                                                 if (selectorMatchCount) {
-                                                    utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
+                                                    alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>' + sourcesToShow, 2500);
                                                 } else {
-                                                    utils.alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>' + sourcesToShow, 2500);
+                                                    alertNote(cssSelectorToShow + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>' + sourcesToShow, 2500);
                                                 }
                                             }
                                         });
@@ -3442,7 +3456,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 onCssHintShownForSelector: function () {    /* As per current CodeMirror/css-hint architecture,
                                                                                "select" is called before "shown".
                                                                                The "select" operation would also show the number  e are hiding the alertNote */
-                                    utils.alertNote.hide();
+                                    alertNote.hide();
                                 }
                             };
 
@@ -3534,7 +3548,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             ) {
                                                 event.preventDefault();
 
-                                                setTimeout(async () => {
+                                                (async () => {
                                                     try {
                                                         await loadIfNotAvailable('main-bundle');
 
@@ -3558,7 +3572,35 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     } catch (e) {
                                                         handleUnrecoverableError(e);
                                                     }
-                                                });
+                                                })();
+                                            }
+
+                                            if (
+                                                (
+                                                    event.ctrlKey ||
+                                                    event.metaKey
+                                                ) &&
+                                                event.shiftKey &&
+                                                (
+                                                    event.key === 'r' ||
+                                                    event.key === 'R' ||
+                                                    event.code === 'KeyR' ||
+                                                    event.keyCode === 82 ||
+                                                    event.which === 82
+                                                )
+                                            ) {
+                                                event.preventDefault();
+
+                                                if (window.flagEditorInExternalWindow) {
+                                                    chromeRuntimeMessageIfRequired({
+                                                        type: 'magicss',
+                                                        subType: 'magicss-reload-all-css-resources'
+                                                    });
+                                                } else {
+                                                    reloadAllCSSResourcesInPage();
+                                                }
+
+                                                sendMessageForGa(['_trackEvent', 'fromKeyboardShortcut', 'reloadCssResources']);
                                             }
                                         }
                                     },
@@ -3603,7 +3645,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     subType: 'mark-as-not-pinned-without-notification'
                                                 });
                                             }
-                                            utils.alertNote(
+                                            alertNote(
                                                 '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                 5000
                                             );
@@ -3618,7 +3660,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                         subType: 'mark-as-pinned-without-notification'
                                                     });
                                                 }
-                                                utils.alertNote(
+                                                alertNote(
                                                     '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically  <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                     10000
                                                 );
@@ -3660,7 +3702,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                         async function asyncCallback(status) {
                                                             if (chrome.runtime.lastError) {
                                                                 console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                                utils.alertNote(
+                                                                alertNote(
                                                                     'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
                                                                     10000
                                                                 );
@@ -3673,13 +3715,13 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                         subType: 'mark-as-pinned-without-notification'
                                                                     });
                                                                 }
-                                                                utils.alertNote(
+                                                                alertNote(
                                                                     '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                                     10000
                                                                 );
                                                                 sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinComplete']);
                                                             } else if (status === 'request-not-granted') {
-                                                                utils.alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                                alertNote('You need to provide permissions to reapply styles automatically', 10000);
                                                                 sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinIncompleteDueToPermission']);
                                                             }
                                                         }
@@ -3730,7 +3772,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 title: 'Edit in external window\n\nNote: Available in CSS / LESS / SASS mode',
                                 cls: 'magicss-external-window-is-not-available-for-mode editor-gray-out-as-disabled',
                                 onclick: async function (evt, editor, divIcon) { // eslint-disable-line no-unused-vars
-                                    utils.alertNote('Please switch to editing code in CSS / LESS / SASS mode to enable this feature', 5000);
+                                    alertNote('Please switch to editing code in CSS / LESS / SASS mode to enable this feature', 5000);
                                     editor.focus();
 
                                     sendMessageForGa(['_trackEvent', 'fromHeader', 'movingEditorNotAvailableInMode']);
@@ -3833,11 +3875,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 useAlertNote: true
                                                             });
                                                             if (!cssSelector) {
-                                                                utils.alertNote.hide();
+                                                                alertNote.hide();
                                                             }
 
                                                             if (!editor.styleHighlightingSelector) {
-                                                                editor.styleHighlightingSelector = new utils.StyleTag({
+                                                                editor.styleHighlightingSelector = new StyleTag({
                                                                     id: 'magicss-highlight-by-selector',
                                                                     parentTag: 'body',
                                                                     attributes: [{
@@ -3971,15 +4013,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             onclick: async function (evt, editor) {
                                 var textValue = editor.getTextValue();
                                 if (!textValue.trim()) {
-                                    utils.alertNote('Please type some code to be beautified', 5000);
+                                    alertNote('Please type some code to be beautified', 5000);
                                 } else {
-                                    var beautifiedCSS = await beautifyCSS(textValue);
-                                    if (textValue.trim() !== beautifiedCSS.trim()) {
-                                        await editor.setTextValue(beautifiedCSS);
+                                    var beautifiedCss = await beautifyCss(textValue);
+                                    if (textValue.trim() !== beautifiedCss.trim()) {
+                                        await editor.setTextValue(beautifiedCss);
                                         await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
-                                        utils.alertNote('Your code has been beautified :-)', 5000);
+                                        alertNote('Your code has been beautified :-)', 5000);
                                     } else {
-                                        utils.alertNote('Your code already looks beautiful :-)', 5000);
+                                        alertNote('Your code already looks beautiful :-)', 5000);
                                     }
                                 }
                                 editor.focus();
@@ -4032,7 +4074,21 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 }()),
                                 {
                                     name: 'reload-css-resources',
-                                    title: 'Reload all CSS resources',
+                                    title: (function () {
+                                        const titleText = 'Reload all CSS resources';
+                                        if (runningInAndroidFirefox) {
+                                            return titleText;
+                                        } else {
+                                            const flagMacOs = (navigator.platform || '').toLowerCase().indexOf('mac') >= 0 ? true : false;
+
+                                            if (flagMacOs) {
+                                                return `${titleText} <span style="color:#ccc">(Cmd + Shift + R)</span>`;
+                                            } else {
+                                                return `${titleText} <span style="color:#ccc">(Ctrl + Shift + R)</span>`;
+                                            }
+                                        }
+                                    }()),
+                                    // hoverTitle: 'Reload all CSS resources',
                                     cls: 'magicss-reload-all-css-resources',
                                     uniqCls: 'magicss-reload-all-css-resources',
                                     onclick: function (evt, editor) {
@@ -4372,7 +4428,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     .animate({marginRight: 0}, 1000)
                                     .fadeOut(100)
                                     .fadeIn(750);
-                                utils.alertNote(
+                                alertNote(
                                     'Auto-save changes for: <span style="font-weight:normal;">' + htmlEscape(file.path) + '</span>',
                                     5000,
                                     {
@@ -4430,7 +4486,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (userPrefFontSizeInPx < 12) {
                                 cssLintErrorWarningMarkerSize = Math.round(userPrefFontSizeInPx * 1.2);
                             }
-                            utils.addStyleTag({
+                            addStyleTag({
                                 attributes: [{
                                     name: 'data-style-created-by',
                                     value: 'magicss'
@@ -4488,7 +4544,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             // }
                         },
                         launched: async function (editor) {
-                            utils.addStyleTag({
+                            addStyleTag({
                                 attributes: [{
                                     name: 'data-style-created-by',
                                     value: 'magicss'
@@ -4505,7 +4561,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 parentTag: 'body'
                             });
 
-                            utils.addStyleTag({
+                            addStyleTag({
                                 attributes: [{
                                     name: 'data-style-created-by',
                                     value: 'magicss'
@@ -4650,7 +4706,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     useAlertNote: false
                                 });
                                 if (!cssSelector) {
-                                    utils.alertNote.hide();
+                                    alertNote.hide();
                                 }
 
                                 chromeRuntimeMessageIfRequired({
@@ -4680,9 +4736,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 return str;
                                             };
                                             if (selectorMatchCount) {
-                                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>', 2500);
+                                                alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + selectorMatchCount + ' match' + ((selectorMatchCount === 1) ? '':'es') + ')</span>', 2500);
                                             } else {
-                                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
+                                                alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
                                             }
                                         }
                                     });
@@ -4696,11 +4752,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     useAlertNote: true
                                 });
                                 if (!cssSelector) {
-                                    utils.alertNote.hide();
+                                    alertNote.hide();
                                 }
 
                                 if (!editor.styleHighlightingSelector) {
-                                    editor.styleHighlightingSelector = new utils.StyleTag({
+                                    editor.styleHighlightingSelector = new StyleTag({
                                         id: 'magicss-highlight-by-selector',
                                         parentTag: 'body',
                                         attributes: [{
@@ -4823,9 +4879,9 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                         if (useAlertNote) {
                             if (count) {
-                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
+                                alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(' + count + ' match' + ((count === 1) ? '':'es') + ')</span>', 2500);
                             } else {
-                                utils.alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
+                                alertNote(trunc(cssSelector, 100) + '&nbsp; &nbsp;<span style="font-weight:normal;">(No&nbsp;matches)</span>', 2500);
                             }
                         }
                     }
@@ -4943,17 +4999,17 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
                         if (disabled) {
                             this.indicateEnabledDisabled('disabled');
-                            utils.alertNote('Deactivated the code', 5000);
+                            alertNote('Deactivated the code', 5000);
                             return 'disabled';
                         } else {
                             this.indicateEnabledDisabled('enabled');
-                            utils.alertNote('Activated the code', 5000);
+                            alertNote('Activated the code', 5000);
                             return 'enabled';
                         }
                     }
                 }
 
-                utils.alertNote.hide();     // Hide the note which says that Magic CSS is loading
+                alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
 
                 // "window.flagEditorInExternalWindow" would also be true when "sessionStorageDataForInitialization" is truthy
@@ -5011,7 +5067,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             return;
                         }
 
-                        utils.addStyleTag({
+                        addStyleTag({
                             id: opacityStyleTagId,
                             attributes: [{
                                 name: 'data-style-created-by',

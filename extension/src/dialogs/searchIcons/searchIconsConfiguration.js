@@ -1,4 +1,4 @@
-/* globals chrome, utils, sendMessageForGa */
+/* globals chrome */
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -31,7 +31,13 @@ import {
     APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET
 } from 'reducers/actionTypes.js';
 
-import './searchIconsConfiguration.css';
+import { sendMessageForGa } from '../../../scripts/magicss/metrics/sendMessageForGa.js';
+
+import { alertNote } from '../../../scripts/utils/alertNote.js';
+
+import commonStyles from '../../common-styles/common-styles.css';
+
+import styles from './searchIconsConfiguration.css';
 
 function mapStateToProps(state) {
     return {
@@ -168,12 +174,21 @@ const SearchIconsConfiguration = function (props) {
         };
 
         return (
-            <div>
+            <div className={styles.SearchIconsConfiguration}>
                 <Dialog
                     disableScrollLock // https://github.com/mui-org/material-ui/issues/10000#issuecomment-559116355
                     open={open}
                     onClose={handleClose}
-                    className="magicss-base-element magicss-material-ui-dialog magicss-dialog-search-icons magicss-dialog-search-icons-configuration"
+                    className={
+                        'magicss-base-element' + ' ' +
+                        commonStyles['magicss-material-ui-dialog'] + ' ' +
+
+                        // TODO: Use only the `styles[]` one
+                        'magicss-dialog-search-icons' + ' ' +
+                        styles['magicss-dialog-search-icons'] + ' ' +
+
+                        'magicss-dialog-search-icons-configuration'
+                    }
                     PaperProps={{
                         style: {
                             maxWidth: 475
@@ -243,7 +258,7 @@ const SearchIconsConfiguration = function (props) {
                                                             status: 'has-access'
                                                         });
 
-                                                        utils.alertNote('<span style="color:#3f51b5;">✔</span> The required permissions are already granted');
+                                                        alertNote('<span style="color:#3f51b5;">✔</span> The required permissions are already granted');
                                                     } else {
                                                         setExtAccessToNounProjectApi({
                                                             status: 'no-access'
@@ -258,7 +273,7 @@ const SearchIconsConfiguration = function (props) {
                                                                 // TODO: Check if this check for "chrome.runtime.lastError" is useful in some way
                                                                 if (chrome.runtime.lastError) {
                                                                     console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                                    utils.alertNote(
+                                                                    alertNote(
                                                                         'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
                                                                         10000
                                                                     );
@@ -269,9 +284,9 @@ const SearchIconsConfiguration = function (props) {
                                                                         status: 'has-access'
                                                                     });
 
-                                                                    utils.alertNote('<span style="color:#3f51b5;">✔</span> The required permissions have been granted');
+                                                                    alertNote('<span style="color:#3f51b5;">✔</span> The required permissions have been granted');
                                                                 } else if (status === 'request-not-granted') {
-                                                                    utils.alertNote('<span style="color:#800000;">✘</span> You need to provide permissions for Noun Project API Configuration', 10000);
+                                                                    alertNote('<span style="color:#800000;">✘</span> You need to provide permissions for Noun Project API Configuration', 10000);
                                                                 }
                                                             }
                                                         );
@@ -279,7 +294,7 @@ const SearchIconsConfiguration = function (props) {
                                                 }
                                             );
                                         }}
-                                    >Allow this extension access</a> to api.thenounproject.com
+                                    >Click here</a> for allowing access to api.thenounproject.com
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: 4 }}>
@@ -460,6 +475,8 @@ const SearchIconsConfiguration = function (props) {
 };
 SearchIconsConfiguration.propTypes = {
     open: PropTypes.bool,
+    accessKey: PropTypes.string,
+    secret: PropTypes.string,
     dispatch: PropTypes.func
 };
 
