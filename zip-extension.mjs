@@ -4,8 +4,8 @@
 import fs from 'fs';
 import path from 'path';
 
-import cpFile from 'cp-file';
-import del from 'del';
+import { copyFileSync } from 'cp-file';
+import { deleteSync } from 'del';
 import archiver from 'archiver';
 import chalk from 'chalk';
 
@@ -57,8 +57,8 @@ var warnUserToCheckManifestFile = function (e) {
 // listen for all archive data to be written
 output.on('close', function() {
     try {
-        del.sync(['extension-dist/manifest.json']);
-        cpFile.sync('extension-dist/manifest-chrome.json', 'extension-dist/manifest.json', {overwrite: false});
+        deleteSync(['extension-dist/manifest.json']);
+        copyFileSync('extension-dist/manifest-chrome.json', 'extension-dist/manifest.json', {overwrite: false});
 
         console.log(chalk.green('The extension has been zipped as: ' + zipFileName + ' (' + archive.pointer() + ' bytes)'));
     } catch (e) {
@@ -76,8 +76,8 @@ archive.on('error', function(e) {
 archive.pipe(output);
 
 try {
-    del.sync(['extension-dist/manifest.json']);
-    cpFile.sync(
+    deleteSync(['extension-dist/manifest.json']);
+    copyFileSync(
         'extension-dist/' +
             (function () {
                 switch (whichBrowser) {
