@@ -6,11 +6,16 @@
 
 var t1 = new Date();
 
-var fs = require('fs'),
-    path = require('path'),
-    http = require('https');
+import fs from 'fs';
+import path from 'path';
+import http from 'https';
 
-var logger = require('../logger.js');
+import logger from '../logger.js';
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+const __dirname = path.dirname(import.meta.url).replace('file://', '');
 
 var returnExitCode = (process.argv[2] === 'returnExitCode');
 
@@ -58,7 +63,7 @@ function mergeObjects (obj1, obj2) {
 
 function readFileAsJson (filePath) {
     try {
-        var data = fs.readFileSync(filePath, 'utf-8');
+        var data = fs.readFileSync(filePath, 'utf-8'),
             json = JSON.parse(data);
         return json;
     } catch (e) {
