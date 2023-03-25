@@ -10,6 +10,8 @@ var fs = require('fs'),
     path = require('path'),
     http = require('https');
 
+var logger = require('../logger.js');
+
 var returnExitCode = (process.argv[2] === 'returnExitCode');
 
 var semverFilePath = __dirname + '/../semver.js';   // This file needs to be placed outside this folder (post-checkout/),
@@ -112,14 +114,13 @@ function main (rootPath) {
         // All npm packages are loosely matching. It might be fine to skip running "$ npm install"
         return 0;
     } else {
-        var chalk = require('chalk');
-        console.log(chalk.yellow('\n' + updateMessages.length + '/' + Object.keys(allDependencies).length + ' npm packages need to be updated: (' + ((t2 - t1) / 1000) + ' seconds)'));
-        console.log('    ' + updateMessages.join('\n    '));
-        console.log(chalk.yellow(
+        logger.warn('\n' + updateMessages.length + '/' + Object.keys(allDependencies).length + ' npm packages need to be updated: (' + ((t2 - t1) / 1000) + ' seconds)');
+        logger.info('    ' + updateMessages.join('\n    '));
+        logger.warn(
             'You might want to run "$ npm install" for ' +
             getPathRelativeToCwd(mainPackageJsonPath) +
             '\n'
-        ));
+        );
         return 1;
     }
 };
@@ -141,7 +142,7 @@ try {
     fs.statSync(semverFilePath);
     initiateCheck();
 } catch (e) {
-    var url = 'https://raw.githubusercontent.com/npm/node-semver/master/semver.js';
+    var url = 'https://unpkg.com/semver@6.3.0/semver.js';
     console.log('\nDownloading (timeout: 15s) ' + url + ' (to be used in post-checkout Git hook)');
     download(url, semverFilePath, function (errMsg) {
         if (errMsg) {
