@@ -2,13 +2,13 @@
   "name": "live-css-editor-tests",
   "version": "8.20.3",
   "scripts": {
-    "test": "        cp ../extension/manifest-puppeteer.json ../extension/manifest.json ;                                        mocha *.test.js ; cp ../extension/manifest-chrome.json ../extension/manifest.json",
-    "test:inspect": "cp ../extension/manifest-puppeteer.json ../extension/manifest.json ; node --inspect-brk ./node_modules/.bin/mocha *.test.js ; cp ../extension/manifest-chrome.json ../extension/manifest.json"
+    "test": "        cp ../extension-dist/manifest-puppeteer.json ../extension-dist/manifest.json ;                                        mocha *.test.mjs ; cp ../extension-dist/manifest-chrome.json ../extension-dist/manifest.json",
+    "test:inspect": "cp ../extension-dist/manifest-puppeteer.json ../extension-dist/manifest.json ; node --inspect-brk ./node_modules/.bin/mocha *.test.mjs ; cp ../extension-dist/manifest-chrome.json ../extension-dist/manifest.json"
   },
   "devDependencies": {
-    "expect": "^26.6.2",
-    "expect-mocha-image-snapshot": "^2.0.3",
-    "mocha": "^8.4.0",
-    "puppeteer": "^9.1.1"
+    "expect": "^27.5.1",
+    "expect-mocha-image-snapshot": "^3.0.8",
+    "mocha": "^10.2.0",
+    "puppeteer": "^19.8.0"
   }
 }

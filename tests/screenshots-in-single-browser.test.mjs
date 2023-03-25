@@ -2,18 +2,19 @@
 /* eslint-env node */
 /* globals chrome, describe, it, before, after */
 
-const path = require('path');
+import path from 'path';
 
-const expect = require('expect');
+import expect from 'expect';
 
-const puppeteer = require('puppeteer');
+import puppeteer from 'puppeteer';
 
-const { toMatchImageSnapshot } = require('expect-mocha-image-snapshot');
+import { toMatchImageSnapshot } from 'expect-mocha-image-snapshot';
 expect.extend({ toMatchImageSnapshot });
 
-const secrets = require('./secrets/secrets.js');
+import secrets from './secrets/secrets.js';
 
-const pathToExtension = path.resolve(__dirname, '..', 'extension');
+const __dirname = path.dirname(import.meta.url).replace('file://', '');
+const pathToExtension = path.resolve(__dirname, '..', 'extension-dist');
 
 const _screenshot = async function (handle, options) {
     const image = await handle.screenshot({
@@ -93,8 +94,8 @@ describe('Cross site UI consistency', async function () {
         });
 
         // Wait for extension background target
-        const extBackgroundTarget = await browser.waitForTarget((t) => {
-            return t.type() === 'background_page';
+        const extBackgroundTarget = await browser.waitForTarget((target) => {
+            return target.type() === 'background_page';
         });
         extBackgroundPage = await extBackgroundTarget.page();
     });

@@ -63,7 +63,9 @@ var generateManifest = function (whichBrowser) {
             const background = {
                 "page": "background-magicss.html"
             };
-            if (whichBrowser !== "firefox") {
+            if (whichBrowser === "puppeteer") {
+                background.persistent = true;
+            } else if (whichBrowser !== "firefox") {
                 background.persistent = false;
             }
             return background;
