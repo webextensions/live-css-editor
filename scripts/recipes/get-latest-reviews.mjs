@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const axios = require('axios');
-const chalk = require('chalk');
-const wordWrap = require('word-wrap');
+import axios from 'axios';
+import chalk from 'chalk';
+import wordWrap from 'word-wrap';
 
 const formatTimestamp = function (t) {
     let str;

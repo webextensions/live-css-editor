@@ -27,7 +27,7 @@
     "zip:extension:opera": "  node ./zip-extension.js opera",
     "zip:extension": "npm run zip:extension:chrome && npm run zip:extension:edge && npm run zip:extension:firefox && npm run zip:extension:opera",
     "publish:build-and-zip": "npm run clean && npm run start:build:publish && npm run zip:extension",
-    "get-latest-reviews": "node ./scripts/recipes/get-latest-reviews.js"
+    "get-latest-reviews": "node ./scripts/recipes/get-latest-reviews.mjs"
   },
   "dependencies": {
     "@babel/cli": "^7.21.0",
