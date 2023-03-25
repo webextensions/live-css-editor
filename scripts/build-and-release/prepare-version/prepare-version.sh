@@ -19,7 +19,7 @@
 #         git add ./tests/package.json
 #         Update  ./tests/package-lock.json
 #         git add ./tests/package-lock.json
-#         Run ./extension/manifest-generator.js
+#         Run ./extension/manifest-generator.mjs
 #         git add extension/manifest.json
 #         git add extension/manifest-*.json
 #     Step 3: (Handled by "npm version ..." command)
@@ -58,7 +58,7 @@ git add ./tests/package.json
 git add ./tests/package-lock.json
 
 # Update and add manifest.json and related files
-./extension/manifest-generator.js
+./extension/manifest-generator.mjs
 git add extension/manifest.json
 git add extension/manifest-*.json
 

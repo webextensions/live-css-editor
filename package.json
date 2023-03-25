@@ -20,7 +20,7 @@
     "start:build:dev:inspect-brk": "cd extension/ ; node --inspect-brk ../node_modules/.bin/webpack --mode development --config ./webpack/webpack.config.js --env build.buildFor='development' --env build.watch",
     "start:build:publish": "        cd extension/ ; node               ../node_modules/.bin/webpack --mode development --config ./webpack/webpack.config.js --env build.buildFor='publish'",
     "start:build:publish:watch": "  cd extension/ ;                    ../node_modules/.bin/webpack --mode development --config ./webpack/webpack.config.js --env build.buildFor='publish'     --env build.watch",
-    "manifest-generator": "node ./extension/manifest-generator.js",
+    "manifest-generator": "node ./extension/manifest-generator.mjs",
     "zip:extension:chrome": " node ./zip-extension.mjs chrome",
     "zip:extension:edge": "   node ./zip-extension.mjs edge",
     "zip:extension:firefox": "node ./zip-extension.mjs firefox",

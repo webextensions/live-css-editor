@@ -1,13 +1,20 @@
 #!/usr/bin/env node
 /* eslint-env node */
 
-var path = require("path");
+import path from 'path';
 
-var chalk = require("chalk"),
-    jsonfile = require("jsonfile");
+import chalk from 'chalk';
+import jsonfile from 'jsonfile';
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+const packageJson = require('../package.json');
+
+const __dirname = path.dirname(import.meta.url).replace('file://', '');
 
 var generateManifest = function (whichBrowser) {
-    var version = require("../package.json").version;
+    var version = packageJson.version;
     var manifest = {
         "version": version,
         "manifest_version": 2,

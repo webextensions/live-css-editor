@@ -96,7 +96,7 @@ try {
         cwd: __dirname + '/extension-dist',
         ignore: (function () {
             var pathsToIgnore = [
-                // 'manifest-generator.js',
+                // 'manifest-generator.mjs',
                 'manifest-chrome.json',
                 'manifest-edge.json',
                 'manifest-firefox.json',

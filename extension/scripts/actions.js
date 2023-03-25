@@ -443,7 +443,7 @@ window.mainFnMetricsHandler = async function ({ event }) {
                         }());
 
                         // // Global site tag (gtag.js)
-                        // // TODO: Add https://www.googletagmanager.com for "content_security_policy" in manifest-generator.js when enabling this
+                        // // TODO: Add https://www.googletagmanager.com for "content_security_policy" in manifest-generator.mjs when enabling this
                         // // WAIT: For moving to GA4, we have to wait till this gets fixed
                         // //  * https://issuetracker.google.com/issues/174954288
                         // // Further references:
