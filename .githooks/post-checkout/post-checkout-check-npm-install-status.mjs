@@ -10,7 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import http from 'https';
 
-import logger from '../logger.js';
+import logger from '../logger.mjs';
 
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);

@@ -5,7 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import logger from '../logger.js';
+import logger from '../logger.mjs';
 
 const __dirname = path.dirname(import.meta.url).replace('file://', '');
 
