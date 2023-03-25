@@ -2,10 +2,12 @@
 
 // This Git hook finds mismatches between Node version in use and the .nvmrc file and informs the user
 
-var fs = require('fs'),
-    path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-var logger = require('../logger.js');
+import logger from '../logger.js';
+
+const __dirname = path.dirname(import.meta.url).replace('file://', '');
 
 var nodeVersion = process.versions.node;
 try {
