@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 /* eslint-env node */
 
-var fs = require('fs'),
-    cpFile = require('cp-file'),
-    del = require('del'),
-    archiver = require('archiver'),
-    chalk = require('chalk');
+import fs from 'fs';
+import path from 'path';
 
-var processCommand = process.title + ' ' + require('path').relative(__dirname, process.argv[1]);
+import cpFile from 'cp-file';
+import del from 'del';
+import archiver from 'archiver';
+import chalk from 'chalk';
+
+const __dirname = path.dirname(import.meta.url).replace('file://', '');
+
+var processCommand = process.title + ' ' + path.relative(__dirname, process.argv[1]);
 console.log(chalk.gray([
     '',
     'Format:   ' + processCommand + ' [chrome/edge/firefox/opera]',
