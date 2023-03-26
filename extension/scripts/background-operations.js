@@ -1,5 +1,8 @@
 /* global chrome, remoteConfig */
 
+import { getUuid } from './appUtils/getUuid.js';
+import { isFeatureEnabled } from './appUtils/isFeatureEnabled.js';
+
 chrome.runtime.onInstalled.addListener((details) => {
     const {
         previousVersion,
@@ -43,10 +46,10 @@ chrome.runtime.onInstalled.addListener((details) => {
         if (
             remoteConfig.features &&
             remoteConfig.features.useUninstallUrl &&
-            await window.isFeatureEnabled(remoteConfig.features.useUninstallUrl.enabled) &&
+            await isFeatureEnabled(remoteConfig.features.useUninstallUrl.enabled) &&
             remoteConfig.features.useUninstallUrl.uninstallUrl
         ) {
-            const [err, uuid] = await window.getUuid();
+            const [err, uuid] = await getUuid();
 
             if (err) {
                 const errToReport = new Error('Unable to get the uuid', { cause: err });
