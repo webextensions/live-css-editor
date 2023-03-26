@@ -1,7 +1,11 @@
 /* globals chrome, remoteConfig */
 
-import { extLib } from './chrome-extension-lib/ext-lib.js';
 import * as jQuery from './3rdparty/jquery.js';
+
+import { chromeStorageLocalGet } from './utils/chromeStorage.js';
+
+import { getUuid } from './appUtils/getUuid.js';
+import { isFeatureEnabled } from './appUtils/isFeatureEnabled.js';
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 const USER_PREFERENCE_THEME = 'theme';
@@ -189,70 +193,13 @@ const getBrowser = function () {
     return response;
 };
 
-window.timeout = function (ms) {
+const timeout = function (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-};
-
-window.getUuid = async function () {
-    let uuid;
-
-    for (let i = 0; i < 5; i++) {
-        uuid = await extLib.chromeStorageLocalGet(INSTANCE_UUID);
-        if (uuid) {
-            break;
-        }
-        await window.timeout(1000);
-    }
-
-    if (uuid) {
-        return [null, uuid];
-    } else {
-        const errToReport = new Error(`Unable to fetch the ${INSTANCE_UUID}`);
-        console.error(errToReport);
-        return [errToReport];
-    }
-};
-
-window.basisNumberFromUuid = function (uuid) {
-    const uuidWithoutHyphen = uuid.replace(/-/g, '');
-    let basisString = BigInt(`0x${uuidWithoutHyphen}`).toString();
-    basisString = basisString.slice(basisString.length - 4);
-    const basisNumber = parseInt(basisString) + 1;
-    return basisNumber;
-};
-
-window.isFeatureEnabled = async function (enabledOrConditions) {
-    let flag = false;
-
-    const instanceUuid = await extLib.chromeStorageLocalGet(INSTANCE_UUID);
-    const basisNumber = window.basisNumberFromUuid(instanceUuid);
-
-    if (enabledOrConditions === true) {
-        flag = true;
-    } else if (Array.isArray(enabledOrConditions)) {
-        const conditions = enabledOrConditions;
-        for (const condition of conditions) {
-            if (Array.isArray(condition)) {
-                const [from, to] = condition;
-                if (from <= basisNumber && basisNumber <= to) {
-                    flag = true;
-                    break;
-                }
-            } else if (typeof condition === 'string') {
-                if (instanceUuid.indexOf(condition) >= 0) {
-                    flag = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    return flag;
 };
 
 window.detailsGenerator = async function () {
     try {
-        const [err, uuid] = await window.getUuid();
+        const [err, uuid] = await getUuid();
 
         if (err) {
             const errorToReport = new Error('Error: Failed to generate details due to missing uuid', { cause: err });
@@ -343,7 +290,7 @@ window.mainFnMetricsHandler = async function ({ event }) {
         if (
             remoteConfig.features &&
             remoteConfig.features.useMetrics &&
-            await window.isFeatureEnabled(remoteConfig.features.useMetrics.enabled)
+            await isFeatureEnabled(remoteConfig.features.useMetrics.enabled)
         ) {
             const [err, details] = await window.detailsGenerator();
 
@@ -362,7 +309,7 @@ window.mainFnMetricsHandler = async function ({ event }) {
             while (true) { // eslint-disable-line no-constant-condition
                 if (window.ongoingRequests >= 1) {
                     delay *= 2;
-                    await window.timeout(delay);
+                    await timeout(delay);
                 } else {
                     break;
                 }
@@ -436,7 +383,7 @@ window.mainFnMetricsHandler = async function ({ event }) {
                                 }
                             };
 
-                            const instanceUuid = await extLib.chromeStorageLocalGet(INSTANCE_UUID);
+                            const instanceUuid = await chromeStorageLocalGet(INSTANCE_UUID);
                             if (isValidUuidV4(instanceUuid)) {
                                 window._gaq.push(['set', 'userId', instanceUuid]);
                             }

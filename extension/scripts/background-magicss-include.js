@@ -1,7 +1,17 @@
 /* global chrome */
 
-import { extLib } from './chrome-extension-lib/ext-lib.js';
 import * as jQuery from './3rdparty/jquery.js';
+
+import {
+    chromeStorageLocalGet,
+    chromeStorageLocalSet,
+    chromeStorageLocalRemove,
+    chromeStorageSyncGet,
+    chromeStorageSyncRemove
+} from './utils/chromeStorage.js';
+
+import { extLib } from './chrome-extension-lib/ext-lib.js';
+import { basisNumberFromUuid } from './utils/basisNumberFromUuid.js';
 
 var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
@@ -53,33 +63,33 @@ var devHelper = function () {
 
         console.log('    fallbackConfig:', fallbackConfig);
 
-        const storedConfig = await extLib.chromeStorageLocalGet('remoteConfig');
+        const storedConfig = await chromeStorageLocalGet('remoteConfig');
         console.log('    storedConfig:', storedConfig);
 
         console.log('    remoteConfig:', remoteConfig);
 
-        const executionCounterLocal = await extLib.chromeStorageLocalGet('magicss-execution-counter');
+        const executionCounterLocal = await chromeStorageLocalGet('magicss-execution-counter');
         console.log('    executionCounterLocal:', executionCounterLocal);
 
-        const executionCounterSync = await extLib.chromeStorageSyncGet('magicss-execution-counter');
+        const executionCounterSync = await chromeStorageSyncGet('magicss-execution-counter');
         console.log('    executionCounterSync:', executionCounterSync);
 
-        const allChromeStorageLocalData = await extLib.chromeStorageLocalGet(null);
+        const allChromeStorageLocalData = await chromeStorageLocalGet(null);
         console.log('    allChromeStorageLocalData:', allChromeStorageLocalData);
 
-        const allChromeStorageSyncData = await extLib.chromeStorageSyncGet(null);
+        const allChromeStorageSyncData = await chromeStorageSyncGet(null);
         console.log('    allChromeStorageSyncData:', allChromeStorageSyncData);
 
         console.log('========================================');
     });
 };
 devHelper.clearSomeStorage = async function () {
-    await extLib.chromeStorageLocalRemove('magicss-execution-counter');
-    await extLib.chromeStorageSyncRemove('magicss-execution-counter');
+    await chromeStorageLocalRemove('magicss-execution-counter');
+    await chromeStorageSyncRemove('magicss-execution-counter');
 
-    await extLib.chromeStorageLocalRemove('instance-uuid');
+    await chromeStorageLocalRemove('instance-uuid');
 
-    await extLib.chromeStorageLocalRemove('remoteConfig');
+    await chromeStorageLocalRemove('remoteConfig');
 };
 
 if (window.flagEditorInExternalWindow) {
@@ -168,7 +178,7 @@ if (window.flagEditorInExternalWindow) {
     };
 
     const getStoredConfigIfValid = async function () {
-        const storedConfig = await extLib.chromeStorageLocalGet('remoteConfig');
+        const storedConfig = await chromeStorageLocalGet('remoteConfig');
 
         // https://github.com/substack/semver-compare/blob/152c863e7c2615f9e9e81a9a370b672afaa3819a/index.js
         const semverCompare = function (a, b) {
@@ -267,14 +277,14 @@ if (window.flagEditorInExternalWindow) {
 
     (async () => {
         const INSTANCE_UUID = 'instance-uuid';
-        instanceUuid = await extLib.chromeStorageLocalGet(INSTANCE_UUID);
+        instanceUuid = await chromeStorageLocalGet(INSTANCE_UUID);
 
         if (!isValidUuidV4(instanceUuid)) {
             instanceUuid = randomUUID();
-            await extLib.chromeStorageLocalSet(INSTANCE_UUID, instanceUuid);
+            await chromeStorageLocalSet(INSTANCE_UUID, instanceUuid);
         }
 
-        instanceBasisNumber = window.basisNumberFromUuid(instanceUuid);
+        instanceBasisNumber = basisNumberFromUuid(instanceUuid);
 
         const fn = async function () {
             await updateRemoteConfig();
