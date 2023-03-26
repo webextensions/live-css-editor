@@ -2,6 +2,8 @@
 
 import { getUuid } from './appUtils/getUuid.js';
 import { isFeatureEnabled } from './appUtils/isFeatureEnabled.js';
+import { metricsUrlGenerator } from './appUtils/metricsUrlGenerator.js';
+import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
 
 chrome.runtime.onInstalled.addListener((details) => {
     const {
@@ -16,7 +18,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 
     if (reason === INSTALL) {
         (async () => {
-            await window.mainFnMetricsHandler({ event: 'install' });
+            await mainFnMetricsHandler({ event: 'install' });
         })();
 
         // chrome.tabs.create({
@@ -29,7 +31,7 @@ chrome.runtime.onInstalled.addListener((details) => {
         // at chrome://extensions/ page can also trigger "onInstalled" listener
         if (extensionVersion !== previousVersion) {
             (async () => {
-                await window.mainFnMetricsHandler({ event: 'update' });
+                await mainFnMetricsHandler({ event: 'update' });
             })();
 
             // chrome.tabs.create({
@@ -60,7 +62,8 @@ chrome.runtime.onInstalled.addListener((details) => {
             const details = {
                 uuid
             };
-            const url = await window.metricsUrlGenerator({
+            const url = await metricsUrlGenerator({
+                remoteConfig,
                 event: 'uninstall',
                 details,
                 uninstallPathOnServer: remoteConfig.features.useUninstallUrl.uninstallUrl
