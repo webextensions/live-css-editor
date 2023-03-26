@@ -1,5 +1,17 @@
 {
     // When "search.useIgnoreFiles" is set to false, the search-in-files functionality does not take
     // .gitignore into consideration for exclusion
-    "search.useIgnoreFiles": true
+    "search.useIgnoreFiles": true,
+
+    // https://github.com/wk-j/vscode-save-and-run#sample-config
+    "saveAndRun": {
+        "commands": [
+            {
+                "match": "./extension/manifest-generator.mjs",
+                "cmd": "./extension/manifest-generator.mjs",
+                "useShortcut": false,
+                "silent": true
+            }
+        ]
+    }
 }
