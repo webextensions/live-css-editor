@@ -13,6 +13,8 @@ import {
 import { extLib } from './chrome-extension-lib/ext-lib.js';
 import { basisNumberFromUuid } from './utils/basisNumberFromUuid.js';
 
+import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
+
 var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT = 'show-reapplying-styles-notification-at';
@@ -42,7 +44,7 @@ var fallbackConfig = {
     },
     "version": "8.20.3"
 };
-var remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
+let remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
 var instanceUuid = null;
 var instanceBasisNumber = -1;
 
@@ -171,7 +173,7 @@ if (window.flagEditorInExternalWindow) {
             console.error(err);
         } else {
             (async () => {
-                await window.mainFnMetricsHandler({ event: 'configFetch' });
+                await mainFnMetricsHandler({ event: 'configFetch' });
             })();
         }
         return [err, fetchedConfig];
