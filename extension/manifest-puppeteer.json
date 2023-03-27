@@ -42,6 +42,13 @@
     "background": {
         "service_worker": "dist/background-magicss.bundle.js"
     },
+    "commands": {
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Alt+Shift+C"
+            }
+        }
+    },
     "options_ui": {
         "open_in_tab": true,
         "page": "options.html"

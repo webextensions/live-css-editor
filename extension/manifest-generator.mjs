@@ -103,13 +103,13 @@ var generateManifest = function (whichBrowser) {
             };
             return background;
         }()),
-        // "commands": {
-        //     "_execute_browser_action": {
-        //         "suggested_key": {
-        //             "default": "Alt+Shift+C"
-        //         }
-        //     }
-        // },
+        "commands": {
+            "_execute_action": {
+                "suggested_key": {
+                    "default": "Alt+Shift+C"
+                }
+            }
+        },
         "options_ui": {
             "open_in_tab": true,
             "page": "options.html"
