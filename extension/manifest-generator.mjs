@@ -17,7 +17,7 @@ var generateManifest = function (whichBrowser) {
     var version = packageJson.version;
     var manifest = {
         "version": version,
-        "manifest_version": 2,
+        "manifest_version": 3,
         "author": "Priyank Parashar",
         "default_locale": "en",
         "name": "__MSG_Extension_Name__",
@@ -37,25 +37,44 @@ var generateManifest = function (whichBrowser) {
             var permissions = [
                 "activeTab",
                 "storage",
-                "unlimitedStorage"
+                "unlimitedStorage",
+                "scripting"
             ];
             if (whichBrowser === "firefox") {
                 permissions.push("webNavigation");
-                permissions.push("<all_urls>");
+                // permissions.push("<all_urls>");
             } else if (whichBrowser === "puppeteer") {
-                permissions.push("<all_urls>");
+                // permissions.push("<all_urls>");
             }
             return permissions;
         }()),
+
+        "host_permissions": (function () {
+            var host_permissions = [];
+            host_permissions.push("*://*/*");
+            return host_permissions;
+        }()),
+
         "optional_permissions": (function () {
             var optional_permissions = [];
             if (whichBrowser !== "firefox") {
                 optional_permissions.push("webNavigation");
-                optional_permissions.push("<all_urls>");
+                // optional_permissions.push("<all_urls>");
             }
             return optional_permissions;
         }()),
-        "browser_action": {
+        // "browser_action": {
+        //     "default_icon": {
+        //         "16": "icons/icon-16.png",
+        //         "24": "icons/icon-24.png",
+        //         "32": "icons/icon-32.png",
+        //         "40": "icons/icon-40.png",
+        //         "48": "icons/icon-48.png",
+        //         "128": "icons/icon-128.png",
+        //         "256": "icons/icon-256.png"
+        //     }
+        // },
+        "action": {
             "default_icon": {
                 "16": "icons/icon-16.png",
                 "24": "icons/icon-24.png",
@@ -64,26 +83,33 @@ var generateManifest = function (whichBrowser) {
                 "48": "icons/icon-48.png",
                 "128": "icons/icon-128.png",
                 "256": "icons/icon-256.png"
-            }
+            },
+            "default_title": "Launch Magic CSS editor for this page"
         },
         "background": (function () {
+            // const background = {
+            //     "page": "background-magicss.html"
+            // };
+            // if (whichBrowser === "puppeteer") {
+            //     background.persistent = true;
+            // } else if (whichBrowser !== "firefox") {
+            //     background.persistent = false;
+            // }
+            // return background;
+
             const background = {
-                "page": "background-magicss.html"
+                "service_worker": "dist/background-magicss.bundle.js"
+                // "service_worker": "background-magicss.js"
             };
-            if (whichBrowser === "puppeteer") {
-                background.persistent = true;
-            } else if (whichBrowser !== "firefox") {
-                background.persistent = false;
-            }
             return background;
         }()),
-        "commands": {
-            "_execute_browser_action": {
-                "suggested_key": {
-                    "default": "Alt+Shift+C"
-                }
-            }
-        },
+        // "commands": {
+        //     "_execute_browser_action": {
+        //         "suggested_key": {
+        //             "default": "Alt+Shift+C"
+        //         }
+        //     }
+        // },
         "options_ui": {
             "open_in_tab": true,
             "page": "options.html"
@@ -98,7 +124,11 @@ var generateManifest = function (whichBrowser) {
     };
 
     if (whichBrowser !== "puppeteer") {
-        manifest["content_security_policy"] = "script-src 'unsafe-eval' 'self' https://cdnjs.cloudflare.com https://ssl.google-analytics.com; object-src 'self'";
+        // manifest["content_security_policy"] = "script-src 'unsafe-eval' 'self' https://cdnjs.cloudflare.com https://ssl.google-analytics.com; object-src 'self'";
+        manifest["content_security_policy"] = {
+            // "extension_pages": "script-src 'unsafe-eval' 'self' https://cdnjs.cloudflare.com https://ssl.google-analytics.com; object-src 'self'"
+            "extension_pages": "script-src 'self'; object-src 'self'"
+        };
     }
 
     if (whichBrowser === "puppeteer") {

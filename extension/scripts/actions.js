@@ -27,9 +27,9 @@ const flagDevMode = (function () {
     // https://developer.chrome.com/docs/extensions/mv2/tut_analytics/
     // https://developer.chrome.com/docs/extensions/mv3/tut_analytics/
 
-    window._gaq = window._gaq || [];
-    window._gaq.push(['_setAccount', 'UA-198813835-4']);
-    window._gaq.push(['_gat._forceSSL']); // https://stackoverflow.com/questions/37799578/google-analytics-force-https-to-prevent-307-internal-redirect/37799579#37799579
+    // window._gaq = window._gaq || [];
+    // window._gaq.push(['_setAccount', 'UA-198813835-4']);
+    // window._gaq.push(['_gat._forceSSL']); // https://stackoverflow.com/questions/37799578/google-analytics-force-https-to-prevent-307-internal-redirect/37799579#37799579
 
     // // Global site tag (gtag.js)
     // window.dataLayer = window.dataLayer || [];

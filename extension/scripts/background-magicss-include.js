@@ -2,6 +2,8 @@
 
 import * as jQuery from './3rdparty/jquery.js';
 
+import { getBrowserStrategyGetManifest } from 'helpmate/dist/browser/getBrowser.js';
+
 import {
     chromeStorageLocalGet,
     chromeStorageLocalSet,
@@ -14,6 +16,7 @@ import { extLib } from './chrome-extension-lib/ext-lib.js';
 import { basisNumberFromUuid } from './utils/basisNumberFromUuid.js';
 
 import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
+import { myWin } from './appUtils/myWin.js';
 
 var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
     USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
@@ -48,9 +51,9 @@ let remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
 var instanceUuid = null;
 var instanceBasisNumber = -1;
 
-window.remoteConfigLoadedFromRemote = new Promise((resolve, reject) => {
-    window.remoteConfigLoadedFromRemoteResolve = resolve;
-    window.remoteConfigLoadedFromRemoteReject = reject;
+myWin.remoteConfigLoadedFromRemote = new Promise((resolve, reject) => {
+    myWin.remoteConfigLoadedFromRemoteResolve = resolve;
+    myWin.remoteConfigLoadedFromRemoteReject = reject;
 });
 
 // eslint-disable-next-line no-unused-vars
@@ -94,7 +97,7 @@ devHelper.clearSomeStorage = async function () {
     await chromeStorageLocalRemove('remoteConfig');
 };
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
     // TODO: REUSE: Move this under "extLib"
@@ -253,13 +256,13 @@ if (window.flagEditorInExternalWindow) {
             remoteConfig = storedConfig;
             console.info('Applied stored config:', storedConfig);
             if (storedConfig.mode === 'online') {
-                window.remoteConfigLoadedFromRemoteResolve();
+                myWin.remoteConfigLoadedFromRemoteResolve();
             }
         } else {
             const [err, fetchedConfig] = await fetchRemoteConfig();
 
             if (err) {
-                window.remoteConfigLoadedFromRemoteReject();
+                myWin.remoteConfigLoadedFromRemoteReject();
             } else {
                 fetchedConfig.nextUpdateAt = Date.now() + fetchedConfig.nextUpdate;
                 remoteConfig = fetchedConfig;
@@ -272,7 +275,7 @@ if (window.flagEditorInExternalWindow) {
                 } catch (e) {
                     // do nothing
                 }
-                window.remoteConfigLoadedFromRemoteResolve();
+                myWin.remoteConfigLoadedFromRemoteResolve();
             }
         }
     };
@@ -347,7 +350,7 @@ if (window.flagEditorInExternalWindow) {
 }
 
 const tabConnectivityMap = {};
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
     chrome.runtime.onMessage.addListener(
@@ -480,7 +483,7 @@ if (window.flagEditorInExternalWindow) {
 /*
 // Not used anymore
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -512,15 +515,14 @@ var runningInChromiumLikeEnvironment = function () {
 };
 
 var runningInFirefoxLikeEnvironment = function () {
-    if (window.location.href.indexOf('moz-extension://') === 0) {
-        return true;
-    } else {
-        return false;
-    }
-};
+    // if (window.location.href.indexOf('moz-extension://') === 0) {
+    //     return true;
+    // } else {
+    //     return false;
+    // }
 
-var runningInOldEdgeLikeEnvironment = function () {
-    if (window.location.href.indexOf('ms-browser-extension://') === 0) {
+    const browser = getBrowserStrategyGetManifest();
+    if (browser.name === 'firefox') {
         return true;
     } else {
         return false;
@@ -561,7 +563,7 @@ var informUser = function (config) {
 // user loaded the extension in a webpage, the events were not getting reattached on reload.
 // So, for fixing that, now we are attaching the events as soon as the extension loads.
 
-if (!window.openOptionsPageListenerAdded) {
+if (!myWin.openOptionsPageListenerAdded) {
     if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
@@ -575,11 +577,11 @@ if (!window.openOptionsPageListenerAdded) {
                 }
             }
         );
-        window.openOptionsPageListenerAdded = true;
+        myWin.openOptionsPageListenerAdded = true;
     }
 }
 
-if (!window.loadRemoteJsListenerAdded) {
+if (!myWin.loadRemoteJsListenerAdded) {
     if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {
@@ -594,13 +596,23 @@ if (!window.loadRemoteJsListenerAdded) {
                                 }
                             }
                             getAllFrames(function (allFrames) {
-                                chrome.tabs.executeScript(
-                                    sender.tab.id,
-                                    { code: remoteCode, allFrames: allFrames},
-                                    function(){
-                                        sendResponse();
-                                    }
-                                );
+                                // chrome.tabs.executeScript(
+                                //     sender.tab.id,
+                                //     { code: remoteCode, allFrames: allFrames},
+                                //     function(){
+                                //         sendResponse();
+                                //     }
+                                // );
+
+                                // chrome.scripting.executeScript({
+                                //     target: {
+                                //         tabId: sender.tab.id,
+                                //         allFrames: allFrames
+                                //     },
+                                //     callback: function(){
+                                //         sendResponse();
+                                //     }
+                                // });
                             });
                         })
                         .fail(function() {
@@ -611,46 +623,41 @@ if (!window.loadRemoteJsListenerAdded) {
                     // Need to return true from the event listener to indicate that we wish to send a response asynchronously
                     return true;
                 } else if (request.requestPermissions) {
-                    if (window.flagEditorInExternalWindow) {
+                    if (myWin.flagEditorInExternalWindow) {
                         return;
                     }
-                    if (runningInOldEdgeLikeEnvironment()) {
-                        // We use full permissions on old Microsoft Edge
-                        sendResponse('request-granted');
-                        onDOMContentLoadedHandler();
-                    } else {
-                        var tabOriginWithSlash = request.tabOriginWithSlash;
 
-                        const permissionsOb = {};
-                        if (request.requestWebNavigation) {
-                            permissionsOb.permissions = ['webNavigation'];
-                        }
-                        permissionsOb.origins = [tabOriginWithSlash];
+                    var tabOriginWithSlash = request.tabOriginWithSlash;
 
-                        chrome.permissions.request(
-                            permissionsOb,
-                            function (granted) {
-                                if (granted) {
-                                    sendResponse('request-granted');
-                                    onDOMContentLoadedHandler();
-                                } else {
-                                    sendResponse('request-not-granted');
-                                }
-                            }
-                        );
-
-                        // https://developer.chrome.com/extensions/messaging
-                        // Need to return true from the event listener to indicate that we wish to send a response asynchronously
-                        return true;
+                    const permissionsOb = {};
+                    if (request.requestWebNavigation) {
+                        permissionsOb.permissions = ['webNavigation'];
                     }
+                    permissionsOb.origins = [tabOriginWithSlash];
+
+                    chrome.permissions.request(
+                        permissionsOb,
+                        function (granted) {
+                            if (granted) {
+                                sendResponse('request-granted');
+                                onDOMContentLoadedHandler();
+                            } else {
+                                sendResponse('request-not-granted');
+                            }
+                        }
+                    );
+
+                    // https://developer.chrome.com/extensions/messaging
+                    // Need to return true from the event listener to indicate that we wish to send a response asynchronously
+                    return true;
                 }
             }
         );
-        window.loadRemoteJsListenerAdded = true;
+        myWin.loadRemoteJsListenerAdded = true;
     }
 }
 
-if (!window.apiHelperForContentScriptAdded) {
+if (!myWin.apiHelperForContentScriptAdded) {
     if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {
@@ -668,7 +675,7 @@ if (!window.apiHelperForContentScriptAdded) {
                 }
             }
         );
-        window.apiHelperForContentScriptAdded = true;
+        myWin.apiHelperForContentScriptAdded = true;
     }
 }
 
@@ -731,7 +738,7 @@ var reapplyCss = function (tabId) {
                 arrScripts.push(pathDist + 'load-reapply.bundle.js');
 
                 extLib.loadMultipleJsCss({
-                    treatAsNormalWebpage: window.treatAsNormalWebpage,
+                    treatAsNormalWebpage: myWin.treatAsNormalWebpage,
                     arrSources: arrScripts,
                     allFrames,
                     tabId,
@@ -767,137 +774,147 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
         // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
-        extLib.loadMultipleJsCss({
-            treatAsNormalWebpage: window.treatAsNormalWebpage,
-            arrSources: [
-                pathScripts + 'appVersion.js',
-                // {
-                //     type: 'js',
-                //     sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
-                // },
+        (async () => {
+            const [a] = await chrome.tabs.query({ active: true, currentWindow: true });
+            const [b] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+            debugger;
+            const tab = a;
+            const tabId = tab.id;
+            debugger;
 
-                (
-                    platformInfoOs === 'android' ?
-                        pathScripts + 'platformInfoOs-android.js' :
-                        pathScripts + 'platformInfoOs-non-android.js'
-                ),
-                // {
-                //     type: 'js',
-                //     sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
-                // },
+            extLib.loadMultipleJsCss({
+                treatAsNormalWebpage: myWin.treatAsNormalWebpage,
+                arrSources: [
+                    pathScripts + 'appVersion.js',
+                    // {
+                    //     type: 'js',
+                    //     sourceText: 'window.magicCssVersion = ' + JSON.stringify(chrome.runtime.getManifest().version) + ';'
+                    // },
 
-                pathDist + 'load-editor.bundle.js',
-                pathDist + 'load-editor.bundle.css'
+                    (
+                        platformInfoOs === 'android' ?
+                            pathScripts + 'platformInfoOs-android.js' :
+                            pathScripts + 'platformInfoOs-non-android.js'
+                    ),
+                    // {
+                    //     type: 'js',
+                    //     sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
+                    // },
 
-                /*
-                {
-                    src: path3rdparty + 'jquery.js',
-                    skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
-                },
-                // {
-                //     src: pathScripts + 'chrome-extension-lib/ext-lib.js',
-                //     skip: typeof extLib !== "undefined" || runningInBrowserExtension ? false : true
-                // },
+                    pathDist + 'load-editor.bundle.js',
+                    pathDist + 'load-editor.bundle.css'
 
-                pathScripts + 'utils.js',
-                pathScripts + 'loading-magic-css.js',
+                    /*
+                    {
+                        src: path3rdparty + 'jquery.js',
+                        skip: typeof jQuery !== "undefined" || runningInBrowserExtension ? false : true
+                    },
+                    // {
+                    //     src: pathScripts + 'chrome-extension-lib/ext-lib.js',
+                    //     skip: typeof extLib !== "undefined" || runningInBrowserExtension ? false : true
+                    // },
 
-                path3rdparty + 'css.escape.js',
+                    pathScripts + 'utils.js',
+                    pathScripts + 'loading-magic-css.js',
 
-                pathCodeMirror + 'codemirror.css',
-                pathCodeMirror + 'theme/ambiance.css',
-                path3rdpartyCustomFixes + 'codemirror/magicss-codemirror.css',
-                pathCodeMirror + 'codemirror.js',
-                pathCodeMirror + 'mode/css.js',
-                pathCodeMirror + 'addons/display/placeholder.js',
-                pathCodeMirror + 'addons/selection/active-line.js',
-                pathCodeMirror + 'addons/edit/closebrackets.js',
-                pathCodeMirror + 'addons/edit/matchbrackets.js',
+                    path3rdparty + 'css.escape.js',
 
-                // This is required for some cases in multi-selection (using Ctrl+D)
-                pathCodeMirror + 'addons/search/searchcursor.js',
+                    pathCodeMirror + 'codemirror.css',
+                    pathCodeMirror + 'theme/ambiance.css',
+                    path3rdpartyCustomFixes + 'codemirror/magicss-codemirror.css',
+                    pathCodeMirror + 'codemirror.js',
+                    pathCodeMirror + 'mode/css.js',
+                    pathCodeMirror + 'addons/display/placeholder.js',
+                    pathCodeMirror + 'addons/selection/active-line.js',
+                    pathCodeMirror + 'addons/edit/closebrackets.js',
+                    pathCodeMirror + 'addons/edit/matchbrackets.js',
 
-                pathCodeMirror + 'addons/comment/comment.js',
+                    // This is required for some cases in multi-selection (using Ctrl+D)
+                    pathCodeMirror + 'addons/search/searchcursor.js',
 
-                path3rdparty + 'csslint/csslint.js',
-                path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
-                pathCodeMirror + 'addons/lint/lint.css',
-                path3rdpartyCustomFixes + 'codemirror/addons/lint/tooltip.css',
-                pathCodeMirror + 'addons/lint/lint.js',
-                pathCodeMirror + 'addons/lint/css-lint_customized.js',
+                    pathCodeMirror + 'addons/comment/comment.js',
 
-                pathCodeMirror + 'addons/hint/show-hint.css',
-                pathCodeMirror + 'addons/hint/show-hint_customized.js',
-                pathCodeMirror + 'addons/hint/css-hint_customized.js',
+                    path3rdparty + 'csslint/csslint.js',
+                    path3rdpartyCustomFixes + 'csslint/ignore-some-rules.js',
+                    pathCodeMirror + 'addons/lint/lint.css',
+                    path3rdpartyCustomFixes + 'codemirror/addons/lint/tooltip.css',
+                    pathCodeMirror + 'addons/lint/lint.js',
+                    pathCodeMirror + 'addons/lint/css-lint_customized.js',
 
-                // https://github.com/easylogic/codemirror-colorpicker
-                pathCodeMirror + 'addons/colorpicker/colorpicker.css',
-                pathCodeMirror + 'addons/colorpicker/colorview_customized.js',
-                pathCodeMirror + 'addons/colorpicker/colorpicker.js',
+                    pathCodeMirror + 'addons/hint/show-hint.css',
+                    pathCodeMirror + 'addons/hint/show-hint_customized.js',
+                    pathCodeMirror + 'addons/hint/css-hint_customized.js',
 
-                pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
+                    // https://github.com/easylogic/codemirror-colorpicker
+                    pathCodeMirror + 'addons/colorpicker/colorpicker.css',
+                    pathCodeMirror + 'addons/colorpicker/colorview_customized.js',
+                    pathCodeMirror + 'addons/colorpicker/colorpicker.js',
 
-                pathCodeMirror + 'keymap/sublime.js',
+                    pathCodeMirror + 'addons/emmet/emmet-codemirror-plugin.js',
 
-                path3rdparty + 'jquery-ui_customized.css',
-                path3rdparty + 'jquery-ui.js',
-                path3rdparty + 'jquery.ui.touch-punch_customized.js',
+                    pathCodeMirror + 'keymap/sublime.js',
 
-                path3rdparty + 'socket.io/socket.io.slim.js',
+                    path3rdparty + 'jquery-ui_customized.css',
+                    path3rdparty + 'jquery-ui.js',
+                    path3rdparty + 'jquery.ui.touch-punch_customized.js',
 
-                path3rdparty + 'amplify-store.js',
-                pathScripts + 'migrate-storage.js',
+                    path3rdparty + 'socket.io/socket.io.slim.js',
 
-                path3rdparty + 'tooltipster/tooltipster.css',
-                path3rdparty + 'tooltipster/jquery.tooltipster.js',
-                path3rdparty + 'tooltipster/tooltipster-scrollableTip.js',
+                    path3rdparty + 'amplify-store.js',
+                    pathScripts + 'migrate-storage.js',
 
-                path3rdparty + 'toastr/toastr.css',
-                path3rdparty + 'toastr/toastr_customized.js',
+                    path3rdparty + 'tooltipster/tooltipster.css',
+                    path3rdparty + 'tooltipster/jquery.tooltipster.js',
+                    path3rdparty + 'tooltipster/tooltipster-scrollableTip.js',
 
-                path3rdparty + 'magicsuggest/magicsuggest.css',
-                path3rdparty + 'magicsuggest/magicsuggest.js',
+                    path3rdparty + 'toastr/toastr.css',
+                    path3rdparty + 'toastr/toastr_customized.js',
 
-                path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
-                path3rdparty + 'csspretty/csspretty.js',
-                // Alternatively, use cssbeautify & Yahoo's CSS Min libraries
-                // path3rdparty + 'cssbeautify/cssbeautify.js',
-                // path3rdparty + 'yui-cssmin/cssmin.js',
+                    path3rdparty + 'magicsuggest/magicsuggest.css',
+                    path3rdparty + 'magicsuggest/magicsuggest.js',
 
-                // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
-                // path3rdparty + 'less.js',
-                // // TODO: Remove this piece of commented out code. Now loading 'less' dynamically via `loadIfNotAvailable`
-                // path3rdparty + 'basic-less-with-sourcemap-support.browserified.js',
+                    path3rdpartyCustomFixes + 'csspretty/pre-csspretty.js',
+                    path3rdparty + 'csspretty/csspretty.js',
+                    // Alternatively, use cssbeautify & Yahoo's CSS Min libraries
+                    // path3rdparty + 'cssbeautify/cssbeautify.js',
+                    // path3rdparty + 'yui-cssmin/cssmin.js',
 
-                // Commented out so that Opera users can use Sass the way it is loaded in Chrome (when installed from Chrome Web Store)
-                // {
-                //     src: path3rdparty + 'sass/sass.sync.min.js',
-                //     skip: (runningInBrowserExtension && isOpera) ? false : true
-                // },
+                    // http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.js
+                    // path3rdparty + 'less.js',
+                    // // TODO: Remove this piece of commented out code. Now loading 'less' dynamically via `loadIfNotAvailable`
+                    // path3rdparty + 'basic-less-with-sourcemap-support.browserified.js',
 
-                path3rdparty + 'source-map.js',
+                    // Commented out so that Opera users can use Sass the way it is loaded in Chrome (when installed from Chrome Web Store)
+                    // {
+                    //     src: path3rdparty + 'sass/sass.sync.min.js',
+                    //     skip: (runningInBrowserExtension && isOpera) ? false : true
+                    // },
 
-                // http://www.miyconst.com/Blog/View/14/conver-css-to-less-with-css2less-js
-                // path3rdparty + 'css2less/linq.js',
-                // path3rdparty + 'css2less/css2less.js',
+                    path3rdparty + 'source-map.js',
 
-                pathEditor + 'editor.css',
-                pathEditor + 'editor.js',
+                    // http://www.miyconst.com/Blog/View/14/conver-css-to-less-with-css2less-js
+                    // path3rdparty + 'css2less/linq.js',
+                    // path3rdparty + 'css2less/css2less.js',
 
-                pathMagicss + 'magicss.css',
-                pathDist + 'main.bundle.css', // TODO: FIXME: Ideally, this should be loaded only on demand, like main.bundle.js
+                    pathEditor + 'editor.css',
+                    pathEditor + 'editor.js',
 
-                pathMagicss + 'generate-selector.js',
+                    pathMagicss + 'magicss.css',
+                    pathDist + 'main.bundle.css', // TODO: FIXME: Ideally, this should be loaded only on demand, like main.bundle.js
 
-                pathMagicss + 'magicss.js'
-                /* */
-            ],
-            allFrames,
-            tabId: undefined,
-            done: function () {
-                // Currently doing nothing
-            }
-        });
+                    pathMagicss + 'generate-selector.js',
+
+                    pathMagicss + 'magicss.js'
+                    /* */
+                ],
+                allFrames,
+                // tabId: undefined,
+                tabId,
+                done: function () {
+                    // Currently doing nothing
+                }
+            });
+        })();
     });
 };
 
@@ -954,8 +971,8 @@ var isRestrictedUrl = function (url) {
 };
 
 var prerequisitesReady = function (main) {
-    if (typeof chrome !== "undefined" && chrome && chrome.browserAction) {
-        chrome.browserAction.onClicked.addListener(function (tab) {
+    if (typeof chrome !== "undefined" && chrome && chrome.action) {
+        chrome.action.onClicked.addListener(function (tab) {
             var url = tab.url;
 
             if (isRestrictedUrl(url)) {
@@ -1064,7 +1081,7 @@ var prerequisitesReady = function (main) {
     }
 };
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     main();
 } else {
     prerequisitesReady(function (tab) {
@@ -1073,9 +1090,12 @@ if (window.flagEditorInExternalWindow) {
 }
 
 var parseUrl = function(href) {
-    var l = document.createElement("a");
-    l.href = href;
-    return l;
+    // var l = document.createElement("a");
+    // l.href = href;
+    // return l;
+
+    var url = new URL(href);
+    return url;
 };
 
 var generatePermissionPattern = function (url) {
@@ -1093,17 +1113,9 @@ var generatePermissionPattern = function (url) {
 };
 
 var onDOMContentLoadedHandler = function () {
-    if (!window.onDOMContentLoadedListenerAdded) {
+    if (!myWin.onDOMContentLoadedListenerAdded) {
         if (chrome.webNavigation) {
-            (function () {
-                if (runningInOldEdgeLikeEnvironment()) {
-                    // .onDOMContentLoaded() appears to work better for old Microsoft Edge
-                    // .onCommitted() on old Microsoft Edge seems to be not loading the styles under some situations
-                    return chrome.webNavigation.onDOMContentLoaded;
-                } else {
-                    return chrome.webNavigation.onCommitted;
-                }
-            }()).addListener(function(details) {
+            chrome.webNavigation.onCommitted.addListener(function(details) {
                 var tabId = details.tabId,
                     url = details.url;
 
@@ -1115,9 +1127,7 @@ var onDOMContentLoadedHandler = function () {
                         // do nothing
                     } else {
                         // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
-                        if (runningInOldEdgeLikeEnvironment()) {
-                            reapplyCss(tabId);
-                        } else if (runningInFirefoxLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
+                        if (runningInFirefoxLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
                             reapplyCss(tabId);
                         } else if (tab && tab.url) {
                             // Old logic:
@@ -1141,12 +1151,12 @@ var onDOMContentLoadedHandler = function () {
                     }
                 });
             });
-            window.onDOMContentLoadedListenerAdded = true;
+            myWin.onDOMContentLoadedListenerAdded = true;
         }
     }
 };
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
     onDOMContentLoadedHandler();

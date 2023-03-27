@@ -1,3 +1,5 @@
+import { myWin } from '../appUtils/myWin.js';
+
 /*
 Parameters:
     config.cssText (required): The CSS style
@@ -59,7 +61,7 @@ const addStyleTag = function (config) {
     var disabled = config.disabled;
 
     // TODO: FIXME: HACK: This 'if' condition should be converted into some standard implementation
-    if (window.flagEditorInExternalWindow && id === 'MagiCSS-bookmarklet-html-id') {
+    if (myWin.flagEditorInExternalWindow && id === 'MagiCSS-bookmarklet-html-id') {
         disabled = true;
     }
 

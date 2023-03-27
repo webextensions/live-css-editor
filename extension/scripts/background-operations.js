@@ -4,6 +4,7 @@ import { getUuid } from './appUtils/getUuid.js';
 import { isFeatureEnabled } from './appUtils/isFeatureEnabled.js';
 import { metricsUrlGenerator } from './appUtils/metricsUrlGenerator.js';
 import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
+import { myWin } from './appUtils/myWin.js';
 
 chrome.runtime.onInstalled.addListener((details) => {
     const {
@@ -44,7 +45,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 (async () => {
     try {
-        await window.remoteConfigLoadedFromRemote;
+        await myWin.remoteConfigLoadedFromRemote;
         if (
             remoteConfig.features &&
             remoteConfig.features.useUninstallUrl &&

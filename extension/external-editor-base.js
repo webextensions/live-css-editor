@@ -1,3 +1,5 @@
+import { myWin } from './scripts/appUtils/myWin.js';
+
 (function () {
     try {
         const
@@ -12,6 +14,6 @@
         // do nothing
     }
 
-    window.flagEditorInExternalWindow = true;
-    window.treatAsNormalWebpage = true;
+    myWin.flagEditorInExternalWindow = true;
+    myWin.treatAsNormalWebpage = true;
 })();

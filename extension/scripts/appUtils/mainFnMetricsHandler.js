@@ -5,6 +5,7 @@ import * as jQuery from '../3rdparty/jquery.js';
 import { getUuid } from './getUuid.js';
 import { isFeatureEnabled } from './isFeatureEnabled.js';
 import { metricsUrlGenerator } from './metricsUrlGenerator.js';
+import { myWin } from './myWin.js';
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 const USER_PREFERENCE_THEME = 'theme';
@@ -245,7 +246,7 @@ const detailsGenerator = async function () {
 let ongoingRequests = 0;
 const mainFnMetricsHandler = async function ({ event }) {
     try {
-        await window.remoteConfigLoadedFromRemote;
+        await myWin.remoteConfigLoadedFromRemote;
 
         if (
             remoteConfig.features &&

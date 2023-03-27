@@ -100,9 +100,20 @@ var extLib = {
             chrome &&
             chrome.tabs
         ) {
-            chrome.tabs.insertCSS(tabId, { file, code, allFrames, frameId, runAt }, function () {
-                callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+            // chrome.tabs.insertCSS(tabId, { file, code, allFrames, frameId, runAt }, function () {
+            //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+            // });
+            chrome.scripting.insertCSS({
+                target: {
+                    tabId,
+                    allFrames,
+                    frameIds: frameId ? [frameId] : undefined
+                },
+                // runAt,
+                files: file ? [file] : undefined,
+                css: code ? code : undefined
             });
+            callback();
         } else {
             if (file) {
                 extLib.loadCss(file);
@@ -179,9 +190,23 @@ var extLib = {
                     callback();
                 });
             } else {
-                chrome.tabs.executeScript(tabId, { file, code, allFrames, frameId, runAt }, function () {
-                    callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+                // chrome.tabs.executeScript(tabId, { file, code, allFrames, frameId, runAt }, function () {
+                //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+                // });
+
+                chrome.scripting.executeScript({
+                    target: {
+                        tabId,
+                        allFrames,
+                        frameIds: frameId ? [frameId] : undefined
+                    },
+                    // runAt,
+                    files: [file]
+                    // callback: function () {
+                    //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+                    // }
                 });
+                callback();
             }
         } else {
             if (file) {

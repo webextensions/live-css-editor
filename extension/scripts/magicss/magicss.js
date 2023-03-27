@@ -15,6 +15,9 @@ import {
     addStyleTag,
     StyleTag
 } from '../utils/StyleTag.js';
+
+import { myWin } from '../appUtils/myWin.js';
+
 import { extLib } from '../chrome-extension-lib/ext-lib.js';
 import sourceMap from '../3rdparty/source-map.js';
 
@@ -159,7 +162,7 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
 
     if (dependencyToLoad === 'less') {
         if (typeof window.less === 'undefined') {
-            if (window.treatAsNormalWebpage) {
+            if (myWin.treatAsNormalWebpage) {
                 const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
                     treatAsNormalWebpage: true,
                     source: path3rdparty + 'basic-less-with-sourcemap-support.browserified.js'
@@ -175,7 +178,7 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
         return window.less;
     } else if (dependencyToLoad === 'main-bundle') {
         if (typeof window.reactMain === 'undefined') {
-            if (window.treatAsNormalWebpage) {
+            if (myWin.treatAsNormalWebpage) {
                 const [errCss] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
                     treatAsNormalWebpage: true,
                     source: pathDist + 'main.bundle.css'
@@ -264,7 +267,7 @@ var getConfig = async function () {
 
 var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload }) {
     return new Promise((resolve) => {
-        if (window.flagEditorInExternalWindow) {
+        if (myWin.flagEditorInExternalWindow) {
             chrome.runtime.sendMessage(
                 {
                     tabId,
@@ -314,16 +317,16 @@ var sendMessageForMetrics = function (payload) {
 
 sendMessageForGa([
     '_trackPageview',
-    window.flagEditorInExternalWindow ? '/external-editor' : '/in-page-editor'
+    myWin.flagEditorInExternalWindow ? '/external-editor' : '/in-page-editor'
 ]);
 
 sendMessageForGa([
     '_trackEvent',
     'loadedEditor',
-    window.flagEditorInExternalWindow ? 'externalEditor' : 'inPageEditor'
+    myWin.flagEditorInExternalWindow ? 'externalEditor' : 'inPageEditor'
 ]);
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     chromeRuntimeMessageIfRequired({
         type: 'magicss',
         subType: 'external-editor-window-is-loading'
@@ -347,7 +350,7 @@ if (window.flagEditorInExternalWindow) {
     };
 }
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     alertNote.setup({
         paddingRight: '25px',
         paddingBottom: '25px',
@@ -795,6 +798,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
     // for HTML frameset pages, this value would be 'FRAMESET'
     // chrome.tabs.executeScript uses allFrames: true, to run inside all frames
+    // TODO: Check if it is still the same for chrome.tabs.scripting
     if (document.body.tagName !== 'BODY') {
         return;
     }
@@ -1214,7 +1218,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             };
         });
     };
-    if (window.flagEditorInExternalWindow) {
+    if (myWin.flagEditorInExternalWindow) {
         setTimeout(async () => {
             const cssSelectorsAutocompleteObjects = await chromeRuntimeMessageIfRequired({
                 type: 'magicss',
@@ -1877,7 +1881,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
     var main = async function () {
         let sessionStorageDataForInitialization = null;
-        if (window.flagEditorInExternalWindow) {
+        if (myWin.flagEditorInExternalWindow) {
             const sessionStorageData = await chromeRuntimeMessageIfRequired({
                 type: 'magicss',
                 subType: 'storage-data-to-initialize'
@@ -2618,7 +2622,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
                                 }
 
-                                if (window.flagEditorInExternalWindow) {
+                                if (myWin.flagEditorInExternalWindow) {
                                     const script = document.createElement('script');
                                     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js';
                                     script.onload = function () {
@@ -3419,7 +3423,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 ),
                                 onCssHintSelectForSelector: function (selectedText) {
                                     var editor = window.MagiCSSEditor;
-                                    if (window.flagEditorInExternalWindow) {
+                                    if (myWin.flagEditorInExternalWindow) {
                                         setTimeout(async () => {
                                             const cssSelector = selectedText.originalSelector;
                                             var selectorMatchCount = await chromeRuntimeMessageIfRequired({
@@ -3591,7 +3595,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             ) {
                                                 event.preventDefault();
 
-                                                if (window.flagEditorInExternalWindow) {
+                                                if (myWin.flagEditorInExternalWindow) {
                                                     chromeRuntimeMessageIfRequired({
                                                         type: 'magicss',
                                                         subType: 'magicss-reload-all-css-resources'
@@ -3619,7 +3623,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     cls: 'magicss-reapply-styles editor-gray-out',
                                     onclick: async function (evt, editor, divIcon) {
                                         let tabOriginWithSlash;
-                                        if (window.flagEditorInExternalWindow) {
+                                        if (myWin.flagEditorInExternalWindow) {
                                             const urlParams = new URLSearchParams(window.location.search);
                                             tabOriginWithSlash = urlParams.get('tabOriginWithSlash');
                                         } else {
@@ -3639,7 +3643,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
                                             sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyUnpinInitiate']);
                                             await markAsPinnedOrNotPinned(editor, 'not-pinned');
-                                            if (window.flagEditorInExternalWindow) {
+                                            if (myWin.flagEditorInExternalWindow) {
                                                 chromeRuntimeMessageIfRequired({
                                                     type: 'magicss',
                                                     subType: 'mark-as-not-pinned-without-notification'
@@ -3654,7 +3658,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinInitiate']);
                                             if (isFirefox) {
                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                if (window.flagEditorInExternalWindow) {
+                                                if (myWin.flagEditorInExternalWindow) {
                                                     chromeRuntimeMessageIfRequired({
                                                         type: 'magicss',
                                                         subType: 'mark-as-pinned-without-notification'
@@ -3667,7 +3671,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinComplete']);
                                             } else {
                                                 // If the editor is in external window, then we may want to resize the window before requesting for permissions
-                                                if (window.flagEditorInExternalWindow) {
+                                                if (myWin.flagEditorInExternalWindow) {
                                                     const flagPermissions = await chromePermissionsContains({
                                                         permissions: ['webNavigation'],
                                                         origins: [tabOriginWithSlash]
@@ -3709,7 +3713,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                             }
                                                             if (status === 'request-granted') {
                                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                                if (window.flagEditorInExternalWindow) {
+                                                                if (myWin.flagEditorInExternalWindow) {
                                                                     chromeRuntimeMessageIfRequired({
                                                                         type: 'magicss',
                                                                         subType: 'mark-as-pinned-without-notification'
@@ -3739,7 +3743,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         }()),
                         (function () {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 return {
                                     name: 'edit-in-internal',
                                     title: 'Move editor inside page',
@@ -3760,7 +3764,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         }()),
                         (function () {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 return null;
                             }
                             if (isFirefox) {
@@ -3780,7 +3784,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             };
                         }()),
                         (function () {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 return null;
                             }
                             if (isFirefox) {
@@ -4092,7 +4096,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     cls: 'magicss-reload-all-css-resources',
                                     uniqCls: 'magicss-reload-all-css-resources',
                                     onclick: function (evt, editor) {
-                                        if (window.flagEditorInExternalWindow) {
+                                        if (myWin.flagEditorInExternalWindow) {
                                             chromeRuntimeMessageIfRequired({
                                                 type: 'magicss',
                                                 subType: 'magicss-reload-all-css-resources'
@@ -4675,7 +4679,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             // currently doing nothing
                         },
                         onClose: async function (editor, config) {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 if (config && config.closeByKeyPress) {
                                     chromeRuntimeMessageIfRequired({
                                         type: 'magicss',
@@ -4691,7 +4695,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         },
                         onSetTextValue: function (val) {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 chromeRuntimeMessageIfRequired({
                                     type: 'magicss',
                                     subType: 'magicss-set-text-value',
@@ -4700,7 +4704,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         },
                         delayedcursormove: function (editor) {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 let cssSelector = processSplitText({
                                     splitText: editor.splitTextByCursor(),
                                     useAlertNote: false
@@ -5012,7 +5016,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
 
-                // "window.flagEditorInExternalWindow" would also be true when "sessionStorageDataForInitialization" is truthy
+                // "myWin.flagEditorInExternalWindow" would also be true when "sessionStorageDataForInitialization" is truthy
                 if (sessionStorageDataForInitialization) {
                     for (const prop in sessionStorageDataForInitialization) {
                         await window.MagiCSSEditor.userPreference(prop, sessionStorageDataForInitialization[prop]);
@@ -5108,13 +5112,13 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             targetEditModeIsNotFile &&
                             notInsideIframe
                         ) {
-                            if (!window.flagEditorInExternalWindow) {
+                            if (!myWin.flagEditorInExternalWindow) {
                                 window.loadEditorInExternalWindow(editor);
                             }
                         }
 
                         if (magicCssLoadedFine) {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 chromeStorageForExtensionData.set({'last-time-editor-was-in-external-window': true}, function() {
                                     // do nothing
                                 });
