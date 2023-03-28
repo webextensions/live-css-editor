@@ -74,11 +74,13 @@ module.exports = function (env) {
             //       'eval-cheap-module-source-map' does not work for `CSS`.
 
             if (buildFor === 'web') {
-                return 'source-map';                   // Recommended for production mode for a webpage (this mode does not work well for a WebExtension)
+                return 'source-map';                      // This mode does not work for a WebExtension
             } else if (buildFor === 'development') {
-                return 'eval-cheap-module-source-map'; // Recommended for development mode for a webpage/WebExtension
+                // return 'eval-cheap-module-source-map'; // Recommended for development mode for a WebExtension Manifest V2
+                // return 'eval-source-map';              // Recommended for development mode for a WebExtension Manifest V2
+                return 'inline-source-map';               // Recommended for development mode for a WebExtension Manifest V2 / V3
             } else { // buildFor === 'publish'
-                return false;                          // Recommended for production mode for a WebExtension
+                return false;                             // Recommended for production mode for a WebExtension
             }
         })(),
 
