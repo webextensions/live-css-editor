@@ -51,6 +51,9 @@ module.exports = function (env) {
 
     const webpackConfig = {
         watch,
+        watchOptions: {
+            aggregateTimeout: 250
+        },
         mode: 'development',
         entry: {
             main: './src/main.js',
