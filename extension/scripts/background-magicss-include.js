@@ -367,23 +367,40 @@ if (myWin.flagEditorInExternalWindow) {
 
                 let width = request.width || 400,
                     height = request.height || 400;
-                const windowForExternalEditor = (
-                    window
-                        .open(
-                            (
-                                `${chrome.runtime.getURL('external-editor.html')}` +
+
+                (async () => {
+                    // const windowForExternalEditor = (
+                    //     window
+                    //         .open(
+                    //             (
+                    //                 `${chrome.runtime.getURL('external-editor.html')}` +
+                    //                 `?tabId=${sender.tab.id}` +
+                    //                 `&tabTitle=${encodeURIComponent(request.tabTitle)}` +
+                    //                 `&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}` +
+                    //                 `&magicssHostSessionUuid=${encodeURIComponent(request.magicssHostSessionUuid)}`
+                    //             ),
+                    //             `Magic CSS (Random Name: ${Math.random()})`,
+                    //             `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
+                    //         )
+                    // );
+                    const windowForExternalEditor = await chrome.windows.create({
+                        url: (
+                            `${chrome.runtime.getURL('external-editor.html')}` +
                                 `?tabId=${sender.tab.id}` +
                                 `&tabTitle=${encodeURIComponent(request.tabTitle)}` +
                                 `&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}` +
                                 `&magicssHostSessionUuid=${encodeURIComponent(request.magicssHostSessionUuid)}`
-                            ),
-                            `Magic CSS (Random Name: ${Math.random()})`,
-                            `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
-                        )
-                );
-                windowForExternalEditor.focus();
+                        ),
+                        width,
+                        height,
+                        type: 'popup',
+                        focused: true
+                    });
 
-                tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
+                    // windowForExternalEditor.focus();
+
+                    tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
+                })();
             } else if (request.closeExternalEditor) {
                 const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
                 if (windowForExternalEditor) {

@@ -60,6 +60,7 @@ module.exports = function (env) {
             'background-magicss': './background-magicss.js',
             options: './src/options/options.js',
             'load-editor': './scripts/load-editor.js',
+            'external-editor-base': './external-editor-base.js',
             'load-reapply': './scripts/load-reapply.js'
         },
         output: {
