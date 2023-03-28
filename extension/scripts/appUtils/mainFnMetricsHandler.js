@@ -32,18 +32,22 @@ const timeout = function (ms) {
 };
 
 const ajaxGet = async function ({ url }) {
-    return new Promise((resolve) => {
-        jQuery.ajax({
-            url,
-            method: 'get',
-            success: function (data) {
-                resolve([null, data]);
-            },
-            error: function (err) {
-                resolve([err]);
-            }
-        });
-    });
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            return [null, data];
+        } else {
+            return [
+                'error-in-fetching-data-from: ' + url,
+                {
+                    response
+                }
+            ];
+        }
+    } catch (err) {
+        return [err];
+    }
 };
 
 // https://stackoverflow.com/questions/5916900/how-can-you-detect-the-version-of-a-browser/16938481#16938481

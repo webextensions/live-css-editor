@@ -13,11 +13,6 @@ import { amplify } from './3rdparty/amplify-store.js';
 
     var USER_PREFERENCE_STORAGE_MODE = 'storage-mode';
 
-    var showReapplyingStylesNotification = true;
-    if (window.hideReapplyingStylesNotification === true) {
-        showReapplyingStylesNotification = false;
-    }
-
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
     var whichStoreToUse = await chromeStorageGet(chromeStorageForExtensionData, USER_PREFERENCE_STORAGE_MODE);
@@ -52,6 +47,14 @@ import { amplify } from './3rdparty/amplify-store.js';
         });
     };
 
+    var showReapplyingStylesNotification = true;
+    {
+        const showReapplyingStylesNotificationOption = await chromeStorageGet(chromeStorageForExtensionData, 'show-reapplying-styles-notification');
+        if (showReapplyingStylesNotificationOption === 'no') {
+            showReapplyingStylesNotification = false;
+        }
+    }
+
     var localStorageDisableStyles = 'disable-styles';
     var disableStyles = await getUserPreference(localStorageDisableStyles) === 'yes';
 
@@ -62,9 +65,12 @@ import { amplify } from './3rdparty/amplify-store.js';
     var cssText = (await getUserPreference(localStorageLastAppliedCss)).trim();
 
     if (cssText && applyStylesAutomatically && !disableStyles) {
-        var showReapplyingStylesNotificationAt = (window.showReapplyingStylesNotificationAt || 'top-right').split('-');
+        var showReapplyingStylesNotificationAt = await chromeStorageGet(chromeStorageForExtensionData, 'show-reapplying-styles-notification-at');
+        showReapplyingStylesNotificationAt = (showReapplyingStylesNotificationAt || 'top-right').split('-');
+
         var verticalAlignment = showReapplyingStylesNotificationAt[0] || 'top',
             horizontalAlignment = showReapplyingStylesNotificationAt[1] || 'right';
+
         var alertNoteConfig = {
             unobtrusive: true,
             verticalAlignment: verticalAlignment,

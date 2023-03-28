@@ -194,19 +194,24 @@ var extLib = {
                 //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
                 // });
 
-                chrome.scripting.executeScript({
-                    target: {
-                        tabId,
-                        allFrames,
-                        frameIds: frameId ? [frameId] : undefined
+                chrome.scripting.executeScript(
+                    {
+                        target: {
+                            tabId,
+                            allFrames,
+                            frameIds: frameId ? [frameId] : undefined
+                        },
+                        // runAt,
+                        files: [file]
+                        // callback: function () {
+                        //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+                        // }
                     },
-                    // runAt,
-                    files: [file]
-                    // callback: function () {
-                    //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
-                    // }
-                });
-                callback();
+                    function () {
+                        callback();
+                    }
+                );
+                // callback();
             }
         } else {
             if (file) {

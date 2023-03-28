@@ -176,6 +176,22 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
             }
         }
         return window.less;
+    } else if (dependencyToLoad === 'sass') {
+        if (typeof window.Sass === 'undefined') {
+            if (myWin.treatAsNormalWebpage) {
+                const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
+                    treatAsNormalWebpage: true,
+                    source: path3rdparty + 'sass/sass.sync.min.js'
+                });
+            } else {
+                await chromeRuntimeMessageToBackgroundScript({
+                    type: 'magicss-dependency',
+                    subType: 'load-dependency',
+                    payload: path3rdparty + 'sass/sass.sync.min.js'
+                });
+            }
+        }
+        return window.Sass;
     } else if (dependencyToLoad === 'main-bundle') {
         if (typeof window.reactMain === 'undefined') {
             if (myWin.treatAsNormalWebpage) {
@@ -287,12 +303,13 @@ var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload })
     });
 };
 
-var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, payload }) {
+var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, subTypeOptions, payload }) {
     return new Promise((resolve) => {
         chrome.runtime.sendMessage(
             {
                 type,
                 subType,
+                subTypeOptions,
                 payload
             },
             undefined,
@@ -2603,6 +2620,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 }
                             });
                         };
+
+                        const Sass = await loadIfNotAvailable('sass');
+                        fnSassToCssAndApply();
+
+                        /*
                         if (
                             // isOpera || // Commented out so that Opera users can use Sass the way it is loaded in Chrome (when installed from Chrome Web Store)
                             isFirefox ||
@@ -2685,6 +2707,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 }
                             }
                         }
+                        /* */
                     } else {
                         var cssCode = editor.getTextValue();
                         newStyleTag.cssText = cssCode;

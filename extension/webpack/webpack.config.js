@@ -241,6 +241,12 @@ module.exports = function (env) {
                                 from: path.join(extensionRoot,       'scripts', '3rdparty', 'basic-less-with-sourcemap-support.browserified.js'),
                                 to: path.resolve(targetExtensionDir, 'scripts', '3rdparty', 'basic-less-with-sourcemap-support.browserified.js')
                             },
+                            {
+                                // Sass
+                                from: path.join(extensionRoot,       'scripts', '3rdparty', 'sass', 'sass.sync.min.js'),
+                                to: path.resolve(targetExtensionDir, 'scripts', '3rdparty', 'sass', 'sass.sync.min.js')
+
+                            }
                         ];
                         return arr;
                     }())

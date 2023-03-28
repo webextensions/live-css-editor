@@ -113,7 +113,13 @@ const flagDevMode = (function () {
             chrome.runtime.onMessage.addListener(
                 function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
                     if (request.type === 'ga') {
-                        window._gaq.push(request.payload);
+                        if (
+                            typeof window !== 'undefined' &&
+                            window._gaq &&
+                            window._gaq.push
+                        ) {
+                            window._gaq.push(request.payload);
+                        }
 
                         // // Global site tag (gtag.js)
                         // window.dataLayer.push({'event': 'dummy-event'});

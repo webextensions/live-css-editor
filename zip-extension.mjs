@@ -105,9 +105,9 @@ try {
                 // 'ui-images/**/*.*',     // Exclude files in "ui-images" folder
                 // 'ui-images'             // Avoid "ui-images" folder from getting created
             ];
-            if (whichBrowser !== 'opera') {
-                pathsToIgnore.push('scripts/3rdparty/sass/**');
-            }
+            // if (whichBrowser !== 'opera') {
+            //     pathsToIgnore.push('scripts/3rdparty/sass/**');
+            // }
             return pathsToIgnore;
         }())
     }, {});

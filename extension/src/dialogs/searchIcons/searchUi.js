@@ -875,6 +875,9 @@ const SearchUi = function (props) {
         const [err, data, coreResponse] = await window.chromeRuntimeMessageToBackgroundScript({
             type: 'magicss-bg',
             subType: 'ajax',
+            subTypeOptions: {
+                provideResponseAs: 'json'
+            },
             payload: {
                 url: request_data.url,
                 type: request_data.method,
