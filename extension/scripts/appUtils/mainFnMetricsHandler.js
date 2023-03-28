@@ -1,7 +1,5 @@
 /* globals chrome, remoteConfig */
 
-import * as jQuery from '../3rdparty/jquery.js';
-
 import { getUuid } from './getUuid.js';
 import { isFeatureEnabled } from './isFeatureEnabled.js';
 import { metricsUrlGenerator } from './metricsUrlGenerator.js';
