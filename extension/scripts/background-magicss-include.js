@@ -775,12 +775,9 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
         // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
         (async () => {
-            const [a] = await chrome.tabs.query({ active: true, currentWindow: true });
-            const [b] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-            debugger;
-            const tab = a;
-            const tabId = tab.id;
-            debugger;
+            const [tabActiveCurrentWindow] = await chrome.tabs.query({ active: true, currentWindow: true });
+            const [tabActiveLastFocusedWindow] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+            const tabId = tabActiveCurrentWindow.id;
 
             extLib.loadMultipleJsCss({
                 treatAsNormalWebpage: myWin.treatAsNormalWebpage,
