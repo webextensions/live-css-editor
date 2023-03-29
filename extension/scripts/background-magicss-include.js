@@ -53,6 +53,32 @@ myWin.remoteConfigLoadedFromRemote = new Promise((resolve, reject) => {
     myWin.remoteConfigLoadedFromRemoteReject = reject;
 });
 
+// DEVHELPER: Useful for debugging purposes
+/*
+// Usage (inside function and condition which is going to eventually call sendResponse in (async) callback):
+//     sendResponse = wrapSendResponse({
+//         sendResponse,
+//         id: '<unique-id-for-each-message-type-being-handled>', // To compare the logs
+//         verbose: true
+//     });
+const wrapSendResponse = function ({
+    sendResponse,
+    id,
+    verbose
+}) {
+    console.log(`Wrapping message with id: ${id}`);
+    return function (data) {
+        let verboseValueToUse = verbose;
+        // verboseValueToUse = true;
+        // verboseValueToUse = false;
+        if (verboseValueToUse) {
+            console.log('sendResponse', id, data);
+        }
+        sendResponse(data);
+    };
+};
+/* */
+
 // eslint-disable-next-line no-unused-vars
 var devHelper = function () {
     // Running the code under a setTimeout so that in the console, the return value of this function (undefined) is
@@ -328,6 +354,9 @@ if (myWin.flagEditorInExternalWindow) {
                         }
                     }
                 );
+                // Need to return true to run "sendResponse" in async manner
+                // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                return true;
             } else if (type === 'magicss-instance-info') {
                 chrome.tabs.sendMessage(
                     sender.tab.id,
@@ -342,10 +371,10 @@ if (myWin.flagEditorInExternalWindow) {
                         sendResponse([instanceUuid, instanceBasisNumber]);
                     }
                 );
+                // Need to return true to run "sendResponse" in async manner
+                // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                return true;
             }
-            // Need to return true to run "sendResponse" in async manner
-            // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
-            return true;
         }
     );
 }
@@ -1175,3 +1204,15 @@ if (myWin.flagEditorInExternalWindow) {
 } else {
     onDOMContentLoadedHandler();
 }
+
+// DEVHELPER: Useful for debugging purposes
+/*
+(async () => {
+    debugger;
+    console.log('The Service Worker will deregister in 10 seconds.');
+    setTimeout(async () => {
+        await self.registration.unregister();
+        console.log('Service Worker is deregistered now.');
+    }, 10000);
+})();
+/* */
