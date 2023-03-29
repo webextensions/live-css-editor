@@ -21,11 +21,11 @@
         "unlimitedStorage",
         "scripting"
     ],
-    "host_permissions": [
-        "*://*/*"
-    ],
     "optional_permissions": [
         "webNavigation"
+    ],
+    "optional_host_permissions": [
+        "*://*/*"
     ],
     "action": {
         "default_icon": {
@@ -56,5 +56,6 @@
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'"
     },
-    "offline_enabled": true
+    "offline_enabled": true,
+    "minimum_chrome_version": "102"
 }

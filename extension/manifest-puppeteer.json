@@ -21,11 +21,11 @@
         "unlimitedStorage",
         "scripting"
     ],
-    "host_permissions": [
-        "*://*/*"
-    ],
     "optional_permissions": [
         "webNavigation"
+    ],
+    "optional_host_permissions": [
+        "*://*/*"
     ],
     "action": {
         "default_icon": {

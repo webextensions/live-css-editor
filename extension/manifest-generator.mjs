@@ -49,11 +49,11 @@ var generateManifest = function (whichBrowser) {
             return permissions;
         }()),
 
-        "host_permissions": (function () {
-            var host_permissions = [];
-            host_permissions.push("*://*/*");
-            return host_permissions;
-        }()),
+        // "host_permissions": (function () {
+        //     var host_permissions = [];
+        //     host_permissions.push("*://*/*");
+        //     return host_permissions;
+        // }()),
 
         "optional_permissions": (function () {
             var optional_permissions = [];
@@ -63,6 +63,13 @@ var generateManifest = function (whichBrowser) {
             }
             return optional_permissions;
         }()),
+
+        "optional_host_permissions": (function () {
+            var optional_host_permissions = [];
+            optional_host_permissions.push("*://*/*");
+            return optional_host_permissions;
+        }()),
+
         // "browser_action": {
         //     "default_icon": {
         //         "16": "icons/icon-16.png",
@@ -148,6 +155,11 @@ var generateManifest = function (whichBrowser) {
                 "strict_min_version": "48.0"
             }
         };
+    }
+
+    if (whichBrowser === "chrome") {
+        // https://github.com/w3c/webextensions/issues/119#issuecomment-1146576788
+        manifest["minimum_chrome_version"] = "102";
     }
 
     var targetFileName;

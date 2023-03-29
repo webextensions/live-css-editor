@@ -22,10 +22,10 @@
         "scripting",
         "webNavigation"
     ],
-    "host_permissions": [
+    "optional_permissions": [],
+    "optional_host_permissions": [
         "*://*/*"
     ],
-    "optional_permissions": [],
     "action": {
         "default_icon": {
             "16": "icons/icon-16.png",
