@@ -11,6 +11,8 @@ import {
     chromeStorageGet
 } from './utils/chromeStorage.js';
 
+import { TR } from './utils/i18n.js';
+
 import { extLib } from './chrome-extension-lib/ext-lib.js';
 import { basisNumberFromUuid } from './utils/basisNumberFromUuid.js';
 
@@ -18,8 +20,6 @@ import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
 import { myWin } from './appUtils/myWin.js';
 
 var USER_PREFERENCE_ALL_FRAMES = 'all-frames';
-
-var TR = extLib.TR;
 
 var fallbackConfig = {
     "mode": "offline",

@@ -52,19 +52,6 @@ if (isEdge || isOpera || isChrome) {
 }
 
 var extLib = {
-    TR: function (key, defaultValue) {
-        if (typeof chrome !== 'undefined' && chrome && chrome.i18n) {
-            return chrome.i18n.getMessage(key);
-        } else {
-            if (defaultValue) {
-                return defaultValue;
-            } else {
-                console.warn('No default value available for key: ' + key);
-                return '';
-            }
-        }
-    },
-
     loadCss: function (href) {
         const link = document.createElement('link');
 

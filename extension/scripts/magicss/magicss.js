@@ -5,6 +5,7 @@
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
+import { TR } from '../utils/i18n.js';
 import { alertNote } from '../utils/alertNote.js';
 import { delayFunctionUntilTestFunction } from '../utils/delayFunctionUntilTestFunction.js';
 import { minifyCss } from '../utils/minifyCss.js';
@@ -4336,7 +4337,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
                         {
                             skip: true,

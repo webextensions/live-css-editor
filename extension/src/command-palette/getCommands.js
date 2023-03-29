@@ -1,5 +1,3 @@
-/* global extLib */
-
 import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
 import {
     isCopyToClipboardSupported,
@@ -8,6 +6,7 @@ import {
 
 import { sendMessageForGa } from '../../scripts/magicss/metrics/sendMessageForGa.js';
 
+import { TR } from '../../scripts/utils/i18n.js';
 import { alertNote } from '../../scripts/utils/alertNote.js';
 
 import {
@@ -308,7 +307,7 @@ const getCommands = async (setRefreshedAt) => (
             iconCls: 'magicss-use-logo-twitter-gray',
             command() {
                 const extensionUrl = window.extensionUrl;
-                const url = 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions';
+                const url = 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions';
                 window.open(url);
                 sendMessageForGa(['_trackEvent', 'commandPalette', 'tweet']);
             }
