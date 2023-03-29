@@ -1,4 +1,4 @@
-/* globals chrome, remoteConfig */
+/* global chrome, remoteConfig */
 
 import { getUuid } from './getUuid.js';
 import { isFeatureEnabled } from './isFeatureEnabled.js';

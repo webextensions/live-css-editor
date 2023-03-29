@@ -1,4 +1,4 @@
-/* globals chrome */
+/* global chrome */
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';

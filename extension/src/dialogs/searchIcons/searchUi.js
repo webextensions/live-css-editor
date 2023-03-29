@@ -1,4 +1,4 @@
-/* globals sendMessageForGa */
+/* global sendMessageForGa */
 
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';

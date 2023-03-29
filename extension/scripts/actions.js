@@ -1,4 +1,4 @@
-/* globals chrome */
+/* global chrome */
 
 import { chromeStorageLocalGet } from './utils/chromeStorage.js';
 

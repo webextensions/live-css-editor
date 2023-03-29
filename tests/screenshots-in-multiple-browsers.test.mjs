@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* eslint-env node */
-/* globals chrome, describe, it, before, after */
+/* global chrome, describe, it, before, after */
 
 import path from 'path';
 
