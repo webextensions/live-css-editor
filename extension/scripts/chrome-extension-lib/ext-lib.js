@@ -91,7 +91,7 @@ var extLib = {
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
             frameId = options.frameId,
-            runAt = options.runAt || 'document_idle',
+            // runAt = options.runAt || 'document_idle',
             callback = options.callback;
 
         if (
