@@ -448,13 +448,19 @@ if (myWin.flagEditorInExternalWindow) {
                         const ajaxOb = JSON.parse(JSON.stringify(request.payload));
 
                         (async () => {
+                            let response = null;
+                            let responseText = null;
                             try {
-                                const response = await fetch(ajaxOb.url, {
+                                response = await fetch(ajaxOb.url, {
                                     method: ajaxOb.type,
                                     headers: ajaxOb.headers,
                                     body: ajaxOb.data
                                 });
-                                const responseText = await response.text();
+                                responseText = await response.text();
+
+                                if (!response.ok) {
+                                    throw new Error('Response is not ok');
+                                }
 
                                 let responseToReturn = null;
                                 if (
@@ -475,12 +481,20 @@ if (myWin.flagEditorInExternalWindow) {
                                     }
                                 ]);
                             } catch (err) {
+                                if (!responseText) {
+                                    try {
+                                        responseText = await response.text();
+                                    } catch (e) {
+                                        // do nothing
+                                    }
+                                }
                                 sendResponse([
                                     err,
                                     null,
                                     {
-                                        status: 0,
-                                        responseText: ''
+                                        status: response?.status || 0,
+                                        contentType: response?.headers?.get?.('content-type'),
+                                        responseText
                                     }
                                 ]);
                             }
