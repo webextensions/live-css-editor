@@ -580,15 +580,16 @@ if (myWin.flagEditorInExternalWindow) {
 console.log('Welcome :)');
 
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
-var runningInChromiumLikeEnvironment = function () {
-    if (window.location.href.indexOf('chrome-extension://') === 0) {
-        return true;
-    } else {
-        return false;
-    }
-};
 
-var runningInFirefoxLikeEnvironment = function () {
+// var runningInChromiumExtensionLikeEnvironment = function () {
+//     if (window.location.href.indexOf('chrome-extension://') === 0) {
+//         return true;
+//     } else {
+//         return false;
+//     }
+// };
+
+var runningInFirefoxExtensionLikeEnvironment = function () {
     // if (window.location.href.indexOf('moz-extension://') === 0) {
     //     return true;
     // } else {
@@ -625,7 +626,8 @@ var informUser = function (config) {
     // Note:
     //     alert() does not work on Firefox
     //     https://bugzilla.mozilla.org/show_bug.cgi?id=1203394
-    if (runningInChromiumLikeEnvironment()) {
+    // if (runningInChromiumLikeEnvironment()) {
+    if (!runningInFirefoxExtensionLikeEnvironment()) {
         alert(message);
     }
 };
@@ -1073,9 +1075,9 @@ var prerequisitesReady = function (main) {
             };
 
             if (url.indexOf('file:///') === 0) {
-                if (runningInFirefoxLikeEnvironment()) {
+                if (runningInFirefoxExtensionLikeEnvironment()) {
                     goAhead();
-                } else if (runningInChromiumLikeEnvironment()) {
+                } else { // if (runningInChromiumExtensionLikeEnvironment()) {
                     chrome.extension.isAllowedFileSchemeAccess(function (isAllowedAccess) {
                         if (isAllowedAccess) {
                             goAhead();
@@ -1095,19 +1097,19 @@ var prerequisitesReady = function (main) {
                             });
                         }
                     });
-                } else {
-                    var message = (
-                        'For your browser, "Live editor for CSS, Less & Sass" (Magic CSS) does not support running on:' +
-                        '\n    ' + url
-                    );
-                    informUser({
-                        message: message,
-                        tab: tab,
-                        badgeText: '!',
-                        badgeBackgroundColor: '#b00'
-                    });
-                    return;
-                }
+                } // else {
+                //     var message = (
+                //         'For your browser, "Live editor for CSS, Less & Sass" (Magic CSS) does not support running on:' +
+                //         '\n    ' + url
+                //     );
+                //     informUser({
+                //         message: message,
+                //         tab: tab,
+                //         badgeText: '!',
+                //         badgeBackgroundColor: '#b00'
+                //     });
+                //     return;
+                // }
             } else {
                 goAhead();
             }
@@ -1166,7 +1168,7 @@ var onDOMContentLoadedHandler = function () {
                         // do nothing
                     } else {
                         // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
-                        if (runningInFirefoxLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
+                        if (runningInFirefoxExtensionLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
                             (async () => {
                                 await reapplyCss(tabId);
                             })();
