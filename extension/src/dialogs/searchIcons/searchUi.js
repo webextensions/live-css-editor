@@ -1,4 +1,4 @@
-/* global sendMessageForGa */
+/* global sendMessageForGa, fnApplyTextAsCSS */
 
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
@@ -456,6 +456,7 @@ const ListOfIcons = function (props) {
                                                                                     }
                                                                                     await editor.setTextValue(strToInsert + code);
                                                                                     await editor.reInitTextComponent({pleaseIgnoreCursorActivity: true});
+                                                                                    await fnApplyTextAsCSS(editor);
 
                                                                                     editor.setCursor({ line: 0, ch: 0 }, {pleaseIgnoreCursorActivity: true});
                                                                                     editor.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 18 });

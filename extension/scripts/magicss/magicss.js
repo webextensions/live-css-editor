@@ -2725,6 +2725,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }
                     });
                 };
+                window.fnApplyTextAsCSS = fnApplyTextAsCSS;
 
                 var showFileEditOptions = async function (editor, callback) {
                     /* eslint-disable indent */
