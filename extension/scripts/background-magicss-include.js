@@ -1219,14 +1219,20 @@ if (myWin.flagEditorInExternalWindow) {
     onDOMContentLoadedHandler();
 }
 
-// DEVHELPER: Useful for debugging purposes
-/*
-(async () => {
-    debugger;
-    console.log('The Service Worker will deregister in 10 seconds.');
-    setTimeout(async () => {
+if (myWin.flagEditorInExternalWindow) {
+    // do nothing
+} else {
+    // DEVHELPER: Useful for debugging purposes
+    /*
+    (async () => {
+        const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await timeout(1000);
+
+        debugger;
+        console.log('The Service Worker will deregister in 10 seconds.');
+        await timeout(10000);
         await self.registration.unregister();
         console.log('Service Worker is deregistered now.');
-    }, 10000);
-})();
-/* */
+    })();
+    /* */
+}
