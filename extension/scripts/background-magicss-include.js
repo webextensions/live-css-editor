@@ -562,7 +562,7 @@ if (myWin.flagEditorInExternalWindow) {
 } else {
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         // Set icon for dark mode of browser
-        chrome.browserAction.setIcon({
+        chrome.action.setIcon({
             path: {
                 "16":  "icons/icon-dark-scheme-16.png",
                 "24":  "icons/icon-dark-scheme-24.png",
@@ -613,12 +613,12 @@ var informUser = function (config) {
     console.log(message);
 
     if (tabId) {
-        chrome.browserAction.setTitle({ tabId: tabId, title: message });
+        chrome.action.setTitle({ tabId: tabId, title: message });
         if (badgeText) {
-            chrome.browserAction.setBadgeText({ tabId: tabId, text: badgeText });
+            chrome.action.setBadgeText({ tabId: tabId, text: badgeText });
         }
         if (badgeBackgroundColor) {
-            chrome.browserAction.setBadgeBackgroundColor({ tabId: tabId, color: badgeBackgroundColor });
+            chrome.action.setBadgeBackgroundColor({ tabId: tabId, color: badgeBackgroundColor });
         }
     }
 
