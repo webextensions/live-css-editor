@@ -20,6 +20,7 @@
         "storage",
         "unlimitedStorage",
         "scripting",
+        "offscreen",
         "webNavigation"
     ],
     "optional_permissions": [],

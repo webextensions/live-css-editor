@@ -19,7 +19,8 @@
         "activeTab",
         "storage",
         "unlimitedStorage",
-        "scripting"
+        "scripting",
+        "offscreen"
     ],
     "optional_permissions": [
         "webNavigation"

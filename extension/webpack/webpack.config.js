@@ -58,6 +58,7 @@ module.exports = function (env) {
         entry: {
             main: './src/main.js',
             'background-magicss': './background-magicss.js',
+            'alert': './alert.js',
             options: './src/options/options.js',
             'load-editor': './scripts/load-editor.js',
             'external-editor-base': './external-editor-base.js',

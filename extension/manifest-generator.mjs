@@ -38,7 +38,8 @@ var generateManifest = function (whichBrowser) {
                 "activeTab",
                 "storage",
                 "unlimitedStorage",
-                "scripting"
+                "scripting",
+                "offscreen"
             ];
             if (whichBrowser === "firefox") {
                 permissions.push("webNavigation");
