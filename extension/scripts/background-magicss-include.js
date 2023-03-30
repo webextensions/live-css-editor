@@ -111,6 +111,7 @@ var devHelper = function () {
         console.log('========================================');
     });
 };
+globalThis.devHelper = devHelper;
 devHelper.clearSomeStorage = async function () {
     await chromeStorageLocalRemove('magicss-execution-counter');
     await chromeStorageSyncRemove('magicss-execution-counter');
