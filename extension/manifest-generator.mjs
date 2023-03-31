@@ -33,6 +33,7 @@ var generateManifest = function (whichBrowser) {
             "128": "icons/icon-128.png",
             "256": "icons/icon-256.png"
         },
+        // https://developer.chrome.com/docs/extensions/mv3/permission_warnings/#permissions_with_warnings
         "permissions": (function () {
             var permissions = [
                 "activeTab",
