@@ -303,6 +303,17 @@ var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload })
         }
     });
 };
+if (myWin.flagEditorInExternalWindow) {
+    // This is just to keep the service worker active when the external editor window is open
+    // To try alternative options: https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension
+    // https://github.com/webextensions/live-css-editor/issues/106
+    setInterval(() => {
+        chromeRuntimeMessageIfRequired({
+            type: 'magicss',
+            subType: 'stay-awake'
+        });
+    }, 4000);
+}
 
 var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, subTypeOptions, payload }) {
     return new Promise((resolve) => {
@@ -358,9 +369,9 @@ if (myWin.flagEditorInExternalWindow) {
     };
 } else {
     window.onbeforeunload = function () {
-        // https://stackoverflow.com/questions/53939205/how-to-avoid-extension-context-invalidated-errors-when-messaging-after-an-exte/54740757#54740757
+        // https://stackoverflow.com/questions/53939205/how-to-avoid-extension-context-invalidated-errors-when-messaging-after-an-exte/69603416#69603416
         // This `if` condition is required for ignoring some unwanted errors (or rather error like warnings, eg: When this code gets executed from within a webpage after the extension is refreshed from chrome://extensions/)
-        if (chrome.app && typeof chrome.app.isInstalled !== 'undefined') {
+        if (chrome.runtime?.id) {
             chrome.runtime.sendMessage({
                 closeExternalEditor: true
             });
@@ -4004,6 +4015,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                             });
                                                         } else if (request.subType === 'magicss-reload-all-css-resources') {
                                                             reloadAllCSSResourcesInPage();
+                                                        } else if (request.subType === 'stay-awake') {
+                                                            // Do nothing - This is just to keep the service worker active when the external editor window is open
                                                         } else {
                                                             console.log(`Received an unexpected event with subType: ${request.subType}`);
                                                         }

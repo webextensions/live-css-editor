@@ -432,11 +432,13 @@ if (myWin.flagEditorInExternalWindow) {
                     tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
                 })();
             } else if (request.closeExternalEditor) {
-                const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
-                if (windowForExternalEditor) {
-                    windowForExternalEditor.close();
-                }
-                delete tabConnectivityMap[sender.tab.id];
+                (async () => {
+                    const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
+                    if (windowForExternalEditor) {
+                        await chrome.windows.remove(windowForExternalEditor.id);
+                    }
+                    delete tabConnectivityMap[sender.tab.id];
+                })();
             }
         }
     );
