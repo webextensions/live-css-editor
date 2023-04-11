@@ -38,52 +38,53 @@ const isDevMode = function (extension) {
     }
 };
 
-(function() {
+const computeFlagRunningInDevMode = async function () {
+    const extension = await chrome.management.getSelf();
+    let flag = null;
+    if (isDevMode(extension)) {
+        flag = true;
+    } else {
+        flag = false;
+    }
+    return flag;
+};
+
+const setupMixpanel = async function () {
+    const flagRunningInDevMode = await computeFlagRunningInDevMode();
+
+    if (flagRunningInDevMode) {
+        // DEV: DEBUG: We may wish to enable/disable it for development and debugging depending on the functionality we are working on
+        return false;
+    }
+
     try {
-        chrome.management.getSelf(function (extension) {
-            /* */
-            // We may wish to enable/disable it for development and debugging depending on the functionality we are working on
-            if (isDevMode(extension)) { // 'development'
-                return;
-            }
-            /* */
-
-            try {
-                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
-                const getRandomIntInclusive = function (min, max) {
-                    min = Math.ceil(min);
-                    max = Math.floor(max);
-                    return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
-                };
-
-                // Some random delay which should not be too high since the background page of the extension can become inactive after a few seconds
-                const delay = getRandomIntInclusive(2250, 4500);
-                setTimeout(
-                    function () {
-                        (async function () {
-                            const instanceUuid = await chromeStorageLocalGet(INSTANCE_UUID);
-                            if (isValidUuidV4(instanceUuid)) {
-                                const MIXPANEL_PROJECT_TOKEN = '672f8c9aa876de5834bc48330f074412';
-                                if (isDevMode(extension)) {
-                                    mixpanel.init(MIXPANEL_PROJECT_TOKEN, { debug: true });
-                                } else {
-                                    mixpanel.init(MIXPANEL_PROJECT_TOKEN);
-                                }
-                                mixpanel.identify(instanceUuid);
-                            }
-                        }());
-                    },
-                    // Load with a delay since this network request is not required for showing the UI of the extension
-                    delay
+        const instanceUuid = await chromeStorageLocalGet(INSTANCE_UUID);
+        if (isValidUuidV4(instanceUuid)) {
+            const MIXPANEL_PROJECT_TOKEN = '672f8c9aa876de5834bc48330f074412';
+            if (flagRunningInDevMode) {
+                mixpanel.init(
+                    MIXPANEL_PROJECT_TOKEN,
+                    {
+                        api_host: "http://localhost:8040",
+                        api_method: 'GET',
+                        api_payload_format: 'json',
+                        debug: true
+                    }
                 );
-            } catch (e) {
-                // do nothing
+            } else {
+                mixpanel.init(MIXPANEL_PROJECT_TOKEN);
             }
-        });
+            mixpanel.identify(instanceUuid);
+            return true;
+        }
     } catch (e) {
         // do nothing
     }
+    return false;
+};
+let flagMixpanelSetupDone = false;
 
+(function() {
     if (!gaListenerAdded) {
         if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
             chrome.runtime.onMessage.addListener(
@@ -92,12 +93,15 @@ const isDevMode = function (extension) {
                         if (request.subType === 'event') {
                             const evt = request.payload;
 
-                            // `mixpanel._flags` seems to be getting set when we call the mixpanel.init() method, without
-                            // calling `mixpanel.init()`, we can't do tracking.
-                            // TODO: We may wish to improve this logic of `if(...)` condition
-                            if (mixpanel._flags) {
-                                mixpanel.track(evt.name, evt);
-                            }
+                            (async () => {
+                                if (!flagMixpanelSetupDone) {
+                                    flagMixpanelSetupDone = await setupMixpanel();
+                                }
+
+                                if (flagMixpanelSetupDone) {
+                                    mixpanel.track(evt.name, evt);
+                                }
+                            })();
                         }
                     }
                 }
