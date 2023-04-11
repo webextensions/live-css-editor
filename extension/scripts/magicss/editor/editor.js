@@ -7,7 +7,7 @@ import { utils } from '../../utils.js';
 import { alertNote } from '../../utils/alertNote.js';
 import { waterfall } from '../../utils/waterfall.js';
 import { runMigration } from '../../migrate-storage.js';
-import { sendMessageForGa } from '../metrics/sendMessageForGa.js';
+import { sendEventMessageForMetrics } from '../metrics/sendMessageForMetrics.js';
 import { amplify } from '../../3rdparty/amplify-store.js';
 
 import { myWin } from '../../appUtils/myWin.js';
@@ -764,7 +764,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                     // Clear corner positioning and allow free-style (jQuery uses top and left for draggable)
                     $(thisOb.container).css('bottom','').css('right','');
 
-                    sendMessageForGa([ '_trackEvent', 'dragEditor', 'start' ]);
+                    sendEventMessageForMetrics({
+                        name: 'dragEditor',
+                        type: 'start'
+                    });
                 },
                 stop: function (event, ui) {
                     setTimeout(async function () {
@@ -782,7 +785,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                             thisOb.focus();
                         }
 
-                        sendMessageForGa([ '_trackEvent', 'dragEditor', 'stop' ]);
+                        sendEventMessageForMetrics({
+                            name: 'dragEditor',
+                            type: 'stop'
+                        });
                     });
                 }
             });
@@ -988,7 +994,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                             });
                         });
 
-                        sendMessageForGa([ '_trackEvent', 'resizeEditor', 'start' ]);
+                        sendEventMessageForMetrics({
+                            name: 'resizeEditor',
+                            type: 'start'
+                        });
                     },
                     resize: function (event, ui) {
                         if (ui.size.width < CONSTANTS.USE_NORMAL_SIZE_EDITOR) {
@@ -1013,7 +1022,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                                     propagateTo: 'codemirror'
                                 }
                             );
-                            sendMessageForGa([ '_trackEvent', 'resizeEditor', 'stop' ]);
+                            sendEventMessageForMetrics({
+                                name: 'resizeEditor',
+                                type: 'stop'
+                            });
                         });
                     }
                 });

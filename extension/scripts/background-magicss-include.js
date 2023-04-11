@@ -12,6 +12,8 @@ import {
 } from './utils/chromeStorage.js';
 
 import { TR } from './utils/i18n.js';
+import { isValidUuidV4 } from './utils/isValidUuidV4.js';
+import { randomUUID } from './utils/randomUUID.js';
 
 import { extLib } from './chrome-extension-lib/ext-lib.js';
 import { basisNumberFromUuid } from './utils/basisNumberFromUuid.js';
@@ -124,29 +126,6 @@ devHelper.clearSomeStorage = async function () {
 if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
-    // TODO: REUSE: Move this under "extLib"
-    const isValidUuidV4 = function (str) {
-        const v4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        if (v4Regex.test(str)) {
-            return true;
-        } else {
-            return false;
-        }
-    };
-
-    const randomUUID = function () {
-        let uuid;
-        if (typeof crypto.randomUUID === 'function') {
-            uuid = crypto.randomUUID();
-        } else {
-            // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid/2117523#2117523
-            uuid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-            );
-        }
-        return uuid;
-    };
-
     // Use this for the cases where the code should never reach in imaginable scenarios.
     const requestUserViaConsoleToReportUnexpectedError = function (e) {
         console.error(e);

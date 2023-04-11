@@ -31,7 +31,7 @@ import {
     APP_$_SEARCH_ICONS_CONFIGURATION_SET_SECRET
 } from 'reducers/actionTypes.js';
 
-import { sendMessageForGa } from '../../../scripts/magicss/metrics/sendMessageForGa.js';
+import { sendEventMessageForMetrics } from '../../../scripts/magicss/metrics/sendMessageForMetrics.js';
 
 import { alertNote } from '../../../scripts/utils/alertNote.js';
 
@@ -114,7 +114,11 @@ const SearchIconsConfiguration = function (props) {
         };
 
         const doTestConnection = async function () {
-            sendMessageForGa(['_trackEvent', 'getIcons', 'testConnectionInitiated']);
+            sendEventMessageForMetrics({
+                name: 'getIconsTestConnection',
+                type: 'initiated',
+                spot: 'getIconsConfiguration'
+            });
 
             // http://lti.tools/oauth/
             const oauth = OAuth({
@@ -158,14 +162,22 @@ const SearchIconsConfiguration = function (props) {
                     [READYSTATE]: ERROR,
                     [STATUSCODE]: coreResponse.status,
                 });
-                sendMessageForGa(['_trackEvent', 'getIcons', 'testConnectionError']);
+                sendEventMessageForMetrics({
+                    name: 'getIconsTestConnection',
+                    type: 'error',
+                    spot: 'getIconsConfiguration'
+                });
             } else {
                 setTestConnectionStatus({
                     [READYSTATE]: LOADED,
                     [STATUSCODE]: coreResponse.status,
                     data
                 });
-                sendMessageForGa(['_trackEvent', 'getIcons', 'testConnectionSuccess']);
+                sendEventMessageForMetrics({
+                    name: 'getIconsTestConnection',
+                    type: 'success',
+                    spot: 'getIconsConfiguration'
+                });
             }
         };
 

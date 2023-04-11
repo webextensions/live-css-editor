@@ -1,4 +1,4 @@
-/* global sendMessageForGa, fnApplyTextAsCSS */
+/* global sendEventMessageForMetrics, fnApplyTextAsCSS */
 
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
@@ -120,7 +120,10 @@ const ListOfIcons = function (props) {
                 [READYSTATE]: LOADING
             });
 
-            sendMessageForGa(['_trackEvent', 'getIcons', 'receiveSvgIconDataInitiated']);
+            sendEventMessageForMetrics({
+                name: 'receiveSvgIconDataInitiated',
+                spot: 'getIcons'
+            });
             const [err, data, coreResponse] = ( // eslint-disable-line no-unused-vars
                 await window.chromeRuntimeMessageToBackgroundScript({
                     type: 'magicss-bg',
@@ -136,7 +139,10 @@ const ListOfIcons = function (props) {
                     [READYSTATE]: ERROR,
                     status: '✘ Failed to get icon data'
                 });
-                sendMessageForGa(['_trackEvent', 'getIcons', 'receiveSvgIconDataError']);
+                sendEventMessageForMetrics({
+                    name: 'receiveSvgIconDataError',
+                    spot: 'getIcons'
+                });
             } else if (coreResponse && coreResponse.status === 200 && coreResponse.responseText) {
                 const svgInResponse = coreResponse.responseText;
 
@@ -145,14 +151,20 @@ const ListOfIcons = function (props) {
                     svgXml: svgInResponse,
                     contentType: coreResponse.contentType
                 });
-                sendMessageForGa(['_trackEvent', 'getIcons', 'receiveSvgIconDataSuccess']);
+                sendEventMessageForMetrics({
+                    name: 'receiveSvgIconDataSuccess',
+                    spot: 'getIcons'
+                });
             } else {
                 // Unexpected error
                 setSvgContents({
                     [READYSTATE]: ERROR,
                     status: '✘ Failed to get icon data'
                 });
-                sendMessageForGa(['_trackEvent', 'getIcons', 'receiveSvgIconDataErrorUnexpected']);
+                sendEventMessageForMetrics({
+                    name: 'receiveSvgIconDataErrorUnexpected',
+                    spot: 'getIcons'
+                });
             }
         }
     };
@@ -466,7 +478,10 @@ const ListOfIcons = function (props) {
                                                                                         type: APP_$_CLOSE_SEARCH_ICONS
                                                                                     });
 
-                                                                                    sendMessageForGa(['_trackEvent', 'getIcons', 'svgIconInsertedInEditor']);
+                                                                                    sendEventMessageForMetrics({
+                                                                                        name: 'svgIconInsertedInEditor',
+                                                                                        spot: 'getIcons'
+                                                                                    });
                                                                                 });
 
 
@@ -502,7 +517,10 @@ const ListOfIcons = function (props) {
                                                                                 setTimeout(async function () {
                                                                                     const flag = await copyToClipboard(prevState['svgXml']);
                                                                                     if (!flag) {
-                                                                                        sendMessageForGa(['_trackEvent', 'getIcons', 'svgIconCopyError']);
+                                                                                        sendEventMessageForMetrics({
+                                                                                            name: 'svgIconCopyError',
+                                                                                            spot: 'getIcons'
+                                                                                        });
                                                                                         setSvgContents(function (prevState) {
                                                                                             return {
                                                                                                 ...prevState,
@@ -511,7 +529,10 @@ const ListOfIcons = function (props) {
                                                                                         });
                                                                                     }
                                                                                 });
-                                                                                sendMessageForGa(['_trackEvent', 'getIcons', 'svgIconCopySuccess']);
+                                                                                sendEventMessageForMetrics({
+                                                                                    name: 'svgIconCopySuccess',
+                                                                                    spot: 'getIcons'
+                                                                                });
                                                                                 return {
                                                                                     ...prevState,
                                                                                     status: '✔ Copied SVG'
@@ -547,7 +568,10 @@ const ListOfIcons = function (props) {
                                                                                     const dataUrl = `data:${prevState['contentType']};base64,` + btoa(prevState['svgXml']);
                                                                                     const flag = await copyToClipboard(dataUrl);
                                                                                     if (!flag) {
-                                                                                        sendMessageForGa(['_trackEvent', 'getIcons', 'svgIconCopyDataUrlError']);
+                                                                                        sendEventMessageForMetrics({
+                                                                                            name: 'svgIconCopyDataUrlError',
+                                                                                            spot: 'getIcons'
+                                                                                        });
                                                                                         setSvgContents(function (prevState) {
                                                                                             return {
                                                                                                 ...prevState,
@@ -556,7 +580,10 @@ const ListOfIcons = function (props) {
                                                                                         });
                                                                                     }
                                                                                 });
-                                                                                sendMessageForGa(['_trackEvent', 'getIcons', 'svgIconCopyDataUrlSuccess']);
+                                                                                sendEventMessageForMetrics({
+                                                                                    name: 'svgIconCopyDataUrlSuccess',
+                                                                                    spot: 'getIcons'
+                                                                                });
                                                                                 return {
                                                                                     ...prevState,
                                                                                     status: '✔ Copied Data URL'
@@ -836,7 +863,10 @@ const SearchUi = function (props) {
     });
 
     const doSearch = async function ({ page }) {
-        sendMessageForGa(['_trackEvent', 'getIcons', 'initiatedSearch']);
+        sendEventMessageForMetrics({
+            name: 'initiatedSearch',
+            spot: 'getIcons'
+        });
 
         // http://lti.tools/oauth/
         const oauth = OAuth({
@@ -900,8 +930,15 @@ const SearchUi = function (props) {
                     [STATUSCODE_FURTHER]: coreResponse.status,
                 });
             }
-            sendMessageForGa(['_trackEvent', 'getIcons', 'searchError']);
-            sendMessageForGa(['_trackEvent', 'getIcons', 'searchErrorForPage' + page]);
+            sendEventMessageForMetrics({
+                name: 'searchError',
+                spot: 'getIcons'
+            });
+            sendEventMessageForMetrics({
+                name: 'searchErrorForPage',
+                index: page,
+                spot: 'getIcons'
+            });
         } else {
             if (page === 1) {
                 setOutput({
@@ -918,8 +955,15 @@ const SearchUi = function (props) {
                     icons: output.icons.concat(data.icons)
                 });
             }
-            sendMessageForGa(['_trackEvent', 'getIcons', 'searchSuccess']);
-            sendMessageForGa(['_trackEvent', 'getIcons', 'searchSuccessForPage' + page]);
+            sendEventMessageForMetrics({
+                name: 'searchSuccess',
+                spot: 'getIcons'
+            });
+            sendEventMessageForMetrics({
+                name: 'searchSuccessForPage',
+                index: page,
+                spot: 'getIcons'
+            });
         }
     };
 
