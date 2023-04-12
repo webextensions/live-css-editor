@@ -57,5 +57,6 @@
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'"
     },
-    "offline_enabled": true
+    "offline_enabled": true,
+    "minimum_chrome_version": "102"
 }

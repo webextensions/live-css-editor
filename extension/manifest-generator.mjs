@@ -160,9 +160,16 @@ var generateManifest = function (whichBrowser) {
         };
     }
 
-    if (whichBrowser === "chrome") {
-        // https://github.com/w3c/webextensions/issues/119#issuecomment-1146576788
-        manifest["minimum_chrome_version"] = "102";
+    switch (whichBrowser) {
+        case "edge":
+        case "firefox":
+        case "opera":
+        case "puppeteer":
+            break;
+        case "chrome":
+        default:
+            // https://github.com/w3c/webextensions/issues/119#issuecomment-1146576788
+            manifest["minimum_chrome_version"] = "102";
     }
 
     var targetFileName;
