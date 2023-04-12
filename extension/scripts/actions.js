@@ -15,7 +15,7 @@ import { myWin } from './appUtils/myWin.js';
 
 const INSTANCE_UUID = 'instance-uuid';
 
-let gaListenerAdded = false;
+let mpListenerAdded = false;
 let metricsListenerAdded = false;
 
 /*
@@ -87,7 +87,7 @@ const setupMixpanel = async function () {
 let flagMixpanelSetupDone = false;
 
 (function() {
-    if (!gaListenerAdded) {
+    if (!mpListenerAdded) {
         if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
             chrome.runtime.onMessage.addListener(
                 function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
@@ -116,7 +116,7 @@ let flagMixpanelSetupDone = false;
                     }
                 }
             );
-            gaListenerAdded = true;
+            mpListenerAdded = true;
         }
     }
 
