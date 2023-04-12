@@ -58,7 +58,6 @@ You might want to use it for:
 Notes:
 ➤ The CSS/Less/Sass code you write gets applied as you write it
 ➤ The CSS reloader watches CSS files and live updates them immediately
-➤ The Sass parser is loaded remotely from https://cdnjs.cloudflare.com/ajax/libs/sass.js/...
 ➤ You can develop the code and see the output at the same time
 ➤ The code is saved in file/browser as soon as you write it
 ➤ The code editor is draggable and resizable
