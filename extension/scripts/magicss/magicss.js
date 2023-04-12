@@ -1,10 +1,11 @@
-/* global jQuery, Sass, chrome, CodeMirror, io, toastr */
+/* global jQuery, chrome, CodeMirror, io, toastr */
 
 // TODO: Remove turning off of this rule (require-atomic-updates)
 /* eslint require-atomic-updates: "off" */
 
 /*! https://webextensions.org/ by Priyank Parashar | MIT license */
 
+import { TR } from '../utils/i18n.js';
 import { alertNote } from '../utils/alertNote.js';
 import { delayFunctionUntilTestFunction } from '../utils/delayFunctionUntilTestFunction.js';
 import { minifyCss } from '../utils/minifyCss.js';
@@ -15,10 +16,13 @@ import {
     addStyleTag,
     StyleTag
 } from '../utils/StyleTag.js';
+
+import { myWin } from '../appUtils/myWin.js';
+
 import { extLib } from '../chrome-extension-lib/ext-lib.js';
 import sourceMap from '../3rdparty/source-map.js';
 
-import { sendMessageForGa } from './metrics/sendMessageForGa.js';
+import { sendEventMessageForMetrics } from './metrics/sendMessageForMetrics.js';
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
@@ -159,7 +163,7 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
 
     if (dependencyToLoad === 'less') {
         if (typeof window.less === 'undefined') {
-            if (window.treatAsNormalWebpage) {
+            if (myWin.treatAsNormalWebpage) {
                 const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
                     treatAsNormalWebpage: true,
                     source: path3rdparty + 'basic-less-with-sourcemap-support.browserified.js'
@@ -173,9 +177,25 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
             }
         }
         return window.less;
+    } else if (dependencyToLoad === 'sass') {
+        if (typeof window.Sass === 'undefined') {
+            if (myWin.treatAsNormalWebpage) {
+                const [err] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
+                    treatAsNormalWebpage: true,
+                    source: path3rdparty + 'sass/sass.sync.min.js'
+                });
+            } else {
+                await chromeRuntimeMessageToBackgroundScript({
+                    type: 'magicss-dependency',
+                    subType: 'load-dependency',
+                    payload: path3rdparty + 'sass/sass.sync.min.js'
+                });
+            }
+        }
+        return window.Sass;
     } else if (dependencyToLoad === 'main-bundle') {
         if (typeof window.reactMain === 'undefined') {
-            if (window.treatAsNormalWebpage) {
+            if (myWin.treatAsNormalWebpage) {
                 const [errCss] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
                     treatAsNormalWebpage: true,
                     source: pathDist + 'main.bundle.css'
@@ -264,7 +284,7 @@ var getConfig = async function () {
 
 var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload }) {
     return new Promise((resolve) => {
-        if (window.flagEditorInExternalWindow) {
+        if (myWin.flagEditorInExternalWindow) {
             chrome.runtime.sendMessage(
                 {
                     tabId,
@@ -283,13 +303,25 @@ var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload })
         }
     });
 };
+if (myWin.flagEditorInExternalWindow) {
+    // This is just to keep the service worker active when the external editor window is open
+    // To try alternative options: https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension
+    // https://github.com/webextensions/live-css-editor/issues/106
+    setInterval(() => {
+        chromeRuntimeMessageIfRequired({
+            type: 'magicss',
+            subType: 'stay-awake'
+        });
+    }, 4000);
+}
 
-var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, payload }) {
+var chromeRuntimeMessageToBackgroundScript = async function ({ type, subType, subTypeOptions, payload }) {
     return new Promise((resolve) => {
         chrome.runtime.sendMessage(
             {
                 type,
                 subType,
+                subTypeOptions,
                 payload
             },
             undefined,
@@ -312,18 +344,17 @@ var sendMessageForMetrics = function (payload) {
     }
 };
 
-sendMessageForGa([
-    '_trackPageview',
-    window.flagEditorInExternalWindow ? '/external-editor' : '/in-page-editor'
-]);
+sendEventMessageForMetrics({
+    name: 'pageview',
+    path: myWin.flagEditorInExternalWindow ? '/external-editor' : '/in-page-editor'
+});
 
-sendMessageForGa([
-    '_trackEvent',
-    'loadedEditor',
-    window.flagEditorInExternalWindow ? 'externalEditor' : 'inPageEditor'
-]);
+sendEventMessageForMetrics({
+    name: 'loadedEditor',
+    type: myWin.flagEditorInExternalWindow ? 'externalEditor' : 'inPageEditor'
+});
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     chromeRuntimeMessageIfRequired({
         type: 'magicss',
         subType: 'external-editor-window-is-loading'
@@ -337,9 +368,9 @@ if (window.flagEditorInExternalWindow) {
     };
 } else {
     window.onbeforeunload = function () {
-        // https://stackoverflow.com/questions/53939205/how-to-avoid-extension-context-invalidated-errors-when-messaging-after-an-exte/54740757#54740757
+        // https://stackoverflow.com/questions/53939205/how-to-avoid-extension-context-invalidated-errors-when-messaging-after-an-exte/69603416#69603416
         // This `if` condition is required for ignoring some unwanted errors (or rather error like warnings, eg: When this code gets executed from within a webpage after the extension is refreshed from chrome://extensions/)
-        if (chrome.app && typeof chrome.app.isInstalled !== 'undefined') {
+        if (chrome.runtime?.id) {
             chrome.runtime.sendMessage({
                 closeExternalEditor: true
             });
@@ -347,7 +378,7 @@ if (window.flagEditorInExternalWindow) {
     };
 }
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     alertNote.setup({
         paddingRight: '25px',
         paddingBottom: '25px',
@@ -795,6 +826,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
     // for HTML frameset pages, this value would be 'FRAMESET'
     // chrome.tabs.executeScript uses allFrames: true, to run inside all frames
+    // TODO: Check if it is still the same for chrome.tabs.scripting
     if (document.body.tagName !== 'BODY') {
         return;
     }
@@ -1214,7 +1246,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
             };
         });
     };
-    if (window.flagEditorInExternalWindow) {
+    if (myWin.flagEditorInExternalWindow) {
         setTimeout(async () => {
             const cssSelectorsAutocompleteObjects = await chromeRuntimeMessageIfRequired({
                 type: 'magicss',
@@ -1877,7 +1909,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
 
     var main = async function () {
         let sessionStorageDataForInitialization = null;
-        if (window.flagEditorInExternalWindow) {
+        if (myWin.flagEditorInExternalWindow) {
             const sessionStorageData = await chromeRuntimeMessageIfRequired({
                 type: 'magicss',
                 subType: 'storage-data-to-initialize'
@@ -2599,6 +2631,11 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 }
                             });
                         };
+
+                        const Sass = await loadIfNotAvailable('sass');
+                        fnSassToCssAndApply();
+
+                        /*
                         if (
                             // isOpera || // Commented out so that Opera users can use Sass the way it is loaded in Chrome (when installed from Chrome Web Store)
                             isFirefox ||
@@ -2618,7 +2655,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     alertNote('Loading... Sass parser from:<br />' + sassJsUrl, 10000);
                                 }
 
-                                if (window.flagEditorInExternalWindow) {
+                                if (myWin.flagEditorInExternalWindow) {
                                     const script = document.createElement('script');
                                     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js';
                                     script.onload = function () {
@@ -2681,6 +2718,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 }
                             }
                         }
+                        /* */
                     } else {
                         var cssCode = editor.getTextValue();
                         newStyleTag.cssText = cssCode;
@@ -2697,6 +2735,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }
                     });
                 };
+                window.fnApplyTextAsCSS = fnApplyTextAsCSS;
 
                 var showFileEditOptions = async function (editor, callback) {
                     /* eslint-disable indent */
@@ -2935,7 +2974,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             editor.cm.clearHistory();
 
                             window.languageModeIsIntermittent = false;
-                            sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'file']);
+                            sendEventMessageForMetrics({
+                                name: 'switchedSelectedMode',
+                                type: 'file'
+                            });
                         });
                     } else {
                         editor.options.rememberText = true;
@@ -2963,7 +3005,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (!options.skipNotifications) {
                                 alertNote('Now editing code in LESS mode', 5000);
                             }
-                            sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'less']);
+                            sendEventMessageForMetrics({
+                                name: 'switchedSelectedMode',
+                                type: 'less'
+                            });
                         } else if (newLanguageMode === 'sass') {
                             setLanguageModeClass(editor, 'magicss-selected-mode-sass');
                             await editor.userPreference('language-mode', 'sass');
@@ -2972,7 +3017,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (!options.skipNotifications) {
                                 alertNote('Now editing code in SASS mode', 5000);
                             }
-                            sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'sass']);
+                            sendEventMessageForMetrics({
+                                name: 'switchedSelectedMode',
+                                type: 'sass'
+                            });
                         } else {
                             setLanguageModeClass(editor, 'magicss-selected-mode-css');
                             await editor.userPreference('language-mode', 'css');
@@ -2980,7 +3028,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             if (!options.skipNotifications) {
                                 alertNote('Now editing code in CSS mode', 5000);
                             }
-                            sendMessageForGa(['_trackEvent', 'switchedSelectedMode', 'css']);
+                            sendEventMessageForMetrics({
+                                name: 'switchedSelectedMode',
+                                type: 'css'
+                            });
                         }
                         await fnApplyTextAsCSS(editor, {
                             skipNotifications: options.skipNotifications
@@ -3265,7 +3316,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                         }
 
                         $(document).on('click', '.webextensions-login-icon-in-header', async function () {
-                            sendMessageForGa(['_trackEvent', 'trigger-to-site', 'login-icon-in-header']);
+                            sendEventMessageForMetrics({
+                                name: 'trigger-to-site',
+                                spot: 'login-icon-in-header'
+                            });
                         });
 
                         $(document).on('click', '.magicss-mode-css', async function () {
@@ -3275,7 +3329,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 type: 'magicss',
                                 subType: 'set-language-mode-to-css'
                             });
-                            sendMessageForGa(['_trackEvent', 'clickedSwitchSelectedMode', 'css']);
+                            sendEventMessageForMetrics({
+                                name: 'clickedSwitchSelectedMode',
+                                type: 'css'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-less', async function () {
                             await setLanguageMode('less', editor);
@@ -3284,7 +3341,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 type: 'magicss',
                                 subType: 'set-language-mode-to-less'
                             });
-                            sendMessageForGa(['_trackEvent', 'clickedSwitchSelectedMode', 'less']);
+                            sendEventMessageForMetrics({
+                                name: 'clickedSwitchSelectedMode',
+                                type: 'less'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-sass', async function () {
                             await setLanguageMode('sass', editor);
@@ -3293,12 +3353,18 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 type: 'magicss',
                                 subType: 'set-language-mode-to-sass'
                             });
-                            sendMessageForGa(['_trackEvent', 'clickedSwitchSelectedMode', 'sass']);
+                            sendEventMessageForMetrics({
+                                name: 'clickedSwitchSelectedMode',
+                                type: 'sass'
+                            });
                         });
                         $(document).on('click', '.magicss-mode-file', async function () {
                             await setLanguageMode('file', editor);
                             editor.focus();
-                            sendMessageForGa(['_trackEvent', 'clickedSwitchSelectedMode', 'file']);
+                            sendEventMessageForMetrics({
+                                name: 'clickedSwitchSelectedMode',
+                                type: 'file'
+                            });
                         });
 
                         return $outer;
@@ -3419,7 +3485,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 ),
                                 onCssHintSelectForSelector: function (selectedText) {
                                     var editor = window.MagiCSSEditor;
-                                    if (window.flagEditorInExternalWindow) {
+                                    if (myWin.flagEditorInExternalWindow) {
                                         setTimeout(async () => {
                                             const cssSelector = selectedText.originalSelector;
                                             var selectorMatchCount = await chromeRuntimeMessageIfRequired({
@@ -3522,7 +3588,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         type: 'APP_$_OPEN_COMMAND_PALETTE'
                                     });
 
-                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedShowMoreCommands']);
+                                    sendEventMessageForMetrics({
+                                        name: 'clickedShowMoreCommands',
+                                        spot: 'header'
+                                    });
                                 } catch (e) {
                                     handleUnrecoverableError(e);
                                 }
@@ -3591,7 +3660,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             ) {
                                                 event.preventDefault();
 
-                                                if (window.flagEditorInExternalWindow) {
+                                                if (myWin.flagEditorInExternalWindow) {
                                                     chromeRuntimeMessageIfRequired({
                                                         type: 'magicss',
                                                         subType: 'magicss-reload-all-css-resources'
@@ -3600,7 +3669,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     reloadAllCSSResourcesInPage();
                                                 }
 
-                                                sendMessageForGa(['_trackEvent', 'fromKeyboardShortcut', 'reloadCssResources']);
+                                                sendEventMessageForMetrics({
+                                                    name: 'reloadCssResources',
+                                                    spot: 'fromKeyboardShortcut'
+                                                });
                                             }
                                         }
                                     },
@@ -3619,7 +3691,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     cls: 'magicss-reapply-styles editor-gray-out',
                                     onclick: async function (evt, editor, divIcon) {
                                         let tabOriginWithSlash;
-                                        if (window.flagEditorInExternalWindow) {
+                                        if (myWin.flagEditorInExternalWindow) {
                                             const urlParams = new URLSearchParams(window.location.search);
                                             tabOriginWithSlash = urlParams.get('tabOriginWithSlash');
                                         } else {
@@ -3637,9 +3709,12 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         }
 
                                         if ($(divIcon).parents('#' + id).hasClass('magic-css-apply-styles-automatically')) {
-                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyUnpinInitiate']);
+                                            sendEventMessageForMetrics({
+                                                name: 'applyStylesAutomaticallyUnpinInitiate',
+                                                spot: 'header'
+                                            });
                                             await markAsPinnedOrNotPinned(editor, 'not-pinned');
-                                            if (window.flagEditorInExternalWindow) {
+                                            if (myWin.flagEditorInExternalWindow) {
                                                 chromeRuntimeMessageIfRequired({
                                                     type: 'magicss',
                                                     subType: 'mark-as-not-pinned-without-notification'
@@ -3649,12 +3724,18 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 '<span style="font-weight:normal;">Now onwards,</span> styles would be applied only when you load this extension <span style="font-weight:normal;"><br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                 5000
                                             );
-                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyUnpinComplete']);
+                                            sendEventMessageForMetrics({
+                                                name: 'applyStylesAutomaticallyUnpinComplete',
+                                                spot: 'header'
+                                            });
                                         } else {
-                                            sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinInitiate']);
+                                            sendEventMessageForMetrics({
+                                                name: 'applyStylesAutomaticallyPinInitiate',
+                                                spot: 'header'
+                                            });
                                             if (isFirefox) {
                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                if (window.flagEditorInExternalWindow) {
+                                                if (myWin.flagEditorInExternalWindow) {
                                                     chromeRuntimeMessageIfRequired({
                                                         type: 'magicss',
                                                         subType: 'mark-as-pinned-without-notification'
@@ -3664,10 +3745,13 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically  <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                     10000
                                                 );
-                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinComplete']);
+                                                sendEventMessageForMetrics({
+                                                    name: 'applyStylesAutomaticallyPinComplete',
+                                                    spot: 'header'
+                                                });
                                             } else {
                                                 // If the editor is in external window, then we may want to resize the window before requesting for permissions
-                                                if (window.flagEditorInExternalWindow) {
+                                                if (myWin.flagEditorInExternalWindow) {
                                                     const flagPermissions = await chromePermissionsContains({
                                                         permissions: ['webNavigation'],
                                                         origins: [tabOriginWithSlash]
@@ -3709,7 +3793,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                             }
                                                             if (status === 'request-granted') {
                                                                 await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                                if (window.flagEditorInExternalWindow) {
+                                                                if (myWin.flagEditorInExternalWindow) {
                                                                     chromeRuntimeMessageIfRequired({
                                                                         type: 'magicss',
                                                                         subType: 'mark-as-pinned-without-notification'
@@ -3719,10 +3803,16 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                     '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
                                                                     10000
                                                                 );
-                                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinComplete']);
+                                                                sendEventMessageForMetrics({
+                                                                    name: 'applyStylesAutomaticallyPinComplete',
+                                                                    spot: 'header'
+                                                                });
                                                             } else if (status === 'request-not-granted') {
                                                                 alertNote('You need to provide permissions to reapply styles automatically', 10000);
-                                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'applyStylesAutomaticallyPinIncompleteDueToPermission']);
+                                                                sendEventMessageForMetrics({
+                                                                    name: 'applyStylesAutomaticallyPinIncompleteDueToPermission',
+                                                                    spot: 'header'
+                                                                });
                                                             }
                                                         }
                                                     );
@@ -3739,7 +3829,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         }()),
                         (function () {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 return {
                                     name: 'edit-in-internal',
                                     title: 'Move editor inside page',
@@ -3750,7 +3840,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                             subType: 'reopen-main-editor'
                                         });
 
-                                        sendMessageForGa(['_trackEvent', 'fromHeader', 'moveEditorInsidePage']);
+                                        sendEventMessageForMetrics({
+                                            name: 'moveEditorInsidePage',
+                                            spot: 'header'
+                                        });
 
                                         window.close();
                                     }
@@ -3760,7 +3853,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         }()),
                         (function () {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 return null;
                             }
                             if (isFirefox) {
@@ -3775,12 +3868,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     alertNote('Please switch to editing code in CSS / LESS / SASS mode to enable this feature', 5000);
                                     editor.focus();
 
-                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'movingEditorNotAvailableInMode']);
+                                    sendEventMessageForMetrics({
+                                        name: 'movingEditorNotAvailableInMode',
+                                        spot: 'header'
+                                    });
                                 }
                             };
                         }()),
                         (function () {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 return null;
                             }
                             if (isFirefox) {
@@ -3975,6 +4071,8 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                             });
                                                         } else if (request.subType === 'magicss-reload-all-css-resources') {
                                                             reloadAllCSSResourcesInPage();
+                                                        } else if (request.subType === 'stay-awake') {
+                                                            // Do nothing - This is just to keep the service worker active when the external editor window is open
                                                         } else {
                                                             console.log(`Received an unexpected event with subType: ${request.subType}`);
                                                         }
@@ -3989,10 +4087,17 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         }
                                     }
 
-                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedEditInExternalWindow']);
+                                    sendEventMessageForMetrics({
+                                        name: 'clickedEditInExternalWindow',
+                                        spot: 'header'
+                                    });
                                 } catch (e) {
                                     handleUnrecoverableError(e);
-                                    sendMessageForGa(['_trackEvent', 'error', 'couldNotEnableEditInExternalWindow']);
+                                    sendEventMessageForMetrics({
+                                        name: 'error',
+                                        type: 'couldNotEnableEditInExternalWindow',
+                                        spot: 'header'
+                                    });
                                 }
                             };
 
@@ -4044,7 +4149,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 await socketOb._stopWatchingFiles(editor);
                                                 editor.focus();
 
-                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedStopWatchingCssFiles']);
+                                                sendEventMessageForMetrics({
+                                                    name: 'clickedStopWatchingCssFiles',
+                                                    spot: 'header'
+                                                });
                                             }
                                         };
                                     } else {
@@ -4062,7 +4170,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 await socketOb._startWatchingFiles(editor);
                                                 editor.focus();
 
-                                                sendMessageForGa(['_trackEvent', 'fromHeader', 'clickedWatchCssFiles']);
+                                                sendEventMessageForMetrics({
+                                                    name: 'clickedWatchCssFiles',
+                                                    spot: 'header'
+                                                });
                                             },
                                             beforeShow: function (origin, tooltip) {
                                                 tooltip.addClass(socketOb.flagWatchingCssFiles ? 'tooltipster-watching-css-files-enabled' : 'tooltipster-watching-css-files-disabled');
@@ -4092,7 +4203,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                     cls: 'magicss-reload-all-css-resources',
                                     uniqCls: 'magicss-reload-all-css-resources',
                                     onclick: function (evt, editor) {
-                                        if (window.flagEditorInExternalWindow) {
+                                        if (myWin.flagEditorInExternalWindow) {
                                             chromeRuntimeMessageIfRequired({
                                                 type: 'magicss',
                                                 subType: 'magicss-reload-all-css-resources'
@@ -4102,7 +4213,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         }
                                         editor.focus();
 
-                                        sendMessageForGa(['_trackEvent', 'fromHeader', 'reloadCssResources']);
+                                        sendEventMessageForMetrics({
+                                            name: 'reloadCssResources',
+                                            spot: 'header'
+                                        });
                                     }
                                 }
                             ]
@@ -4118,14 +4232,20 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                         type: 'magicss',
                                         subType: 'enableCss'
                                     });
-                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'enabledCss']);
+                                    sendEventMessageForMetrics({
+                                        name: 'enabledCss',
+                                        spot: 'header'
+                                    });
                                 } else {
                                     await editor.disableEnableCSS('disable');
                                     chromeRuntimeMessageIfRequired({
                                         type: 'magicss',
                                         subType: 'disableCss'
                                     });
-                                    sendMessageForGa(['_trackEvent', 'fromHeader', 'disabledCss']);
+                                    sendEventMessageForMetrics({
+                                        name: 'disabledCss',
+                                        spot: 'header'
+                                    });
                                 }
 
                                 if (!runningInAndroidFirefox) {
@@ -4168,7 +4288,10 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                 togglePointAndClick(editor);
                                 editor.focus();
 
-                                sendMessageForGa(['_trackEvent', 'fromHeader', 'pointAndClickActivated']);
+                                sendEventMessageForMetrics({
+                                    name: 'pointAndClickActivated',
+                                    spot: 'header'
+                                });
                             }
                         }
                     ],
@@ -4309,7 +4432,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             name: 'tweet',
                             title: 'Tweet',
                             uniqCls: 'magicss-tweet',
-                            href: 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
+                            href: 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions'
                         },
                         {
                             skip: true,
@@ -4675,7 +4798,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             // currently doing nothing
                         },
                         onClose: async function (editor, config) {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 if (config && config.closeByKeyPress) {
                                     chromeRuntimeMessageIfRequired({
                                         type: 'magicss',
@@ -4691,7 +4814,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         },
                         onSetTextValue: function (val) {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 chromeRuntimeMessageIfRequired({
                                     type: 'magicss',
                                     subType: 'magicss-set-text-value',
@@ -4700,7 +4823,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             }
                         },
                         delayedcursormove: function (editor) {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 let cssSelector = processSplitText({
                                     splitText: editor.splitTextByCursor(),
                                     useAlertNote: false
@@ -5012,7 +5135,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                 alertNote.hide();     // Hide the note which says that Magic CSS is loading
                 window.MagiCSSEditor = new StylesEditor(options);
 
-                // "window.flagEditorInExternalWindow" would also be true when "sessionStorageDataForInitialization" is truthy
+                // "myWin.flagEditorInExternalWindow" would also be true when "sessionStorageDataForInitialization" is truthy
                 if (sessionStorageDataForInitialization) {
                     for (const prop in sessionStorageDataForInitialization) {
                         await window.MagiCSSEditor.userPreference(prop, sessionStorageDataForInitialization[prop]);
@@ -5108,13 +5231,13 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             targetEditModeIsNotFile &&
                             notInsideIframe
                         ) {
-                            if (!window.flagEditorInExternalWindow) {
+                            if (!myWin.flagEditorInExternalWindow) {
                                 window.loadEditorInExternalWindow(editor);
                             }
                         }
 
                         if (magicCssLoadedFine) {
-                            if (window.flagEditorInExternalWindow) {
+                            if (myWin.flagEditorInExternalWindow) {
                                 chromeStorageForExtensionData.set({'last-time-editor-was-in-external-window': true}, function() {
                                     // do nothing
                                 });

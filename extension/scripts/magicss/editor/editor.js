@@ -7,8 +7,10 @@ import { utils } from '../../utils.js';
 import { alertNote } from '../../utils/alertNote.js';
 import { waterfall } from '../../utils/waterfall.js';
 import { runMigration } from '../../migrate-storage.js';
-import { sendMessageForGa } from '../metrics/sendMessageForGa.js';
+import { sendEventMessageForMetrics } from '../metrics/sendMessageForMetrics.js';
 import { amplify } from '../../3rdparty/amplify-store.js';
+
+import { myWin } from '../../appUtils/myWin.js';
 
 // TODO: If remember text option is on, detect text change in another instance of this extension in some different tab
 
@@ -762,7 +764,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                     // Clear corner positioning and allow free-style (jQuery uses top and left for draggable)
                     $(thisOb.container).css('bottom','').css('right','');
 
-                    sendMessageForGa([ '_trackEvent', 'dragEditor', 'start' ]);
+                    sendEventMessageForMetrics({
+                        name: 'dragEditor',
+                        type: 'start'
+                    });
                 },
                 stop: function (event, ui) {
                     setTimeout(async function () {
@@ -780,7 +785,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                             thisOb.focus();
                         }
 
-                        sendMessageForGa([ '_trackEvent', 'dragEditor', 'stop' ]);
+                        sendEventMessageForMetrics({
+                            name: 'dragEditor',
+                            type: 'stop'
+                        });
                     });
                 }
             });
@@ -953,7 +961,7 @@ var manageClassListForWidth = function ({ classList, width }) {
             if (document.documentElement.classList.contains('full-screen-editor')) {
                 // do nothing
 
-                if (window.flagEditorInExternalWindow) {
+                if (myWin.flagEditorInExternalWindow) {
                     window.addEventListener('resize', function () {
                         // https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window/11744120#11744120
                         const width = (
@@ -986,7 +994,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                             });
                         });
 
-                        sendMessageForGa([ '_trackEvent', 'resizeEditor', 'start' ]);
+                        sendEventMessageForMetrics({
+                            name: 'resizeEditor',
+                            type: 'start'
+                        });
                     },
                     resize: function (event, ui) {
                         if (ui.size.width < CONSTANTS.USE_NORMAL_SIZE_EDITOR) {
@@ -1011,7 +1022,10 @@ var manageClassListForWidth = function ({ classList, width }) {
                                     propagateTo: 'codemirror'
                                 }
                             );
-                            sendMessageForGa([ '_trackEvent', 'resizeEditor', 'stop' ]);
+                            sendEventMessageForMetrics({
+                                name: 'resizeEditor',
+                                type: 'stop'
+                            });
                         });
                     }
                 });
@@ -1271,7 +1285,7 @@ var manageClassListForWidth = function ({ classList, width }) {
                 thisOb.container.classList.add('magicss-editor-is-small');
             }
 
-            if (window.flagEditorInExternalWindow) {
+            if (myWin.flagEditorInExternalWindow) {
                 // https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window/11744120#11744120
                 const width = (
                     window.innerWidth ||
@@ -1351,7 +1365,7 @@ var manageClassListForWidth = function ({ classList, width }) {
             // Note: For editor in external window, it was observed that mouse wheel scrolling was getting blocked due
             //       to the following code. Didn't analyze the issue in the code below, but, since we don't need this
             //       code for external window, we are skipping its execution in that case.
-            if (!window.flagEditorInExternalWindow) {
+            if (!myWin.flagEditorInExternalWindow) {
                 // Prevent scrolling on page body when mouse is scrolling '.section.tags .section-contents'
                 $(thisOb.container).bind('mousewheel DOMMouseScroll', function (e) {
                     var that = this,
@@ -1746,7 +1760,7 @@ var manageClassListForWidth = function ({ classList, width }) {
                 });
             },
             function (callback) {
-                if (window.flagEditorInExternalWindow) {
+                if (myWin.flagEditorInExternalWindow) {
                     whichStoreToUse = 'sessionStorage';
                     return callback(null);
                 }

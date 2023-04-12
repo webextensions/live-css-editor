@@ -52,19 +52,6 @@ if (isEdge || isOpera || isChrome) {
 }
 
 var extLib = {
-    TR: function (key, defaultValue) {
-        if (typeof chrome !== 'undefined' && chrome && chrome.i18n) {
-            return chrome.i18n.getMessage(key);
-        } else {
-            if (defaultValue) {
-                return defaultValue;
-            } else {
-                console.warn('No default value available for key: ' + key);
-                return '';
-            }
-        }
-    },
-
     loadCss: function (href) {
         const link = document.createElement('link');
 
@@ -91,7 +78,7 @@ var extLib = {
             allFrames = options.allFrames === false ? false : true,
             tabId = options.tabId || null,
             frameId = options.frameId,
-            runAt = options.runAt || 'document_idle',
+            // runAt = options.runAt || 'document_idle',
             callback = options.callback;
 
         if (
@@ -100,9 +87,20 @@ var extLib = {
             chrome &&
             chrome.tabs
         ) {
-            chrome.tabs.insertCSS(tabId, { file, code, allFrames, frameId, runAt }, function () {
-                callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+            // chrome.tabs.insertCSS(tabId, { file, code, allFrames, frameId, runAt }, function () {
+            //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+            // });
+            chrome.scripting.insertCSS({
+                target: {
+                    tabId,
+                    allFrames,
+                    frameIds: frameId ? [frameId] : undefined
+                },
+                // runAt,
+                files: file ? [file] : undefined,
+                css: code ? code : undefined
             });
+            callback();
         } else {
             if (file) {
                 extLib.loadCss(file);
@@ -179,9 +177,28 @@ var extLib = {
                     callback();
                 });
             } else {
-                chrome.tabs.executeScript(tabId, { file, code, allFrames, frameId, runAt }, function () {
-                    callback();       // Somehow this callback is not getting called without this anonymous function wrapper
-                });
+                // chrome.tabs.executeScript(tabId, { file, code, allFrames, frameId, runAt }, function () {
+                //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+                // });
+
+                chrome.scripting.executeScript(
+                    {
+                        target: {
+                            tabId,
+                            allFrames,
+                            frameIds: frameId ? [frameId] : undefined
+                        },
+                        // runAt,
+                        files: [file]
+                        // callback: function () {
+                        //     callback();       // Somehow this callback is not getting called without this anonymous function wrapper
+                        // }
+                    },
+                    function () {
+                        callback();
+                    }
+                );
+                // callback();
             }
         } else {
             if (file) {
@@ -318,64 +335,7 @@ var extLib = {
                 }
             }
         );
-    },
-
-    chromeStorageGet: function (storageObject, prop) {
-        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-            storageObject.get(prop, function (values) {
-                if (prop === null) {
-                    resolve(values);
-                } else {
-                    resolve(values[prop]);
-                }
-            });
-        });
-    },
-
-    chromeStorageSet: function (storageObject, prop, value) {
-        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-            storageObject.set(
-                {
-                    [prop]: value
-                },
-                function () {
-                    resolve();
-                }
-            );
-        });
-    },
-
-    chromeStorageRemove: function (storageObject, prop) {
-        return new Promise(function (resolve, reject) {     // eslint-disable-line no-unused-vars
-            storageObject.remove(prop, function () {
-                resolve();
-            });
-        });
-    },
-
-    chromeStorageLocalGet: async function (prop) {
-        const value = await extLib.chromeStorageGet(chrome.storage.local, prop);
-        return value;
-    },
-    chromeStorageSyncGet: async function (prop) {
-        const value = await extLib.chromeStorageGet(chrome.storage.sync, prop);
-        return value;
-    },
-
-    chromeStorageLocalSet: async function (prop, value) {
-        await extLib.chromeStorageSet(chrome.storage.local, prop, value);
-    },
-    chromeStorageSyncSet: async function (prop, value) {
-        await extLib.chromeStorageSet(chrome.storage.sync, prop, value);
-    },
-
-    chromeStorageLocalRemove: async function (prop, value) {
-        await extLib.chromeStorageRemove(chrome.storage.local, prop, value);
-    },
-    chromeStorageSyncRemove: async function (prop, value) {
-        await extLib.chromeStorageRemove(chrome.storage.sync, prop, value);
     }
-
 };
 
 export { extLib };

@@ -8,6 +8,10 @@ extension-firefox/
 extension-opera.zip
 extension-opera/
 
+# Packaged extension files
+*.crx
+*.pem
+
 # Temporary files and directories
 tmp
 temp

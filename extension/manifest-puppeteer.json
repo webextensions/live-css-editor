@@ -1,6 +1,6 @@
 {
     "version": "8.20.3",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "author": "Priyank Parashar",
     "default_locale": "en",
     "name": "__MSG_Extension_Name__",
@@ -19,13 +19,16 @@
         "activeTab",
         "storage",
         "unlimitedStorage",
-        "<all_urls>"
+        "scripting",
+        "offscreen"
     ],
     "optional_permissions": [
-        "webNavigation",
-        "<all_urls>"
+        "webNavigation"
     ],
-    "browser_action": {
+    "optional_host_permissions": [
+        "*://*/*"
+    ],
+    "action": {
         "default_icon": {
             "16": "icons/icon-16.png",
             "24": "icons/icon-24.png",
@@ -34,14 +37,14 @@
             "48": "icons/icon-48.png",
             "128": "icons/icon-128.png",
             "256": "icons/icon-256.png"
-        }
+        },
+        "default_title": "Launch Magic CSS editor for this page"
     },
     "background": {
-        "page": "background-magicss.html",
-        "persistent": true
+        "service_worker": "dist/background-magicss.bundle.js"
     },
     "commands": {
-        "_execute_browser_action": {
+        "_execute_action": {
             "suggested_key": {
                 "default": "Alt+Shift+C"
             }

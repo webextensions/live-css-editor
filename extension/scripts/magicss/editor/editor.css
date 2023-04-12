@@ -54,6 +54,9 @@
     background-color: rgba(25, 25, 25, 0.25);
     border-left: 0;
 }
+#MagiCSS-bookmarklet .cm-s-ambiance .CodeMirror-overwrite .CodeMirror-cursor {
+    background-color: rgba(255, 255, 255, 0.35);
+}
 
 /* Style the brackets when cursor is placed around them */
 /* Using 'html' to increase selector specificity for overriding default styles, for cases this editor is loaded as a browser extension and the webpage has its own CodeMirror (CSS) */

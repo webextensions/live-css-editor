@@ -1,13 +1,27 @@
 /* global chrome */
 
+import { getBrowserStrategyGetManifest } from 'helpmate/dist/browser/getBrowser.js';
+
+import {
+    chromeStorageLocalGet,
+    chromeStorageLocalSet,
+    chromeStorageLocalRemove,
+    chromeStorageSyncGet,
+    chromeStorageSyncRemove,
+    chromeStorageGet
+} from './utils/chromeStorage.js';
+
+import { TR } from './utils/i18n.js';
+import { isValidUuidV4 } from './utils/isValidUuidV4.js';
+import { randomUUID } from './utils/randomUUID.js';
+
 import { extLib } from './chrome-extension-lib/ext-lib.js';
-import * as jQuery from './3rdparty/jquery.js';
+import { basisNumberFromUuid } from './utils/basisNumberFromUuid.js';
 
-var USER_PREFERENCE_ALL_FRAMES = 'all-frames',
-    USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION = 'show-reapplying-styles-notification',
-    USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT = 'show-reapplying-styles-notification-at';
+import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
+import { myWin } from './appUtils/myWin.js';
 
-var TR = extLib.TR;
+var USER_PREFERENCE_ALL_FRAMES = 'all-frames';
 
 var fallbackConfig = {
     "mode": "offline",
@@ -32,14 +46,41 @@ var fallbackConfig = {
     },
     "version": "8.20.3"
 };
-var remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
+let remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
+myWin.remoteConfig = remoteConfig;
 var instanceUuid = null;
 var instanceBasisNumber = -1;
 
-window.remoteConfigLoadedFromRemote = new Promise((resolve, reject) => {
-    window.remoteConfigLoadedFromRemoteResolve = resolve;
-    window.remoteConfigLoadedFromRemoteReject = reject;
+myWin.remoteConfigLoadedFromRemote = new Promise((resolve, reject) => {
+    myWin.remoteConfigLoadedFromRemoteResolve = resolve;
+    myWin.remoteConfigLoadedFromRemoteReject = reject;
 });
+
+// DEVHELPER: Useful for debugging purposes
+/*
+// Usage (inside function and condition which is going to eventually call sendResponse in (async) callback):
+//     sendResponse = wrapSendResponse({
+//         sendResponse,
+//         id: '<unique-id-for-each-message-type-being-handled>', // To compare the logs
+//         verbose: true
+//     });
+const wrapSendResponse = function ({
+    sendResponse,
+    id,
+    verbose
+}) {
+    console.log(`Wrapping message with id: ${id}`);
+    return function (data) {
+        let verboseValueToUse = verbose;
+        // verboseValueToUse = true;
+        // verboseValueToUse = false;
+        if (verboseValueToUse) {
+            console.log('sendResponse', id, data);
+        }
+        sendResponse(data);
+    };
+};
+/* */
 
 // eslint-disable-next-line no-unused-vars
 var devHelper = function () {
@@ -53,61 +94,39 @@ var devHelper = function () {
 
         console.log('    fallbackConfig:', fallbackConfig);
 
-        const storedConfig = await extLib.chromeStorageLocalGet('remoteConfig');
+        const storedConfig = await chromeStorageLocalGet('remoteConfig');
         console.log('    storedConfig:', storedConfig);
 
         console.log('    remoteConfig:', remoteConfig);
 
-        const executionCounterLocal = await extLib.chromeStorageLocalGet('magicss-execution-counter');
+        const executionCounterLocal = await chromeStorageLocalGet('magicss-execution-counter');
         console.log('    executionCounterLocal:', executionCounterLocal);
 
-        const executionCounterSync = await extLib.chromeStorageSyncGet('magicss-execution-counter');
+        const executionCounterSync = await chromeStorageSyncGet('magicss-execution-counter');
         console.log('    executionCounterSync:', executionCounterSync);
 
-        const allChromeStorageLocalData = await extLib.chromeStorageLocalGet(null);
+        const allChromeStorageLocalData = await chromeStorageLocalGet(null);
         console.log('    allChromeStorageLocalData:', allChromeStorageLocalData);
 
-        const allChromeStorageSyncData = await extLib.chromeStorageSyncGet(null);
+        const allChromeStorageSyncData = await chromeStorageSyncGet(null);
         console.log('    allChromeStorageSyncData:', allChromeStorageSyncData);
 
         console.log('========================================');
     });
 };
+globalThis.devHelper = devHelper;
 devHelper.clearSomeStorage = async function () {
-    await extLib.chromeStorageLocalRemove('magicss-execution-counter');
-    await extLib.chromeStorageSyncRemove('magicss-execution-counter');
+    await chromeStorageLocalRemove('magicss-execution-counter');
+    await chromeStorageSyncRemove('magicss-execution-counter');
 
-    await extLib.chromeStorageLocalRemove('instance-uuid');
+    await chromeStorageLocalRemove('instance-uuid');
 
-    await extLib.chromeStorageLocalRemove('remoteConfig');
+    await chromeStorageLocalRemove('remoteConfig');
 };
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
-    // TODO: REUSE: Move this under "extLib"
-    const isValidUuidV4 = function (str) {
-        const v4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        if (v4Regex.test(str)) {
-            return true;
-        } else {
-            return false;
-        }
-    };
-
-    const randomUUID = function () {
-        let uuid;
-        if (typeof crypto.randomUUID === 'function') {
-            uuid = crypto.randomUUID();
-        } else {
-            // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid/2117523#2117523
-            uuid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-            );
-        }
-        return uuid;
-    };
-
     // Use this for the cases where the code should never reach in imaginable scenarios.
     const requestUserViaConsoleToReportUnexpectedError = function (e) {
         console.error(e);
@@ -131,18 +150,22 @@ if (window.flagEditorInExternalWindow) {
     })();
 
     const ajaxGet = async function ({ url }) {
-        return new Promise((resolve) => {
-            jQuery.ajax({
-                url,
-                method: 'get',
-                success: function (data) {
-                    resolve([null, data]);
-                },
-                error: function (err) {
-                    resolve([err]);
-                }
-            });
-        });
+        try {
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                return [null, data];
+            } else {
+                return [
+                    'error-in-fetching-data-from: ' + url,
+                    {
+                        response
+                    }
+                ];
+            }
+        } catch (err) {
+            return [err];
+        }
     };
 
     const fetchRemoteConfig = async function () {
@@ -161,14 +184,14 @@ if (window.flagEditorInExternalWindow) {
             console.error(err);
         } else {
             (async () => {
-                await window.mainFnMetricsHandler({ event: 'configFetch' });
+                await mainFnMetricsHandler({ event: 'configFetch' });
             })();
         }
         return [err, fetchedConfig];
     };
 
     const getStoredConfigIfValid = async function () {
-        const storedConfig = await extLib.chromeStorageLocalGet('remoteConfig');
+        const storedConfig = await chromeStorageLocalGet('remoteConfig');
 
         // https://github.com/substack/semver-compare/blob/152c863e7c2615f9e9e81a9a370b672afaa3819a/index.js
         const semverCompare = function (a, b) {
@@ -239,18 +262,20 @@ if (window.flagEditorInExternalWindow) {
 
         if (storedConfig) {
             remoteConfig = storedConfig;
+            myWin.remoteConfig = remoteConfig;
             console.info('Applied stored config:', storedConfig);
             if (storedConfig.mode === 'online') {
-                window.remoteConfigLoadedFromRemoteResolve();
+                myWin.remoteConfigLoadedFromRemoteResolve();
             }
         } else {
             const [err, fetchedConfig] = await fetchRemoteConfig();
 
             if (err) {
-                window.remoteConfigLoadedFromRemoteReject();
+                myWin.remoteConfigLoadedFromRemoteReject();
             } else {
                 fetchedConfig.nextUpdateAt = Date.now() + fetchedConfig.nextUpdate;
                 remoteConfig = fetchedConfig;
+                myWin.remoteConfig = remoteConfig;
                 console.info('Applied config from remote:', fetchedConfig);
 
                 try {
@@ -260,21 +285,21 @@ if (window.flagEditorInExternalWindow) {
                 } catch (e) {
                     // do nothing
                 }
-                window.remoteConfigLoadedFromRemoteResolve();
+                myWin.remoteConfigLoadedFromRemoteResolve();
             }
         }
     };
 
     (async () => {
         const INSTANCE_UUID = 'instance-uuid';
-        instanceUuid = await extLib.chromeStorageLocalGet(INSTANCE_UUID);
+        instanceUuid = await chromeStorageLocalGet(INSTANCE_UUID);
 
         if (!isValidUuidV4(instanceUuid)) {
             instanceUuid = randomUUID();
-            await extLib.chromeStorageLocalSet(INSTANCE_UUID, instanceUuid);
+            await chromeStorageLocalSet(INSTANCE_UUID, instanceUuid);
         }
 
-        instanceBasisNumber = window.basisNumberFromUuid(instanceUuid);
+        instanceBasisNumber = basisNumberFromUuid(instanceUuid);
 
         const fn = async function () {
             await updateRemoteConfig();
@@ -312,6 +337,9 @@ if (window.flagEditorInExternalWindow) {
                         }
                     }
                 );
+                // Need to return true to run "sendResponse" in async manner
+                // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                return true;
             } else if (type === 'magicss-instance-info') {
                 chrome.tabs.sendMessage(
                     sender.tab.id,
@@ -326,16 +354,16 @@ if (window.flagEditorInExternalWindow) {
                         sendResponse([instanceUuid, instanceBasisNumber]);
                     }
                 );
+                // Need to return true to run "sendResponse" in async manner
+                // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
+                return true;
             }
-            // Need to return true to run "sendResponse" in async manner
-            // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
-            return true;
         }
     );
 }
 
 const tabConnectivityMap = {};
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
     chrome.runtime.onMessage.addListener(
@@ -351,29 +379,48 @@ if (window.flagEditorInExternalWindow) {
 
                 let width = request.width || 400,
                     height = request.height || 400;
-                const windowForExternalEditor = (
-                    window
-                        .open(
-                            (
-                                `${chrome.runtime.getURL('external-editor.html')}` +
+
+                (async () => {
+                    // const windowForExternalEditor = (
+                    //     window
+                    //         .open(
+                    //             (
+                    //                 `${chrome.runtime.getURL('external-editor.html')}` +
+                    //                 `?tabId=${sender.tab.id}` +
+                    //                 `&tabTitle=${encodeURIComponent(request.tabTitle)}` +
+                    //                 `&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}` +
+                    //                 `&magicssHostSessionUuid=${encodeURIComponent(request.magicssHostSessionUuid)}`
+                    //             ),
+                    //             `Magic CSS (Random Name: ${Math.random()})`,
+                    //             `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
+                    //         )
+                    // );
+                    const windowForExternalEditor = await chrome.windows.create({
+                        url: (
+                            `${chrome.runtime.getURL('external-editor.html')}` +
                                 `?tabId=${sender.tab.id}` +
                                 `&tabTitle=${encodeURIComponent(request.tabTitle)}` +
                                 `&tabOriginWithSlash=${encodeURIComponent(tabOriginWithSlash)}` +
                                 `&magicssHostSessionUuid=${encodeURIComponent(request.magicssHostSessionUuid)}`
-                            ),
-                            `Magic CSS (Random Name: ${Math.random()})`,
-                            `width=${width},height=${height},scrollbars=yes,resizable=yes` // scrollbars=yes is required for some browsers (like FF & IE)
-                        )
-                );
-                windowForExternalEditor.focus();
+                        ),
+                        width,
+                        height,
+                        type: 'popup',
+                        focused: true
+                    });
 
-                tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
+                    // windowForExternalEditor.focus();
+
+                    tabConnectivityMap[sender.tab.id] = windowForExternalEditor;
+                })();
             } else if (request.closeExternalEditor) {
-                const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
-                if (windowForExternalEditor) {
-                    windowForExternalEditor.close();
-                }
-                delete tabConnectivityMap[sender.tab.id];
+                (async () => {
+                    const windowForExternalEditor = tabConnectivityMap[sender.tab.id];
+                    if (windowForExternalEditor) {
+                        await chrome.windows.remove(windowForExternalEditor.id);
+                    }
+                    delete tabConnectivityMap[sender.tab.id];
+                })();
             }
         }
     );
@@ -413,32 +460,59 @@ if (window.flagEditorInExternalWindow) {
                 if (request.type === 'magicss-bg') {
                     if (request.subType === 'ajax') {
                         const ajaxOb = JSON.parse(JSON.stringify(request.payload));
-                        ajaxOb.error = function (jqXhr, textStatus, error) {
-                            sendResponse([
-                                {
-                                    jqXhr,
-                                    textStatus,
-                                    error
-                                },
-                                null,
-                                {
-                                    status: jqXhr.status,
-                                    responseText: jqXhr.responseText
+
+                        (async () => {
+                            let response = null;
+                            let responseText = null;
+                            try {
+                                response = await fetch(ajaxOb.url, {
+                                    method: ajaxOb.type,
+                                    headers: ajaxOb.headers,
+                                    body: ajaxOb.data
+                                });
+                                responseText = await response.text();
+
+                                if (!response.ok) {
+                                    throw new Error('Response is not ok');
                                 }
-                            ]);
-                        };
-                        ajaxOb.success = function (data, textStatus, jqXhr) { // eslint-disable-line no-unused-vars
-                            sendResponse([
-                                null,
-                                data,
-                                {
-                                    status: jqXhr.status,
-                                    contentType: jqXhr.getResponseHeader('content-type'),
-                                    responseText: jqXhr.responseText
+
+                                let responseToReturn = null;
+                                if (
+                                    request.subTypeOptions &&
+                                    request.subTypeOptions.provideResponseAs === 'json'
+                                ) {
+                                    responseToReturn = JSON.parse(responseText);
+                                } else {
+                                    responseToReturn = responseText;
                                 }
-                            ]);
-                        };
-                        jQuery.ajax(ajaxOb);
+                                sendResponse([
+                                    null,
+                                    responseToReturn,
+                                    {
+                                        status: response.status,
+                                        contentType: response.headers.get('content-type'),
+                                        responseText
+                                    }
+                                ]);
+                            } catch (err) {
+                                if (!responseText) {
+                                    try {
+                                        responseText = await response.text();
+                                    } catch (e) {
+                                        // do nothing
+                                    }
+                                }
+                                sendResponse([
+                                    err,
+                                    null,
+                                    {
+                                        status: response?.status || 0,
+                                        contentType: response?.headers?.get?.('content-type'),
+                                        responseText
+                                    }
+                                ]);
+                            }
+                        })();
 
                         return true;
                     }
@@ -468,12 +542,12 @@ if (window.flagEditorInExternalWindow) {
 /*
 // Not used anymore
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         // Set icon for dark mode of browser
-        chrome.browserAction.setIcon({
+        chrome.action.setIcon({
             path: {
                 "16":  "icons/icon-dark-scheme-16.png",
                 "24":  "icons/icon-dark-scheme-24.png",
@@ -491,24 +565,24 @@ if (window.flagEditorInExternalWindow) {
 console.log('Welcome :)');
 
 console.log('If you notice any issues/errors here, kindly report them at:\n    https://github.com/webextensions/live-css-editor/issues');
-var runningInChromiumLikeEnvironment = function () {
-    if (window.location.href.indexOf('chrome-extension://') === 0) {
-        return true;
-    } else {
-        return false;
-    }
-};
 
-var runningInFirefoxLikeEnvironment = function () {
-    if (window.location.href.indexOf('moz-extension://') === 0) {
-        return true;
-    } else {
-        return false;
-    }
-};
+// var runningInChromiumExtensionLikeEnvironment = function () {
+//     if (window.location.href.indexOf('chrome-extension://') === 0) {
+//         return true;
+//     } else {
+//         return false;
+//     }
+// };
 
-var runningInOldEdgeLikeEnvironment = function () {
-    if (window.location.href.indexOf('ms-browser-extension://') === 0) {
+var runningInFirefoxExtensionLikeEnvironment = function () {
+    // if (window.location.href.indexOf('moz-extension://') === 0) {
+    //     return true;
+    // } else {
+    //     return false;
+    // }
+
+    const browser = getBrowserStrategyGetManifest();
+    if (browser.name === 'firefox') {
         return true;
     } else {
         return false;
@@ -525,20 +599,32 @@ var informUser = function (config) {
     console.log(message);
 
     if (tabId) {
-        chrome.browserAction.setTitle({ tabId: tabId, title: message });
+        chrome.action.setTitle({ tabId: tabId, title: message });
         if (badgeText) {
-            chrome.browserAction.setBadgeText({ tabId: tabId, text: badgeText });
+            chrome.action.setBadgeText({ tabId: tabId, text: badgeText });
         }
         if (badgeBackgroundColor) {
-            chrome.browserAction.setBadgeBackgroundColor({ tabId: tabId, color: badgeBackgroundColor });
+            chrome.action.setBadgeBackgroundColor({ tabId: tabId, color: badgeBackgroundColor });
         }
     }
 
     // Note:
     //     alert() does not work on Firefox
     //     https://bugzilla.mozilla.org/show_bug.cgi?id=1203394
-    if (runningInChromiumLikeEnvironment()) {
-        alert(message);
+    // if (runningInChromiumLikeEnvironment()) {
+    if (!runningInFirefoxExtensionLikeEnvironment()) {
+        // alert(message);
+        (async () => {
+            await chrome.offscreen.createDocument({
+                url: (
+                    chrome.runtime.getURL('alert.html') +
+                    '?message=' + encodeURIComponent(message)
+                ),
+                reasons: ['DISPLAY_MEDIA'],
+                justification: 'show an alert that extension does not work on various special pages'
+            });
+            await chrome.offscreen.closeDocument();
+        })();
     }
 };
 
@@ -549,7 +635,7 @@ var informUser = function (config) {
 // user loaded the extension in a webpage, the events were not getting reattached on reload.
 // So, for fixing that, now we are attaching the events as soon as the extension loads.
 
-if (!window.openOptionsPageListenerAdded) {
+if (!myWin.openOptionsPageListenerAdded) {
     if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
@@ -563,82 +649,86 @@ if (!window.openOptionsPageListenerAdded) {
                 }
             }
         );
-        window.openOptionsPageListenerAdded = true;
+        myWin.openOptionsPageListenerAdded = true;
     }
 }
 
-if (!window.loadRemoteJsListenerAdded) {
+if (!myWin.loadRemoteJsListenerAdded) {
     if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {
                 if (request.loadRemoteJs) {
-                    // https://stackoverflow.com/questions/18169666/remote-script-as-content-script-in-chrome-extension
-                    jQuery
-                        .get(request.loadRemoteJs, null, null, 'text')
-                        .done(function(remoteCode){
+                    (async () => {
+                        try {
+                            const response = await fetch(request.loadRemoteJs);
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+
+                            let remoteCode = await response.text();
                             if (request.preRunReplace) {
                                 for (var i = 0; i < request.preRunReplace.length; i++) {
                                     remoteCode = remoteCode.replace(request.preRunReplace[i].oldText, request.preRunReplace[i].newText);
                                 }
                             }
-                            getAllFrames(function (allFrames) {
-                                chrome.tabs.executeScript(
-                                    sender.tab.id,
-                                    { code: remoteCode, allFrames: allFrames},
-                                    function(){
-                                        sendResponse();
-                                    }
-                                );
-                            });
-                        })
-                        .fail(function() {
+                            (async () => {
+                                // const allFrames = await getAllFramesAsync();
+                                // chrome.tabs.executeScript(
+                                //     sender.tab.id,
+                                //     { code: remoteCode, allFrames: allFrames},
+                                //     function(){
+                                //         sendResponse();
+                                //     }
+                                // );
+
+                                // Does not work in Manifest V3
+                                // Future solution: https://github.com/w3c/webextensions/blob/main/proposals/user-scripts-api.md
+                                sendResponse('error');
+                            })();
+                        } catch (error) {
                             sendResponse('error');
-                        });
+                        }
+                    })();
 
                     // https://developer.chrome.com/extensions/messaging
                     // Need to return true from the event listener to indicate that we wish to send a response asynchronously
                     return true;
                 } else if (request.requestPermissions) {
-                    if (window.flagEditorInExternalWindow) {
+                    if (myWin.flagEditorInExternalWindow) {
                         return;
                     }
-                    if (runningInOldEdgeLikeEnvironment()) {
-                        // We use full permissions on old Microsoft Edge
-                        sendResponse('request-granted');
-                        onDOMContentLoadedHandler();
-                    } else {
-                        var tabOriginWithSlash = request.tabOriginWithSlash;
 
-                        const permissionsOb = {};
-                        if (request.requestWebNavigation) {
-                            permissionsOb.permissions = ['webNavigation'];
-                        }
-                        permissionsOb.origins = [tabOriginWithSlash];
+                    var tabOriginWithSlash = request.tabOriginWithSlash;
 
-                        chrome.permissions.request(
-                            permissionsOb,
-                            function (granted) {
-                                if (granted) {
-                                    sendResponse('request-granted');
-                                    onDOMContentLoadedHandler();
-                                } else {
-                                    sendResponse('request-not-granted');
-                                }
-                            }
-                        );
-
-                        // https://developer.chrome.com/extensions/messaging
-                        // Need to return true from the event listener to indicate that we wish to send a response asynchronously
-                        return true;
+                    const permissionsOb = {};
+                    if (request.requestWebNavigation) {
+                        permissionsOb.permissions = ['webNavigation'];
                     }
+                    permissionsOb.origins = [tabOriginWithSlash];
+
+                    chrome.permissions.request(
+                        permissionsOb,
+                        function (granted) {
+                            if (granted) {
+                                sendResponse('request-granted');
+                                onDOMContentLoadedHandler();
+                            } else {
+                                sendResponse('request-not-granted');
+                            }
+                        }
+                    );
+
+                    // https://developer.chrome.com/extensions/messaging
+                    // Need to return true from the event listener to indicate that we wish to send a response asynchronously
+                    return true;
                 }
             }
         );
-        window.loadRemoteJsListenerAdded = true;
+        myWin.loadRemoteJsListenerAdded = true;
     }
 }
 
-if (!window.apiHelperForContentScriptAdded) {
+if (!myWin.apiHelperForContentScriptAdded) {
     if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {
@@ -656,77 +746,43 @@ if (!window.apiHelperForContentScriptAdded) {
                 }
             }
         );
-        window.apiHelperForContentScriptAdded = true;
+        myWin.apiHelperForContentScriptAdded = true;
     }
 }
 
-var getFromChromeStorage = function (property, cb) {
+var getFromChromeStorageAsync = async function (property) {
     var chromeStorageForExtensionData = chrome.storage.sync || chrome.storage.local;
 
-    chromeStorageForExtensionData.get(property, function (values) {
-        if (values) {
-            cb(values[property]);
-        } else {
-            cb(undefined);
-        }
-    });
+    const value = await chromeStorageGet(chromeStorageForExtensionData, property);
+    return value;
 };
 
-var getAllFrames = function (cb) {
-    getFromChromeStorage(USER_PREFERENCE_ALL_FRAMES, function (value) {
-        if (value === 'yes') {
-            cb(true);
-        } else {
-            cb(false);
-        }
-    });
+var getAllFramesAsync = async function () {
+    const value = await getFromChromeStorageAsync(USER_PREFERENCE_ALL_FRAMES);
+    return value === 'yes';
 };
 
-var reapplyCss = function (tabId) {
-    getFromChromeStorage(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION, function (value) {
-        var showReapplyingStylesNotification = true;
-        if (value === 'no') {
-            showReapplyingStylesNotification = false;
-        }
+var reapplyCss = async function (tabId) {
+    const allFrames = await getAllFramesAsync();
 
-        getFromChromeStorage(USER_PREFERENCE_SHOW_REAPPLYING_STYLES_NOTIFICATION_AT, function (value) {
-            var showReapplyingStylesNotificationAt = 'top-right';
-            if (['bottom-right', 'bottom-left', 'top-left'].indexOf(value) >= 0) {
-                showReapplyingStylesNotificationAt = value;
-            }
-            getAllFrames(function (allFrames) {
-                var // pathScripts = 'scripts/',
-                    // path3rdparty = pathScripts + '3rdparty/',
-                    pathDist = 'dist/';
+    var // pathScripts = 'scripts/',
+        // path3rdparty = pathScripts + '3rdparty/',
+        pathDist = 'dist/';
 
-                var arrScripts = [];
-                if (!showReapplyingStylesNotification) {
-                    arrScripts.push({
-                        type: 'js',
-                        sourceText: 'window.hideReapplyingStylesNotification = true;'
-                    });
-                } else {
-                    arrScripts.push({
-                        type: 'js',
-                        sourceText: 'window.showReapplyingStylesNotificationAt = "' + showReapplyingStylesNotificationAt + '";'
-                    });
-                }
+    var arrScripts = [];
 
-                // arrScripts.push(path3rdparty + 'amplify-store.js');
-                // arrScripts.push(pathScripts + 'utils.js');
-                // arrScripts.push(pathScripts + 'migrate-storage.js');
-                // arrScripts.push(pathScripts + 'reapply-css.js');
-                arrScripts.push(pathDist + 'load-reapply.bundle.js');
+    // arrScripts.push(path3rdparty + 'amplify-store.js');
+    // arrScripts.push(pathScripts + 'utils.js');
+    // arrScripts.push(pathScripts + 'migrate-storage.js');
+    // arrScripts.push(pathScripts + 'reapply-css.js');
+    arrScripts.push(pathDist + 'load-reapply.bundle.js');
 
-                extLib.loadMultipleJsCss({
-                    treatAsNormalWebpage: window.treatAsNormalWebpage,
-                    arrSources: arrScripts,
-                    allFrames,
-                    tabId,
-                    runAt: 'document_start'
-                });
-            });
-        });
+    extLib.loadMultipleJsCss({
+        treatAsNormalWebpage: myWin.treatAsNormalWebpage,
+        arrSources: arrScripts,
+        allFrames,
+        tabId,
+        runAt: 'document_start'
     });
 };
 
@@ -741,22 +797,31 @@ try {
 }
 
 var main = function (tab) {     // eslint-disable-line no-unused-vars
-    getAllFrames(function (allFrames) {
-        var pathDist = 'dist/',
-            pathScripts = 'scripts/'
-            // path3rdparty = pathScripts + '3rdparty/',
-            // path3rdpartyCustomFixes = pathScripts + '3rdparty-custom-fixes/',
-            // pathMagicss = pathScripts + 'magicss/',
-            // pathEditor = pathMagicss + 'editor/',
-            // pathCodeMirror = path3rdparty + 'codemirror/'
-            ;
+    var pathDist = 'dist/',
+        pathScripts = 'scripts/'
+        // path3rdparty = pathScripts + '3rdparty/',
+        // path3rdpartyCustomFixes = pathScripts + '3rdparty-custom-fixes/',
+        // pathMagicss = pathScripts + 'magicss/',
+        // pathEditor = pathMagicss + 'editor/',
+        // pathCodeMirror = path3rdparty + 'codemirror/'
+        ;
 
-        // var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:" || document.location.protocol === "ms-browser-extension:") ? true : false;
-        // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
-        // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
+    // var runningInBrowserExtension = (document.location.protocol === "chrome-extension:" || document.location.protocol === "moz-extension:" || document.location.protocol === "ms-browser-extension:") ? true : false;
+    // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
+    // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
+
+    (async () => {
+        const [tabActiveCurrentWindow] = await chrome.tabs.query({ active: true, currentWindow: true });
+        let tabId = tabActiveCurrentWindow?.id;
+        if (!tabId) {
+            const [tabActiveLastFocusedWindow] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+            tabId = tabActiveLastFocusedWindow?.id;
+        }
+
+        const allFrames = await getAllFramesAsync();
 
         extLib.loadMultipleJsCss({
-            treatAsNormalWebpage: window.treatAsNormalWebpage,
+            treatAsNormalWebpage: myWin.treatAsNormalWebpage,
             arrSources: [
                 pathScripts + 'appVersion.js',
                 // {
@@ -881,12 +946,13 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
                 /* */
             ],
             allFrames,
-            tabId: undefined,
+            // tabId: undefined,
+            tabId,
             done: function () {
                 // Currently doing nothing
             }
         });
-    });
+    })();
 };
 
 var isRestrictedUrl = function (url) {
@@ -942,8 +1008,8 @@ var isRestrictedUrl = function (url) {
 };
 
 var prerequisitesReady = function (main) {
-    if (typeof chrome !== "undefined" && chrome && chrome.browserAction) {
-        chrome.browserAction.onClicked.addListener(function (tab) {
+    if (typeof chrome !== "undefined" && chrome && chrome.action) {
+        chrome.action.onClicked.addListener(function (tab) {
             var url = tab.url;
 
             if (isRestrictedUrl(url)) {
@@ -1005,9 +1071,9 @@ var prerequisitesReady = function (main) {
             };
 
             if (url.indexOf('file:///') === 0) {
-                if (runningInFirefoxLikeEnvironment()) {
+                if (runningInFirefoxExtensionLikeEnvironment()) {
                     goAhead();
-                } else if (runningInChromiumLikeEnvironment()) {
+                } else { // if (runningInChromiumExtensionLikeEnvironment()) {
                     chrome.extension.isAllowedFileSchemeAccess(function (isAllowedAccess) {
                         if (isAllowedAccess) {
                             goAhead();
@@ -1027,19 +1093,19 @@ var prerequisitesReady = function (main) {
                             });
                         }
                     });
-                } else {
-                    var message = (
-                        'For your browser, "Live editor for CSS, Less & Sass" (Magic CSS) does not support running on:' +
-                        '\n    ' + url
-                    );
-                    informUser({
-                        message: message,
-                        tab: tab,
-                        badgeText: '!',
-                        badgeBackgroundColor: '#b00'
-                    });
-                    return;
-                }
+                } // else {
+                //     var message = (
+                //         'For your browser, "Live editor for CSS, Less & Sass" (Magic CSS) does not support running on:' +
+                //         '\n    ' + url
+                //     );
+                //     informUser({
+                //         message: message,
+                //         tab: tab,
+                //         badgeText: '!',
+                //         badgeBackgroundColor: '#b00'
+                //     });
+                //     return;
+                // }
             } else {
                 goAhead();
             }
@@ -1052,7 +1118,7 @@ var prerequisitesReady = function (main) {
     }
 };
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     main();
 } else {
     prerequisitesReady(function (tab) {
@@ -1061,9 +1127,12 @@ if (window.flagEditorInExternalWindow) {
 }
 
 var parseUrl = function(href) {
-    var l = document.createElement("a");
-    l.href = href;
-    return l;
+    // var l = document.createElement("a");
+    // l.href = href;
+    // return l;
+
+    var url = new URL(href);
+    return url;
 };
 
 var generatePermissionPattern = function (url) {
@@ -1081,17 +1150,9 @@ var generatePermissionPattern = function (url) {
 };
 
 var onDOMContentLoadedHandler = function () {
-    if (!window.onDOMContentLoadedListenerAdded) {
+    if (!myWin.onDOMContentLoadedListenerAdded) {
         if (chrome.webNavigation) {
-            (function () {
-                if (runningInOldEdgeLikeEnvironment()) {
-                    // .onDOMContentLoaded() appears to work better for old Microsoft Edge
-                    // .onCommitted() on old Microsoft Edge seems to be not loading the styles under some situations
-                    return chrome.webNavigation.onDOMContentLoaded;
-                } else {
-                    return chrome.webNavigation.onCommitted;
-                }
-            }()).addListener(function(details) {
+            chrome.webNavigation.onCommitted.addListener(function(details) {
                 var tabId = details.tabId,
                     url = details.url;
 
@@ -1103,10 +1164,10 @@ var onDOMContentLoadedHandler = function () {
                         // do nothing
                     } else {
                         // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
-                        if (runningInOldEdgeLikeEnvironment()) {
-                            reapplyCss(tabId);
-                        } else if (runningInFirefoxLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
-                            reapplyCss(tabId);
+                        if (runningInFirefoxExtensionLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
+                            (async () => {
+                                await reapplyCss(tabId);
+                            })();
                         } else if (tab && tab.url) {
                             // Old logic:
                             //     "if (permissionsPattern && details.frameId === 0) {"
@@ -1119,7 +1180,9 @@ var onDOMContentLoadedHandler = function () {
                                     origins: [permissionsPattern]
                                 }, function (result) {
                                     if (result) {
-                                        reapplyCss(tabId);
+                                        (async () => {
+                                            await reapplyCss(tabId);
+                                        })();
                                     } else {
                                         // do nothing because we don't have enough permissions
                                     }
@@ -1129,13 +1192,31 @@ var onDOMContentLoadedHandler = function () {
                     }
                 });
             });
-            window.onDOMContentLoadedListenerAdded = true;
+            myWin.onDOMContentLoadedListenerAdded = true;
         }
     }
 };
 
-if (window.flagEditorInExternalWindow) {
+if (myWin.flagEditorInExternalWindow) {
     // do nothing
 } else {
     onDOMContentLoadedHandler();
+}
+
+if (myWin.flagEditorInExternalWindow) {
+    // do nothing
+} else {
+    // DEVHELPER: Useful for debugging purposes
+    /*
+    (async () => {
+        const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await timeout(1000);
+
+        debugger;
+        console.log('The Service Worker will deregister in 10 seconds.');
+        await timeout(10000);
+        await self.registration.unregister();
+        console.log('Service Worker is deregistered now.');
+    })();
+    /* */
 }

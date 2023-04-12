@@ -9,6 +9,7 @@ import { delayFunctionUntilTestFunction } from '../../../scripts/utils/delayFunc
 
     // for HTML frameset pages, this value would be 'FRAMESET'
     // chrome.tabs.executeScript uses allFrames: true, to run inside all frames
+    // TODO: Check if it is still the same for chrome.tabs.scripting
     if (document.body.tagName !== 'BODY') {
         return;
     }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* eslint-env node */
-/* globals chrome, describe, it, before, after */
+/* global chrome, describe, it, before, after */
 
 import path from 'path';
 
@@ -85,7 +85,7 @@ describe('Cross site UI consistency', async function () {
                 await extBackgroundPage.evaluate(function () {
                     chrome.tabs.query({ active: true }, function (tabs) {
                         // Launch extension
-                        chrome.browserAction.onClicked.dispatch(tabs[0]);
+                        chrome.action.onClicked.dispatch(tabs[0]);
                     });
                 });
             });

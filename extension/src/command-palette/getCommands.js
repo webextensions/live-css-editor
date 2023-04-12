@@ -1,13 +1,12 @@
-/* global extLib */
-
 import { getBrowser } from 'helpmate/dist/browser/getBrowser.js';
 import {
     isCopyToClipboardSupported,
     copyToClipboard
 } from 'helpmate/dist/browser/copyToClipboard.js';
 
-import { sendMessageForGa } from '../../scripts/magicss/metrics/sendMessageForGa.js';
+import { sendEventMessageForMetrics } from '../../scripts/magicss/metrics/sendMessageForMetrics.js';
 
+import { TR } from '../../scripts/utils/i18n.js';
 import { alertNote } from '../../scripts/utils/alertNote.js';
 
 import {
@@ -120,7 +119,11 @@ const getCommands = async (setRefreshedAt) => (
                 commandOb.command = function () {
                     window.open(href);
 
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'rateUsOn_' + browser]);
+                    sendEventMessageForMetrics({
+                        name: 'rateUsOn_' + browser,
+                        type: 'rateUsOn',
+                        spot: 'commandPalette'
+                    });
                 };
 
                 return commandOb;
@@ -141,7 +144,10 @@ const getCommands = async (setRefreshedAt) => (
                         type: APP_$_OPEN_SEARCH_ICONS
                     });
 
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'openGetIcon']);
+                    sendEventMessageForMetrics({
+                        name: 'openGetIcon',
+                        spot: 'commandPalette'
+                    });
                 });
             }
         },
@@ -156,7 +162,10 @@ const getCommands = async (setRefreshedAt) => (
 
                     await window.execConvertToCssAction(editor);
 
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'lessOrSassToCss']);
+                    sendEventMessageForMetrics({
+                        name: 'lessOrSassToCss',
+                        spot: 'commandPalette'
+                    });
                 });
             }
         },
@@ -170,7 +179,10 @@ const getCommands = async (setRefreshedAt) => (
 
                     await window.execBeautifyCssAction(editor);
 
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'beautifyCode']);
+                    sendEventMessageForMetrics({
+                        name: 'beautifyCode',
+                        spot: 'commandPalette'
+                    });
                 });
             }
         },
@@ -183,7 +195,10 @@ const getCommands = async (setRefreshedAt) => (
 
                     await window.execMinifyCssAction(editor);
 
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'minifyCode']);
+                    sendEventMessageForMetrics({
+                        name: 'minifyCode',
+                        spot: 'commandPalette'
+                    });
                 });
             }
         },
@@ -202,14 +217,23 @@ const getCommands = async (setRefreshedAt) => (
                         const flag = await copyToClipboard(textValue);
                         if (flag) {
                             alertNote('Copied code to clipboard', 2500);
-                            sendMessageForGa(['_trackEvent', 'commandPalette', 'copiedCodeToClipboard']);
+                            sendEventMessageForMetrics({
+                                name: 'copiedCodeToClipboard',
+                                spot: 'commandPalette'
+                            });
                         } else {
                             alertNote('Failed to copy to clipboard', 2500);
-                            sendMessageForGa(['_trackEvent', 'commandPalette', 'failedToCopyCodeToClipboard']);
+                            sendEventMessageForMetrics({
+                                name: 'failedToCopyCodeToClipboard',
+                                spot: 'commandPalette'
+                            });
                         }
                     } else {
                         alertNote('There is no code to copy', 2500);
-                        sendMessageForGa(['_trackEvent', 'commandPalette', 'noCodeToCopyToClipboard']);
+                        sendEventMessageForMetrics({
+                            name: 'noCodeToCopyToClipboard',
+                            spot: 'commandPalette'
+                        });
                     }
                 });
             }
@@ -224,7 +248,10 @@ const getCommands = async (setRefreshedAt) => (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execShowLineNumbersAction(editor);
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'showLineNumbers']);
+                    sendEventMessageForMetrics({
+                        name: 'showLineNumbers',
+                        spot: 'commandPalette'
+                    });
                     setRefreshedAt(Date.now());
                 });
             }
@@ -238,7 +265,10 @@ const getCommands = async (setRefreshedAt) => (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execHideLineNumbersAction(editor);
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'hideLineNumbers']);
+                    sendEventMessageForMetrics({
+                        name: 'hideLineNumbers',
+                        spot: 'commandPalette'
+                    });
                     setRefreshedAt(Date.now());
                 });
             }
@@ -253,7 +283,10 @@ const getCommands = async (setRefreshedAt) => (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execEnableLineWrapAction(editor);
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'enableLineWrap']);
+                    sendEventMessageForMetrics({
+                        name: 'enableLineWrap',
+                        spot: 'commandPalette'
+                    });
                     setRefreshedAt(Date.now());
                 });
             }
@@ -267,7 +300,10 @@ const getCommands = async (setRefreshedAt) => (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execDisableLineWrapAction(editor);
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'disableLineWrap']);
+                    sendEventMessageForMetrics({
+                        name: 'disableLineWrap',
+                        spot: 'commandPalette'
+                    });
                     setRefreshedAt(Date.now());
                 });
             }
@@ -282,7 +318,10 @@ const getCommands = async (setRefreshedAt) => (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execEnableCssLintingAction(editor);
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'enableCssLinting']);
+                    sendEventMessageForMetrics({
+                        name: 'enableCssLinting',
+                        spot: 'commandPalette'
+                    });
                     setRefreshedAt(Date.now());
                 });
             }
@@ -296,7 +335,10 @@ const getCommands = async (setRefreshedAt) => (
                 setTimeout(async function () {
                     var editor = window.MagiCSSEditor;
                     await window.execDisableCssLintingAction(editor);
-                    sendMessageForGa(['_trackEvent', 'commandPalette', 'disableCssLinting']);
+                    sendEventMessageForMetrics({
+                        name: 'disableCssLinting',
+                        spot: 'commandPalette'
+                    });
                     setRefreshedAt(Date.now());
                 });
             }
@@ -308,9 +350,12 @@ const getCommands = async (setRefreshedAt) => (
             iconCls: 'magicss-use-logo-twitter-gray',
             command() {
                 const extensionUrl = window.extensionUrl;
-                const url = 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(extLib.TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions';
+                const url = 'http://twitter.com/intent/tweet?url=' + encodeURIComponent(extensionUrl.forThisBrowser) + '&text=' + encodeURIComponent(TR('Extension_Name', 'Live editor for CSS, Less & Sass - Magic CSS')) + ' (for Chrome%2C Edge %26 Firefox) ... web devs check it out!&via=webextensions';
                 window.open(url);
-                sendMessageForGa(['_trackEvent', 'commandPalette', 'tweet']);
+                sendEventMessageForMetrics({
+                    name: 'tweet',
+                    spot: 'commandPalette'
+                });
             }
         },
         {
@@ -321,7 +366,10 @@ const getCommands = async (setRefreshedAt) => (
                 const extensionUrl = window.extensionUrl;
                 const url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(extensionUrl.forThisBrowser);
                 window.open(url);
-                sendMessageForGa(['_trackEvent', 'commandPalette', 'shareOnFacebook']);
+                sendEventMessageForMetrics({
+                    name: 'shareOnFacebook',
+                    spot: 'commandPalette'
+                });
             }
         },
         {
@@ -330,7 +378,10 @@ const getCommands = async (setRefreshedAt) => (
             iconCls: 'magicss-use-logo-github-gray',
             command() {
                 window.open('https://github.com/webextensions/live-css-editor');
-                sendMessageForGa(['_trackEvent', 'commandPalette', 'openGithub']);
+                sendEventMessageForMetrics({
+                    name: 'openGithub',
+                    spot: 'commandPalette'
+                });
             }
         },
         ...(await (async function () {
@@ -346,7 +397,10 @@ const getCommands = async (setRefreshedAt) => (
                     iconCls: 'magicss-use-icon-chrome',
                     command() {
                         window.open(extensionUrl.chrome);
-                        sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionForChrome']);
+                        sendEventMessageForMetrics({
+                            name: 'extensionForChrome',
+                            spot: 'commandPalette'
+                        });
                     }
                 },
                 {
@@ -356,7 +410,10 @@ const getCommands = async (setRefreshedAt) => (
                     iconCls: 'magicss-use-icon-edge-gray',
                     command() {
                         window.open(extensionUrl.edge);
-                        sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionForEdge']);
+                        sendEventMessageForMetrics({
+                            name: 'extensionForEdge',
+                            spot: 'commandPalette'
+                        });
                     }
                 },
                 {
@@ -366,7 +423,10 @@ const getCommands = async (setRefreshedAt) => (
                     iconCls: 'magicss-use-icon-firefox-gray',
                     command() {
                         window.open(extensionUrl.firefox);
-                        sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionForFirefox']);
+                        sendEventMessageForMetrics({
+                            name: 'extensionForFirefox',
+                            spot: 'commandPalette'
+                        });
                     }
                 },
                 {
@@ -376,7 +436,10 @@ const getCommands = async (setRefreshedAt) => (
                     iconCls: 'magicss-use-logo-opera-gray',
                     command() {
                         window.open(extensionUrl.opera);
-                        sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionForOpera']);
+                        sendEventMessageForMetrics({
+                            name: 'extensionForOpera',
+                            spot: 'commandPalette'
+                        });
                     }
                 }
             ];
@@ -388,7 +451,10 @@ const getCommands = async (setRefreshedAt) => (
             command() {
                 var editor = window.MagiCSSEditor;
                 window.execMoreOptionsAction(editor);
-                sendMessageForGa(['_trackEvent', 'commandPalette', 'extensionOptionsPage']);
+                sendEventMessageForMetrics({
+                    name: 'extensionOptionsPage',
+                    spot: 'commandPalette'
+                });
             }
         }
     ]

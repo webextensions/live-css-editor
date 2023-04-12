@@ -1,5 +1,11 @@
 /* global chrome, remoteConfig */
 
+import { getUuid } from './appUtils/getUuid.js';
+import { isFeatureEnabled } from './appUtils/isFeatureEnabled.js';
+import { metricsUrlGenerator } from './appUtils/metricsUrlGenerator.js';
+import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
+import { myWin } from './appUtils/myWin.js';
+
 chrome.runtime.onInstalled.addListener((details) => {
     const {
         previousVersion,
@@ -13,7 +19,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 
     if (reason === INSTALL) {
         (async () => {
-            await window.mainFnMetricsHandler({ event: 'install' });
+            await mainFnMetricsHandler({ event: 'install' });
         })();
 
         // chrome.tabs.create({
@@ -26,7 +32,7 @@ chrome.runtime.onInstalled.addListener((details) => {
         // at chrome://extensions/ page can also trigger "onInstalled" listener
         if (extensionVersion !== previousVersion) {
             (async () => {
-                await window.mainFnMetricsHandler({ event: 'update' });
+                await mainFnMetricsHandler({ event: 'update' });
             })();
 
             // chrome.tabs.create({
@@ -39,14 +45,14 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 (async () => {
     try {
-        await window.remoteConfigLoadedFromRemote;
+        await myWin.remoteConfigLoadedFromRemote;
         if (
             remoteConfig.features &&
             remoteConfig.features.useUninstallUrl &&
-            await window.isFeatureEnabled(remoteConfig.features.useUninstallUrl.enabled) &&
+            await isFeatureEnabled(remoteConfig.features.useUninstallUrl.enabled) &&
             remoteConfig.features.useUninstallUrl.uninstallUrl
         ) {
-            const [err, uuid] = await window.getUuid();
+            const [err, uuid] = await getUuid();
 
             if (err) {
                 const errToReport = new Error('Unable to get the uuid', { cause: err });
@@ -57,7 +63,8 @@ chrome.runtime.onInstalled.addListener((details) => {
             const details = {
                 uuid
             };
-            const url = await window.metricsUrlGenerator({
+            const url = await metricsUrlGenerator({
+                remoteConfig,
                 event: 'uninstall',
                 details,
                 uninstallPathOnServer: remoteConfig.features.useUninstallUrl.uninstallUrl

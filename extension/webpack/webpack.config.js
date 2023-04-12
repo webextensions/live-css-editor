@@ -58,8 +58,10 @@ module.exports = function (env) {
         entry: {
             main: './src/main.js',
             'background-magicss': './background-magicss.js',
+            'alert': './alert.js',
             options: './src/options/options.js',
             'load-editor': './scripts/load-editor.js',
+            'external-editor-base': './external-editor-base.js',
             'load-reapply': './scripts/load-reapply.js'
         },
         output: {
@@ -238,9 +240,15 @@ module.exports = function (env) {
                             { from: path.join(extensionRoot, 'scripts', 'platformInfoOs-android.js'),     to: path.resolve(targetExtensionDir, 'scripts', 'platformInfoOs-android.js') },
                             { from: path.join(extensionRoot, 'scripts', 'platformInfoOs-non-android.js'), to: path.resolve(targetExtensionDir, 'scripts', 'platformInfoOs-non-android.js') },
                             {
+                                // Less
                                 from: path.join(extensionRoot,       'scripts', '3rdparty', 'basic-less-with-sourcemap-support.browserified.js'),
                                 to: path.resolve(targetExtensionDir, 'scripts', '3rdparty', 'basic-less-with-sourcemap-support.browserified.js')
                             },
+                            {
+                                // Sass
+                                from: path.join(extensionRoot,       'scripts', '3rdparty', 'sass', 'sass.sync.min.js'),
+                                to: path.resolve(targetExtensionDir, 'scripts', '3rdparty', 'sass', 'sass.sync.min.js')
+                            }
                         ];
                         return arr;
                     }())
