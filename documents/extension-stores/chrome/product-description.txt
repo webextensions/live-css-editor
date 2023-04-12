@@ -80,30 +80,8 @@ Security and privacy:
 ⓘ Mixpanel is used to get anonymized stats for improving UX
 ⓘ Browser extension's storage, localStorage etc are utilized for the extension's core features.
 
-Credits for open source code used by this extension:
-* Amplify JS
-* Babel
-* Browserify
-* Code Mirror
-* codemirror-colorpicker by easylogic @ GitHub
-* Emmet codemirror-plugin by emmetio @ GitHub
-* CSS Pretty
-* CSSLint
-* ESLint
-* jQuery
-* jQuery UI
-* jQuery UI Touch Punch
-* Less
-* magicsuggest
-* Material-UI
-* Mozilla Source Map
-* Node.js
-* React JS
-* React Redux
-* SASS / SCSS
-* socket.io (WebSocket API library)
-* Tooltipster
-* Webpack
+Inspirations:
+* "Auto-generate CSS selectors with point-and-click" feature is partly inspired by the Chrome extensions SelectorGadget and Stylebot
 
 Alternative CSS development tools you may like if you are looking for features which are not yet available in Magic CSS:
 * Amino: Live CSS Editor
@@ -116,9 +94,6 @@ Alternative CSS development tools you may like if you are looking for features w
 * Viewport Resizer
 * VisBug
 * WhatFont
-
-Inspirations:
-* "Auto-generate CSS selectors with point-and-click" feature is partly inspired by the Chrome extensions SelectorGadget and Stylebot
 
 Visit https://webextensions.org/ for further details.
 
