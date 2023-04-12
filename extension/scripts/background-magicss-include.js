@@ -964,6 +964,7 @@ var isRestrictedUrl = function (url) {
     //     https://github.com/gorhill/uMatrix/wiki/Privileged-Pages
     var restrictedPatterns = [
         "chrome://",
+        "edge://",
         "view-source:",
         "about:",
 
@@ -971,7 +972,10 @@ var isRestrictedUrl = function (url) {
         "moz-extension://",
         "ms-browser-extension://",
 
-        "https://chrome.google.com/webstore/",
+        "https://chrome.google.com/",
+        // "https://chrome.google.com/webstore/",
+
+        "https://microsoftedge.microsoft.com/",
 
         "https://addons.opera.com/",
 
