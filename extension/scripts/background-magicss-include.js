@@ -20,6 +20,7 @@ import { basisNumberFromUuid } from './utils/basisNumberFromUuid.js';
 
 import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
 import { myWin } from './appUtils/myWin.js';
+import { nativeAlert } from './appUtils/nativeAlert.js';
 
 var USER_PREFERENCE_ALL_FRAMES = 'all-frames';
 
@@ -616,15 +617,7 @@ var informUser = function (config) {
     if (!runningInFirefoxExtensionLikeEnvironment()) {
         // alert(message);
         (async () => {
-            await chrome.offscreen.createDocument({
-                url: (
-                    chrome.runtime.getURL('alert.html') +
-                    '?message=' + encodeURIComponent(message)
-                ),
-                reasons: ['DISPLAY_MEDIA'],
-                justification: 'show an alert that extension does not work on various special pages'
-            });
-            await chrome.offscreen.closeDocument();
+            await nativeAlert(message);
         })();
     }
 };
