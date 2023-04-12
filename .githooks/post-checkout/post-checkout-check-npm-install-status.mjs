@@ -94,9 +94,18 @@ function main (rootPath) {
 
     var mainPackageJsonPath = path.resolve(rootPath, 'package.json'),
         mainPackageJson = readFileAsJson(mainPackageJsonPath),
-        allDependencies = mergeObjects(mainPackageJson.dependencies, mainPackageJson.devDependencies),
+        originalAllDependencies = mergeObjects(mainPackageJson.dependencies, mainPackageJson.devDependencies),
         mismatchFound = false,
         invalidFound = false;
+
+    // Removing all the dependencies which have invalid version range (eg: packages which are loaded from a github.com repo)
+    var allDependencies = JSON.parse(JSON.stringify(originalAllDependencies));
+    for (const dependency in allDependencies) {
+        const dependencyVersion = allDependencies[dependency];
+        if (!semver.validRange(dependencyVersion)) {
+            delete allDependencies[dependency];
+        }
+    }
 
     var updateMessages = [];
     Object.keys(allDependencies).forEach(function (packageName, index) {
@@ -119,7 +128,7 @@ function main (rootPath) {
         // All npm packages are loosely matching. It might be fine to skip running "$ npm install"
         return 0;
     } else {
-        logger.warn('\n' + updateMessages.length + '/' + Object.keys(allDependencies).length + ' npm packages need to be updated: (' + ((t2 - t1) / 1000) + ' seconds)');
+        logger.warn('\n' + updateMessages.length + '/' + Object.keys(originalAllDependencies).length + ' npm packages need to be updated: (' + ((t2 - t1) / 1000) + ' seconds)');
         logger.info('    ' + updateMessages.join('\n    '));
         logger.warn(
             'You might want to run "$ npm install" for ' +
