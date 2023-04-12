@@ -5,10 +5,12 @@ import mixpanel from 'mixpanel-browser';
 import { chromeStorageLocalGet } from './utils/chromeStorage.js';
 import { isValidUuidV4 } from './utils/isValidUuidV4.js';
 
+import { isFeatureEnabled } from './appUtils/isFeatureEnabled.js';
 import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
 
+import { myWin } from './appUtils/myWin.js';
+
 // // Useful for debugging purposes
-// import { myWin } from './appUtils/myWin.js';
 // myWin.mixpanel = mixpanel;
 
 const INSTANCE_UUID = 'instance-uuid';
@@ -90,19 +92,21 @@ let flagMixpanelSetupDone = false;
             chrome.runtime.onMessage.addListener(
                 function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
                     if (request.type === 'mixpanel') {
-                        if (request.subType === 'event') {
-                            const evt = request.payload;
+                        (async () => {
+                            if (await isFeatureEnabled(myWin?.remoteConfig?.features?.useMixpanel?.enabled)) {
+                                if (request.subType === 'event') {
+                                    const evt = request.payload;
 
-                            (async () => {
-                                if (!flagMixpanelSetupDone) {
-                                    flagMixpanelSetupDone = await setupMixpanel();
-                                }
+                                    if (!flagMixpanelSetupDone) {
+                                        flagMixpanelSetupDone = await setupMixpanel();
+                                    }
 
-                                if (flagMixpanelSetupDone) {
-                                    mixpanel.track(evt.name, evt);
+                                    if (flagMixpanelSetupDone) {
+                                        mixpanel.track(evt.name, evt);
+                                    }
                                 }
-                            })();
-                        }
+                            }
+                        })();
                     }
                 }
             );

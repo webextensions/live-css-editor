@@ -47,6 +47,7 @@ var fallbackConfig = {
     "version": "8.20.3"
 };
 let remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
+myWin.remoteConfig = remoteConfig;
 var instanceUuid = null;
 var instanceBasisNumber = -1;
 
@@ -261,6 +262,7 @@ if (myWin.flagEditorInExternalWindow) {
 
         if (storedConfig) {
             remoteConfig = storedConfig;
+            myWin.remoteConfig = remoteConfig;
             console.info('Applied stored config:', storedConfig);
             if (storedConfig.mode === 'online') {
                 myWin.remoteConfigLoadedFromRemoteResolve();
@@ -273,6 +275,7 @@ if (myWin.flagEditorInExternalWindow) {
             } else {
                 fetchedConfig.nextUpdateAt = Date.now() + fetchedConfig.nextUpdate;
                 remoteConfig = fetchedConfig;
+                myWin.remoteConfig = remoteConfig;
                 console.info('Applied config from remote:', fetchedConfig);
 
                 try {
