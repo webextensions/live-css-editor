@@ -12,7 +12,7 @@
         "message": "And grant permissions by enabling \"Allow access to file URLs\" for this extension"
     },
     "Include_MagicssDoesNotOperateOnSomeTabs": {
-        "message": "For security reasons, Magic CSS does not operate on:"
+        "message": "For security reasons, Magic CSS does not run on:"
     },
     "Include_RequiresYourPermission": {
         "message": "It requires your permission to execute on:"
