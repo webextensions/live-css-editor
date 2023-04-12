@@ -1,9 +1,9 @@
-Magic CSS extension code open-sourced at
-========================================
+Magic CSS extension source code
+===============================
 - https://github.com/webextensions/live-css-editor
 
-Magic CSS published in various extension stores
-===============================================
+Magic CSS in various extension stores
+=====================================
 - Google Chrome - https://chrome.google.com/webstore/detail/ifhikkcafabcgolfjegfcgloomalapol
 - Microsoft Edge - https://microsoftedge.microsoft.com/addons/detail/live-editor-for-css-less/ahibbdhoijcafelmfepfpcmmdifchpdg
 - Mozilla Firefox - https://addons.mozilla.org/firefox/addon/live-editor-for-css-less-sass/
@@ -16,11 +16,7 @@ Notes about usage of 3rdparty code
 - Inside that `3rdparty` folder, the link to the original sources of all the files are placed along with those files as:
     `<3rd-party-filename>.<ext>.source.txt`
 - A list of most of those files and their origins can also be seen at:
-    https://github.com/webextensions/live-css-editor/blob/main/copy-third-party-front-end-scripts.cjson
-
-3rdparty code which is used "as-is" from GitHub
------------------------------------------------
-- You would find that `<3d-party-filename>.<ext>.source.txt` refers to the GitHub URL pointing to the source
+    https://github.com/webextensions/live-css-editor/blob/main/copy-files-from-to.cjson
 
 3rdparty code which is used "as-is" from npm
 --------------------------------------------
@@ -33,23 +29,18 @@ Please note that:
 - https://www.npmjs.com/package/emmetio-codemirror-plugin-webextensions is published from https://github.com/webextensions/codemirror-plugin
 - https://github.com/webextensions/codemirror-plugin is a fork of https://github.com/emmetio/codemirror-plugin and differs from the original repository only with the commit https://github.com/webextensions/codemirror-plugin/commit/687c68a76804a8b20371ad54ddca803bfc66ed30 (the commit adds option to bundle a non-minified browser version of the library)
 
+3rdparty code which is used "as-is" from GitHub
+-----------------------------------------------
+- You would find that `<3rd-party-filename>.<ext>.source.txt` refers to the GitHub URL pointing to the source
+- Loading Sass in extension:
+  - It is loaded from the "scripts/3rdparty/sass/sass.sync.min.js".
+  - The GitHub page for this library is at: https://github.com/medialize/sass.js  
+  - More information available at: https://cdnjs.com/libraries/sass.js
+  - The script is also available at https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js  
+
 3rdparty code which is compiled/minified with minor customization (after forking from the official GitHub repository)
 ---------------------------------------------------------------------------------------------------------------------
 The file, `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.js`, has been fetched from https://github.com/webextensions/less.js which is a fork of a popular open-source library (https://github.com/less/less.js/). More details about those minor changes can be found in `<extension>/scripts/3rdparty/basic-less-with-sourcemap-support.browserified.js.source.description.txt`
-
-3rdparty code which is used "as-is" from other sources
-------------------------------------------------------
-
-Loading Sass in extension for Firefox and Opera browsers:
-  - It is loaded from the "scripts/3rdparty/sass/sass.sync.min.js". For more details, refer to section "Notes about usage of 3rdparty code".
-
-Loading Sass in extension for all other browsers:
-  - For parsing Sass, during runtime, we load:  
-    https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js  
-    The GitHub page for this library is at:  
-    https://github.com/medialize/sass.js  
-    More information available at:  
-    https://cdnjs.com/libraries/sass.js
 
 3rdparty code which is customized
 ---------------------------------
@@ -67,7 +58,7 @@ If you wish to build a ZIP package of the extension on your own from the Git rep
 ```
 $ git clone https://github.com/webextensions/live-css-editor.git
 $ cd live-css-editor
-$ nvm use
+$ nvm use                              # Run `nvm install` if required
 $ npm install --ignore-scripts
-$ npm run zip:extension     # Now, the zip versions of the extension would be created for all the supported browsers (Chrome/Edge/Firefox/Opera)
+$ npm run publish:build-and-zip        # Now, the zip versions of the extension would be created for all the supported browsers (Chrome/Edge/Firefox/Opera)
 ```
