@@ -45,7 +45,7 @@ var fallbackConfig = {
             }
         }
     },
-    "version": "8.21.1"
+    "version": "8.21.2"
 };
 let remoteConfig = JSON.parse(JSON.stringify(fallbackConfig));
 myWin.remoteConfig = remoteConfig;
