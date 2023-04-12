@@ -78,7 +78,7 @@ Notes:
 Security and privacy:
 ⓘ No permissions approval is required for installing the extension
 ⓘ For advanced features, like "Apply styles automatically", permissions are requested on-demand
-ⓘ Google Analytics is used to get anonymized stats for improving UX
+ⓘ Mixpanel is used to get anonymized stats for improving UX
 ⓘ Browser extension's storage, localStorage etc are utilized for the extension's core features.
 
 Credits for open source code used by this extension:
