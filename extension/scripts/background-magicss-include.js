@@ -289,6 +289,7 @@ if (myWin.flagEditorInExternalWindow) {
             }
         }
     };
+    myWin.updateRemoteConfig = updateRemoteConfig;
 
     (async () => {
         const INSTANCE_UUID = 'instance-uuid';

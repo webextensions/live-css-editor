@@ -93,6 +93,12 @@ let flagMixpanelSetupDone = false;
                 function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
                     if (request.type === 'mixpanel') {
                         (async () => {
+                            // If the service worker had shut down and started again due to this listener, then we shall
+                            // wait for the remote config to be updated (loaded)
+                            if (myWin.remoteConfig.mode === 'offline') {
+                                await myWin.updateRemoteConfig();
+                            }
+
                             if (await isFeatureEnabled(myWin?.remoteConfig?.features?.useMixpanel?.enabled)) {
                                 if (request.subType === 'event') {
                                     const evt = request.payload;
