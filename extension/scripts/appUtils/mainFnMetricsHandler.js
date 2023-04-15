@@ -1,4 +1,4 @@
-/* global chrome, remoteConfig */
+/* global chrome */
 
 import { getUuid } from './getUuid.js';
 import { isFeatureEnabled } from './isFeatureEnabled.js';
@@ -250,11 +250,7 @@ const mainFnMetricsHandler = async function ({ event }) {
     try {
         await myWin.remoteConfigLoadedFromRemote;
 
-        if (
-            remoteConfig.features &&
-            remoteConfig.features.useMetrics &&
-            await isFeatureEnabled(remoteConfig.features.useMetrics.enabled)
-        ) {
+        if (await isFeatureEnabled(myWin.remoteConfig?.features?.useMetrics?.enabled)) {
             const [err, details] = await detailsGenerator();
 
             if (err) {
@@ -263,7 +259,7 @@ const mainFnMetricsHandler = async function ({ event }) {
                 return [errorToReport];
             }
             const url = await metricsUrlGenerator({
-                remoteConfig,
+                remoteConfig: myWin.remoteConfig,
                 event,
                 details
             });
