@@ -1,4 +1,4 @@
-/* global chrome, remoteConfig */
+/* global chrome */
 
 import { getUuid } from './appUtils/getUuid.js';
 import { isFeatureEnabled } from './appUtils/isFeatureEnabled.js';
@@ -47,10 +47,8 @@ chrome.runtime.onInstalled.addListener((details) => {
     try {
         await myWin.remoteConfigLoadedFromRemote;
         if (
-            remoteConfig.features &&
-            remoteConfig.features.useUninstallUrl &&
-            await isFeatureEnabled(remoteConfig.features.useUninstallUrl.enabled) &&
-            remoteConfig.features.useUninstallUrl.uninstallUrl
+            await isFeatureEnabled(myWin.remoteConfig?.features?.useUninstallUrl?.enabled) &&
+            myWin.remoteConfig?.features?.useUninstallUrl?.uninstallUrl
         ) {
             const [err, uuid] = await getUuid();
 
@@ -64,10 +62,10 @@ chrome.runtime.onInstalled.addListener((details) => {
                 uuid
             };
             const url = await metricsUrlGenerator({
-                remoteConfig,
+                remoteConfig: myWin.remoteConfig,
                 event: 'uninstall',
                 details,
-                uninstallPathOnServer: remoteConfig.features.useUninstallUrl.uninstallUrl
+                uninstallPathOnServer: myWin.remoteConfig?.features?.useUninstallUrl?.uninstallUrl
             });
 
             chrome.runtime.setUninstallURL(
