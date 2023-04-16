@@ -769,7 +769,7 @@ var reapplyCss = async function (tabId) {
     // arrScripts.push(pathScripts + 'utils.js');
     // arrScripts.push(pathScripts + 'migrate-storage.js');
     // arrScripts.push(pathScripts + 'reapply-css.js');
-    arrScripts.push(pathDist + 'load-reapply.bundle.js');
+    arrScripts.push(pathDist + 'load-reapply/load-reapply.bundle.js');
 
     extLib.loadMultipleJsCss({
         treatAsNormalWebpage: myWin.treatAsNormalWebpage,
@@ -833,8 +833,8 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
                 //     sourceText: 'window.platformInfoOs = "' + platformInfoOs + '";'
                 // },
 
-                pathDist + 'load-editor.bundle.js',
-                pathDist + 'load-editor.bundle.css'
+                pathDist + 'load-editor/load-editor.bundle.css',
+                pathDist + 'load-editor/load-editor.bundle.js'
 
                 /*
                 {

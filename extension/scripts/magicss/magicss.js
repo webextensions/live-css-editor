@@ -198,22 +198,22 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
             if (myWin.treatAsNormalWebpage) {
                 const [errCss] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
                     treatAsNormalWebpage: true,
-                    source: pathDist + 'main.bundle.css'
+                    source: pathDist + 'main/main.bundle.css'
                 });
                 const [errJs] = await extLib.loadJsCssAsync({ // eslint-disable-line no-unused-vars
                     treatAsNormalWebpage: true,
-                    source: pathDist + 'main.bundle.js'
+                    source: pathDist + 'main/main.bundle.js'
                 });
             } else {
                 await chromeRuntimeMessageToBackgroundScript({
                     type: 'magicss-dependency',
                     subType: 'load-dependency',
-                    payload: pathDist + 'main.bundle.css'
+                    payload: pathDist + 'main/main.bundle.css'
                 });
                 await chromeRuntimeMessageToBackgroundScript({
                     type: 'magicss-dependency',
                     subType: 'load-dependency',
-                    payload: pathDist + 'main.bundle.js'
+                    payload: pathDist + 'main/main.bundle.js'
                 });
             }
         }

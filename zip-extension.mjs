@@ -44,8 +44,8 @@ var output = fs.createWriteStream(__dirname + '/' + zipFileName);
 var archive = archiver('zip', {
     zlib: {
         // Sets the compression level.
-        // level: 9 // More compression, but slower
-        level: 1    // Less compression, but faster
+        // level: 1  // Less compression, but faster
+        level: 9     // More compression, but slower
     }
 });
 

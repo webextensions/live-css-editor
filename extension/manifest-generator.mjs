@@ -108,7 +108,7 @@ var generateManifest = function (whichBrowser) {
             // return background;
 
             const background = {
-                "service_worker": "dist/background-magicss.bundle.js"
+                "service_worker": "dist/background-magicss/background-magicss.bundle.js"
                 // "service_worker": "background-magicss.js"
             };
             return background;

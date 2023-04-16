@@ -40,7 +40,7 @@
         "default_title": "Launch Magic CSS editor for this page"
     },
     "background": {
-        "service_worker": "dist/background-magicss.bundle.js"
+        "service_worker": "dist/background-magicss/background-magicss.bundle.js"
     },
     "commands": {
         "_execute_action": {
