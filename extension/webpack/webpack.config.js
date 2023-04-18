@@ -86,6 +86,11 @@ module.exports = function (env) {
             // vendorsBundleName: 'options.vendors'
         }
     ];
+    const fullHashByEntryName = {};
+    for (const config of configs) {
+        const entryName = Object.keys(config.entry)[0];
+        fullHashByEntryName[entryName] = undefined;
+    }
 
     for (const config of configs) {
         const webpackConfig = {
@@ -261,7 +266,26 @@ module.exports = function (env) {
             ({
                 apply: (compiler) => {
                     compiler.hooks.done.tap('done', (stats) => {
-                        notifyCompletionStatus(stats);
+                        const entryName = Object.keys(config.entry)[0];
+                        if (
+                            typeof fullHashByEntryName[entryName] === 'undefined' ||
+                            stats.compilation.emittedAssets.size
+                        ) {
+                            if (stats.compilation.fullHash !== fullHashByEntryName[entryName]) {
+                                const everyValueInObjectIsAvailable = function (ob) {
+                                    // eslint-disable-next-line no-unused-vars
+                                    const flag = Object.entries(ob).every(([key, value]) => {
+                                        return (typeof value !== 'undefined');
+                                    });
+                                    return flag;
+                                };
+                                fullHashByEntryName[entryName] = stats.compilation.fullHash;
+                                if (everyValueInObjectIsAvailable(fullHashByEntryName)) {
+                                    notifyCompletionStatus(stats);
+                                }
+                            }
+                        }
+                        fullHashByEntryName[entryName] = stats.compilation.fullHash;
                     });
                 }
             })
