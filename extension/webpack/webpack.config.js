@@ -91,7 +91,10 @@ module.exports = function (env) {
         const webpackConfig = {
             watch,
             watchOptions: {
-                aggregateTimeout: 250
+                aggregateTimeout: 250,
+                ignored: [
+                    path.resolve(__dirname, 'webpack.config.js')
+                ]
             },
             mode: 'development',
             entry: config.entry,
