@@ -96,7 +96,7 @@ module.exports = function (env) {
                     path.resolve(__dirname, 'webpack.config.js')
                 ]
             },
-            mode: 'development',
+            mode: 'development', // Even for the "publish" purpose, we are using "development" mode, so that the code is not minified
             entry: config.entry,
             output: {
                 path: __dirname + '/../../extension-dist/dist/' + Object.keys(config.entry)[0],
