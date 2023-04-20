@@ -62,7 +62,7 @@
     "react-roving-tabindex": "^3.2.0",
     "react-use": "^17.4.0",
     "redux": "^4.2.1",
-    "rooks": "^7.11.1",
+    "rooks": "^7.11.2",
     "socket.io": "=2.5.0",
     "toastr": "^2.1.4"
   },
@@ -81,7 +81,7 @@
     "jsonfile": "^6.1.0",
     "node-notifier": "^10.0.1",
     "note-down": "^0.3.1",
-    "webpack": "^5.79.0",
+    "webpack": "^5.80.0",
     "webpack-cli": "^5.0.1"
   }
 }
