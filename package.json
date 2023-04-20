@@ -47,7 +47,7 @@
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
     "helpmate": "=1.5.1",
     "helpmate-css": "=0.1.1",
-    "immer": "^9.0.21",
+    "immer": "^10.0.1",
     "jquery": "^3.6.4",
     "mini-css-extract-plugin": "^2.7.5",
     "mixpanel-browser": "webextensions/mixpanel-js-mv3#fetch-support-for-mv3-extensions",
