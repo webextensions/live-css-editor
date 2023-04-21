@@ -124,13 +124,18 @@ var generateManifest = function (whichBrowser) {
             "open_in_tab": true,
             "page": "options.html"
         }
-        /*
-        // "web_accessible_resources" might be required on some platforms (but currently we are using data-uri for images, so no need yet)
 
-        "web_accessible_resources": [
-            "ui-images/*.*"
-        ]
-        /* */
+        // // "web_accessible_resources" might be required on some platforms (but currently we are using data-uri for images, so no need yet)
+        // "web_accessible_resources": [
+        //     {
+        //         "resources": [
+        //             "ui-images/*.*"
+        //         ],
+        //         "matches": [
+        //             "*://*/*"
+        //         ]
+        //     }
+        // ]
     };
 
     if (whichBrowser !== "puppeteer") {

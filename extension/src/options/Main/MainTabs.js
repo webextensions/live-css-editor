@@ -5,9 +5,11 @@ import Tabs from '@mui/material/Tabs/index.js';
 import Tab from '@mui/material/Tab/index.js';
 
 import SettingsIcon from '@mui/icons-material/Settings.js';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle.js';
 import HelpIcon from '@mui/icons-material/Help.js';
 
 import { TabOptions } from './Tabs/TabOptions.js';
+import { TabAccount } from './Tabs/TabAccount.js';
 import { TabHelp } from './Tabs/TabHelp.js';
 
 const TabPanel = function (props) {
@@ -39,6 +41,8 @@ const MainTabs = function () {
         const hash = window.location.hash;
         switch (hash) {
             case '#help':
+                return 2;
+            case '#account':
                 return 1;
             case '#options':
             default:
@@ -88,6 +92,19 @@ const MainTabs = function () {
                     />
 
                     <Tab
+                        label="Account"
+                        icon={<AccountCircleIcon />}
+                        iconPosition="start"
+                        href="#account"
+                        sx={{
+                            justifyContent: 'flex-start', // Align contents to the left
+                            fontSize: 12,
+                            minHeight: 48,
+                            paddingLeft: 0
+                        }}
+                    />
+
+                    <Tab
                         label="Help"
                         icon={<HelpIcon />}
                         iconPosition="start"
@@ -111,7 +128,12 @@ const MainTabs = function () {
                 <TabPanel value={value} index={0} renderedIndexes={renderedIndexes}>
                     <TabOptions />
                 </TabPanel>
+
                 <TabPanel value={value} index={1} renderedIndexes={renderedIndexes}>
+                    <TabAccount />
+                </TabPanel>
+
+                <TabPanel value={value} index={2} renderedIndexes={renderedIndexes}>
                     <TabHelp />
                 </TabPanel>
             </div>

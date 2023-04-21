@@ -1,0 +1,95 @@
+<mxfile host="app.diagrams.net" modified="2023-04-23T10:03:03.140Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" etag="eWKbZmPDqeQwHubqlZUC" version="21.2.1" type="device">
+  <diagram name="Page-1" id="bMOyiO1p-XPdJgZzXNTT">
+    <mxGraphModel dx="1660" dy="926" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-1" value="Start" style="overflow=block;blockSpacing=1;rounded=1;arcSize=50;spacing=3.8;strokeOpacity=100;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="240" y="40" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-2" value="Ext: Open webextensions.org/connect page in &lt;iframe&gt;" style="overflow=block;blockSpacing=1;spacing=9;strokeOpacity=100;fillOpacity=100;fillColor=#c3f7c8;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="160" y="160" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-3" value="Web: Load /connect page" style="overflow=block;blockSpacing=1;spacing=9;strokeOpacity=100;fillOpacity=100;fillColor=#d7faf5;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="880" y="280" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-4" value="" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;edgeStyle=orthogonalEdgeStyle;startArrow=none;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;exitDx=0;exitDy=0;entryDx=0;entryDy=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-2" target="x3CuetDOfEWvBa8g2b8s-3" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-5" value="Web: Is the user already logged in?" style="overflow=block;blockSpacing=1;rhombus;spacing=3.8;strokeOpacity=100;fillOpacity=100;fillColor=#d7faf5;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="880" y="400" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-6" value="" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;edgeStyle=orthogonalEdgeStyle;startArrow=none;endArrow=block;endFill=1;exitX=0.5;exitY=1.013;exitPerimeter=0;entryX=0.5;entryY=-0.013;entryPerimeter=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-3" target="x3CuetDOfEWvBa8g2b8s-5" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-7" value="Web: Show UI to the user asking for connecting to extension as current user or sign-in as a different user" style="overflow=block;blockSpacing=1;spacing=9;strokeOpacity=100;fillOpacity=100;fillColor=#d7faf5;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="640" y="520" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-8" value="Yes" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;startArrow=none;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=-0.008;entryPerimeter=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-5" target="x3CuetDOfEWvBa8g2b8s-7" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-10" value="" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;edgeStyle=orthogonalEdgeStyle;startArrow=none;endArrow=block;endFill=1;exitX=0.5;exitY=1.008;exitPerimeter=0;entryX=0.5;entryY=-0.013;entryPerimeter=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-7" target="x3CuetDOfEWvBa8g2b8s-11" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-11" value="Web: Current user or different user?" style="overflow=block;blockSpacing=1;rhombus;spacing=3.8;strokeOpacity=100;fillOpacity=100;fillColor=#d7faf5;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="640" y="640" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-12" value="Current user" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;startArrow=none;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-11" edge="1" target="x3CuetDOfEWvBa8g2b8s-14">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="585" y="819" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-14" value="Web: Send postMessage to extension with user details" style="overflow=block;blockSpacing=1;spacing=9;strokeOpacity=100;fillOpacity=100;fillColor=#d7faf5;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="400" y="760" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="z4qGBDPze2n-vEj58NLe-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="x3CuetDOfEWvBa8g2b8s-15" target="x3CuetDOfEWvBa8g2b8s-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-15" value="Ext: In the extension, activate that user as a logged in user" style="overflow=block;blockSpacing=1;spacing=9;strokeOpacity=100;fillOpacity=100;fillColor=#c3f7c8;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="160" y="880" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-16" value="" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;startArrow=none;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;exitDx=0;exitDy=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-14" target="x3CuetDOfEWvBa8g2b8s-15" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="260" y="840" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-17" value="Different User" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;startArrow=none;endArrow=block;endFill=1;exitX=1.013;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-11" target="x3CuetDOfEWvBa8g2b8s-19" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-19" value="Web: Sign out the user (without redirecting) and update the UI" style="overflow=block;blockSpacing=1;spacing=9;strokeOpacity=100;fillOpacity=100;fillColor=#d7faf5;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="880" y="760" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-20" value="No" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;startArrow=none;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=-0.008;entryPerimeter=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-5" target="x3CuetDOfEWvBa8g2b8s-22" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-22" value="Web: Show UI to the user asking for &quot;sign-in as&quot;" style="overflow=block;blockSpacing=1;spacing=9;strokeOpacity=100;fillOpacity=100;fillColor=#d7faf5;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1120" y="520" width="320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-23" value="" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;edgeStyle=orthogonalEdgeStyle;startArrow=none;endArrow=block;endFill=1;exitX=1.002;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=1.008;entryPerimeter=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-19" target="x3CuetDOfEWvBa8g2b8s-22" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-24" value="" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;edgeStyle=orthogonalEdgeStyle;startArrow=none;endArrow=block;endFill=1;exitX=-0.002;exitY=0.5;exitPerimeter=0;entryX=1.002;entryY=0.5;entryPerimeter=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-22" target="x3CuetDOfEWvBa8g2b8s-7" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-25" value="" style="jettySize=18;whiteSpace=wrap;strokeWidth=1.5;rounded=1;arcSize=0;edgeStyle=orthogonalEdgeStyle;startArrow=none;endArrow=block;endFill=1;exitX=0.5;exitY=1.013;exitPerimeter=0;entryX=0.5;entryY=-0.012;entryPerimeter=0;" parent="1" source="x3CuetDOfEWvBa8g2b8s-1" target="x3CuetDOfEWvBa8g2b8s-2" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x3CuetDOfEWvBa8g2b8s-26" value="Stop" style="overflow=block;blockSpacing=1;rounded=1;arcSize=50;spacing=3.8;strokeOpacity=100;strokeWidth=1.5;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="240" y="1000" width="160" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
