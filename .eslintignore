@@ -1,9 +1,28 @@
 # http://eslint.org/docs/user-guide/configuring.html#ignoring-files-and-directories
 
-# node_modules ignored by default
-**/node_modules
+# node_modules folders
+# --------------------
+
+# https://github.com/eslint/eslint/blob/v8.38.0/lib/config/default-config.js#L51
+# `!**/node_modules/*` is ignored by default
+# Since we are creating handwritten code in some non-npm based node_modules folders (to utilize the module resolution
+# algorithm for custom code), we are disabling that ESLint ignore rule to add paths to those folders immediately after
+# this. If we don't do this, then we may have to do a weird workaround to enable ESLint for those custom code
+# in node_modules paths, like: https://github.com/eslint/eslint/issues/5728#issuecomment-246430604
+!**/node_modules/*
+
+/node_modules/
+/live-css/node_modules/
+/tests/node_modules/
+/scripts/node_modules/
+
+# 3rd party code
+# --------------
 
 extension/scripts/3rdparty/
+
+# Generated files
+# ---------------
 
 extension-dist/
 
