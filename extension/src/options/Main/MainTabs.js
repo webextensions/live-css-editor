@@ -79,9 +79,8 @@ const MainTabs = function () {
                         icon={<SettingsIcon />}
                         iconPosition="start"
                         href="#options"
-                        // Align contents to the left
                         sx={{
-                            justifyContent: 'flex-start',
+                            justifyContent: 'flex-start', // Align contents to the left
                             fontSize: 12,
                             minHeight: 48,
                             paddingLeft: 0
@@ -94,7 +93,7 @@ const MainTabs = function () {
                         iconPosition="start"
                         href="#help"
                         sx={{
-                            justifyContent: 'flex-start',
+                            justifyContent: 'flex-start', // Align contents to the left
                             fontSize: 12,
                             minHeight: 48,
                             paddingLeft: 0
