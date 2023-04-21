@@ -1,0 +1,6 @@
+.TabHelp {
+}
+
+.faqItem:not(:first-child) {
+    margin-top: 10px;
+}
