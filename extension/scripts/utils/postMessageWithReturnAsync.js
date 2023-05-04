@@ -13,6 +13,8 @@ const originMatchesTargetOrigin = function (origin, targetOrigin) {
 
 const postMessageWithReturnAsync = function (targetWindow, data, targetOrigin) {
     return new Promise((resolve) => {
+        const uuid = randomUUID();
+
         const fn = (evt) => {
             if (
                 !(
@@ -26,7 +28,11 @@ const postMessageWithReturnAsync = function (targetWindow, data, targetOrigin) {
                         window.removeEventListener('message', fn);
                         resolve({
                             origin: evt.origin,
-                            data: evt.data.originalData
+                            data: {
+                                uuid: evt.data.uuid,
+                                flagProxy: evt.data.flagProxy,
+                                originalData: evt.data.originalData
+                            }
                         });
                     }
                 }
@@ -34,7 +40,6 @@ const postMessageWithReturnAsync = function (targetWindow, data, targetOrigin) {
         };
         window.addEventListener('message', fn);
 
-        const uuid = randomUUID();
         targetWindow.postMessage(
             {
                 uuid,
