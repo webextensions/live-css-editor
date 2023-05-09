@@ -1,5 +1,10 @@
 /* globals chrome */
 
+// import { useSetAtom } from 'jotai';
+// import { showConnectViaDialogAtom } from './optionsJotaiState.js';
+
+import { useDialogsStore } from './optionsZustandStore.js';
+
 import { postMessageWithReturnAsync } from '../../scripts/utils/postMessageWithReturnAsync.js';
 
 window.addEventListener("message", (evt) => {
@@ -29,6 +34,39 @@ window.addEventListener("message", (evt) => {
                             requesterHref: window.location.href,
                             requesterAppId: 'magic-css',
                             requesterAppVersion: manifest.version
+                        },
+                        evt.origin
+                    );
+                })();
+            } else if (evt.data.originalData?.type === 'connect-with-auth') {
+                (async () => {
+                    const authData = evt.data.originalData.message?.data?.auth;
+
+                    await chrome.storage.local.set({
+                        authData: authData
+                    });
+
+
+                    // const setVal = useUpdateAtom(showConnectViaDialogAtom);
+                    // setFlagShowFrame(false);
+                    // setVal(false);
+
+                    // useSetAtom(showConnectViaDialogAtom, false);
+                    useDialogsStore.setState({
+                        flagShowConnectViaDialog: false
+                    });
+
+                    await postMessageWithReturnAsync(
+                        evt.source,
+                        {
+                            uuid: evt.data.uuid,
+                            type: 'connect-with-auth-response',
+                            status: 'success'
+                            // requesterName: manifest.name,
+                            // requesterType: 'extension',
+                            // requesterHref: window.location.href,
+                            // requesterAppId: 'magic-css',
+                            // requesterAppVersion: manifest.version
                         },
                         evt.origin
                     );
