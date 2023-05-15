@@ -118,7 +118,7 @@ ResponsiveDialog.propTypes = {
     closable: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
     disableBackdropClick: PropTypes.bool,
-    title: PropTypes.string,
+    title: PropTypes.node,
     noPrimaryButton: PropTypes.bool,
     primaryButtonOnClick: PropTypes.func,
     primaryButtonDisabled: PropTypes.bool,

@@ -5,49 +5,28 @@ import PropTypes from 'prop-types';
 
 import Button from '@mui/material/Button/index.js';
 
-// import { useAtom } from 'jotai';
+import {
+    useDialogsStore,
+    useAuthStore
+} from '../../../optionsZustandStore.js';
 
-import { useDialogsStore } from '../../../optionsZustandStore.js';
-
+import { siteOrigin } from '../../../../appUtils/siteOrigin.js';
 
 // import { alertDialog } from 'helpmate/dist/dom/alertDialog.js';
 import { ResponsiveDialog } from '../../../../lib/ResponsiveDialog/ResponsiveDialog.js';
 
 import styles from './RegistrationOptions.css';
 
-// Use this for the cases where the code should never reach in imaginable scenarios.
-const requestUserViaConsoleToReportUnexpectedError = function (e) {
-    console.error(e);
-    console.error([
-        'An unexpected error was encountered by Magic CSS.',
-        'Kindly report this issue at:',
-        '    https://github.com/webextensions/live-css-editor/issues'
-    ].join('\n'));
-};
-const flagDevMode = (function () {
-    let flag = false;
-    try {
-        // TODO: Verify that this works well across browsers
-        // https://stackoverflow.com/questions/12830649/check-if-chrome-extension-installed-in-unpacked-mode/20227975#20227975
-        flag = (!('update_url' in chrome.runtime.getManifest()));
-    } catch (e) {
-        requestUserViaConsoleToReportUnexpectedError(e);
-    }
-    return flag;
-})();
-
 const MyFrame = function ({ onClose }) {
-    let iframeSrc = 'https://www.webextensions.org/connect';
-    if (flagDevMode) {
-        iframeSrc = 'https://local.webextensions.org:4443/connect';
-    }
-
-    iframeSrc += (
-        '?appId=magic-css' +
-        '&appVersion=' + encodeURIComponent(chrome.runtime.getManifest().version) +
-        '&appName=' + encodeURIComponent(chrome.runtime.getManifest().name) +
+    const manifest = chrome.runtime.getManifest();
+    const iframeSrc = (
+        siteOrigin +
+        '/connect' +
+        '?apiVersion=1.0.0' +
+        '&appId=magic-css' +
+        '&appVersion=' + encodeURIComponent(manifest.version) +
         '&appType=WebExtension' +
-        '&apiVersion=1.0.0'
+        '&appName=' + encodeURIComponent(manifest.name)
     );
 
     const handleClose = function () {
@@ -115,44 +94,87 @@ MyFrame.propTypes = {
 };
 
 const RegistrationOptions = () => {
-    // const [flagShowFrame, setFlagShowFrame] = useState(false);
-    // const [flagShowFrame, setFlagShowFrame] = useAtom(showConnectViaDialogAtom);
     const flagShowConnectViaDialog = useDialogsStore((state) => {
-        debugger;
         return state.flagShowConnectViaDialog;
     });
 
-    debugger;
+    const auth = useAuthStore((state) => {
+        return state;
+    });
+    const flagLoggedIn = auth.isLoggedIn();
 
     return (
         <div className={styles.RegistrationOptions}>
             <div className={styles.block}>
                 <div className={styles.blockHeader}>
-                    Sign up / Sign in
+                    {
+                        flagLoggedIn ?
+                            'Signed in' :
+                            'Sign up / Sign in'
+                    }
                 </div>
                 <div className={styles.blockList}>
                     <ul>
                         <li>Local File Editing</li>
-                        <li>Basic CSS Generators</li>
+                        <li>CSS Generators</li>
                         <li>Curated Web Development Tools</li>
                     </ul>
                 </div>
                 <div className={styles.blockButton}>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        style={{
-                            minWidth: 160
-                        }}
-                        onClick={() => {
-                            // debugger;
-                            // setFlagShowFrame(true);
-                            // useDialogsStore.setState((state) => ({ flagShowConnectViaDialog: true }));
-                            useDialogsStore.setState({ flagShowConnectViaDialog: true });
-                        }}
-                    >
-                        Continue
-                    </Button>
+                    {(() => {
+                        if (flagLoggedIn) {
+                            return (
+                                <div>
+                                    <Button
+                                        href={siteOrigin + '/account?refAppId=magic-css'}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        variant="contained"
+                                        size="large"
+                                        style={{
+                                            minWidth: 160
+                                        }}
+                                    >
+                                        Account Details
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        size="large"
+                                        style={{
+                                            marginLeft: 20,
+                                            minWidth: 160,
+                                            backgroundColor: '#999'
+                                        }}
+                                        onClick={async () => {
+                                            // TODO: Handle potential errors
+                                            await chrome.storage.local.set({
+                                                authValue: null
+                                            });
+
+                                            auth.logout();
+                                        }}
+                                    >
+                                        Disconnect
+                                    </Button>
+                                </div>
+                            );
+                        } else {
+                            return (
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    style={{
+                                        minWidth: 160
+                                    }}
+                                    onClick={() => {
+                                        useDialogsStore.setState({ flagShowConnectViaDialog: true });
+                                    }}
+                                >
+                                    Continue
+                                </Button>
+                            );
+                        }
+                    })()}
                 </div>
             </div>
 
@@ -160,8 +182,6 @@ const RegistrationOptions = () => {
                 flagShowConnectViaDialog &&
                 <MyFrame
                     onClose={() => {
-                        // debugger;
-                        // setFlagShowFrame(false);
                         useDialogsStore.setState({ flagShowConnectViaDialog: false });
                     }}
                 />

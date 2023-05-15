@@ -3,8 +3,7 @@
 
 .block {
     padding: 40px 40px;
-    border: 2px solid #152c4a;
-    border-radius: 5px;
+    border: 1px solid #b7b7b7;
 }
 
 .blockHeader {
