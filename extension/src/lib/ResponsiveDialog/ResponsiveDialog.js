@@ -6,8 +6,8 @@ import Button from '@mui/material/Button/index.js';
 import Dialog from '@mui/material/Dialog/index.js';
 import DialogContent from '@mui/material/DialogContent/index.js';
 import DialogTitle from '@mui/material/DialogTitle/index.js';
-import useMediaQuery from '@mui/material/useMediaQuery/index.js';
-import { useTheme } from '@mui/material/styles/index.js';
+// import useMediaQuery from '@mui/material/useMediaQuery/index.js';
+// import { useTheme } from '@mui/material/styles/index.js';
 import IconButton from '@mui/material/IconButton/index.js';
 import CloseIcon from '@mui/icons-material/Close.js';
 
@@ -25,8 +25,8 @@ DialogTitleWithClose.propTypes = {
 };
 
 function ResponsiveDialog(props) {
-    const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    // const theme = useTheme();
+    // const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     let closable = true;
     if (props.closable === false) {
