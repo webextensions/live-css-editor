@@ -4,6 +4,6 @@
   "devDependencies": {
     "axios": "^1.3.4",
     "chalk": "^5.2.0",
-    "word-wrap": "^1.2.3"
+    "word-wrap": "^1.2.4"
   }
 }
