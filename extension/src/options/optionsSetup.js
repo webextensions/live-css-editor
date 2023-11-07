@@ -10,7 +10,7 @@ import { postMessageWithReturnAsync } from '../../scripts/utils/postMessageWithR
 window.addEventListener("message", (evt) => {
     if (
         [
-            'https://local.webextensions.org:4443',
+            'https://local.webextensions.org:4430',
             'https://www.webextensions.co.in',
             'https://www.webextensions.org'
         ].includes(evt.origin)

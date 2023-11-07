@@ -173,7 +173,7 @@ if (myWin.flagEditorInExternalWindow) {
         let configUrl;
         const extensionVersion = chrome.runtime.getManifest().version;
         if (flagDevMode) {
-            configUrl = `http://localapi.webextensions.org:3400/magic-css/config?version=latest`;
+            configUrl = `https://local.api.webextensions.org:3400/magic-css/config?version=latest`;
         } else {
             configUrl = `https://api.webextensions.org/magic-css/config?version=${extensionVersion}`;
         }
