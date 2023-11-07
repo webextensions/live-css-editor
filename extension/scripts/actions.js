@@ -55,7 +55,7 @@ const setupMixpanel = async function () {
     const flagRunningInDevMode = await computeFlagRunningInDevMode();
 
     if (flagRunningInDevMode) {
-        // DEV: DEBUG: We may wish to enable/disable it for development and debugging depending on the functionality we are working on
+        // DEV-HELPER: We may wish to enable/disable it for development and debugging depending on the functionality we are working on
         return false;
     }
 
