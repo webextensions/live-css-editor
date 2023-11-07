@@ -47,18 +47,22 @@ const useAuthStore = create((set, get) => ({ // eslint-disable-line no-unused-va
             [READYSTATE]: LOADED,
             value: authValue
         });
+    },
+    refresh: async () => {
+        const authValue = await new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+            chrome.storage.local.get(['authValue'], (result) => {
+                resolve(result.authValue || null);
+            });
+        });
+        set({
+            [READYSTATE]: LOADED,
+            value: authValue || null
+        });
     }
 }));
 (async () => {
-    const authValue = await new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-        chrome.storage.local.get(['authValue'], (result) => {
-            resolve(result.authValue || null);
-        });
-    });
-    useAuthStore.setState({
-        [READYSTATE]: LOADED,
-        value: authValue || null
-    });
+    const auth = useAuthStore.getState();
+    await auth.refresh();
 })();
 
 export {
