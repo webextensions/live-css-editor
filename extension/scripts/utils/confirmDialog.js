@@ -3,13 +3,14 @@ const confirmDialog = function (message) {
     return new Promise((resolve) => {
         const dialog = document.createElement('dialog');
         dialog.className = 'magicCssConfirmDialog';
-        dialog.style.padding = '0';
+        dialog.style.padding = '10px 20px';
+        dialog.style.margin = 'auto'; // Required for some cases where style `* { margin: 0 }` is set
         dialog.innerHTML = `
             <div style="padding:20px;font-size:16px;font-family:sans-serif;">
-                <div>
+                <div style="text-align:left;font-size:18px;line-height:1.2;">
                     ${message}
                 </div>
-                <div style="display:flex;margin-top:25px;">
+                <div style="display:flex;margin-top:35px;">
                     <div style="margin-left:auto;">
                         <button id="magicCssConfirmDialogButtonCancel">
                             Cancel
