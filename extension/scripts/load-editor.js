@@ -88,3 +88,5 @@ import './magicss/magicss.css';
 import './magicss/generate-selector.js';
 
 import './magicss/magicss.js';
+
+import '../commonAppUtils/updateConfigFromRemoteForNextLoad.js';

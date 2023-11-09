@@ -75,7 +75,7 @@ const getBrowser = function () {
         browserWithVersion: ''
     };
     try {
-        const userAgentData = window.navigator.userAgentData || {};
+        const userAgentData = navigator.userAgentData || {};
         const brands = userAgentData.brands || [];
 
         for (const ob of brands) {
@@ -146,9 +146,9 @@ const getOS = function () {
     let os = 'unknown';
     try {
         const
-            userAgent = window.navigator.userAgent,
-            userAgentData = window.navigator.userAgentData || {},
-            platform = userAgentData.platform || window.navigator.platform,
+            userAgent = navigator.userAgent,
+            userAgentData = navigator.userAgentData || {},
+            platform = userAgentData.platform || navigator.platform,
             macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
             windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
             iosPlatforms = ['iPhone', 'iPad', 'iPod'];

@@ -12,7 +12,7 @@ import http from 'https';
 
 import logger from '../logger.mjs';
 
-import { createRequire } from "module";
+import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 const __dirname = path.dirname(import.meta.url).replace('file://', '');

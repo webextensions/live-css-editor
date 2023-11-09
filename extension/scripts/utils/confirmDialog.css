@@ -1,0 +1,10 @@
+.magicCssConfirmDialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.magicCssConfirmDialog button {
+    font-size: 16px !important;
+    font-family: sans-serif !important;
+    cursor: pointer;
+    padding: 4px 10px !important;
+}

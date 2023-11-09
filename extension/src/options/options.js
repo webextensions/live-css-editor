@@ -3,7 +3,11 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
+import './optionsSetup.js';
+
 import { Main } from './Main/Main.js';
+
+import './styles-reset.css';
 
 const renderReactApp = function () {
     // https://reactjs.org/blog/2022/03/08/react-18-upgrade-guide.html

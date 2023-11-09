@@ -12,6 +12,7 @@ import { minifyCss } from '../utils/minifyCss.js';
 import { beautifyCss } from '../utils/beautifyCss.js';
 import { sassToCss } from '../utils/sassToCss.js';
 import { lessToCss } from '../utils/lessToCss.js';
+import { confirmDialog } from '../utils/confirmDialog.js';
 import {
     addStyleTag,
     StyleTag
@@ -22,7 +23,14 @@ import { myWin } from '../appUtils/myWin.js';
 import { extLib } from '../chrome-extension-lib/ext-lib.js';
 import sourceMap from '../3rdparty/source-map.js';
 
+import {
+    getConfig,
+    initializeInstanceInfo
+} from '../../commonAppUtils/instanceAndFeatures.js';
+
 import { sendEventMessageForMetrics } from './metrics/sendMessageForMetrics.js';
+
+import { useAuthStore } from '../../src/options/optionsZustandStore.js';
 
 // TODO: Share constants across files (like magicss.js, editor.js and options.js) (probably keep them in a separate file as global variables)
 var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors',
@@ -225,62 +233,8 @@ var loadIfNotAvailable = async function (dependencyToLoad) {
 window.instanceUuid = window.instanceUuid || null;
 window.instanceBasisNumber = window.instanceBasisNumber || null;
 
-var fetchInstanceInfo = function () {
-    return new Promise((resolve) => {
-        chrome.runtime.sendMessage(
-            { type: 'magicss-instance-info' },
-            function ([instanceUuid, instanceBasisNumber]) {
-                return resolve([instanceUuid, instanceBasisNumber]);
-            }
-        );
-    });
-};
-var getInstanceInfo = async function () {
-    let instanceUuid = null,
-        instanceBasisNumber = null;
-
-    if (window.instanceUuid && window.instanceBasisNumber) {
-        instanceUuid = window.instanceUuid;
-        instanceBasisNumber = window.instanceBasisNumber;
-    } else {
-        [
-            instanceUuid,
-            instanceBasisNumber
-        ] = await fetchInstanceInfo();
-    }
-
-    return [
-        instanceUuid,
-        instanceBasisNumber
-    ];
-};
-var initializeInstanceInfo = async function () {
-    const [ instanceUuid, instanceBasisNumber ] = await getInstanceInfo();
-    window.instanceUuid = instanceUuid;
-    window.instanceBasisNumber = instanceBasisNumber;
-};
-
-var getConfigFromRemote = async function () {
-    return new Promise((resolve) => {
-        chrome.runtime.sendMessage(
-            { type: 'magicss-config' },
-            function (remoteConfig) {
-                return resolve(remoteConfig);
-            }
-        );
-    });
-};
-
 window.remoteConfig = window.remoteConfig || null;
 window.basisNumber = window.basisNumber || -1;
-
-var getConfig = async function () {
-    const flagDebug = false; // DEV-HELPER: Useful when developing / debugging
-    if (flagDebug || !window.remoteConfig) {
-        window.remoteConfig = await getConfigFromRemote();
-    }
-    return window.remoteConfig;
-};
 
 var chromeRuntimeMessageIfRequired = async function ({ type, subType, payload }) {
     return new Promise((resolve) => {
@@ -3280,6 +3234,14 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                     }
                 };
 
+                const getFlagLoggedIn = function () {
+                    const auth = useAuthStore.getState();
+                    const flagLoggedIn = auth.isLoggedIn();
+                    return flagLoggedIn;
+                };
+
+                const flagLoggedIn = getFlagLoggedIn();
+
                 var options = {
                     id: id,
                     title: function ($, editor) {
@@ -3298,15 +3260,24 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             (flagAllowSassUi ? '<div class="magicss-mode-button magicss-mode-sass" title="Sass mode">s<span class="hide-when-magicss-editor-is-small">ass</span></div>' : '')
                         );
 
+                        const appendCssClassIfLoggedIn = (
+                            flagLoggedIn ?
+                                ' webextensions-connected' :
+                                ''
+                        );
                         const showAccountStatusEnabled = (((remoteConfig || {}).features || {}).showAccountStatus || {}).enabled;
-                        const signInUrl = ((remoteConfig || {}).account || {}).signInUrl;
+                        // const signInUrl = ((remoteConfig || {}).account || {}).signInUrl;
+
                         if (isFeatureEnabled(showAccountStatusEnabled)) {
                             /* eslint-disable indent */
                             $outer.append([
-                                '<div class="webextensions-login-icon-in-header">',
+                                '<div',
+                                    ' class="webextensions-login-icon-in-header' + appendCssClassIfLoggedIn + '"',
+                                '>',
                                     '<a',
-                                        ' href="' + signInUrl + '"',
-                                        ' title="Sign In"',
+                                        // ' href="' + signInUrl + '"',
+                                        ' href="javascript:void(0);"',
+                                        ' title="' + (flagLoggedIn ? 'Signed In' : 'Sign In') + '"',
                                         ' target="_blank"',
                                         ' rel="nofollow noopener noreferrer"',
                                     '/>',
@@ -3315,10 +3286,15 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             /* eslint-enable indent */
                         }
 
-                        $(document).on('click', '.webextensions-login-icon-in-header', async function () {
+                        $(document).on('click', '.webextensions-login-icon-in-header', async function (evt) {
+                            evt.preventDefault();
                             sendEventMessageForMetrics({
-                                name: 'trigger-to-site',
+                                name: flagLoggedIn ? 'trigger-account-options-logged-in' : 'trigger-account-options-logging-in',
                                 spot: 'login-icon-in-header'
+                            });
+                            chrome.runtime.sendMessage({
+                                openOptionsPage: true,
+                                pageHash: 'account'
                             });
                         });
 
@@ -3359,6 +3335,27 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             });
                         });
                         $(document).on('click', '.magicss-mode-file', async function () {
+                            const auth = useAuthStore.getState();
+                            await auth.refresh();
+                            const flagLoggedIn = getFlagLoggedIn();
+
+                            if (!flagLoggedIn) {
+                                const userConfirmation = await confirmDialog(
+                                    'This feature is available for logged in users.' +
+                                    '<br />' +
+                                    '<br />' +
+                                    'Do you wish to continue?'
+                                );
+                                if (userConfirmation) {
+                                    chrome.runtime.sendMessage({
+                                        openOptionsPage: true,
+                                        pageHash: 'account'
+                                    });
+                                }
+
+                                return;
+                            }
+
                             await setLanguageMode('file', editor);
                             editor.focus();
                             sendEventMessageForMetrics({

@@ -45,7 +45,7 @@
     "crypto-js": "^4.1.1",
     "css-loader": "^6.7.3",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
-    "helpmate": "=1.5.1",
+    "helpmate": "=1.5.4",
     "helpmate-css": "=0.1.1",
     "immer": "^10.0.1",
     "jquery": "^3.6.4",
@@ -64,7 +64,8 @@
     "redux": "^4.2.1",
     "rooks": "^7.11.2",
     "socket.io": "=2.5.0",
-    "toastr": "^2.1.4"
+    "toastr": "^2.1.4",
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@rbarilani/remove-source-map-url-webpack-plugin": "=1.1.0",

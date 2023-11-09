@@ -55,7 +55,7 @@ const setupMixpanel = async function () {
     const flagRunningInDevMode = await computeFlagRunningInDevMode();
 
     if (flagRunningInDevMode) {
-        // DEV: DEBUG: We may wish to enable/disable it for development and debugging depending on the functionality we are working on
+        // DEV-HELPER: We may wish to enable/disable it for development and debugging depending on the functionality we are working on
         return false;
     }
 
@@ -96,7 +96,7 @@ let flagMixpanelSetupDone = false;
                             // If the service worker had shut down and started again due to this listener, then we shall
                             // wait for the remote config to be updated (loaded)
                             if (myWin.remoteConfig.mode === 'offline') {
-                                await myWin.updateRemoteConfig();
+                                await myWin.updateRemoteConfig({});
                             }
 
                             if (await isFeatureEnabled(myWin?.remoteConfig?.features?.useMixpanel?.enabled)) {

@@ -4,3 +4,7 @@
 .faqItem:not(:first-child) {
     margin-top: 10px;
 }
+
+.TabHelp ul {
+    list-style-type: disc;
+}
