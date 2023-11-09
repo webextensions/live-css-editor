@@ -27,12 +27,14 @@ const confirmDialog = function (message) {
             if (evt.target.id === 'magicCssConfirmDialogButtonOk') {
                 resolve(true);
                 dialog.close();
+                dialog.remove();
             } else if (
                 evt.target.id === 'magicCssConfirmDialogButtonCancel' ||
                 evt.target === dialog
             ) {
                 resolve(false);
                 dialog.close();
+                dialog.remove();
             }
         });
         document.body.appendChild(dialog);
