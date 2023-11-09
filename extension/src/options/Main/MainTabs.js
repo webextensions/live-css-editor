@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import Tabs from '@mui/material/Tabs/index.js';
@@ -12,16 +12,23 @@ import { TabOptions } from './Tabs/TabOptions.js';
 import { TabAccount } from './Tabs/TabAccount.js';
 import { TabHelp } from './Tabs/TabHelp.js';
 
-const TabPanel = function (props) {
-    const { children, value, index, renderedIndexes } = props;
+import { Loading } from 'Loading/Loading.js';
+import { AfterDelay } from 'AfterDelay/AfterDelay.js';
+import {
+    getConfig,
+    isFeatureEnabled
+} from '../../../commonAppUtils/instanceAndFeatures.js';
 
-    const previouslyRendered = renderedIndexes.includes(index);
+const TabPanel = function (props) {
+    const { children, value, label, renderedValues } = props;
+
+    const previouslyRendered = renderedValues.includes(label);
 
     return (
-        <div hidden={value !== index}>
+        <div hidden={value !== label}>
             {
                 (
-                    value === index ||
+                    value === label ||
                     previouslyRendered
                 ) &&
                 children
@@ -31,38 +38,65 @@ const TabPanel = function (props) {
 };
 TabPanel.propTypes = {
     children: PropTypes.node,
-    index: PropTypes.any.isRequired,
+    label: PropTypes.any.isRequired,
     value: PropTypes.any.isRequired,
-    renderedIndexes: PropTypes.array.isRequired
+    renderedValues: PropTypes.array.isRequired
 };
 
 const MainTabs = function () {
-    const defaultTabIndex = (() => {
+    const defaultTabLabel = (() => {
         const hash = window.location.hash;
         switch (hash) {
             case '#help':
-                return 2;
+                return 'tab-help';
             case '#account':
-                return 1;
+                return 'tab-account';
             case '#options':
             default:
-                return 0;
+                return 'tab-options';
         }
     })();
 
-    const [value, setValue] = React.useState(defaultTabIndex);
-    const [renderedIndexes, setRenderedIndexes] = React.useState([defaultTabIndex]);
+    const [value, setValue] = React.useState(defaultTabLabel);
+    const [renderedValues, setRenderedValues] = React.useState([defaultTabLabel]);
 
     const onChange = function (event, newValue) {
         setValue(newValue);
 
-        if (!renderedIndexes.includes(newValue)) {
-            setRenderedIndexes([
-                ...renderedIndexes,
+        if (!renderedValues.includes(newValue)) {
+            setRenderedValues([
+                ...renderedValues,
                 newValue
             ]);
         }
     };
+
+    const [config, setConfig] = React.useState(null);
+
+    useEffect(() => {
+        (async function () {
+            const config = await getConfig();
+            setConfig(config);
+        })();
+    }, []);
+
+    if (!config) {
+        return (
+            <div style={{
+                display: 'flex',
+                width: '100%',
+                justifyContent: 'center'
+            }}>
+                <div style={{ marginLeft: 15, marginRight: 15, display: 'flex', justifyContent: 'center' }}>
+                    <AfterDelay delay={350}>
+                        <Loading type="line-scale" />
+                    </AfterDelay>
+                </div>
+            </div>
+        );
+    }
+
+    const showAccountStatusEnabled = (((config || {}).features || {}).showAccountStatus || {}).enabled;
 
     return (
         <div style={{
@@ -79,6 +113,7 @@ const MainTabs = function () {
                     textColor="primary"
                 >
                     <Tab
+                        value="tab-options"
                         label="Options"
                         icon={<SettingsIcon />}
                         iconPosition="start"
@@ -91,20 +126,25 @@ const MainTabs = function () {
                         }}
                     />
 
-                    <Tab
-                        label="Account"
-                        icon={<AccountCircleIcon />}
-                        iconPosition="start"
-                        href="#account"
-                        sx={{
-                            justifyContent: 'flex-start', // Align contents to the left
-                            fontSize: 12,
-                            minHeight: 48,
-                            paddingLeft: 0
-                        }}
-                    />
+                    {
+                        isFeatureEnabled(showAccountStatusEnabled) &&
+                        <Tab
+                            value="tab-account"
+                            label="Account"
+                            icon={<AccountCircleIcon />}
+                            iconPosition="start"
+                            href="#account"
+                            sx={{
+                                justifyContent: 'flex-start', // Align contents to the left
+                                fontSize: 12,
+                                minHeight: 48,
+                                paddingLeft: 0
+                            }}
+                        />
+                    }
 
                     <Tab
+                        value="tab-help"
                         label="Help"
                         icon={<HelpIcon />}
                         iconPosition="start"
@@ -125,15 +165,18 @@ const MainTabs = function () {
                     marginLeft: 30
                 }}
             >
-                <TabPanel value={value} index={0} renderedIndexes={renderedIndexes}>
+                <TabPanel label="tab-options" value={value} renderedValues={renderedValues}>
                     <TabOptions />
                 </TabPanel>
 
-                <TabPanel value={value} index={1} renderedIndexes={renderedIndexes}>
-                    <TabAccount />
-                </TabPanel>
+                {
+                    isFeatureEnabled(showAccountStatusEnabled) &&
+                    <TabPanel label="tab-account" value={value} renderedValues={renderedValues}>
+                        <TabAccount />
+                    </TabPanel>
+                }
 
-                <TabPanel value={value} index={2} renderedIndexes={renderedIndexes}>
+                <TabPanel label="tab-help" value={value} renderedValues={renderedValues}>
                     <TabHelp />
                 </TabPanel>
             </div>

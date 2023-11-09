@@ -1669,6 +1669,13 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
     align-items: center;
 }
 
+.magic-css-header .webextensions-login-icon-in-header.webextensions-connected {
+    opacity: 0.5;
+}
+.magic-css-header .webextensions-login-icon-in-header.webextensions-connected:hover {
+    opacity: unset;
+}
+
 .magic-css-container:not(.magicss-w-400-plus) .show-for-w-400-plus {
     display: none;
 }

@@ -1,0 +1,110 @@
+/*
+    References:
+        https://github.com/filipelinhares/ress/blob/master/ress.css
+        https://github.com/jtrost/Complete-CSS-Reset/blob/master/reset.css
+        https://github.com/jgthms/minireset.css/blob/master/minireset.css
+        https://github.com/jasonkarns/css-reset/blob/master/reset.css
+        http://yui.yahooapis.com/3.18.1/build/cssreset/cssreset.css
+        https://github.com/shannonmoeller/reset-css/blob/master/reset.css
+        https://github.com/RafaelDeJongh/Rafael-CSS-Reset/blob/gh-pages/reset.css
+        https://github.com/jaydenseric/Fix/blob/master/fix.css
+        https://github.com/necolas/normalize.css/blob/master/normalize.css
+*/
+
+/* https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
+*,
+::before,
+::after {
+    box-sizing: inherit;
+}
+html {
+    box-sizing: border-box;
+}
+
+*,
+::before,
+::after {
+    background-repeat: no-repeat;
+}
+
+* {
+    vertical-align: baseline;
+    font-size: 100%;            /* Helpful for tags like: h1, h2, h3, h4, h5, h6 */
+    font-style: normal;         /* Helpful for tags like: address, cite, dfn, em, var */
+}
+
+* {
+    font-family: inherit;       /* Helpful for tags like: code, kbd, samp, tt */
+}
+html {
+    /* https://www.smashingmagazine.com/2009/09/complete-guide-to-css-font-stacks/#the-myth-of-web-safe-fonts */
+    /* http://code.stephenmorley.org/html-and-css/the-myth-of-web-safe-fonts/#narrowsansserif */
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+* {
+    font-weight: inherit;        /* Helpful for tags like: strong, h1, h2, h3, h4, h5, h6 */
+}
+html {
+    font-weight: normal;
+}
+
+* {
+    word-break: break-word;
+}
+
+*:not(button, dialog, input) {
+    margin: 0;
+    padding: 0;
+    border: 0;                  /* Helpful for tags like: hr */
+}
+
+html {
+    /*
+        Disable the text inflation algorithm used on some smartphones and tablets.
+        Ref: https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust
+    */
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+}
+
+body {
+    line-height: normal;        /* Don't reset line-height to "1" as many of the CSS Reset libraries do because that reduces readability */
+}
+
+iframe,
+img {
+    display: block;
+}
+
+iframe {
+    border: 0;
+    vertical-align:bottom;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+caption,
+th {
+    text-align: left;
+}
+
+blockquote,
+q {
+    quotes: none;
+}
+blockquote::before,
+blockquote::after,
+q::before,
+q::after {
+    content: '';
+    content: none;
+}

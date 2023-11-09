@@ -1,15 +1,5 @@
-let myWin;
+import { theWin } from '../../commonAppUtils/theWin.js';
 
-if (typeof window !== 'undefined') {
-    myWin = window;
-} else {
-    myWin = {};
-}
+const myWin = theWin;
 
 export { myWin };
-
-/*
-const myWin = {};
-
-export { myWin };
-*/

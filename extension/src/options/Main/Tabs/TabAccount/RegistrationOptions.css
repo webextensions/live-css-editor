@@ -1,0 +1,79 @@
+.RegistrationOptions {
+}
+
+.block {
+    padding: 40px 40px;
+    border: 1px solid #b7b7b7;
+}
+
+.blockHeader {
+    display: flex;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.blockMessage {
+    margin-top: 30px;
+    font-size: 14px;
+}
+
+.blockList {
+    font-size: 14px;
+}
+
+.blockList li {
+    line-height: 1.8;
+    padding-left: 30px;
+    background-size: 20px;
+    background-position: left 2px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' %3E%3Cpath d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.blockButton {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+
+/* https://weekendprojects.dev/posts/creating-jumping-dots-css-animation-with-examples/ */
+.dotTyping {
+    position: relative;
+    left: -9999px;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #152c4a;
+    color: #152c4a;
+    box-shadow: 9984px 0 0 0 #152c4a, 9999px 0 0 0 #152c4a, 10014px 0 0 0 #152c4a;
+    animation: dot-typing 1.5s infinite linear;
+}
+@keyframes dot-typing {
+    0% {
+        box-shadow: 9984px 0 0 0 #152c4a, 9999px 0 0 0 #152c4a, 10014px 0 0 0 #152c4a;
+    }
+
+    16.667% {
+        box-shadow: 9984px -10px 0 0 #152c4a, 9999px 0 0 0 #152c4a, 10014px 0 0 0 #152c4a;
+    }
+
+    33.333% {
+        box-shadow: 9984px 0 0 0 #152c4a, 9999px 0 0 0 #152c4a, 10014px 0 0 0 #152c4a;
+    }
+
+    50% {
+        box-shadow: 9984px 0 0 0 #152c4a, 9999px -10px 0 0 #152c4a, 10014px 0 0 0 #152c4a;
+    }
+
+    66.667% {
+        box-shadow: 9984px 0 0 0 #152c4a, 9999px 0 0 0 #152c4a, 10014px 0 0 0 #152c4a;
+    }
+
+    83.333% {
+        box-shadow: 9984px 0 0 0 #152c4a, 9999px 0 0 0 #152c4a, 10014px -10px 0 0 #152c4a;
+    }
+
+    100% {
+        box-shadow: 9984px 0 0 0 #152c4a, 9999px 0 0 0 #152c4a, 10014px 0 0 0 #152c4a;
+    }
+}
