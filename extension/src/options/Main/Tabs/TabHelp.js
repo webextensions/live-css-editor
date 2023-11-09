@@ -194,7 +194,7 @@ const listOfFaqs = [
 
 const FAQs = function () {
     return (
-        <div>
+        <div className={styles.TabHelp}>
             {listOfFaqs.map((faq, index) => {
                 return (
                     <div key={index} className={styles.faqItem}>

@@ -12,11 +12,13 @@
     font-size: 28px;
 }
 
-.blockList {
+.blockMessage {
     margin-top: 30px;
     font-size: 14px;
-    /* display: flex;
-    justify-content: center; */
+}
+
+.blockList {
+    font-size: 14px;
 }
 
 .blockList li {

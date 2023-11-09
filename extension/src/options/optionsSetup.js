@@ -7,6 +7,14 @@ import {
 
 import { postMessageWithReturnAsync } from '../../scripts/utils/postMessageWithReturnAsync.js';
 
+import '../../commonAppUtils/updateConfigFromRemoteForNextLoad.js';
+
+import { setupIsFeatureEnabled } from '../../commonAppUtils/instanceAndFeatures.js';
+
+(async () => {
+    await setupIsFeatureEnabled();
+})();
+
 window.addEventListener("message", (evt) => {
     if (
         [

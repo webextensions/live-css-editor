@@ -29,7 +29,7 @@ var fallbackConfig = {
     "account": {
         "signInUrl": "https://www.webextensions.org/sign-in"
     },
-    "nextUpdate": 7 * 24 * 60 * 60 * 1000,
+    "nextUpdate": 1 * 24 * 60 * 60 * 1000,
     "features": {
         "showAccountStatus": {
             "enabled": false
@@ -258,10 +258,10 @@ if (myWin.flagEditorInExternalWindow) {
         }
     };
 
-    const updateRemoteConfig = async function () {
+    const updateRemoteConfig = async function ({ force }) {
         const storedConfig = await getStoredConfigIfValid();
 
-        if (storedConfig) {
+        if (!force && storedConfig) {
             remoteConfig = storedConfig;
             myWin.remoteConfig = remoteConfig;
             console.info('Applied stored config:', storedConfig);
@@ -304,7 +304,7 @@ if (myWin.flagEditorInExternalWindow) {
         instanceBasisNumber = basisNumberFromUuid(instanceUuid);
 
         const fn = async function () {
-            await updateRemoteConfig();
+            await updateRemoteConfig({});
 
             setTimeout(async function () {
                 fn();
@@ -315,30 +315,37 @@ if (myWin.flagEditorInExternalWindow) {
 
     chrome.runtime.onMessage.addListener(
         function (request, sender, sendResponse) { // eslint-disable-line no-unused-vars
-            const { type } = request;
+            const { type, subType } = request;
 
-            if (type === 'magicss-config') {
-                chrome.tabs.sendMessage(
-                    sender.tab.id,
-                    {},
-                    function() {
-                        // This if condition check is required to avoid unwanted warnings
-                        // TODO: FIXME: Is there some better solution possible?
-                        if (chrome.runtime.lastError) {
-                            // Currently doing nothing
-                        }
+            if (type === '@magic-css/config') {
+                if (subType === 'update-for-next-load') {
+                    (async () => {
+                        await updateRemoteConfig({ force: true });
+                        sendResponse(remoteConfig);
+                    })();
+                } else {
+                    chrome.tabs.sendMessage(
+                        sender.tab.id,
+                        {},
+                        function() {
+                            // This if condition check is required to avoid unwanted warnings
+                            // TODO: FIXME: Is there some better solution possible?
+                            if (chrome.runtime.lastError) {
+                                // Currently doing nothing
+                            }
 
-                        // DEV-HELPER: Useful when developing / debugging
-                        if (false) { // eslint-disable-line no-constant-condition
-                            setTimeout(async () => {
-                                await updateRemoteConfig();
+                            // DEV-HELPER: Useful when developing / debugging
+                            if (false) { // eslint-disable-line no-constant-condition
+                                setTimeout(async () => {
+                                    await updateRemoteConfig({});
+                                    sendResponse(remoteConfig);
+                                });
+                            } else {
                                 sendResponse(remoteConfig);
-                            });
-                        } else {
-                            sendResponse(remoteConfig);
+                            }
                         }
-                    }
-                );
+                    );
+                }
                 // Need to return true to run "sendResponse" in async manner
                 // Ref: https://developer.chrome.com/docs/extensions/mv2/messaging/#simple
                 return true;
@@ -634,11 +641,20 @@ if (!myWin.openOptionsPageListenerAdded) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
                 if (request.openOptionsPage) {
+                    let appendHashIfRequested = '';
+                    if (request.pageHash) {
+                        appendHashIfRequested = '#' + request.pageHash;
+                    }
+
                     // https://developer.chrome.com/extensions/optionsV2
-                    if (chrome.runtime.openOptionsPage) {
+                    if (chrome.tabs?.create) {
+                        chrome.tabs.create({
+                            url: chrome.runtime.getURL('options.html' + appendHashIfRequested)
+                        });
+                    } else if (chrome.runtime.openOptionsPage) {
                         chrome.runtime.openOptionsPage();
                     } else {
-                        window.open(chrome.runtime.getURL('options.html'));
+                        window.open(chrome.runtime.getURL('options.html' + appendHashIfRequested));
                     }
                 }
             }
