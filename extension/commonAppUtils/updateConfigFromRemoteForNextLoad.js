@@ -1,5 +1,5 @@
 import { updateConfigFromRemoteForNextLoad } from './instanceAndFeatures.js';
 
-setTimeout(async () => {
+(async () => {
     await updateConfigFromRemoteForNextLoad();
-}, 500);
+})();

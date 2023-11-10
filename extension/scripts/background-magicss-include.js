@@ -319,10 +319,10 @@ if (myWin.flagEditorInExternalWindow) {
 
             if (type === '@magic-css/config') {
                 if (subType === 'update-for-next-load') {
-                    (async () => {
+                    setTimeout(async () => {
                         await updateRemoteConfig({ force: true });
                         sendResponse(remoteConfig);
-                    })();
+                    }, 4000);
                 } else {
                     chrome.tabs.sendMessage(
                         sender.tab.id,
