@@ -41,7 +41,7 @@
     "@react-hook/window-size": "^3.1.1",
     "babel-loader": "^9.1.2",
     "classnames": "^2.3.2",
-    "codemirror": "=5.34.0",
+    "codemirror": "=5.58.2",
     "crypto-js": "^4.1.1",
     "css-loader": "^6.7.3",
     "emmetio-codemirror-plugin-webextensions": "^0.3.7",
