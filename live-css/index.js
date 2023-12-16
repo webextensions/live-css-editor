@@ -64,7 +64,7 @@ try {
     // do nothing
 }
 
-var logger = require('note-down');
+var { logger } = require('note-down');
 logger.removeOption('showLogLine');
 
 var Emitter = require('tiny-emitter'),
