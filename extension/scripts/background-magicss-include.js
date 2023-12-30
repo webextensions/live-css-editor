@@ -981,8 +981,8 @@ var isRestrictedUrl = function (url) {
         "moz-extension://",
         "ms-browser-extension://",
 
-        "https://chrome.google.com/",
-        // "https://chrome.google.com/webstore/",
+        "https://chrome.google.com/", // "https://chrome.google.com/webstore/",
+        "https://chromewebstore.google.com/",
 
         "https://microsoftedge.microsoft.com/",
 
