@@ -1027,9 +1027,15 @@ var prerequisitesReady = function (main) {
             var url = tab.url;
 
             if (isRestrictedUrl(url)) {
+                let originOrUrlToAlert = url;
+                try {
+                    originOrUrlToAlert = (new URL(originOrUrlToAlert)).origin;
+                } catch (e) {
+                    // do nothing
+                }
                 let message = (
                     TR('Include_MagicssDoesNotOperateOnSomeTabs', 'For security reasons, Magic CSS does not run on:') +
-                    '\n\n' + url +
+                    '\n\n' + originOrUrlToAlert +
                     '\n\n' + TR('Include_CanRunOnOtherPages', 'You can run it on other websites and web pages.')
                 );
 
