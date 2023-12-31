@@ -23,11 +23,33 @@
 
 .blockList li {
     line-height: 1.8;
-    padding-left: 30px;
+    padding-left: 20px;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' %3E%3Cpath d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: 12px;
+    background-position: left 7px;
+
+    /* "Bolt" icon from Material UI icon set */
+    /*
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgLTk2MCA5NjAgOTYwIiB3aWR0aD0iMjQiPjxwYXRoIGQ9Im00MjItMjMyIDIwNy0yNDhINDY5bDI5LTIyNy0xODUgMjY3aDEzOWwtMzAgMjA4Wk0zMjAtODBsNDAtMjgwSDE2MGwzNjAtNTIwaDgwbC00MCAzMjBoMjQwTDQwMC04MGgtODBabTE1MS0zOTBaIi8+PC9zdmc+");
+    background-size: 16px;
+    background-position: left 2px;
+    /* */
+}
+
+.blockList li.bulletPoint {
+    background-image: url('data:image/svg+xml,<svg width="12" height="12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="6" fill="%23777" /></svg>');
+    background-size: 5px;
+    background-position: 6px 10px;
+}
+
+/*
+.blockList li.premiumFeature {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgLTk2MCA5NjAgOTYwIiB3aWR0aD0iMjQiPjxwYXRoIGQ9Ik0xNjAtNDQwdjgwaDY0MHYtODBIMTYwWm0wLTQ0MGg2NDBxMzMgMCA1Ni41IDIzLjVUODgwLTgwMHY0NDBxMCAzMy0yMy41IDU2LjVUODAwLTI4MEg2NDB2MjAwbC0xNjAtODAtMTYwIDgwdi0yMDBIMTYwcS0zMyAwLTU2LjUtMjMuNVQ4MC0zNjB2LTQ0MHEwLTMzIDIzLjUtNTYuNVQxNjAtODgwWm0wIDMyMGg2NDB2LTI0MEgxNjB2MjQwWm0wIDIwMHYtNDQwIDQ0MFoiLz48L3N2Zz4=");
     background-size: 20px;
     background-position: left 2px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' %3E%3Cpath d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z'%3E%3C/path%3E%3C/svg%3E");
 }
+/* */
 
 .blockButton {
     margin-top: 30px;

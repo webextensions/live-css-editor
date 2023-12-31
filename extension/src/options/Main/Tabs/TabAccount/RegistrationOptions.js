@@ -6,9 +6,12 @@ import PropTypes from 'prop-types';
 import Button from '@mui/material/Button/index.js';
 import IconButton from '@mui/material/IconButton/index.js';
 
+import HourglassTopIcon from '@mui/icons-material/HourglassTop.js';
+import FlashOnIcon from '@mui/icons-material/FlashOn.js';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser.js';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline.js';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew.js';
+import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined.js';
 
 import Tooltip from '@mui/material/Tooltip/index.js';
 
@@ -154,22 +157,23 @@ const RegistrationOptions = () => {
                             </div>
                         </div>
                         <div style={{ marginTop: 25 }}>
-                            You have access to the following features:
+                            Activated features:
                         </div>
                     </div>
 
                     <div
                         className={styles.blockList}
                         style={{
-                            marginTop: 20
+                            marginTop: 10
                         }}
                     >
                         <ul>
                             <li>Local File Editing</li>
+                            <li>Get Icons API Interface</li>
                             <li>
                                 <div style={{ display: 'flex' }}>
                                     <div>
-                                        Learning Resources
+                                        Learning Resources - Standard
                                     </div>
                                     <div style={{ marginLeft: 7, marginTop: -2 }}>
                                         <Tooltip
@@ -191,7 +195,7 @@ const RegistrationOptions = () => {
                             <li>
                                 <div style={{ display: 'flex' }}>
                                     <div>
-                                        Web Development Tools
+                                        Web Development Tools - Standard
                                     </div>
                                     <div style={{ marginLeft: 7, marginTop: -2 }}>
                                         <Tooltip
@@ -271,7 +275,24 @@ const RegistrationOptions = () => {
                     </div>
 
                     <div className={styles.blockMessage}>
-                        You need to sign in for accessing the following features:
+                        <div>
+                            <div
+                                style={{
+                                    display: 'inline-block',
+                                    backgroundColor: 'rgba(128,128,0,0.15)',
+                                    border: '1px solid rgba(0,64,0,0.20)',
+                                    padding: '3px 10px',
+                                    borderRadius: 10
+                                }}
+                            >
+                                <div style={{ display: 'inline-block', height: '20px', marginBottom: -3 }}>
+                                    <HourglassTopIcon style={{ marginBottom: -2 }} />
+                                </div>
+                                <div style={{ display: 'inline-block', marginLeft: 8, lineHeight: '20px', marginBottom: -3 }}>
+                                    Awaiting sign in
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div
@@ -282,6 +303,7 @@ const RegistrationOptions = () => {
                     >
                         <ul>
                             <li>Local File Editing</li>
+                            <li>Get Icons API Interface</li>
                             <li>
                                 <div style={{ display: 'flex' }}>
                                     <div>
@@ -289,12 +311,31 @@ const RegistrationOptions = () => {
                                     </div>
                                     <div style={{ marginLeft: 7, marginTop: -2 }}>
                                         <Tooltip
-                                            title="A curated list of resources for learning web development"
+                                            title="Curated list of resources for learning web development"
                                             arrow
                                             placement="right"
                                         >
                                             <IconButton size="small">
                                                 <HelpOutlineIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </div>
+                                </div>
+                            </li>
+                            <li className={styles.bulletPoint} style={{ marginLeft: 30 }}>Standard</li>
+                            <li className={styles.bulletPoint} style={{ marginLeft: 30 }}>
+                                <div style={{ display: 'flex' }}>
+                                    <div>
+                                        Advanced
+                                    </div>
+                                    <div style={{ marginLeft: 7, marginTop: -2 }}>
+                                        <Tooltip
+                                            title="Requires subscription"
+                                            arrow
+                                            placement="right"
+                                        >
+                                            <IconButton size="small">
+                                                <CardMembershipOutlinedIcon />
                                             </IconButton>
                                         </Tooltip>
                                     </div>
@@ -307,12 +348,67 @@ const RegistrationOptions = () => {
                                     </div>
                                     <div style={{ marginLeft: 7, marginTop: -2 }}>
                                         <Tooltip
-                                            title="A curated list of web development tools"
+                                            title="Curated list of web development tools"
                                             arrow
                                             placement="right"
                                         >
                                             <IconButton size="small">
                                                 <HelpOutlineIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </div>
+                                </div>
+                            </li>
+                            <li className={styles.bulletPoint} style={{ marginLeft: 30 }}>Standard</li>
+                            <li className={styles.bulletPoint} style={{ marginLeft: 30 }}>
+                                <div style={{ display: 'flex' }}>
+                                    <div>
+                                        Advanced
+                                    </div>
+                                    <div style={{ marginLeft: 7, marginTop: -2 }}>
+                                        <Tooltip
+                                            title="Requires subscription"
+                                            arrow
+                                            placement="right"
+                                        >
+                                            <IconButton size="small">
+                                                <CardMembershipOutlinedIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </div>
+                                </div>
+                            </li>
+                            <li className={styles.premiumFeature_} style={{ display: 'none' }}>
+                                <div style={{ display: 'flex' }}>
+                                    <div>
+                                        Live Editor for HTML
+                                    </div>
+                                    <div style={{ marginLeft: 7, marginTop: -2 }}>
+                                        <Tooltip
+                                            title="Requires subscription"
+                                            arrow
+                                            placement="right"
+                                        >
+                                            <IconButton size="small">
+                                                <CardMembershipOutlinedIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </div>
+                                </div>
+                            </li>
+                            <li className={styles.premiumFeature_}>
+                                <div style={{ display: 'flex' }}>
+                                    <div>
+                                        Backup / Restore Your Styles
+                                    </div>
+                                    <div style={{ marginLeft: 7, marginTop: -2 }}>
+                                        <Tooltip
+                                            title="Requires subscription"
+                                            arrow
+                                            placement="right"
+                                        >
+                                            <IconButton size="small">
+                                                <CardMembershipOutlinedIcon />
                                             </IconButton>
                                         </Tooltip>
                                     </div>
@@ -324,6 +420,7 @@ const RegistrationOptions = () => {
                         <Button
                             variant="contained"
                             size="large"
+                            startIcon={<FlashOnIcon />}
                             style={{
                                 minWidth: 160
                             }}
