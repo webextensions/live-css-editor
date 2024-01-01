@@ -1,0 +1,10 @@
+.gridDesktop2ColumnsMobile1Column {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+@media screen and (min-width: 1024px) {
+    .gridDesktop2ColumnsMobile1Column {
+        grid-template-columns: 1fr 1fr;
+    }
+}
