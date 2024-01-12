@@ -3335,25 +3335,27 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                             });
                         });
                         $(document).on('click', '.magicss-mode-file', async function () {
-                            const auth = useAuthStore.getState();
-                            await auth.refresh();
-                            const flagLoggedIn = getFlagLoggedIn();
+                            if (isFeatureEnabled(showAccountStatusEnabled)) {
+                                const auth = useAuthStore.getState();
+                                await auth.refresh();
+                                const flagLoggedIn = getFlagLoggedIn();
 
-                            if (!flagLoggedIn) {
-                                const userConfirmation = await confirmDialog(
-                                    'This feature is available for logged in users.' +
-                                    '<br />' +
-                                    '<br />' +
-                                    'Do you wish to continue?'
-                                );
-                                if (userConfirmation) {
-                                    chrome.runtime.sendMessage({
-                                        openOptionsPage: true,
-                                        pageHash: 'account'
-                                    });
+                                if (!flagLoggedIn) {
+                                    const userConfirmation = await confirmDialog(
+                                        'This feature is available for logged in users.' +
+                                        '<br />' +
+                                        '<br />' +
+                                        'Do you wish to continue?'
+                                    );
+                                    if (userConfirmation) {
+                                        chrome.runtime.sendMessage({
+                                            openOptionsPage: true,
+                                            pageHash: 'account'
+                                        });
+                                    }
+
+                                    return;
                                 }
-
-                                return;
                             }
 
                             await setLanguageMode('file', editor);
