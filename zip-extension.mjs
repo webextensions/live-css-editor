@@ -4,7 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { copyFileSync } from 'cp-file';
+import { copyFileSync } from 'copy-file';
 import { deleteSync } from 'del';
 import archiver from 'archiver';
 import chalk from 'chalk';
