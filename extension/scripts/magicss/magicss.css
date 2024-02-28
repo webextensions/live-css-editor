@@ -1473,8 +1473,24 @@ html .cm-s-ambiance.CodeMirror-hints .CodeMirror-hint:hover {
 }
 /* */
 /* Potential fix for https://github.com/webextensions/live-css-editor/issues/41 */
-.CodeMirror span {
+#MagiCSS-bookmarklet .CodeMirror span {
     font-family: monospace, "Courier New" !important;
+
+    /*
+        https://github.com/webextensions/live-css-editor/issues/138 - Observations while debugging:
+            If we use the selector like ".CodeMirror span", then that seems to trigger a weird bug that the font-size of
+            the text (code) which is marked as inherit in the pre-existing CodeMirror instance changes when the
+            font-family is set in this manner (`monospace, "Courier New"` font stack). A style with just `monospace`
+            font wouldn't trigger this issue.
+
+            Using the CSS selector `#MagiCSS-bookmarklet .CodeMirror span` to bypass/fix this issue reported on GitHub.
+
+            It might be a browser/specifications bug which seems to be affecting Chrome as well as
+            Firefox (reproduced/tested in slightly different manner for Firefox). Some other web developer has also
+            faced a similar issue elsewhere for the Firefox browser
+            (https://stackoverflow.com/questions/25060859/why-does-changing-the-font-family-change-the-font-size),
+            though the developer noted that it was not reproducible for Chrome 34 in that case.
+    */
 }
 
 /* Show cursors if the CSS contains style like: div { overflow: hidden } */
