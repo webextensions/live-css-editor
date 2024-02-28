@@ -334,6 +334,7 @@ if (myWin.flagEditorInExternalWindow) {
 
 if (myWin.flagEditorInExternalWindow) {
     alertNote.setup({
+        unobtrusive: true,
         paddingRight: '25px',
         paddingBottom: '25px',
         paddingLeft: '25px',

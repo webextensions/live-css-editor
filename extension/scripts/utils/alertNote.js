@@ -16,6 +16,7 @@ const alertNote = (function () {
     };
 
     const defaults = {
+        unobtrusive: false,
         paddingTop: '',
         paddingRight: '',
         paddingBottom: '',
@@ -37,7 +38,7 @@ const alertNote = (function () {
             paddingRight  = options.paddingRight  || defaults.paddingRight  || '',
             paddingBottom = options.paddingBottom || defaults.paddingBottom || '',
             paddingLeft   = options.paddingLeft   || defaults.paddingLeft   || '',
-            unobtrusive = options.unobtrusive || false;
+            unobtrusive = options.unobtrusive || defaults.unobtrusive || false;
         // TODO:
         // - Apply !important for various inline styles (otherwise, it might get over-ridden by some previously present !important CSS styles)
         // - "OK" button functionality
@@ -134,6 +135,7 @@ const alertNote = (function () {
     };
 
     alertNote.setup = function (defaultsToSet) {
+        if (typeof defaultsToSet.unobtrusive         !== 'undefined' ) { defaults.unobtrusive         = defaultsToSet.unobtrusive;         }
         if (typeof defaultsToSet.verticalAlignment   !== 'undefined' ) { defaults.verticalAlignment   = defaultsToSet.verticalAlignment;   }
         if (typeof defaultsToSet.horizontalAlignment !== 'undefined' ) { defaults.horizontalAlignment = defaultsToSet.horizontalAlignment; }
         if (typeof defaultsToSet.textAlignment       !== 'undefined' ) { defaults.textAlignment       = defaultsToSet.textAlignment;       }
