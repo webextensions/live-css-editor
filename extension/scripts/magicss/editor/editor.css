@@ -58,6 +58,11 @@
     background-color: rgba(255, 255, 255, 0.35);
 }
 
+/* Improve the readability of code comments in the editor: https://github.com/webextensions/live-css-editor/issues/139 */
+#MagiCSS-bookmarklet .cm-s-ambiance .cm-comment {
+    color: rgb(125, 125, 125);
+}
+
 /* Style the brackets when cursor is placed around them */
 /* Using 'html' to increase selector specificity for overriding default styles, for cases this editor is loaded as a browser extension and the webpage has its own CodeMirror (CSS) */
 html div.CodeMirror span.CodeMirror-matchingbracket {
