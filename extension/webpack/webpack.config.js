@@ -14,6 +14,8 @@ const nodeModulesAtProjectRoot = path.resolve(projectRoot, 'node_modules');
 const BABEL_OPTIONS = {
     // plugins: ['transform-es2015-modules-commonjs'],
 
+    comments: false,
+
     presets: [
         [
             "@babel/preset-env",
