@@ -141,5 +141,5 @@ module.exports = {                          // Learn more about "module.exports"
 
     // This represents the version of the live-css server which was used for generating this configuration file
     // This may be helpful while debugging some issues and informing users about new features
-    "version": "8.22.2"
+    "version": "8.22.3"
 };
