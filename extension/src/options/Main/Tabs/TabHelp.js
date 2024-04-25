@@ -4,7 +4,7 @@ import React from 'react';
 
 import { GenericAccordion } from 'GenericAccordion/GenericAccordion.js';
 
-import styles from './TabHelp.css';
+import * as styles from './TabHelp.css';
 
 const listOfFaqs = [
     {

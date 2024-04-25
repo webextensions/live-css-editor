@@ -31,8 +31,8 @@ import { siteOrigin } from '../../../../appUtils/siteOrigin.js';
 // import { alertDialog } from 'helpmate/dist/dom/alertDialog.js';
 import { ResponsiveDialog } from '../../../../lib/ResponsiveDialog/ResponsiveDialog.js';
 
-import styles from './RegistrationOptions.css';
-import commonStyles from '../../commonStyles.css';
+import * as commonStyles from '../../commonStyles.css';
+import * as styles from './RegistrationOptions.css';
 
 const MyFrame = function ({ onClose }) {
     const manifest = chrome.runtime.getManifest();

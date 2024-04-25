@@ -35,9 +35,8 @@ import { sendEventMessageForMetrics } from '../../../scripts/magicss/metrics/sen
 
 import { alertNote } from '../../../scripts/utils/alertNote.js';
 
-import commonStyles from '../../common-styles/common-styles.css';
-
-import styles from './searchIconsConfiguration.css';
+import * as commonStyles from '../../common-styles/common-styles.css';
+import * as styles from './searchIconsConfiguration.css';
 
 function mapStateToProps(state) {
     return {

@@ -26,7 +26,7 @@ import { copyToClipboard } from 'helpmate/dist/browser/copyToClipboard.js';
 
 import { Loading } from 'Loading/Loading.js';
 
-import styles from './searchUi.css';
+import * as styles from './searchUi.css';
 
 import {
     APP_$_CLOSE_SEARCH_ICONS,

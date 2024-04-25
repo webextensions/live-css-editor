@@ -8,7 +8,7 @@ import { MainTabs } from './MainTabs.js';
 
 // import { FLAG_DEV_MODE } from '../helpers/helpers.js';
 
-import styles from './Main.css';
+import * as styles from './Main.css';
 
 // const optionsPageUrl = (
 //     typeof chrome !== 'undefined' &&

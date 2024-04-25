@@ -18,8 +18,8 @@ import {
     APP_$_OPEN_SEARCH_ICONS_CONFIGURATION
 } from 'reducers/actionTypes.js';
 
-import commonStyles from '../../common-styles/common-styles.css';
-import styles from './searchIcons.css';
+import * as commonStyles from '../../common-styles/common-styles.css';
+import * as styles from './searchIcons.css';
 
 function mapStateToProps(state) {
     return {
