@@ -811,6 +811,7 @@ var manageClassListForWidth = function ({ classList, width }) {
             var indentUnit = (!indentWithTabs && parseInt(await thisOb.userPreference('indentation-spaces-count'), 10)) || 4;
             window.indentUnit = indentUnit;
             var codemirrorOptions = {
+                viewportMargin: 5000,
                 value: thisOb.textarea.value,
                 placeholder: thisOb.getOption('placeholder'),
 
