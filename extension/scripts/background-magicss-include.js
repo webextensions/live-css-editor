@@ -174,7 +174,7 @@ if (myWin.flagEditorInExternalWindow) {
     const fetchRemoteConfig = async function () {
         let configUrl;
         const extensionVersion = chrome.runtime.getManifest().version;
-        if (flagDevMode) {
+        if (flagDevMode && !runningInKiwiExtensionLikeEnvironment()) {
             configUrl = `https://local.api.webextensions.org:3400/magic-css/config?version=latest`;
         } else {
             configUrl = `https://api.webextensions.org/magic-css/config?version=${extensionVersion}`;

@@ -1,17 +1,24 @@
 /* global chrome */
 
+let flagRunningInKiwiExtensionLikeEnvironment = null;
 const runningInKiwiExtensionLikeEnvironment = function () {
+    if (flagRunningInKiwiExtensionLikeEnvironment !== null) {
+        return flagRunningInKiwiExtensionLikeEnvironment;
+    }
+
     // An error shouldn't occur. This try...catch block is just for extra safety.
     try {
         const manifest = chrome.runtime.getManifest();
         if (manifest.name.indexOf('Kiwi Browser') !== -1) {
-            return true;
+            flagRunningInKiwiExtensionLikeEnvironment = true;
+        } else {
+            flagRunningInKiwiExtensionLikeEnvironment = false;
         }
     } catch (e) {
-        // do nothing
+        flagRunningInKiwiExtensionLikeEnvironment = false;
     }
 
-    return false;
+    return flagRunningInKiwiExtensionLikeEnvironment;
 };
 
 export {
