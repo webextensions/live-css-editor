@@ -14,7 +14,7 @@ const __dirname = path.dirname(import.meta.url).replace('file://', '');
 var processCommand = process.title + ' ' + path.relative(__dirname, process.argv[1]);
 console.log(chalk.gray([
     '',
-    'Format:   ' + processCommand + ' [chrome/edge/firefox/opera]',
+    'Format:   ' + processCommand + ' [chrome/edge/firefox/kiwi/opera]',
     'Examples: ' + processCommand,
     '          ' + processCommand + ' chrome',
     '          ' + processCommand + ' edge',
@@ -28,6 +28,7 @@ switch (whichBrowser) {
     case 'chrome':  zipFileName = 'extension-chrome.zip';  break;
     case 'edge':    zipFileName = 'extension-edge.zip';    break;
     case 'firefox': zipFileName = 'extension-firefox.zip'; break;
+    case 'kiwi':    zipFileName = 'extension-kiwi.zip';    break;
     case 'opera':   zipFileName = 'extension-opera.zip';   break;
     default:
         console.log(chalk.red('Error: Please pass a supported browser name as parameter (or no parameters)'));
@@ -84,6 +85,7 @@ try {
                     case 'chrome':  return 'manifest-chrome.json';
                     case 'edge':    return 'manifest-edge.json';
                     case 'firefox': return 'manifest-firefox.json';
+                    case 'kiwi':    return 'manifest-kiwi.json';
                     case 'opera':   return 'manifest-opera.json';
                     default:        return 'manifest-chrome.json';
                 }
@@ -100,6 +102,7 @@ try {
                 'manifest-chrome.json',
                 'manifest-edge.json',
                 'manifest-firefox.json',
+                'manifest-kiwi.json',
                 'manifest-opera.json',
                 'manifest-puppeteer.json'
                 // 'ui-images/**/*.*',     // Exclude files in "ui-images" folder

@@ -1,6 +1,6 @@
 # How to load the extension in development mode
 
-## For Chrome / Chromium / Edge / Opera
+## For Chrome / Chromium / Edge / Kiwi / Opera
 
 - Load the unpacked extension via ```manifest.json``` from the ```extension/``` folder
 

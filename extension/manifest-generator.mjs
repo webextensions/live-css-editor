@@ -43,7 +43,7 @@ var generateManifest = function (whichBrowser) {
                 "scripting",
                 "offscreen"
             ];
-            if (whichBrowser === "firefox") {
+            if (whichBrowser === "firefox" || whichBrowser === "kiwi") {
                 permissions.push("webNavigation");
                 // permissions.push("<all_urls>");
             } else if (whichBrowser === "puppeteer") {
@@ -60,7 +60,9 @@ var generateManifest = function (whichBrowser) {
 
         "optional_permissions": (function () {
             var optional_permissions = [];
-            if (whichBrowser !== "firefox") {
+            if (whichBrowser === "firefox" || whichBrowser === "kiwi") {
+                // do nothing
+            } else {
                 optional_permissions.push("webNavigation");
                 // optional_permissions.push("<all_urls>");
             }
@@ -168,6 +170,7 @@ var generateManifest = function (whichBrowser) {
     switch (whichBrowser) {
         case "edge":
         case "firefox":
+        case "kiwi":
         case "opera":
         case "puppeteer":
             break;
@@ -182,6 +185,7 @@ var generateManifest = function (whichBrowser) {
         case "chrome":    targetFileName = "manifest-chrome.json";    break;
         case "edge":      targetFileName = "manifest-edge.json";      break;
         case "firefox":   targetFileName = "manifest-firefox.json";   break;
+        case "kiwi":      targetFileName = "manifest-kiwi.json";      break;
         case "opera":     targetFileName = "manifest-opera.json";     break;
         case "puppeteer": targetFileName = "manifest-puppeteer.json"; break;
         default:          targetFileName = "manifest.json";           break;
@@ -195,5 +199,6 @@ generateManifest("default");
 generateManifest("chrome");
 generateManifest("edge");
 generateManifest("firefox");
+generateManifest("kiwi");
 generateManifest("opera");
 generateManifest("puppeteer");

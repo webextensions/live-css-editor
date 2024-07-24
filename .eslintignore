@@ -29,4 +29,5 @@ extension-dist/
 extension-chrome/
 extension-edge/
 extension-firefox/
+extension-kiwi/
 extension-opera/

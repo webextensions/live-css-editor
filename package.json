@@ -24,8 +24,9 @@
     "zip:extension:chrome": " node ./zip-extension.mjs chrome",
     "zip:extension:edge": "   node ./zip-extension.mjs edge",
     "zip:extension:firefox": "node ./zip-extension.mjs firefox",
+    "zip:extension:kiwi": "   node ./zip-extension.mjs kiwi",
     "zip:extension:opera": "  node ./zip-extension.mjs opera",
-    "zip:extension": "npm run zip:extension:chrome && npm run zip:extension:edge && npm run zip:extension:firefox && npm run zip:extension:opera",
+    "zip:extension": "npm run zip:extension:chrome && npm run zip:extension:edge && npm run zip:extension:firefox && npm run zip:extension:kiwi && npm run zip:extension:opera",
     "publish:build-and-zip": "npm run clean && npm run start:build:publish && npm run zip:extension",
     "get-latest-reviews": "node ./scripts/recipes/get-latest-reviews.mjs"
   },
