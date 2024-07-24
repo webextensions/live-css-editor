@@ -3799,6 +3799,7 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                     if (runningInKiwiExtensionLikeEnvironment()) {
                                                         onRequestGranted();
                                                     } else {
+                                                        const t1 = Date.now();
                                                         chrome.runtime.sendMessage(
                                                             {
                                                                 requestPermissions: true,
@@ -3816,7 +3817,17 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                                 if (status === 'request-granted') {
                                                                     await onRequestGranted();
                                                                 } else if (status === 'request-not-granted') {
-                                                                    alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                                    const t2 = Date.now();
+                                                                    if (t2 - t1 < 200) {
+                                                                        alertNote(
+                                                                            'You need to provide permissions to reapply styles automatically.' +
+                                                                            '<br /><br />' +
+                                                                            'If you wish to use it for a niche browser, like Kiwi Browser, then we recommend you to go to the <a href="https://github.com/webextensions/live-css-editor/releases" target="_blank" style="color:red">Releases page for this extension</a>.',
+                                                                            10000
+                                                                        );
+                                                                    } else {
+                                                                        alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                                    }
                                                                     sendEventMessageForMetrics({
                                                                         name: 'applyStylesAutomaticallyPinIncompleteDueToPermission',
                                                                         spot: 'header'
