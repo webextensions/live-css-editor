@@ -20,7 +20,14 @@ var generateManifest = function (whichBrowser) {
         "manifest_version": 3,
         "author": "Priyank Parashar",
         "default_locale": "en",
-        "name": "__MSG_Extension_Name__",
+        "name": (function () {
+            if (whichBrowser === "kiwi") {
+                // Note: This name is utilized elsewhere to detect the Kiwi Browser
+                return "__MSG_Extension_Name__ for Kiwi Browser";
+            } else {
+                return "__MSG_Extension_Name__";
+            }
+        })(),
         "description": "__MSG_Extension_Description__",
         "homepage_url": "https://github.com/webextensions/live-css-editor",
 

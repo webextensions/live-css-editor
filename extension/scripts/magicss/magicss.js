@@ -19,6 +19,7 @@ import {
 } from '../utils/StyleTag.js';
 
 import { myWin } from '../appUtils/myWin.js';
+import { runningInKiwiExtensionLikeEnvironment } from '../../commonAppUtils/detectEnvironment.js';
 
 import { extLib } from '../chrome-extension-lib/ext-lib.js';
 import sourceMap from '../3rdparty/source-map.js';
@@ -3777,45 +3778,53 @@ var chromePermissionsContains = function ({ permissions, origins }) {
                                                 }
 
                                                 try {
-                                                    chrome.runtime.sendMessage(
-                                                        {
-                                                            requestPermissions: true,
-                                                            requestWebNavigation: true,
-                                                            tabOriginWithSlash
-                                                        },
-                                                        async function asyncCallback(status) {
-                                                            if (chrome.runtime.lastError) {
-                                                                console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
-                                                                alertNote(
-                                                                    'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
-                                                                    10000
-                                                                );
-                                                            }
-                                                            if (status === 'request-granted') {
-                                                                await markAsPinnedOrNotPinned(editor, 'pinned');
-                                                                if (myWin.flagEditorInExternalWindow) {
-                                                                    chromeRuntimeMessageIfRequired({
-                                                                        type: 'magicss',
-                                                                        subType: 'mark-as-pinned-without-notification'
+                                                    const onRequestGranted = async function () {
+                                                        await markAsPinnedOrNotPinned(editor, 'pinned');
+                                                        if (myWin.flagEditorInExternalWindow) {
+                                                            chromeRuntimeMessageIfRequired({
+                                                                type: 'magicss',
+                                                                subType: 'mark-as-pinned-without-notification'
+                                                            });
+                                                        }
+                                                        alertNote(
+                                                            '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
+                                                            10000
+                                                        );
+                                                        sendEventMessageForMetrics({
+                                                            name: 'applyStylesAutomaticallyPinComplete',
+                                                            spot: 'header'
+                                                        });
+                                                    };
+
+                                                    if (runningInKiwiExtensionLikeEnvironment()) {
+                                                        onRequestGranted();
+                                                    } else {
+                                                        chrome.runtime.sendMessage(
+                                                            {
+                                                                requestPermissions: true,
+                                                                requestWebNavigation: true,
+                                                                tabOriginWithSlash
+                                                            },
+                                                            async function asyncCallback(status) {
+                                                                if (chrome.runtime.lastError) {
+                                                                    console.log('Error message reported by Magic CSS:', chrome.runtime.lastError);
+                                                                    alertNote(
+                                                                        'Error! Unexpected error encountered by Magic CSS extension.<br />You may need to reload webpage & Magic CSS and try again.',
+                                                                        10000
+                                                                    );
+                                                                }
+                                                                if (status === 'request-granted') {
+                                                                    await onRequestGranted();
+                                                                } else if (status === 'request-not-granted') {
+                                                                    alertNote('You need to provide permissions to reapply styles automatically', 10000);
+                                                                    sendEventMessageForMetrics({
+                                                                        name: 'applyStylesAutomaticallyPinIncompleteDueToPermission',
+                                                                        spot: 'header'
                                                                     });
                                                                 }
-                                                                alertNote(
-                                                                    '<span style="font-weight:normal;">Now onwards, </span>styles would be applied automatically <span style="font-weight:normal;">even without loading this extension<br/>(for pages on <span style="text-decoration:underline;">' + tabOriginWithSlash + '</span>)</span>',
-                                                                    10000
-                                                                );
-                                                                sendEventMessageForMetrics({
-                                                                    name: 'applyStylesAutomaticallyPinComplete',
-                                                                    spot: 'header'
-                                                                });
-                                                            } else if (status === 'request-not-granted') {
-                                                                alertNote('You need to provide permissions to reapply styles automatically', 10000);
-                                                                sendEventMessageForMetrics({
-                                                                    name: 'applyStylesAutomaticallyPinIncompleteDueToPermission',
-                                                                    spot: 'header'
-                                                                });
                                                             }
-                                                        }
-                                                    );
+                                                        );
+                                                    }
                                                 } catch (e) {
                                                     handleUnrecoverableError(e);
                                                 }

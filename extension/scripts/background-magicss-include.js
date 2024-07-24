@@ -18,6 +18,8 @@ import { randomUUID } from './utils/randomUUID.js';
 import { extLib } from './chrome-extension-lib/ext-lib.js';
 import { basisNumberFromUuid } from './utils/basisNumberFromUuid.js';
 
+import { runningInKiwiExtensionLikeEnvironment } from '../commonAppUtils/detectEnvironment.js';
+
 import { mainFnMetricsHandler } from './appUtils/mainFnMetricsHandler.js';
 import { myWin } from './appUtils/myWin.js';
 import { nativeAlert } from './appUtils/nativeAlert.js';
@@ -592,6 +594,18 @@ var runningInFirefoxExtensionLikeEnvironment = function () {
 
     const browser = getBrowserStrategyGetManifest();
     if (browser.name === 'firefox') {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+var runningExtensionInStaticPermissionsEnvironment = function () {
+    if (
+        // TODO: Move to optional_permissions when Firefox supports it and refactor this code
+        runningInFirefoxExtensionLikeEnvironment() ||
+        runningInKiwiExtensionLikeEnvironment()
+    ) {
         return true;
     } else {
         return false;
@@ -1184,7 +1198,7 @@ var onDOMContentLoadedHandler = function () {
                         // do nothing
                     } else {
                         // tab.url would not be available for a new tab (eg: new tab opened by Ctrl + T)
-                        if (runningInFirefoxExtensionLikeEnvironment()) { // TODO: Move to optional_permissions when Firefox supports it and refactor this code
+                        if (runningExtensionInStaticPermissionsEnvironment()) {
                             (async () => {
                                 await reapplyCss(tabId);
                             })();

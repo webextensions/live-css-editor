@@ -3,7 +3,7 @@
     "manifest_version": 3,
     "author": "Priyank Parashar",
     "default_locale": "en",
-    "name": "__MSG_Extension_Name__",
+    "name": "__MSG_Extension_Name__ for Kiwi Browser",
     "description": "__MSG_Extension_Description__",
     "homepage_url": "https://github.com/webextensions/live-css-editor",
     "icons": {
