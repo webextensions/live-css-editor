@@ -6,6 +6,8 @@ import path from 'path';
 import chalk from 'chalk';
 import jsonfile from 'jsonfile';
 
+import jsonStableStringify from 'json-stable-stringify';
+
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
@@ -198,6 +200,7 @@ var generateManifest = function (whichBrowser) {
         default:          targetFileName = "manifest.json";           break;
     }
     process.stdout.write("Generating " + targetFileName + " : ");
+    manifest = JSON.parse(jsonStableStringify(manifest));
     jsonfile.writeFileSync(path.join(__dirname, targetFileName), manifest, {spaces: 4});
     process.stdout.write(chalk.green(" ✓") + "\n");
 };
