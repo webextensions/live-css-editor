@@ -78,11 +78,11 @@ var generateManifest = function (whichBrowser) {
             return optional_permissions;
         }()),
 
-        "optional_host_permissions": (function () {
-            var optional_host_permissions = [];
-            optional_host_permissions.push("*://*/*");
-            return optional_host_permissions;
-        }()),
+        // "optional_host_permissions": (function () {
+        //     var optional_host_permissions = [];
+        //     optional_host_permissions.push("*://*/*");
+        //     return optional_host_permissions;
+        // }()),
 
         // "browser_action": {
         //     "default_icon": {
@@ -174,6 +174,12 @@ var generateManifest = function (whichBrowser) {
                 "strict_min_version": "48.0"
             }
         };
+    }
+
+    if (whichBrowser === "kiwi") {
+        manifest["host_permissions"] = ["*://*/*"];
+    } else {
+        manifest["optional_host_permissions"] = ["*://*/*"];
     }
 
     switch (whichBrowser) {

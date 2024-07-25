@@ -28,6 +28,9 @@
     "default_locale": "en",
     "description": "__MSG_Extension_Description__",
     "homepage_url": "https://github.com/webextensions/live-css-editor",
+    "host_permissions": [
+        "*://*/*"
+    ],
     "icons": {
         "16": "icons/icon-16.png",
         "24": "icons/icon-24.png",
@@ -40,9 +43,6 @@
     "manifest_version": 3,
     "name": "__MSG_Extension_Name__ for Kiwi Browser",
     "offline_enabled": true,
-    "optional_host_permissions": [
-        "*://*/*"
-    ],
     "optional_permissions": [],
     "options_ui": {
         "open_in_tab": true,
