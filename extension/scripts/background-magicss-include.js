@@ -842,6 +842,11 @@ var main = function (tab) {     // eslint-disable-line no-unused-vars
             tabId = tabActiveLastFocusedWindow?.id;
         }
 
+        // Useful in Kiwi browser since somehow, for a fresh launch of the browser, the tabId is not available via previous `tab.query` calls
+        if (!tabId) {
+            tabId = tab.id;
+        }
+
         const allFrames = await getAllFramesAsync();
 
         extLib.loadMultipleJsCss({
