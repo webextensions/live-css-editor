@@ -13,6 +13,7 @@
 * Add support for converting from/to CSS to Tailwind classes (https://github.com/webextensions/live-css-editor/issues/76)
 
 ## Improvements
+* Provide a customization option for this under the More options page where the user should be able to choose an appropriate value for viewportMargin. (See: https://github.com/webextensions/live-css-editor/issues/142)
 * Set a different icon when the styles are applied
 * Change the background color to neutral dark-gray with appropriate shadow
 * Use black-and-white/grayscale + transparent/translucent for all icons under "+"
