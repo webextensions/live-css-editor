@@ -41,7 +41,7 @@ var matchVersions = function (expectedVersion, arrJsonPaths) {
         }());
 
         if (versionsStatus.match) {
-            logger.success(' ✓ ' + json.version + ' : matches the expected version (' + relativePath + ')');
+            logger.success(' ✔ ' + json.version + ' : matches the expected version (' + relativePath + ')');
         } else {
             if (versionsStatus.mismatchReason) {
                 logger.warn(' ✗ ' + json.version    + ' : does not match the expected version (' + relativePath + ') ' + logger.chalk.cyan('(Mismatch: ' + versionsStatus.mismatchReason + ')'));
@@ -80,5 +80,5 @@ if (mismatchFound) {
     logger.warn('\nWe recommend you to fix the mismatch(es).\n');
     process.exit(1);
 } else {
-    logger.success('\n ✓ All files have matching version numbers\n');
+    logger.success('\n ✔ All files have matching version numbers\n');
 }

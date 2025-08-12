@@ -15,7 +15,7 @@ try {
         dotNvmrcContents = fs.readFileSync(dotNvmrcPath, 'utf8');
     if(dotNvmrcContents !== nodeVersion) {
         logger.log('');
-        logger.success(' ✓   .nvmrc suggests: Node JS ' + dotNvmrcContents);
+        logger.success(' ✔   .nvmrc suggests: Node JS ' + dotNvmrcContents);
         logger.warn(' ✗ You currently use: Node JS ' + nodeVersion);
         logger.warn('\nYou might want to run:');
         logger.warn('    $ nvm use\n');

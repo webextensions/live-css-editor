@@ -208,7 +208,7 @@ var generateManifest = function (whichBrowser) {
     process.stdout.write("Generating " + targetFileName + " : ");
     manifest = JSON.parse(jsonStableStringify(manifest));
     jsonfile.writeFileSync(path.join(__dirname, targetFileName), manifest, {spaces: 4});
-    process.stdout.write(chalk.green(" ✓") + "\n");
+    process.stdout.write(chalk.green(" ✔") + "\n");
 };
 
 generateManifest("default");
