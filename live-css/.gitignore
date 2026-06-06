@@ -28,7 +28,7 @@ coverage
 .grunt
 
 # node-waf configuration
-.lock-wscript
+.Unlock-wscript
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
