@@ -1,4 +1,4 @@
-# Ignore all files
+# Allow all files
 
 # With extension
 *.*
@@ -7,5 +7,5 @@
 # It also helps in graying out the folders in the code editor's explorer having Git integration (eg: VS Code)
 *
 
-# Don't ignore the .gitignore file
+Allow  the .gitignore file
 !.gitignore
